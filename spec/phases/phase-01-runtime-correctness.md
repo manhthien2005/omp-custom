@@ -143,13 +143,38 @@ The template does not create, own, or configure the main session. It cannot guar
 Normative statement (to appear in `AGENTS.md`):
 > The template does not guarantee that the main Tech Lead runs under `@tech-lead` or a fixed thinking level. Those settings belong to the launched main session. Role-based `model:` and `thinking-level:` frontmatter are deterministic only for spawned worker agents where that frontmatter is applied at spawn time.
 
+**CR-33 — "documentation only" is not a category OMP recognizes inside `agents/`.** A file cannot be role-reference documentation *and* live under an agent discovery root. OMP v17.2.10 `task/discovery.ts` `loadAgentsFromDir()` enumerates every `*.md` (file or symlink) in `~/.omp/agent/agents/`, `.omp/agents/`, and each extension's `agents/` directory, and passes each one to `parseAgent()`. There is no opt-out marker, no `enabled: false` in the discovery filter, and no documentation-only class. Any `tech-lead.md` installed to an agents directory **is a live, discoverable, spawnable `AgentDefinition`** regardless of what prose says about it.
+
+Leaving it there creates a second Tech Lead topology — a spawnable `tech-lead` agent with its own `model:`/`thinking-level:` routing alongside the main-session Tech Lead — which reintroduces precisely the recursion-budget, routing-divergence, and result-ownership ambiguities DR-1 resolved.
+
+**Resolution: relocate out of agent discovery.**
+
+```yaml
+tech_lead_role_reference:
+  old_path: template/.omp/agents/tech-lead.md
+  new_path: docs/roles/tech-lead.md
+  installed_as_agent: false
+  discoverable_by_omp: false
+  rationale: >
+    DR-1 Option A puts the Tech Lead in the main session. A discoverable
+    tech-lead agent would create a competing topology. Role-contract prose
+    belongs in documentation, not in an OMP discovery root.
+  content_destination:
+    - orchestration procedure  -> the three command files
+    - role contract / duties   -> AGENTS.md role map
+    - historical rationale     -> docs/roles/tech-lead.md
+```
+
+The installer MUST NOT copy `docs/roles/tech-lead.md` into any `agents/` destination. L1 (Discovery) validation MUST assert that the installed agent set is exactly `{explorer, implementer, verifier, <reviewer-renamed>}` — a discovered `tech-lead` agent is a validation FAIL, not a warning.
+
 Fix:
 - Update `AGENTS.md` with the above normative statement.
 - Update DR-1 in `spec/README.md` to select Option B.
 - Remove any claim in any spec file that assumes guaranteed `@tech-lead` routing for the main session.
-- `tech-lead.md` is retained only as documentation of the Tech Lead role contract; it is not on the spawn path.
+- **Move `template/.omp/agents/tech-lead.md` → `docs/roles/tech-lead.md`.** Fold its orchestration procedure into the three commands and its role contract into `AGENTS.md`. It is not installed as an agent and is not discoverable by OMP.
+- Add an L1 (Discovery) assertion that no `tech-lead` agent is discovered post-install.
 
-**Acceptance**: `AGENTS.md` states the main-session model contract explicitly (user-controlled). Zero spec files assert guaranteed `@tech-lead` routing for the main session. The tech-lead.md purpose is documented as role-reference only.
+**Acceptance**: `AGENTS.md` states the main-session model contract explicitly (user-controlled). Zero spec files assert guaranteed `@tech-lead` routing for the main session. **No file named `tech-lead.md` exists under any `agents/` path in `template/` or at any install destination**; the role reference lives at `docs/roles/tech-lead.md`; L1 validation fails if OMP discovers a `tech-lead` agent.
 
 ### T-01.9 — Honor the installer's `$Force` parameter (F-04)
 

@@ -58,12 +58,14 @@ This is the layer that would have caught D-1 on day one.
 
 Assertions:
 - All three slash commands are discovered and invocable.
-- All five agents parse and appear in the agent list — no `logger.warn` drops.
+- **All four worker agents** (`explorer`, `implementer`, `verifier`, `diff-reviewer`) parse and appear in the agent list — no `logger.warn` drops.
+- **CR-33 — `tech-lead` does NOT appear in the discovered agent list.** The Tech Lead is the main session (DR-1); the role-reference document lives at `docs/roles/tech-lead.md`, outside every agent discovery root. A discovered `tech-lead` agent is a **FAIL**, not a warning: `loadAgentsFromDir()` parses every `.md` under `.omp/agents/` as an active `AgentDefinition`, so its presence creates a second, spawnable Tech Lead path that contradicts the selected topology.
 - All three skills are discovered.
 - Custom model roles resolve (§09) — `@explorer` maps to a real model, not silently to `default`.
 - `.omp/AGENTS.md` and `.omp/RULES.md` load, with RULES.md forced `alwaysApply` (§11).
+- **CR-31 — effective isolation settings.** Read the *effective* (post-precedence) values and assert `task.isolation.mode != "none"`. For a project-target install, also assert `task.isolation.apply == false`. For a user-target install without `-EnableCaptureFirstIsolation`, assert the key was **not** written globally and that the preflight notice was emitted. This is the static counterpart to the mandatory `/orchestrated` runtime preflight (§08 §E-9) — it catches a bad install, but does not replace the runtime read, because a CLI overlay can still override it.
 
-A component that OMP cannot see is broken regardless of how well-formed its file is.
+A component that OMP cannot see is broken regardless of how well-formed its file is. A component OMP *can* see but the architecture does not want is equally broken.
 
 ### L2 — Contract (new)
 
@@ -81,6 +83,17 @@ level that can answer "is the workflow better than no workflow".
 ### L4 — Adversarial (new)
 
 Test the failure modes the design claims to prevent. These cases must be fully deterministic (no model-grading): an Implementer that reports false success, an environment failure, a non-git-repo isolation dispatch, a schema-violating result, and conflicting parallel patches. Each case must produce a specified detection response. L4 also covers A/B comparison runs where a single variable is isolated and results are compared statistically (see §C).
+
+**CR-31/CR-32/CR-33 — required additional L4 cases.** Each of the three Round-5 findings describes a *silent* failure, which is precisely the class L4 exists to catch:
+
+| Case | Setup | Required detection response |
+|---|---|---|
+| **Effective `apply=true` despite install** | Install correctly, then override `task.isolation.apply: true` via a higher-precedence layer (CLI overlay / runtime override), then run `/orchestrated` on independent parallel scope | `/orchestrated` preflight refuses the parallel path; falls back to sequential non-isolated or refuses with the setting named; degradation disclosed in the final report. **Silently fanning out with `apply=true` is a FAIL.** |
+| **`mode: none` with parallel dispatch** | Set `task.isolation.mode: none`, run `/orchestrated` | Preflight refuses. The `isolated` field is *stripped* not rejected (§08 §A), so absent the preflight this silently degrades to concurrent unisolated writers — the worst case in the suite. |
+| **Nested-repo scope reaches a parallel worker** | Fixture repo with a nested git repo / submodule; request a change touching both root and nested paths | Orchestrator enumerates nested repos pre-fan-out and routes nested scope to sequential non-isolated implementation. If a parallel worker does mutate a nested repo, post-integration nested-repo `git status` MUST flag it as a contract violation. **A clean report with a silently-dropped nested change is a FAIL** (§08 §D-1). |
+| **`tech-lead` discoverable as an agent** | Place any `tech-lead.md` under an agents discovery root | L1 reports FAIL (§B L1). Verifies the CR-33 relocation cannot silently regress. |
+
+The first three share a signature worth stating plainly: the runtime returns success, the report reads clean, and work is missing or unsafely serialized. None of them is detectable from the task result alone — each needs an explicit assertion.
 
 ---
 

@@ -196,7 +196,7 @@ that would have bounded those reads.
 | `agents/implementer.md` | AgentDefinition | ✓ frontmatter valid | VALID; no `isolated` at call site |
 | `agents/verifier.md` | AgentDefinition | ✓ frontmatter valid | VALID |
 | `agents/reviewer.md` | AgentDefinition | ✓ frontmatter valid | VALID |
-| `agents/tech-lead.md` | AgentDefinition | ✓ loads, never invoked | DEAD ABSTRACTION |
+| `agents/tech-lead.md` | AgentDefinition | ✓ loads, never invoked | DEAD ABSTRACTION → **relocate out of `agents/` (CR-33)**. Loading is unconditional: `loadAgentsFromDir()` parses every `.md` in the directory. While the file sits there it is a real, spawnable agent regardless of intent, creating a second Tech Lead topology alongside DR-1's main-session decision. |
 | `skills/task-triage/` | Skill (`builtin.ts:287`) | ✓ lazy | CORRECT |
 | `skills/systematic-debugging/` | Skill | ✓ lazy | CORRECT |
 | `skills/evidence-before-completion/` | Skill | ✓ lazy | works; `alwaysApply` candidate |

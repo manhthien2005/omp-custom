@@ -50,12 +50,29 @@ lists every file with a hash.
 
 ### T-05.3 — Implement real config merging
 
-Phase-01 avoids overwrite by writing `config.yml.new` — safe but incomplete. Merge
-`modelRoles` keys into an existing config, preserving all other keys and comments;
+Phase-01 avoids overwrite by writing `config.yml.new` — safe but incomplete. Merge the
+installer-owned keys into an existing config, preserving all other keys and comments;
 report conflicts rather than resolving silently.
 
-**Acceptance**: merging into an existing config adds the five role keys, preserves
-every existing key, and reports conflicts.
+**CR-31 — two ownership classes, target-aware.** Per `12-installation-and-rollback.md §C`,
+the merge now covers two classes, not just `modelRoles`:
+
+- `owned_model_roles` — the five `modelRoles.*` keys. Both targets. Conflict → preserve the
+  user's value, report.
+- `owned_required_settings` — `task.isolation.apply: false`, `task.isolation.mode: auto`.
+  **Project target only.** For the user/global target these keys are skipped unless
+  `-EnableCaptureFirstIsolation` is passed, because writing them globally changes every
+  isolated task in every repository on the machine. Conflict on
+  `task.isolation.apply: true` → print the CONFIG CONFLICT block from §C-3 and do not
+  overwrite.
+
+The manifest `installer_delta` must record `before: null` for a key that was absent, so
+rollback removes it rather than writing OMP's default back explicitly (§D).
+
+**Acceptance**: merging into an existing project config adds the five role keys **and** the
+two isolation keys, preserves every existing key, and reports conflicts per key. A
+user-target merge without the opt-in flag writes zero `task.isolation.*` keys and prints the
+preflight notice. Round-trip rollback removes exactly the keys the installer inserted.
 
 ### T-05.4 — Verify install completeness
 

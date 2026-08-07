@@ -166,11 +166,19 @@ Skills (.omp/skills/<name>/SKILL.md):
 
 REMOVED: .omp/policies/  (→ prose in commands + agent prompts)
 REMOVED: .omp/schemas/   (→ output: frontmatter; YAML retained under docs/ as source)
+MOVED:   .omp/agents/tech-lead.md → docs/roles/tech-lead.md  (CR-33; see below)
 ```
 
-`tech-lead.md` is **retained but demoted** — see `03-agent-topology.md` for the
-narrow nested-orchestration case where it earns its place, and why it must not be on
-the primary path.
+**`tech-lead.md` is MOVED OUT of agent discovery (CR-33).** OMP's `loadAgentsFromDir()`
+parses **every** `.md` file under `.omp/agents/` (and `~/.omp/agent/agents/`) into an
+active `AgentDefinition` — there is no "documentation-only file inside `agents/`"
+category (`task/discovery.ts:42-45`). Calling the file documentation while installing
+it as an agent would leave a second, mechanically spawnable Tech Lead path alongside
+the main-session Tech Lead that DR-1 selected — reintroducing exactly the topology
+ambiguity, divergent model/thinking routing, recursion cost, and final-answer
+ownership confusion DR-1 resolved. The role contract is therefore re-homed to
+`docs/roles/tech-lead.md`, outside every OMP discovery root, and is **not installed**.
+See `03-agent-topology.md §A` and `phases/phase-01-runtime-correctness.md` T-01.8.
 
 ---
 

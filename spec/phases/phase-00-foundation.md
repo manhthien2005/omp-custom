@@ -139,19 +139,103 @@ Test cases:
 
 **Blocks**: DR-1 and DR for model routing (§09); §14/§15 consistency.
 
-### T-00.E3 — Windows/ProjFS isolation backend
+### T-00.E3 — Isolation backend, capture-first control surface, and artifact lifecycle
 
-Verify isolation backend availability and behavior on the target Windows environment.
+**CR-31/CR-32 escalation:** this is no longer a backend smoke test. The capture-first architecture in `08-isolation-and-concurrency.md §E-7/§E-9/§E-10` depends on settings that OMP defaults *against* (`task.isolation.apply` default `true`), and on artifact durability that OMP does not guarantee for nested repositories. T-00.E3 is the experiment that either proves the architecture or forces the documented degradation. It blocks all parallel implementation.
 
-Test cases:
+Baseline cases (original scope):
 1. standard workflow (single Implementer, `isolated: false`) — confirm parent worktree unchanged after success
 2. orchestrated workflow (parallel Implementers, `isolated: true`) — confirm isolation backend engages
 3. isolation backend unavailable — record fallback behavior
 4. non-git repository — record fallback behavior
 
-**Artifact**: isolation behavior transcript per scenario.
+#### E3-A — Settings control surface (CR-30)
 
-**Blocks**: phase-02 parallel-implementer implementation; §08 batch-merge decision.
+Assert the effective values are readable at runtime and that no per-item `apply` exists:
+
+```
+effective task.isolation.mode  != "none"
+effective task.isolation.apply == false
+```
+
+Also confirm that passing `apply: false` inside a task **item** is silently stripped (arktype `"+": "delete"`), not honored — i.e. that the settings layer is the only control point.
+
+**Records**: how `/orchestrated` reads effective settings (the exact mechanism the preflight will use).
+
+#### E3-B — Capture-only root patch durability
+
+```
+isolated: true, apply=false
+worker edits root repo, exits 0
+→ parent working tree unchanged
+→ root patch path present in result summary
+→ patch file still readable AFTER worktree teardown
+```
+
+#### E3-C — Branch mode (if `merge: branch` is selected)
+
+```
+branch retained, not merged
+Tech Lead can integrate it later by name
+```
+
+#### E3-D — Parallel capture
+
+Two near-simultaneous isolated workers:
+
+```
+parent unchanged until the Tech Lead begins integration
+neither worker's changes visible in parent before integration
+```
+
+#### E3-E — Sequential integration ordering (CR-29)
+
+Integrate by **original task-list index**, not completion order:
+
+```
+task[0] artifact → task[1] → task[2]
+```
+
+Arrange for `task[2]` to finish first; assert integration still runs 0 → 1 → 2.
+
+#### E3-F — Conflict semantics
+
+```
+apply task[0] → succeeds
+apply task[1] → conflicts
+→ integration STOPS (task[2] not attempted)
+→ parent retains task[0] only
+→ task[1] and task[2] artifacts remain readable on disk
+```
+
+#### E3-G — Nested repository (CR-32 — decisive)
+
+```
+worker edits root repo AND a nested git repo / submodule
+apply=false, exit 0
+```
+
+Record exactly:
+- does the result summary mention the nested repo at all when the root also changed?
+- is any nested patch file materialized under the artifacts dir?
+- after teardown, can the parent locate and `git apply` the nested change?
+
+**Expected per source reading (OMP v17.2.10):** no — `persistNestedPatches()` is reachable only from `isolationRecoveryHint()` (failure path), and the `apply=false` summary's `else if` chain reports only `patchPath` when the root also changed. If the experiment confirms this, the CR-32 Option A exclusion (nested-repo mutation FORBIDDEN for parallel isolated Implementers) stands as normative. If a future OMP version materializes them, the exclusion may be lifted with recorded evidence.
+
+#### E3-H — Config precedence and preflight refusal (CR-31 — decisive)
+
+```
+global apply=true + project apply=false  → effective false   (project wins)
+project config absent, global/default true → effective true
+  → /orchestrated preflight MUST refuse the parallel path
+  → falls back to sequential non-isolated, and discloses it
+```
+
+Also record whether a CLI/runtime overlay can override project config — this is why the preflight reads *effective* values rather than trusting the installed file.
+
+**Artifact**: isolation behavior transcript per scenario, including the E3-G nested-repo determination and the E3-H precedence table.
+
+**Blocks**: phase-02 T-02.2 (preflight), T-02.2b (integration order), T-02.9 (nested-repo exclusion); §08 §E-7/§E-9/§E-10; §12 §C config-ownership policy.
 
 ### T-00.E4 — Rule sentinel propagation
 
@@ -231,7 +315,7 @@ Manual checks:
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifact present** (Windows/ProjFS isolation)
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-H** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight). E3-A, E3-G and E3-H are BLOCKING for phase-02 parallel implementation.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
 - [ ] **T-00.E5 artifact present** (LSP allowlist validation)
 

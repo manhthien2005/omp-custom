@@ -86,6 +86,66 @@ For parallel Implementers, independence means **disjoint file sets**. Because `m
 | Patch apply conflict | Two isolated Implementers touched the same file | `git apply` failure at merge | **CR-09 — Batch merge is explicit partial-integration, not atomic:** Prior successful merges remain applied. The orchestrator does NOT rollback successful merges when a later merge conflicts. After merge A succeeds and merge B conflicts, the parent state is B+A, not original base B. Recovery: (1) re-partition work excluding the conflicting file, (2) retry B's scope sequentially on the new base, or (3) report conflict and surface to user. The user's own VCS owns the undo mechanism if full rollback is required. |
 | Partial edits from a failed non-isolated Implementer | Implementer fails mid-loop in Standard | Verifier reports FAIL; working tree dirty | Report the partial state explicitly with the file list. Do not attempt automated cleanup — the user's VCS owns undo. |
 | Recursion exhaustion | A worker tries to spawn at depth 2+ | Task tool refuses | Workers other than the orchestrator carry an empty `spawns:`, so this should be unreachable. If it occurs, it indicates a topology regression. |
+| **Nested-repo change lost under `apply=false`** | Isolated worker edits a file inside a nested git repo / submodule | **Not detectable from the task result** — see §D-1 below | **Parallel isolated Implementers MUST NOT modify nested git repositories (CR-32, Option A).** Scope partitioning excludes nested repo paths; such scope routes to sequential non-isolated implementation. |
+
+---
+
+### D-1. CR-32 — Nested-repo patches are NOT durable on the successful `apply=false` path
+
+**This is a source-verified gap in OMP v17.2.10, not a template defect.** It constrains what the capture-first architecture can safely cover.
+
+**Verified control flow** (`task/structured-subagent.ts`, `task/isolation-runner.ts`, OMP v17.2.10):
+
+1. `captureDeltaPatch()` produces `{ rootPatch, nestedPatches }`.
+2. `writeIsolationPatch()` writes **only** `rootPatch` to a durable artifact file (`<artifactsDir>/<agentId>.patch`). It returns `nestedPatches` as **in-memory `SingleResult` data** — no file is written for them.
+3. `persistNestedPatches()` — the only function that materializes nested patches to disk — is called **exclusively** from `isolationRecoveryHint()`.
+4. `isolationRecoveryHint()` is reached only via `buildStructuredSubagentRecoveryHint()`, whose call sites (`eval/agent-bridge.ts`) all fire on **failure/abort/apply-failed** paths:
+   - `result.exitCode !== 0 || result.error || result.aborted`
+   - `policy.isIsolated && changesApplied === false`
+   - structured output + `mergeSummary` contains `<system-notification>`
+5. On the **successful** `policy.isIsolated && !policy.applyChanges` branch, only a `mergeSummary` string is produced. **`persistNestedPatches()` is never called.**
+6. `runIsolatedSubprocess()` tears the isolation handle down in `finally` — the nested working state is gone after the task.
+7. `rememberAgentArtifacts()` records `{ outputPath, patchPath, branchName }` in AgentRegistry history — **`nestedPatches` is not recorded.**
+
+**Consequence, stated precisely:** on a *successful* capture-only spawn, nested-repo changes exist only as in-memory result metadata that the model-facing task path never converts to an addressable file. The worktree is then destroyed.
+
+**Worse than a missing artifact — the summary is silent.** The `apply=false` summary branches are `if/else if`:
+
+```
+if      (result.branchName)          → "captured on branch ... Not merged."
+else if (result.patchPath)           → "captured at <path> ... Not applied."
+else if (nestedPatches.length > 0)   → "captured for N nested repositories ... Not applied."
+else                                 → "no changes captured."
+```
+
+Whenever the root also changed, `result.patchPath` is set, so the **second** branch wins and the nested-repo count is **never mentioned**. A Tech Lead integrating `<agentId>.patch` gets a silently incomplete integration and no signal that anything is missing.
+
+**Resolution adopted: Option A — exclude nested-repo mutation from parallel capture-first (v0).**
+
+```yaml
+parallel_isolated_implementer:
+  nested_repo_mutation: FORBIDDEN
+  rationale: no durable artifact on the successful apply=false path (OMP v17.2.10)
+  enforcement:
+    - orchestrator preflight: enumerate nested repos before fan-out
+    - scope partitioning MUST exclude nested repo paths from parallel worker scope
+    - task packet out_of_scope names each nested repo path explicitly
+  detection:
+    - post-integration: `git submodule status` / nested-repo `git status` unchanged
+    - any nested-repo diff after integration = contract violation, report to user
+  fallback:
+    - nested-repo scope routes to sequential non-isolated implementation
+```
+
+Option B (prove/materialize nested artifacts) is **not available at template level** — it requires an OMP runtime change to call `persistNestedPatches()` on the successful capture path and surface the paths in the task result. T-00.E3-G records the observed behavior; if a future OMP version materializes them, this exclusion can be lifted.
+
+**Preflight enumeration:**
+
+```bash
+# nested repos / submodules under the orchestration root
+git submodule status --recursive
+find . -mindepth 2 -name .git -not -path './.git/*'
+```
 
 ---
 
@@ -123,3 +183,61 @@ For parallel Implementers, independence means **disjoint file sets**. Because `m
    ```
 
    Per-task dispatch: parallel Implementers set `isolated: true`; all other agents omit `isolated` (defaults to non-isolated).
+
+9. **CR-31 — `apply: false` is a correctness precondition, not a tuning knob; deployment is target-aware.** OMP's default is `task.isolation.apply: true` (`config/settings-schema.ts:4499`). Absence of an explicit setting therefore means every successful isolated worker auto-applies to the parent — exactly the concurrent-integration hazard CR-09/CR-27 removed. The template MUST NOT depend on a setting it does not deploy or verify.
+
+   **Config precedence (OMP v17.2.10):** `defaults < user/global config < project config < CLI overlay < runtime overrides`. Project-local `.omp/config.yml` can therefore establish capture-only behavior without touching global state.
+
+   **Deployment policy by install target:**
+
+   | Target | Destination | Policy |
+   |---|---|---|
+   | **Project** (`-Target project`) | `<repo>/.omp/config.yml` | Template **owns** `task.isolation.apply: false` and `task.isolation.mode: auto`. Blast radius is one repository — the repository that opted in by installing the template. |
+   | **User/global** (`-Target user`) | `~/.omp/agent/config.yml` | Template **MUST NOT** silently write `task.isolation.apply`. Doing so changes behavior for **every isolated task in every repository** on the machine — a change far outside this workflow's scope. Requires an explicit opt-in flag (`-EnableCaptureFirstIsolation`) with a printed warning naming the global blast radius. |
+
+   **Runtime preflight is mandatory regardless of install target.** Installation alone is insufficient: a higher-precedence overlay (CLI, runtime override) can re-enable apply after install. Before any parallel isolated fan-out, `/orchestrated` MUST read the **effective** settings and assert:
+
+   ```
+   effective task.isolation.mode  != "none"
+   effective task.isolation.apply == false
+   ```
+
+   **On preflight failure — do not launch parallel isolated Implementers.** Two permitted responses, both of which MUST be disclosed in the final report:
+   - fall back to sequential non-isolated implementation (single Implementer, direct writes), or
+   - refuse the parallel path and tell the user the exact setting to opt into.
+
+   Silently proceeding with `apply=true` is prohibited: it produces concurrent auto-apply with no serialization guarantee.
+
+   **Rollback consequence:** `task.isolation.apply` and `task.isolation.mode` become installer-owned MERGE keys in the project target. `spec/12 §C` and the manifest `installer_delta` schema must track them alongside `modelRoles` — see `spec/12 §C`.
+
+   T-00.E3 (cases E3-A and E3-H) proves the settings path, the precedence behavior, and the preflight read.
+
+10. **CR-29 — Integration order is normative: original orchestrator task-list index.** "Deterministic order" is not a specification — alphabetical name, worker finish order, batch input order, and file-path order all satisfy the English word while producing different conflict and recovery behavior. The rule is fixed:
+
+    ```yaml
+    integration_order:
+      source: original_orchestrator_task_list
+      stable_key: task_index          # position in the tasks[] array as dispatched
+      worker_completion_order: ignored
+    ```
+
+    **Why task index, source-supported:** OMP's batch fan-out preserves per-item indices and returns results in input order — `task/parallel.ts:14` states *"Results are returned in the same order as input items"*, and both worker loops assign `results[index] = ...` against the original array position. The ordering anchor therefore already exists in the result payload; no additional bookkeeping is required, and the order is independent of worker timing.
+
+    **No topological logic is needed.** If two work units have a real dependency, they were not independent and MUST NOT have been parallelized in the first place (see §C parallelism rule). Dependency ordering is a partitioning decision made *before* fan-out, not an integration-time resolution.
+
+    **Conflict semantics during serial integration:**
+
+    ```
+    integrate artifact[0] … artifact[n] in ascending task_index
+
+    on conflict at artifact[i]:
+      - STOP: do not attempt artifact[i+1 …]
+      - PRESERVE: every unapplied artifact remains on disk and addressable
+      - REPORT: parent state = base + artifact[0 … i-1], name the conflicting artifact
+                and every unapplied artifact path
+      - Verifier does NOT run on a partially integrated tree
+    ```
+
+    Recovery is the user's or Tech Lead's explicit next decision (re-partition, retry the conflicting scope on the new base, or escalate) — never an automatic rollback of already-integrated artifacts, because OMP provides no atomic batch-merge primitive (see §D partial-integration row).
+
+    T-00.E3 cases E3-E and E3-F prove ordering independence from completion order and the stop-preserve-report conflict path.

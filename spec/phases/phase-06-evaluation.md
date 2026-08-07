@@ -46,8 +46,19 @@ Assert OMP actually discovers what was installed: agents by name, commands by na
 skills by name, config roles resolving. This is the layer that catches "installed but
 invisible."
 
-**Acceptance**: L1 confirms five agents, three commands, three skills, and five
-resolvable model roles.
+**CR-33 — the agent count is four, and `tech-lead` must be ABSENT.** The discovered set is
+exactly `explorer`, `implementer`, `verifier`, `reviewer`. The Tech Lead is the main session
+(DR-1); its role contract lives at `docs/roles/tech-lead.md`, outside every discovery root. A
+discovered `tech-lead` agent is a **FAIL** — `loadAgentsFromDir()` parses every `.md` under an
+agents directory into an active `AgentDefinition`, so its presence creates a second spawnable
+Tech Lead path.
+
+**CR-31 — L1 also asserts effective isolation settings**, because a discovered-but-misconfigured
+install still breaks the Orchestrated path: `task.isolation.mode != "none"` and, in the project
+target, `task.isolation.apply == false`. See `13-validation-and-evaluation.md §L1`.
+
+**Acceptance**: L1 confirms **four** agents (no `tech-lead`), three commands, three skills, five
+resolvable model roles, and the effective isolation settings above.
 
 ### T-06.3 — Add L2 (contract) + L3 (behavioral) workflow fixtures
 

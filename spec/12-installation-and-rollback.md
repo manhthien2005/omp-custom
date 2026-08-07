@@ -48,8 +48,9 @@ protection must extend to `config.yml`.
 
 **Fix**: two changes, both required.
 1. Add `config.yml` to `$protected`.
-2. Replace whole-file copy with a **merge** that writes only the `modelRoles` keys the
-   template owns, preserving every other key and the file's comments.
+2. Replace whole-file copy with a **merge** that writes only the keys the template owns
+   (see §C for the target-aware ownership set), preserving every other key and the
+   file's comments.
 
 ---
 
@@ -141,16 +142,74 @@ Protected paths, never written: `models.yml`, `config.yml` (merge only), `agent.
 
 ## C. `config.yml` Merge Rule
 
-The template owns exactly one key: `modelRoles`, and within it only the five role names
-it defines. Merge semantics:
+**CR-31 — Ownership is now two-class and target-aware.** An earlier draft said "the template
+owns exactly one key: `modelRoles`." That was correct before capture-first isolation became a
+correctness precondition. It is now insufficient: `08-isolation-and-concurrency.md §E-9`
+establishes that `task.isolation.apply: false` must be *effective at runtime* or the parallel
+Orchestrated path is unsafe, and OMP's default is `true`.
 
-- Destination file absent → write the template file verbatim.
-- Destination present, no `modelRoles` → append the block, preserve everything else.
-- Destination present with `modelRoles` → add only missing role keys; **never** modify
-  a role the user already set; never touch keys outside `modelRoles`.
+### C-1. Ownership classes
+
+```yaml
+owned_model_roles:              # both targets
+  modelRoles.tech-lead
+  modelRoles.explorer
+  modelRoles.implementer
+  modelRoles.verifier
+  modelRoles.reviewer
+
+owned_required_settings:        # PROJECT target only — see C-2
+  task.isolation.apply: false   # correctness precondition for parallel capture-first
+  task.isolation.mode: auto     # backend selector; must not be "none"
+
+user_preserved:
+  everything_else               # never read, never written, never reordered
+```
+
+`task.isolation.merge` is **not** owned. The integration procedure in
+`08-isolation-and-concurrency.md §E-10` handles both `patch` and `branch`; T-00.E3-C records
+the observed behavior of whichever value is effective.
+
+### C-2. Target-aware policy for `owned_required_settings`
+
+| Target | Destination | Policy |
+|---|---|---|
+| **project** | `<repo>/.omp/config.yml` | Installer writes `owned_required_settings`. Blast radius is the one repository that opted in by installing the template. |
+| **user** | `~/.omp/agent/config.yml` | Installer **MUST NOT** write `task.isolation.*` unless `-EnableCaptureFirstIsolation` is passed explicitly. Without the flag: skip these keys, print a notice naming the runtime preflight requirement, and continue. With the flag: write them and print a warning that **every isolated task in every repository** on the machine becomes capture-only. |
+
+Rationale for the asymmetry: a project-scoped setting affects only the project that installed
+the template. A user-global setting silently changes unrelated OMP work across all
+repositories — a blast radius the template has no mandate to take.
+
+### C-3. Merge semantics (all owned keys)
+
+- Destination file absent → write the template file verbatim (owned keys only, per target).
+- Destination present, owned key absent → insert it; preserve everything else.
+- Destination present, owned key already set to the **required** value → no-op.
+- Destination present, owned key set to a **conflicting** value → **CONFLICT: report, do not
+  overwrite.** For `modelRoles.*` the user's choice is simply preserved. For
+  `task.isolation.apply: true` the installer MUST print:
+
+  ```
+  CONFIG CONFLICT: task.isolation.apply is set to true at <path>.
+  The Orchestrated workflow requires false for safe parallel capture-first integration.
+  Parallel isolated Implementers will not launch until this is resolved
+  (/orchestrated preflight will refuse and fall back to sequential).
+  Resolve manually, or re-run with -Force-CaptureFirstIsolation to overwrite.
+  ```
+
+  Never silently overwrite a value the user explicitly set.
 - Always preserve unrelated keys and, where practical, comments.
 
 A destructive whole-file replacement of `config.yml` is prohibited in every mode.
+
+### C-4. Installation does not replace the runtime preflight
+
+Config precedence in OMP v17.2.10 is
+`defaults < user/global < project < CLI overlay < runtime overrides`. A CLI overlay or runtime
+override can re-enable `apply` after a correct install. Therefore `/orchestrated` MUST read the
+**effective** value before every parallel fan-out (`08-isolation-and-concurrency.md §E-9`).
+Installation reduces the probability of misconfiguration; it never proves the runtime state.
 
 ---
 
@@ -183,12 +242,14 @@ Two modes:
   "installer_delta": {
     "inserted": {
       "modelRoles.explorer": "omniroute/codex/...",
-      "modelRoles.implementer": "omniroute/codex/..."
+      "modelRoles.implementer": "omniroute/codex/...",
+      "task.isolation.apply": false,
+      "task.isolation.mode": "auto"
     },
     "modified": {
-      "some.existing.key": {
-        "before": "old-value",
-        "installed": "new-value"
+      "task.isolation.apply": {
+        "before": true,
+        "installed": false
       }
     }
   }
@@ -196,6 +257,10 @@ Two modes:
 ```
 
 A file-level hash alone is insufficient to reconstruct installer key ownership for MERGE rollback.
+
+**CR-31 — isolation keys are tracked identically to `modelRoles`.** `task.isolation.apply` and `task.isolation.mode` are installer-owned in the project target (§C), so they appear in `installer_delta` and follow the same per-key rollback algorithm: on uninstall, remove/restore the key only if its current value still equals the installed value; otherwise report a per-key CONFLICT and preserve the user's value. Because `task.isolation.apply` has a meaningful OMP default (`true`), the `modified` record MUST capture `before` even when the key was absent — record `before: null` for "key was absent, OMP default applied" so rollback removes the key rather than writing `true` explicitly.
+
+In the user/global target these keys are **not** installer-owned unless `-EnableCaptureFirstIsolation` was passed; when it was, the manifest MUST record that flag so uninstall knows the global key is in scope for reversal.
 
 Rollback must be dry-run by default, never delete a file absent from the manifest, and never silently clobber user modifications.
 

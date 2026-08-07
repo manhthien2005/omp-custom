@@ -14,8 +14,11 @@ between good intentions and OMP primitives.
 So this is a **repair-and-rewire migration**, not a rewrite. Concretely:
 
 - **Keep**: `AGENTS.md` constitution, `RULES.md` invariants, all five agent role
-  definitions, the three workflow sizes, the four result contracts, the
-  context-budget targets, the three skills.
+  definitions *as content*, the three workflow sizes, the four result contracts, the
+  context-budget targets, the three skills. **CR-33 caveat:** the Tech Lead role
+  definition is kept as content but **relocated** to `docs/roles/tech-lead.md` — four
+  agent files remain under `template/.omp/agents/`, because any `.md` in an agents
+  directory is a live spawnable agent (see row for `tech-lead.md` below).
 - **Rewire**: schemas → inline `outputSchema` in commands; policies → prose in
   commands and agent prompts; skills → `autoloadSkills` frontmatter.
 - **Fix**: installer component map, `config.yml` protection, LSP contradiction,
@@ -52,7 +55,7 @@ The ordering is forced by dependency, not preference:
 | `template/.omp/agents/implementer.md` | Add `lsp` to tools; add `autoloadSkills`; note isolation | P0-3, P1-8 |
 | `template/.omp/agents/verifier.md` | Remove `read-summarize: false`; add `autoloadSkills` | P1-6 |
 | `template/.omp/agents/reviewer.md` | Rename to avoid bundled collision; remove `read-summarize: false`; add `autoloadSkills` | P0-5, P1-6 |
-| `template/.omp/agents/tech-lead.md` | Resolve dead-abstraction ambiguity | P0-2 |
+| `template/.omp/agents/tech-lead.md` | **MOVE to `docs/roles/tech-lead.md`** (CR-33) — every `.md` under an agents dir is loaded as an active `AgentDefinition` by `loadAgentsFromDir()`; a "documentation-only" agent file does not exist as a category. Remove from the installer's `agents` component manifest. | P0-2, CR-33 |
 | `template/.omp/commands/*.md` | Inline `outputSchema`; inline policy prose; explicit `isolated: true`; remove `policy:*` refs | P0-6, P0-7 |
 | `template/.omp/config.yml` | Add install guidance; keep role aliases | P0-4 |
 | `template/.omp/schemas/*.yml` | Reclassify as docs; add header stating no runtime role | P0-7 |

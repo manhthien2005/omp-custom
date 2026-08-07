@@ -37,10 +37,13 @@ A command spawns `agent: tech-lead`, which then spawns workers.
 preference. `task.maxRecursionDepth = 2` in the frozen baseline does not leave
 room for a spawned coordinator that itself fans out.
 
-Consequence: `tech-lead.md` becomes either (a) deleted, with its content folded
-into the three commands and `AGENTS.md`, or (b) retained with a frontmatter
-`description` that states it is for nested orchestration only. Opus recommends
-(a) for v0 — one fewer unused artifact.
+**Consequence (CR-33 — resolved): `template/.omp/agents/tech-lead.md` is REMOVED from the agent directory.** Its role-contract content moves to `docs/roles/tech-lead.md`, and its orchestration procedure folds into the three commands and `AGENTS.md`.
+
+There is no third option. **OMP agent discovery is mechanical and has no documentation-only category:** `loadAgentsFromDir()` filters on `entry.name.endsWith(".md")` and passes every match to `parseAgent()` (verified: `task/discovery.ts:42-45`, OMP v17.2.10). Discovery covers `~/.omp/agent/agents/*.md`, `<project>/.omp/agents/*.md`, and every extension package's `agents/` directory. Any `.md` file placed there **is** a live, discoverable, spawnable `AgentDefinition` regardless of what the spec calls it.
+
+Retaining `tech-lead.md` under `agents/` while describing it as "role-reference documentation only" would therefore create a **second runtime topology** — a spawnable `tech-lead` agent alongside the main-session Tech Lead — reintroducing exactly what DR-1 Option A was chosen to eliminate: topology ambiguity, divergent model/thinking routing, an extra recursion level, and split ownership of the final answer.
+
+Option (b) from earlier drafts — "retain with a `description` saying it is nested-only" — is **withdrawn**. A frontmatter description is not an enforcement mechanism; the agent remains discoverable and spawnable.
 
 ---
 
@@ -231,7 +234,7 @@ authoritative evidence.
 
 | # | Item | Resolution path |
 |---|---|---|
-| T-1 | Delete `tech-lead.md` or retain as nested-only? | Opus recommends delete for v0 |
+| T-1 | ~~Delete `tech-lead.md` or retain as nested-only?~~ | **RESOLVED (CR-33)** — move to `docs/roles/tech-lead.md`; remove from `template/.omp/agents/` and from the installer's `agents` component. Not deleted (content is useful), but not discoverable as an agent. See §A. |
 | T-2 | Does the Verifier's `bash` need a post-hoc `git status` guard? | Yes — add to command flow |
 | T-3 | Should `implementer` get `lsp`? | See `07-retrieval-and-code-understanding.md` |
 | T-4 | Move `evidence-before-completion` from `alwaysApply` to `autoloadSkills`? | Opus recommends yes |
