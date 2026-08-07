@@ -167,13 +167,20 @@ corrupt, and the edits are already in the working tree when the Verifier runs.
 Standard therefore never enters the capture-first path and never needs the
 `task.isolation.apply` preflight (`08-isolation-and-concurrency.md §E-9`).
 
+**Standard still depends on stage barriers (CR-39).** Steps 2→3, 5→6, 6→7, and 7→8 each
+consume the previous step's completed result, so every worker Standard dispatches must carry
+`blocking: true` — without it the Verifier would run against an unfinished implementation and
+the summary would be written before any result arrived. Standard needs no batch and no
+canary, but it needs the barrier exactly as much as Orchestrated does. See §08 §C-1.
+
 Review is gated on: public API change, security-relevant code, or a diff the
 Verifier passed but the session finds hard to reason about. Not gated on size.
 
 ### Orchestrated
 
 ```
-0. Preflight           — nested-repo scan + effective-settings check; may disable parallel (§E-9, §D-1)
+0. Preflight           — nested-repo scan → task.batch → settings diagnostics → capture
+                          canary; any failure disables parallel (§D-1.2, §C-1.4, §E-9, §E-9.2)
 1. Triage + decompose  — identify genuinely independent workstreams
 2. Explore in parallel — task batch → N explorers, distinct scopes
 3. Architecture review — synthesize; write the spec; assign quality gates
@@ -199,10 +206,27 @@ main-session Tech Lead integrates them one at a time. Integration order is the
 the remaining artifacts are preserved unapplied, and the partial parent state is
 reported; the Verifier does **not** run on a partially integrated tree.
 
-Step 0 can veto parallelism entirely. Two conditions force the sequential
-non-isolated fallback: effective `task.isolation.apply` is not `false`
-(§E-9), or the repository contains a nested git repository or submodule (§D-1).
-Both are mechanical checks, both run before fan-out.
+Step 0 can veto parallelism entirely. Four conditions force the sequential
+non-isolated fallback, checked in this order — cheapest and most decisive first:
+
+| # | Check | Failure means | Ref |
+|---|---|---|---|
+| 1 | nested git repo / submodule present | structural: a lost nested change is undetectable | §D-1.2 |
+| 2 | effective `task.batch != true` | the wire has no `tasks[]`, so no stable index | §C-1.4 |
+| 3 | `omp config get` isolation diagnostics | produces the actionable message; **not** the gate | §E-9 |
+| 4 | same-session capture canary | authoritative: does this session actually capture? | §E-9.2 |
+
+Checks 3 and 4 are both required and are not redundant — 3 explains *why* to the user
+(wrong file, wrong cwd, or an overlay), 4 decides *whether*. A subprocess settings read
+cannot see the parent's `--config` overlay or an in-session override, both of which outrank
+project config and both of which govern the real dispatch (CR-38, §E-9.1).
+
+**Every stage arrow above is a barrier, and barriers are not free (CR-39).** OMP defaults
+`async.enabled` to `true`, so a worker agent that does not declare `blocking: true` becomes a
+background job: the `task` call returns immediately and the next stage begins with no result.
+All four workers therefore carry `blocking: true` in frontmatter (§03, §08 §C-1.3). This does
+not serialize step 5 — an all-blocking batch still fans out concurrently under the
+concurrency cap and returns results in task-index order, which is what step 6 depends on.
 
 Step 7 runs *after* integration, once, against the integrated result. Verifying
 each isolated worktree separately proves each piece works alone and nothing about
@@ -233,7 +257,14 @@ the whole.
 - Orchestrated integration happens in the main session, in original task-index
   order, after all workers settle — not inside the workers (CR-29).
 - Orchestrated preflight runs before fan-out and can downgrade to the sequential
-  non-isolated flow (CR-31 settings check, CR-32 nested-repo check).
+  non-isolated flow: nested-repo scan (CR-32), `task.batch` check (CR-39), settings
+  diagnostics (CR-31), same-session capture canary (CR-38).
+- **Every worker agent the flows dispatch carries `blocking: true` (CR-39).** A flow diagram
+  whose arrows are not backed by barriers is not a flow. Verify per-agent, not per-workflow —
+  the frontmatter is the mechanism, in both Standard and Orchestrated.
+- LSP-dependent roles (Explorer, Implementer, Reviewer) either have all three LSP conditions
+  met or the run discloses reduced-capability mode naming which condition failed (CR-40,
+  `07-retrieval-and-code-understanding.md §A-1`).
 - Escalation triggers are named explicitly in each command.
 - A fixture per size confirms the flow runs end to end (`13-validation-and-evaluation.md`).
 

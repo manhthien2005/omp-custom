@@ -6,11 +6,13 @@
 
 ## A. The LSP Contradiction (P1, verified)
 
-The frozen baseline enables LSP inside subagents:
+The frozen baseline used during spec construction enabled LSP inside subagents:
 
 ```
 task.enableLsp = true
 ```
+
+**That was a property of the development environment, not of OMP or of any install (CR-40).** The setting's default is `false`; §A-1 below makes deploying it the template's responsibility.
 
 `config/settings-schema.ts:4615-4624` confirms this setting exists, defaults to `false`, and is described as: *"Allow subagents spawned via the task tool to use the lsp tool. Off by default to keep subagents cheap; enable when LSP-aware delegation is worth the extra tokens."* So the baseline deliberately turns on a non-default capability.
 
@@ -46,7 +48,75 @@ Add `lsp` to the allowlist of the agents whose retrieval quality depends on it:
 
 The alternative — flipping `task.enableLsp` back to `false` and removing the LSP language from the Explorer prompt — is worse. It gives up genuinely token-efficient retrieval to preserve a setting nobody benefits from.
 
-**Baseline note:** this change requires no baseline modification. `task.enableLsp = true` is already set; we are fixing the allowlists so the setting takes effect as intended.
+### A-1. CR-40 — The allowlist is necessary but NOT sufficient
+
+**An earlier revision of this section said "this change requires no baseline modification —
+`task.enableLsp = true` is already set."** That sentence is withdrawn. It described the *spec
+author's development environment*, which had the setting enabled, and mistook that local fact
+for a property of every install. `task.enableLsp` defaults to **`false`**
+(`config/settings-schema.ts:4615-4617`) — the same paragraph above says so — so on a default
+machine the template ships four agents whose LSP access is granted at the allowlist and then
+withheld at the settings gate. That is the CR-31 defect class exactly: **the spec assumes a
+required runtime setting the installer never establishes.**
+
+LSP availability in a subagent is a **conjunction of three conditions**, all verified:
+
+```ts
+// task/structured-subagent.ts:318-320
+enableLsp:
+  !planMode &&
+  (request.enableLsp ??
+    ((request.session.enableLsp ?? true) && request.session.settings.get("task.enableLsp"))),
+```
+
+| # | Condition | Default | Who establishes it |
+|---|---|---|---|
+| 1 | `lsp` in the agent's `tools:` allowlist | absent | **Template** (this section's resolution) |
+| 2 | `task.enableLsp == true` | **`false`** | **Template** — project-target install (see below) |
+| 3 | parent `session.enableLsp` not disabled, and not plan mode | enabled | **User's session** — template cannot control |
+
+Condition 1 alone was the round-1 finding. Condition 2 is CR-40. Condition 3 is why T-00.E5
+remains a genuine runtime gate rather than a formality: a parent session with LSP disabled
+disables it for every child regardless of what the project config says.
+
+There is **no per-call escape hatch.** `request.enableLsp` is not exposed on the model-facing
+task wire (`docs/tools/task.md` lists `{name?, agent?, task, effort?, outputSchema?,
+schemaMode?, isolated?}`), so a command cannot request LSP per dispatch. The settings layer is
+the only control point — the same structural situation as `task.isolation.apply` (§08 §E-9).
+
+**Deployment contract (project target owns the key):**
+
+```yaml
+owned_required_settings:            # spec/12 §C-1 — project target
+  task.enableLsp: true
+conflict_policy:
+  on_existing_false: report CONFLICT, do NOT overwrite
+  rationale: >
+    a user who explicitly disabled subagent LSP made a cost decision; overriding it
+    silently is the config-clobbering behavior spec/12 exists to prevent
+user_global_target:
+  write: NEVER without an explicit -EnableSubagentLsp opt-in flag
+  rationale: >
+    turning on subagent LSP machine-wide spawns LSP servers for unrelated subagents in
+    every repository — the same blast-radius argument as task.isolation.apply
+```
+
+**Reduced-capability mode, stated honestly.** If condition 2 or 3 is unmet, LSP is
+unavailable and the workflow does not silently pretend otherwise:
+
+- Explorer, Implementer, and Reviewer fall back to `grep` + ranged `read` for symbol
+  questions. This is a **real degradation**, not an equivalent path: `grep` answers "what
+  text exists", not "who calls this" (§C). Blast-radius review in particular gets weaker.
+- The degradation MUST be disclosed in the final report, naming which of the three conditions
+  failed — they have different fixes (edit the agent file / merge the project setting /
+  relaunch the session with LSP enabled).
+- DR-7 is therefore refined: LSP is **required for full-quality retrieval and blast-radius
+  review**, and its absence is a disclosed capability limit — not a silent substitution. A
+  run without LSP is a valid run with a stated weakness; calling it equivalent would be the
+  overclaiming pattern CR-35 corrected elsewhere.
+
+T-00.E5 must separate the three conditions as distinct failure causes, because they are
+diagnosed and fixed differently. See `phases/phase-00-foundation.md` T-00.E5.
 
 ### CR-17 — Authoritative LSP Allowlist (DR-7 decision record)
 
@@ -189,7 +259,7 @@ If a future project genuinely needs a durable architecture overview, that belong
 
 ## E. Contract Summary
 
-1. `lsp` MUST be added to `explorer`, `implementer`, and `reviewer` allowlists — otherwise `task.enableLsp = true` is inert.
+1. `lsp` MUST be added to `explorer`, `implementer`, and `reviewer` allowlists — otherwise `task.enableLsp` is inert. **And the allowlist alone is not sufficient (CR-40):** subagent LSP requires the conjunction of allowlist membership, `task.enableLsp == true` (default **`false`** — project install owns it), and a parent session that has not disabled LSP. Absence is a disclosed reduced-capability mode, never a silent `grep` substitution. See §A-1.
 2. Retrieval levels are a **default priority with bounded escalation**, not exhaustion gates (CR-20, §B-1). Skipping a level is permitted for a named reason from the `permitted_skips` list and MUST be disclosed in the result; an undisclosed skip is a contract violation. "I exhausted local sources" is not a checkable claim and is not required.
 3. Symbol lookup answers "who/where/what exports"; `grep` answers "what text exists". They are not interchangeable.
 4. Prefer ranged reads; reserve whole-file reads for short files, structural reasoning, or rewrites.

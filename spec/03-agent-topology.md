@@ -118,12 +118,46 @@ kebab→camel normalization in `parseFrontmatter`. Both spellings work.
 | `thinking-level` / `thinkingLevel` | string | Also accepts legacy `thinking:`. | ✓ |
 | `read-summarize` / `readSummarize` | boolean | Toggles read summarization. | ✓ |
 | `output` | any | Structured output schema for `yield`. | ✓ |
-| `blocking` | boolean | — | ✓ |
+| `blocking` | boolean | **Parent waits for this agent inline even when `async.enabled` is true.** No default — absent ⇒ `undefined`, and only exact `=== true` blocks. **REQUIRED on all four workers (CR-39).** | ✓ |
 | `prewalk` | boolean or string | Hand off to a cheaper model first. | ✓ |
 | `autoload-skills` / `autoloadSkills` | array or CSV | Skills forced into this agent's context. | ✓ |
 
 Every key used by the current five agent files is valid. The earlier concern
 that these were unverified is resolved: they all parse.
+
+### CR-39 — `blocking: true` is mandatory on every worker, and the empty cell above was the tell
+
+The `blocking` row previously carried no semantics at all — the key was recorded as *parseable*
+and never as *load-bearing*. That omission is exactly how the defect survived six rounds: the
+workflow sequences in `04-workflow-sizing.md` were written as ordered stages, and nothing in
+the topology spec said what makes a stage actually wait.
+
+It does not wait by default. `async.enabled` defaults to **`true`**
+(`config/settings-schema.ts:4223-4225`), `blocking` is parsed with no default
+(`discovery/helpers.ts:299`), and `task/index.ts:715` routes every non-blocking item into the
+`AsyncJobManager` — so the `task` call returns before the worker finishes, with `results: []`
+for a fully-background batch. Full analysis and the barrier consequences are in
+`08-isolation-and-concurrency.md §C-1`.
+
+Required on all four workers:
+
+```yaml
+explorer.md:    blocking: true      # architecture synthesis consumes its evidence
+implementer.md: blocking: true      # integration consumes its artifact
+verifier.md:    blocking: true      # review gate consumes its decision
+reviewer.md:    blocking: true      # final report consumes its findings
+```
+
+Each is justified by a **consumer**, which is the test for whether an agent needs the key: if
+a later stage reads this agent's result, the parent must wait for it. All four have one.
+
+**This does not serialize the batch.** When every item is blocking, `asyncItems` is empty and
+`task/index.ts:722` takes the synchronous fan-out path — concurrent execution under the
+`task.maxConcurrency` semaphore, results in input order. Parallelism and barriers are
+orthogonal here, and conflating them would be a reason to wrongly reject this fix.
+
+L0 validation asserts `blocking: true` on all four worker files; L1 asserts it survives
+discovery (`phases/phase-06-evaluation.md`).
 
 ### The `spawns: ""` subtlety
 

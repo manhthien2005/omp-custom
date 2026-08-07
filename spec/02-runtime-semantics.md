@@ -169,7 +169,9 @@ never passes `isolated`.
 
 `task.enableLsp` default is **`false`** (`settings-schema.ts:4617`), described as
 *"Allow subagents spawned via the task tool to use the lsp tool. Off by default to
-keep subagents cheap."* The user's baseline sets it `true`.
+keep subagents cheap."* The spec author's development environment set it `true`; **that is not a
+property of OMP or of any install (CR-40)** — the project install must own the key. See
+`07-retrieval-and-code-understanding.md §A-1`.
 
 Gate: `lsp/index.ts:1639` — `session.enableLsp === false ? null : new LspTool(session)`.
 

@@ -41,6 +41,55 @@ Assign:
 existing skill directory. Dangling names fail validation (they are filtered silently
 at runtime — `resolveAutoloadSkills` drops unresolved entries).
 
+### T-02.1b — Make stage barriers real: `blocking: true` on every worker (CR-39)
+
+Every workflow in `04-workflow-sizing.md` is written as ordered stages, and each stage
+consumes the previous stage's completed result. **OMP does not provide that ordering by
+default.** `async.enabled` defaults to `true` (`config/settings-schema.ts:4223-4225`),
+`blocking` is parsed with no default (`discovery/helpers.ts:299`), and every non-blocking item
+is routed to the `AsyncJobManager` (`task/index.ts:715`) — so the `task` call returns before
+the worker finishes, with `results: []` for a fully-background batch.
+
+Without this fix the failures are silent and systematic, not cosmetic:
+
+| Stage arrow | Default behavior without `blocking` |
+|---|---|
+| parallel Implementers → serial integration | integration starts with nothing to integrate |
+| Verifier → Reviewer | review runs against an unverified tree |
+| Reviewer → final report | report written before any findings exist |
+| Explorers → architecture synthesis | synthesis runs on absent evidence |
+
+Fix — add to all four worker agent files:
+
+```yaml
+blocking: true
+```
+
+**Do not set `async.enabled: false`.** It is a user-global execution preference; suppressing
+it to satisfy a template-local barrier requirement is the same category error as writing
+`task.isolation.apply` globally. Per-agent frontmatter makes this template deterministic
+regardless of the user's async setting — the strictly narrower fix.
+
+**`blocking: true` does not serialize the batch.** When every item is blocking, `asyncItems` is
+empty and `task/index.ts:722` takes the synchronous fan-out path: concurrent execution under
+the `task.maxConcurrency` semaphore, results returned in **input order**
+(`task/parallel.ts:14`). That input-order guarantee is the anchor T-02.3b's task-index
+integration depends on — so this task is a **precondition** for T-02.3b, not an alternative to
+it. Consuming async deliveries as they arrive would be completion order, which T-02.3b forbids.
+
+Also make `task.batch` an explicit Orchestrated precondition rather than an assumption. It
+defaults to `true`, but a user can disable it, and doing so reverts the wire to the flat
+single-spawn shape with no `tasks[]` array and therefore no stable index.
+
+```
+preflight: effective task.batch == true  → else parallel path unavailable, disclose, go sequential
+```
+
+**Acceptance**: all four worker agent files carry `blocking: true`; L0 asserts it statically
+and L1 asserts it survives discovery; `/orchestrated` checks `task.batch` before fan-out and
+has a disclosed fallback; `async.enabled` is **not** modified by the template or the installer.
+T-00.E3-J proves the barrier and the ordering together.
+
 ### T-02.2 — Make isolation explicit for write-capable workers
 
 `task.isolation.mode` defaults to `none`, and the `isolated` parameter only exists in
@@ -63,9 +112,20 @@ assert effective task.isolation.apply == false
 
 On failure: **do not launch parallel isolated Implementers.** Fall back to sequential non-isolated implementation, or refuse and name the setting the user must opt into. Disclose the degradation in the final report. Deployment target policy (project config owns the key; user/global requires explicit opt-in flag) is specified in `08-isolation-and-concurrency.md §E-9` and `12-installation-and-rollback.md §C`.
 
+**CR-38 — the settings read is a diagnostic; the same-session canary is the authority.** `omp config get` runs in a **separate process** and re-resolves settings from files. What actually governs dispatch is the parent session's in-memory `Settings`: `applyChanges: request.isolation?.apply ?? (invocationKind === "task" ? request.session.settings.get("task.isolation.apply") : true)` (`task/structured-subagent.ts:315-317`). Two layers are invisible to a subprocess and both outrank project config:
+
+- `--config <file>` CLI overlay — *"for that one process. Never persisted."* (`docs/settings.md:21`)
+- in-session runtime override — `Settings.set()` writes the in-memory `#overrides` layer (`config/settings.ts:524`), touching no file
+
+So a parent launched with `--config` setting `apply: true` over a project config of `false` yields a subprocess read of `false` (preflight PASS) and an actual `applyChanges == true` — restoring the CR-27 concurrent-auto-apply hazard through the check meant to prevent it.
+
+Add a **same-session capture canary** after the nested-repo and `task.batch` checks pass: dispatch one minimal isolated **blocking** worker that creates a single sentinel file (`.omp/.capture-first-canary-<nonce>`) and yields. Then assert the task completed, the sentinel is **absent** from the parent tree, and the result summary reports a retained artifact (`captured at <path>`) rather than `Applied patches: yes`. If the sentinel exists: delete it, fail the preflight, do not fan out. If the isolated dispatch itself errors, parallel mode is unavailable. This exercises the same session, the same `task` tool, the same `session.settings`, and the same isolation path — so it attests behavior instead of reconstructing config. Full contract in `08-isolation-and-concurrency.md §E-9.2`.
+
+The canary requires T-02.1b: it must be synchronous from the coordinator's perspective, and a canary that returns before the worker writes proves nothing.
+
 **CR-32 — Any nested git repo or submodule disables parallel isolated implementation for the whole repository.** On the successful `apply=false` path, OMP v17.2.10 never materializes nested-repo patches to disk (`persistNestedPatches()` is reachable only from the failure/recovery path), and the `apply=false` summary reports only the root patch when the root also changed — so a nested-repo change is silently lost with no signal. Post-integration `git status` on the nested repo **cannot distinguish compliance from silent loss** (the parent tree looks identical in both cases), so scope-exclusion instructions and post-hoc detection are not accepted as enforcement (§08 §D-1.1). The safe v0 policy is **Option A1**: the orchestrator enumerates nested repos before fan-out (`git submodule status --recursive`, `find . -mindepth 2 -name .git -not -path './node_modules/*'`), and **any non-empty result disables parallel isolated implementation for that run**, routing to sequential non-isolated implementation instead. Full source trace and enforcement analysis in `08-isolation-and-concurrency.md §D-1`.
 
-**Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `/orchestrated` performs the effective-settings preflight and has a disclosed fallback path (T-00.E3-A/E3-H); nested-repo paths are enumerated and excluded from parallel scope (T-00.E3-G).
+**Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `/orchestrated` runs the settings diagnostics **and** the same-session capture canary, treating only the canary as the gate, with a disclosed fallback path (T-00.E3-A/E3-H/E3-I); the nested-repo preflight runs **before** fan-out and a non-empty result **disables parallel isolated implementation for the whole run**, routing to sequential non-isolated implementation with the nested paths disclosed (T-00.E3-G, CR-32 Option A1). Scope exclusion is explicitly NOT an accepted outcome here — an acceptance criterion reading "excluded from parallel scope" would restate the rule §08 §D-1.1 withdrew.
 
 ### T-02.3 — Add the non-git-repo fallback
 
@@ -218,6 +278,9 @@ Execute each workflow against a real task in a scratch repository:
 - [ ] Implementers isolated in parallel; observation-phase agents (Explorer, Verifier, Reviewer) not isolated
 - [ ] `task.isolation.apply: false` confirmed at session/project settings (T-00.E3); parallel Implementers return captured artifacts without auto-apply
 - [ ] **CR-31** — `/orchestrated` performs the effective-settings preflight (`mode != none`, `apply == false`) and never fans out in parallel when it fails; the fallback or refusal is disclosed in the report
+- [ ] **CR-38** — `omp config get` is used as a diagnostic only; the **same-session capture canary** is the gate. Canary asserts task completion, sentinel absent from the parent tree, and a retained-artifact summary; a present sentinel deletes the file, fails the preflight, and blocks fan-out
+- [ ] **CR-39** — all four worker agents carry `blocking: true`; L0 checks the files, L1 checks discovery; `async.enabled` untouched; `task.batch == true` verified in preflight with a disclosed fallback
+- [ ] **CR-40** — project install owns `task.enableLsp: true`; an existing `false` reports CONFLICT and is not overwritten; a run without LSP discloses reduced-capability mode naming which of the three conditions failed
 - [ ] **CR-32** — orchestrator performs nested-repo preflight (Option A1); any non-empty nested-repo result disables parallel isolated implementation for that run and routes to sequential non-isolated; withdrawn enforcement: scope exclusion and post-integration `git status`
 - [ ] **CR-29** — integration order is original task-list index order, normatively stated in `orchestrated.md` and independent of worker completion order
 - [ ] **CR-29** — conflict on artifact *i* stops integration of *i+1…n*; all unapplied artifacts remain readable and are reported by path

@@ -55,7 +55,91 @@ If a project prefers strict staging for all writes, this is a **one-line policy 
 |---|---|---|
 | `task.maxConcurrency` | 4 | Max simultaneous subagents. |
 | `task.maxRecursionDepth` | 2 | Max nesting. Main session → worker = depth 1. A worker spawning its own worker = depth 2. |
-| `task.batch` | true | Enables the batched `tasks: [...]` form with a shared `context` string. |
+| `task.batch` | true | Enables the batched `tasks: [...]` form with a shared `context` string. **Orchestrated precondition — see §C-1.4.** |
+| `async.enabled` | **true (OMP default)** | Background task execution. **Every stage barrier in this template depends on defeating this per-agent — see §C-1.** |
+
+---
+
+## C-1. Execution Mode: Stage Barriers Are Not Free (CR-39)
+
+**This is the correctness gap that every workflow sequence in this spec silently assumed away.** `04-workflow-sizing.md` writes Standard and Orchestrated as ordered stages — explore *then* plan, implement *then* integrate, verify *then* review, review *then* report. Those arrows are barriers: each stage consumes the previous stage's completed result. OMP does not provide them by default.
+
+### C-1.1 Verified source behavior
+
+```ts
+// task/index.ts:707-715
+const itemBlocking = policies.map(policy => policy.effectiveAgent.blocking === true);
+const asyncEnabled = this.session.settings.get("async.enabled");
+const manager = asyncEnabled ? this.session.asyncJobManager : undefined;
+const asyncItems = manager ? spawnItems.filter((_, index) => !itemBlocking[index]) : [];
+```
+
+| Fact | Source |
+|---|---|
+| `async.enabled` defaults to **`true`** | `config/settings-schema.ts:4223-4225` |
+| `blocking` is parsed from agent frontmatter, with **no default** | `discovery/helpers.ts:299` — `parseBoolean(frontmatter.blocking)`; absent ⇒ `undefined` |
+| Only exact `=== true` is treated as blocking | `task/index.ts:707`, `task/index.ts:165` |
+| Non-blocking items become `AsyncJobManager` background jobs | `task/index.ts:715`, and the async branch at `:795+` |
+| A background call returns **before** the work finishes | `docs/tools/task.md` — *"Spawned agent `<id>` (job `<jobId>`). The result will be delivered when it yields."*; batch form returns `results: []` |
+
+So a worker agent that does not declare `blocking: true` becomes a background job whose result arrives **later**, as an async injection into the parent conversation. The `task` call itself returns immediately.
+
+### C-1.2 What that does to this template
+
+Every barrier fails in the same way — the parent proceeds on an empty result set:
+
+| Intended barrier | Actual default behavior |
+|---|---|
+| parallel Implementers complete → serial integration | `task` returns `results: []`; integration begins with **nothing to integrate** |
+| Verifier completes → Reviewer dispatched | Reviewer runs against an unverified tree |
+| Reviewer completes → final report | Report is produced before any review exists |
+| Explorers complete → architecture synthesis | Synthesis runs on absent evidence |
+
+Worse, it interacts with two decisions already made:
+
+- **Task-index integration order (§E-10) becomes unimplementable.** That rule anchors on `parallel.ts`'s input-order guarantee, which applies to the **synchronous** fan-out. Background jobs settle independently and deliver on completion, so consuming async results as they arrive is *completion order* — exactly what §E-10 forbids. Implementing index order over async delivery would require an explicit job-collection barrier plus an index map, a protocol this spec does not define and does not need.
+- **The capture-first canary (§E-9) cannot work.** A canary that returns before the worker has written anything proves nothing.
+
+### C-1.3 Resolution: `blocking: true` on every worker agent
+
+```yaml
+worker_agents:                    # all four
+  blocking: true                  # frontmatter; parsed by discovery/helpers.ts:299
+rationale: stage barriers are a correctness property of this workflow
+async_enabled: NOT MODIFIED       # user's global preference, left alone
+```
+
+**Do not disable `async.enabled`.** It is a useful OMP capability and a user-global setting; suppressing it to fix a template-local barrier requirement would be the same category error as writing `task.isolation.apply` globally (§E-9). Per-agent `blocking: true` makes this template's orchestration deterministic **regardless** of the user's async preference — the strictly narrower fix.
+
+**`blocking: true` does not serialize the batch.** This is the point most likely to be misread, so it is stated normatively: when every item in a batch is blocking, `asyncItems` is empty and `task/index.ts:722` takes the **synchronous fan-out** path, which runs the batch under the concurrency semaphore (`#getSpawnSemaphore()`, cap `task.maxConcurrency`) via `mapWithConcurrencyLimit`. Workers still run **concurrently**; the parent waits for the complete set; results arrive in **input order** (`task/parallel.ts:14`). That is precisely the contract §E-10 requires:
+
+```
+batch of blocking Implementers
+  → concurrent execution      (semaphore-bounded, cap 4)
+  → parent waits for all      (barrier)
+  → merged result in task-index order  (§E-10 anchor holds)
+```
+
+### C-1.4 `task.batch` is an Orchestrated precondition, not an assumption
+
+`task.batch` defaults to `true`, but a user can disable it — and when disabled the model-facing schema reverts to the **flat single-spawn** form (`docs/tools/task.md`: *"Disable to restore the flat single-spawn schema"*). The Orchestrated contract depends on a `tasks[]` array and its stable indices, so "default true" is not sufficient grounds to assume it.
+
+```
+preflight: effective task.batch == true
+  → false: parallel Orchestrated path UNAVAILABLE
+           route to sequential non-isolated implementation, disclose the setting
+```
+
+Defining a multi-flat-call aggregation protocol with its own synthetic indices is the alternative and is **rejected for v0**: it reimplements batching in prose, and the stable key would no longer be OMP's own input index, which is the only thing making §E-10 source-anchored.
+
+This check joins the other two in the Orchestrated preflight. Ordering matters — cheapest and most decisive first:
+
+```
+1. nested-repo scan          (§D-1.2)  → any hit disables parallel
+2. task.batch == true        (§C-1.4)  → false disables parallel
+3. isolation settings        (§E-9)    → diagnostics + canary
+4. fan out
+```
 
 ### Recursion depth governs the topology
 
@@ -242,6 +326,9 @@ with a real boundary."
 4. Isolation requires git. Absent git, fall back to sequential and disclose it.
 5. `apply: true` means isolation stages-then-merges; it is not a review sandbox.
 6. Effective-config validation MUST assert `task.isolation.mode != none`, because the silent-absence failure has no runtime signal.
+6b. **CR-38 — a subprocess settings read is a diagnostic, not attestation.** `omp config get` cannot see the parent's `--config` overlay or in-session runtime overrides, both of which outrank project config and both of which govern the actual dispatch (`task/structured-subagent.ts:315-317` reads `request.session.settings`). The authority is the same-session capture canary (§E-9.2); the command pair supplies the actionable diagnosis. Neither alone is sufficient.
+6c. **CR-39 — every worker agent MUST declare `blocking: true`.** `async.enabled` defaults to `true` (`settings-schema.ts:4223`) and `blocking` has no default (`discovery/helpers.ts:299`), so an undeclared worker becomes a background job and its `task` call returns before the work completes — breaking every stage barrier in `04-workflow-sizing.md` and making the §E-10 task-index order unimplementable. `blocking: true` does **not** serialize a batch: all-blocking takes the synchronous fan-out path, which keeps concurrency (semaphore, cap 4) and input ordering. Do not modify `async.enabled` (§C-1).
+6d. **CR-39 — `task.batch == true` is an Orchestrated precondition**, checked in preflight rather than assumed from its default; `false` reverts the wire to the flat single-spawn form and disables the parallel path (§C-1.4).
 7. **CR-09/CR-27/CR-30 — Parallel integration is NOT internally serialized by OMP; `apply=false` is a session/settings control, not a per-task-item field.** `runStructuredSubagent()` calls `mergeIsolatedChanges()` directly from each spawn (verified: `task/structured-subagent.ts`, `task/isolation-runner.ts` in OMP v17.2.10). There is no orchestrator-level merge mutex in that path. Git lock contention can cause one apply to fail, but that is lock *contention*, not safe serialization.
 
    **Control surface (CR-30 — OMP v17.2.10):** The model-facing task item schema exposes `{name?, agent?, task, effort?, outputSchema?, schemaMode?, isolated?}`. There is **no per-item `apply` field**. Effective apply policy resolves as:
@@ -287,6 +374,8 @@ with a real boundary."
    effective task.isolation.apply == false
    ```
 
+   **CR-38 — `omp config get` is a DIAGNOSTIC, not attestation of the running session.** Read §E-9.1 below before treating the command pair as proof. The authoritative check is the same-session canary (§E-9.2). The command pair remains required — it is what produces an actionable *diagnosis* — but it cannot close the gate alone.
+
    **The read mechanism is concrete and source-verified (CR-31 round 6).** An earlier revision of this section left the settings-read API as an open uncertainty and permitted a user assertion as a fallback proof. Both are now closed. OMP exposes the effective (fully merged) value on the command line:
 
    ```bash
@@ -316,6 +405,92 @@ with a real boundary."
    **Rollback consequence:** `task.isolation.apply` and `task.isolation.mode` become installer-owned MERGE keys in the project target. `spec/12 §C` and the manifest `installer_delta` schema must track them alongside `modelRoles` — see `spec/12 §C`.
 
    T-00.E3 (cases E3-A and E3-H) proves the settings path, the precedence behavior, and the preflight read.
+
+   ### E-9.1 CR-38 — Why a subprocess read is not attestation
+
+   The round-6 preflight has a cross-process gap. What governs the actual dispatch is the **already-running parent session's in-memory `Settings` object**:
+
+   ```ts
+   // task/structured-subagent.ts:315-317
+   applyChanges:
+     request.isolation?.apply ??
+     (request.invocationKind === "task"
+       ? request.session.settings.get("task.isolation.apply")
+       : true),
+   // and :314 — mergeMode, :320 — enableLsp: all request.session.settings
+   ```
+
+   `omp config get` is a **different process**. It re-resolves settings from scratch, and two layers of the precedence chain are not reconstructible from outside:
+
+   | Divergence source | Why the subprocess misses it | Source |
+   |---|---|---|
+   | `--config <file>` CLI overlay | *"Loaded after global and project settings, **for that one process**. Never persisted."* A plain `omp config get` has no way to know the parent was launched with it. | `docs/settings.md:21` |
+   | In-session runtime override | `Settings.set()` writes to the in-memory `#overrides` layer (`config/settings.ts:524`), the **highest** precedence tier. A `/settings` change during the session never touches any file. | `config/settings.ts:343,524` |
+
+   `PI_CONFIG_FILES` overlays *are* environment-inherited and so would be seen by a child process — but that only narrows the gap, it does not close it. Explicit `--config` and in-session overrides remain invisible.
+
+   **The concrete false pass:**
+
+   ```yaml
+   project_config:  task.isolation.apply: false        # <repo>/.omp/config.yml
+   parent_launched: omp --config /tmp/override.yml     # where apply: true
+   parent_session:  session.settings.get(...) == true  # what dispatch actually reads
+   subprocess_read: omp config get ... --json → false  # what the preflight sees
+   preflight:       PASS                               # WRONG
+   actual:          applyChanges == true → parallel workers auto-apply
+   ```
+
+   That is the CR-27 hazard — concurrent unserialized auto-apply — restored through the very check meant to prevent it. Accepting a subprocess read as proof would be a narrower version of the round-5 error: substituting an inspectable artifact for the effective runtime value.
+
+   **Wording is normative.** `omp config get` MUST be described as a *diagnostic precheck*, never as attestation of current session state. It is retained because it is the only thing that can produce an actionable diagnosis — it distinguishes "the project file is wrong", "you launched from the wrong cwd" (§E-9, cwd scoping), and "the persistent layers are fine, so the divergence is an overlay or an in-session override."
+
+   ### E-9.2 CR-38 — The same-session canary is the authority
+
+   Verify capture-first behavior through **the same parent session, the same `task` tool, the same `session.settings`, the same isolation code path** — rather than trying to reconstruct the session's config externally. This is a behavioral test, and behavior is what the gate actually cares about.
+
+   ```yaml
+   canary:
+     when: after the §D-1.2 nested-repo scan and §C-1.4 batch check pass
+     dispatch: ONE isolated worker, blocking (§C-1.3), minimal prompt
+     worker_action: create exactly one sentinel file, then yield immediately
+     sentinel: .omp/.capture-first-canary-<nonce>     # nonce per run; never reused
+     assert_all:
+       - task completed (exit 0)
+       - sentinel does NOT exist in the parent working tree
+       - result summary reports a RETAINED artifact, not an applied change
+     on_sentinel_present:
+       - delete the sentinel immediately (it is template scratch, not user work)
+       - preflight FAILED — effective apply is true regardless of any file
+       - do NOT launch parallel workers
+     on_dispatch_error:
+       - parallel mode unavailable (covers non-git, backend failure, mode: none)
+     cost: one minimal spawn per Orchestrated run
+   ```
+
+   **Why the assertions are discriminating** — the two paths produce different, model-visible summaries and different parent-tree states:
+
+   | Effective setting | Parent tree | `<merge-summary>` text |
+   |---|---|---|
+   | `apply == false` (required) | sentinel **absent** | ``Isolation: changes captured at `<path>` (apply=false). Not applied.`` |
+   | `apply == true` (hazard) | sentinel **present** | `Applied patches: yes` |
+
+   Both signals are checkable: the sentinel via the parent's own `read`/`glob`, and the summary because `mergeSummary` is rendered into the model-facing task result (`prompts/tools/task-summary.md` — `<merge-summary>`), not buried in `details`. Asserting on **both** matters: the filesystem check is the ground truth, and the summary check catches the case where isolation silently did not engage at all.
+
+   **The canary depends on CR-39.** It must be synchronous from the coordinator's perspective — a canary that returns before the worker writes anything proves nothing. That requires `blocking: true` on the worker (§C-1.3). CR-38 and CR-39 are therefore a single fix, not two independent ones.
+
+   **What the canary does not prove.** It attests `apply` and that isolation engaged, at canary time, for a single spawn. It does not prove the setting cannot change mid-run, and it is not a substitute for the nested-repo gate (§D-1.2) — a nested repo is undetectable by *any* behavioral probe, which is exactly why that gate is structural.
+
+   Full preflight sequence:
+
+   ```
+   1. nested-repo scan             (§D-1.2)   structural  → any hit disables parallel
+   2. effective task.batch         (§C-1.4)   diagnostic  → false disables parallel
+   3. omp config get × 2           (§E-9)     diagnostic  → produces the actionable message
+   4. same-session capture canary  (§E-9.2)   AUTHORITY   → decides the gate
+   5. fan out
+   ```
+
+   Steps 3 and 4 are not redundant: 3 explains *why* to the user, 4 decides *whether*. A run where 3 passes and 4 fails is precisely the CR-38 overlay case, and the report must say so rather than reporting a generic refusal.
 
 10. **CR-29 — Integration order is normative: original orchestrator task-list index.** "Deterministic order" is not a specification — alphabetical name, worker finish order, batch input order, and file-path order all satisfy the English word while producing different conflict and recovery behavior. The rule is fixed:
 

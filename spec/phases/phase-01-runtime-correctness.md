@@ -64,10 +64,37 @@ doubly unavailable.
 
 Fix (all three parts required):
 - add `lsp` to `explorer.md`, `implementer.md`, **and `reviewer.md`** tool lists — per the CR-17 authoritative table in `spec/07§A` (Reviewer requires `lsp references` for blast-radius checks)
-- document `task.enableLsp: true` as a required setting, and state the graceful
-  degradation to grep/glob when it is off
+- **deploy** `task.enableLsp: true` as an installer-owned project setting — not merely document
+  it (CR-40)
+- state the reduced-capability behavior when LSP is unavailable, naming which of the three
+  conditions failed
 
-**Acceptance**: no agent prompt names a tool absent from its own allowlist. Explorer, Implementer, and Reviewer each carry `lsp` in their `tools:` lists. The LSP prerequisite is documented where a user will see it before installing.
+**CR-40 — documenting the setting is not deploying it.** This task previously said "document
+`task.enableLsp: true` as a required setting". Documentation does not change effective settings,
+and the default is `false` (`config/settings-schema.ts:4615-4617`), so on a default machine the
+allowlist fix alone leaves `lsp` granted at the agent and withheld at the gate. The setting
+becomes an installer-owned project key (`spec/12 §C-1`, `phase-05` T-05.3); the user/global
+target requires `-EnableSubagentLsp`. LSP availability is a three-condition conjunction —
+allowlist ∧ `task.enableLsp` ∧ parent-session LSP — detailed in `spec/07 §A-1`, with T-00.E5
+cases A–E distinguishing the four remediations.
+
+### T-01.3b — Add `blocking: true` to every worker agent file (CR-39)
+
+Mechanically trivial, architecturally load-bearing. Add to `explorer.md`, `implementer.md`,
+`verifier.md`, and `reviewer.md`:
+
+```yaml
+blocking: true
+```
+
+Without it, `async.enabled` (default **`true`**) routes each worker to the `AsyncJobManager`,
+the `task` call returns before the work completes, and every stage barrier in
+`04-workflow-sizing.md` silently breaks — the parent proceeds on an empty result set. Full
+analysis in `08-isolation-and-concurrency.md §C-1`; rationale for `blocking` over disabling
+`async.enabled` in §C-1.3. This does **not** serialize batches: all-blocking takes OMP's
+synchronous fan-out path, preserving concurrency and input ordering.
+
+**Acceptance**: no agent prompt names a tool absent from its own allowlist. Explorer, Implementer, and Reviewer each carry `lsp` in their `tools:` lists. `task.enableLsp: true` is an installer-owned project key with a conflict-preserving merge, not just a documented prerequisite. All four worker files carry `blocking: true`. The LSP prerequisite and its reduced-capability fallback are documented where a user will see them before installing.
 
 ### T-01.4 — Reverse the read-summarize inversion (P1-6, promoted)
 

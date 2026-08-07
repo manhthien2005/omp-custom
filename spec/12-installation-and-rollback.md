@@ -165,6 +165,12 @@ optional_model_roles:           # CR-34 — convenience alias, NOT installer-own
 owned_required_settings:        # PROJECT target only — see C-2
   task.isolation.apply: false   # correctness precondition for parallel capture-first
   task.isolation.mode: auto     # backend selector; must not be "none"
+  task.enableLsp: true          # CR-40 — default is FALSE; three worker roles need it
+
+opt_in_only_settings:           # CR-40 — user/global target requires an explicit flag
+  task.enableLsp:
+    flag: -EnableSubagentLsp
+    blast_radius: LSP servers spawn for unrelated subagents in every repository
 
 user_preserved:
   everything_else               # never read, never written, never reordered
@@ -203,16 +209,38 @@ for manual model selection in their main session can add it. The template docume
   failure. An agent file that *does* reference it would be a CR-33 regression, caught by
   the L1 check that `tech-lead` must not appear in the discovered agent list.
 
+**CR-40 — `task.enableLsp` is owned for the same reason `task.isolation.apply` is.** Its
+default is `false` (`config/settings-schema.ts:4615-4617`), and subagent LSP requires it to be
+`true` at the settings layer — there is no per-call override on the model-facing task wire.
+Three worker roles (Explorer, Implementer, Reviewer) have retrieval contracts that depend on
+`lsp`, so a template that adds `lsp` to their allowlists without deploying the setting ships a
+capability that is granted and then withheld. That was the round-1 defect inverted: the
+allowlist fixed, the gate still shut.
+
+Conflict handling differs from the isolation keys in one respect worth stating: an existing
+`task.enableLsp: false` is a **deliberate user cost decision** (the setting's own description
+is *"Off by default to keep subagents cheap"*). Report the conflict, do not overwrite, and let
+the workflow enter the disclosed reduced-capability mode (`07-retrieval-and-code-understanding.md §A-1`).
+Unlike `task.isolation.apply: true`, a `false` here is not a correctness hazard — it is a
+quality reduction, so it degrades rather than refuses.
+
 `task.isolation.merge` is **not** owned. The integration procedure in
 `08-isolation-and-concurrency.md §E-10` handles both `patch` and `branch`; T-00.E3-C records
 the observed behavior of whichever value is effective.
+
+`task.batch` and `async.enabled` are **not** owned either, for opposite reasons.
+`task.batch: true` is an Orchestrated *precondition* checked at runtime with a documented
+fallback (§08 §C-1.4) — owning it would write a key whose default is already correct and whose
+override the user may want for other work. `async.enabled` is deliberately left alone: the
+template achieves its stage barriers with per-agent `blocking: true` frontmatter (§08 §C-1.3),
+which is strictly narrower than suppressing a user-global execution mode.
 
 ### C-2. Target-aware policy for `owned_required_settings`
 
 | Target | Destination | Policy |
 |---|---|---|
 | **project** | `<repo>/.omp/config.yml` | Installer writes `owned_required_settings`. Blast radius is the one repository that opted in by installing the template. |
-| **user** | `~/.omp/agent/config.yml` | Installer **MUST NOT** write `task.isolation.*` unless `-EnableCaptureFirstIsolation` is passed explicitly. Without the flag: skip these keys, print a notice naming the runtime preflight requirement, and continue. With the flag: write them and print a warning that **every isolated task in every repository** on the machine becomes capture-only. |
+| **user** | `~/.omp/agent/config.yml` | Installer **MUST NOT** write `task.isolation.*` unless `-EnableCaptureFirstIsolation` is passed explicitly. Without the flag: skip these keys, print a notice naming the runtime preflight requirement, and continue. With the flag: write them and print a warning that **every isolated task in every repository** on the machine becomes capture-only. **Likewise `task.enableLsp` requires `-EnableSubagentLsp` (CR-40)** — writing it globally spawns LSP servers for unrelated subagents in every repository. Without the flag: skip it, print a notice that workers will run in reduced-capability mode unless the project config or the launched session enables it. |
 
 Rationale for the asymmetry: a project-scoped setting affects only the project that installed
 the template. A user-global setting silently changes unrelated OMP work across all

@@ -296,9 +296,89 @@ has no evidence and MUST refuse the parallel path. Record the exact observed fai
 the command can distinguish "read succeeded, value is wrong" from "read failed" — they get
 the same refusal but different user-facing messages.
 
-**Artifact**: isolation behavior transcript per scenario, including the E3-G nested-repo determination and the E3-H precedence table.
+#### E3-I — Parent-overlay attestation gap (CR-38 — decisive)
 
-**Blocks**: phase-02 T-02.2 (preflight), T-02.2b (integration order), T-02.9 (nested-repo exclusion); §08 §E-7/§E-9/§E-10; §12 §C config-ownership policy.
+The case that proves why a subprocess read is not attestation. Construct the divergence
+deliberately:
+
+```yaml
+project_config:            task.isolation.apply: false     # <repo>/.omp/config.yml
+parent_launch:            omp --config /tmp/override.yml   # containing apply: true
+child_config_get_expect:  {"value": false}                 # subprocess sees files only
+parent_actual_expect:     applyChanges == true             # session.settings governs
+canary_expect:            detects apply=true → refuses parallel
+```
+
+Assert all four rows. The third and fourth **must disagree** — that disagreement is the
+finding. If they agree, record it: either the overlay did not take effect as documented, or a
+subprocess inherits more context than `docs/settings.md:21` implies, and CR-38's premise needs
+revision.
+
+Run the same shape a second time with an **in-session** override instead of a CLI overlay
+(change the setting via `/settings` mid-session, then dispatch). `Settings.set()` writes the
+in-memory `#overrides` layer (`config/settings.ts:524`), so no file changes at all — this is
+the harder variant and the one no external read can ever catch.
+
+Also record the canary's own cost and reliability: wall time, tokens, and whether the
+sentinel-absent assertion is stable across repeated runs (a flaky gate is worse than none).
+
+**Records**: whether `omp config get` can be trusted as a gate (expected: no, diagnostic only),
+and whether the canary reliably discriminates. If the canary proves unreliable, the parallel
+path needs a different authority and §08 §E-9.2 must be revised before phase-02.
+
+#### E3-J — Async barrier and ordering (CR-39 — decisive)
+
+Proves the two properties the whole Orchestrated sequence rests on, together:
+
+```yaml
+setup:
+  async_enabled: true                    # OMP default — do NOT disable
+  worker_frontmatter: blocking: true     # all four workers
+  batch: three isolated Implementers
+  completion_order: [2, 0, 1]            # make tasks[2] finish first
+assert:
+  task_call_returns_after_all: true      # barrier holds despite async.enabled
+  result_order: [0, 1, 2]                # input order, not completion order
+  concurrency_preserved: true            # workers overlapped; not serialized
+```
+
+The `concurrency_preserved` assertion is the one most worth capturing evidence for, because the
+objection to `blocking: true` would be "it serializes the batch." Record start/end timestamps
+per worker and show overlap.
+
+**Control case — omit `blocking`:** rerun with the frontmatter key removed from one worker and
+record what the parent receives. Expected: a "Spawned … background agent" response and
+`results` missing that item, i.e. the barrier failure the fix prevents. This is what makes the
+fix falsifiable rather than assumed.
+
+Then the two stage-specific barriers:
+
+```
+Verifier sleeps briefly  → parent cannot dispatch Reviewer until the verification result returns
+Reviewer sleeps briefly  → final report cannot be produced from workflow state until findings return
+```
+
+#### E3-K — `task.batch` disabled (CR-39)
+
+```yaml
+task_batch: false
+expected:
+  model_facing_wire: flat single-spawn form (no tasks[] array)
+  orchestrated_parallel_path: refuses or falls back to sequential
+```
+
+Record the actual wire shape the model sees, to confirm the fallback trigger is detectable
+before dispatch rather than discovered by a schema error mid-run.
+
+**Artifact**: isolation behavior transcript per scenario, including the E3-G nested-repo
+determination, the E3-H precedence table, the E3-I attestation disagreement, and the E3-J
+timing/ordering record.
+
+**Blocks**: phase-02 T-02.1b (barrier + batch precondition), T-02.2 (isolation preflight, including the CR-32 nested-repo disable and the CR-38 canary), T-02.3b (serial integration order); §08 §C-1/§E-7/§E-9/§E-9.2/§E-10; §12 §C config-ownership policy.
+
+**E3-A, E3-G, E3-H, E3-I, and E3-J are BLOCKING for phase-02 parallel implementation.** E3-J
+additionally blocks *every* workflow size, not just Orchestrated — Standard's stage arrows
+depend on the same barrier.
 
 ### T-00.E4 — Rule sentinel propagation
 
@@ -337,7 +417,74 @@ Procedure:
 - Success with `lsp` in allowlist → phase-01 T-01.3 proceeds safely
 - Rejection despite allowlist → investigate `task.enableLsp` propagation or allowlist gating logic
 
-**Blocks**: phase-01 T-01.3 (LSP allowlist fix for explorer, implementer, reviewer).
+**CR-40 — this is a three-condition conjunction, not a single allowlist check.** The procedure
+above tests only "allowlist present vs absent" against an assumed `task.enableLsp = true`
+baseline. That assumed the spec author's environment: the setting defaults to **`false`**
+(`config/settings-schema.ts:4615-4617`), so the interesting failures are ones the original
+procedure could not distinguish. Verified policy:
+
+```ts
+// task/structured-subagent.ts:318-320
+enableLsp:
+  !planMode &&
+  (request.enableLsp ??
+    ((request.session.enableLsp ?? true) && request.session.settings.get("task.enableLsp"))),
+```
+
+There is no per-call override — `request.enableLsp` is not on the model-facing task wire
+(`docs/tools/task.md`), so the settings layer is the only control point. Each condition gets its
+own case, because each has a different fix:
+
+```yaml
+E5-A:
+  task_enableLsp: false            # OMP default
+  agent_allowlist: includes lsp
+  expected: worker lsp UNAVAILABLE
+  fix_if_hit: project install must merge task.enableLsp: true (spec/12 §C-1)
+
+E5-B:
+  task_enableLsp: true
+  parent_session_lsp: enabled
+  agent_allowlist: includes lsp
+  expected:
+    explorer:    lsp callable
+    implementer: lsp callable
+    reviewer:    lsp callable
+    verifier:    lsp NOT in allowlist by contract — control case
+
+E5-C:
+  task_enableLsp: true
+  parent_session_lsp: DISABLED
+  expected: worker lsp UNAVAILABLE
+  fix_if_hit: user must relaunch with LSP enabled — the template cannot fix this
+
+E5-D:
+  task_enableLsp: true
+  parent_session_lsp: enabled
+  agent_allowlist: lsp ABSENT      # the original control case
+  expected: worker lsp UNAVAILABLE
+  fix_if_hit: agent file edit (phase-01 T-01.3)
+
+E5-E:
+  all_conditions_met: true
+  language_server: unavailable / not installed
+  expected: distinguish "tool callable but no server" from "tool unavailable"
+```
+
+**The discriminator that matters is the error shape.** E5-A, E5-C, E5-D, and E5-E all present to
+the agent as "LSP did not work", but they require four different remediations (merge a project
+setting / relaunch the session / edit an agent file / install a language server). Record the
+exact observed failure — is `lsp` absent from the tool list, or present and erroring? — because
+the reduced-capability disclosure required by `07-retrieval-and-code-understanding.md §A-1` must
+name the actual cause. A disclosure reading "LSP unavailable" without the cause sends the user
+to the wrong fix.
+
+**Artifact (extended)**: LSP capability transcript per case A–E, each recording the tool-list
+contents and the verbatim error or success.
+
+**Blocks**: phase-01 T-01.3 (LSP allowlist fix for explorer, implementer, reviewer);
+phase-05 T-05.3 (`task.enableLsp` as an owned project setting); the reduced-capability
+disclosure contract in §07 §A-1.
 
 ---
 
@@ -378,9 +525,9 @@ Manual checks:
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-H** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight). E3-A, E3-G and E3-H are BLOCKING for phase-02 parallel implementation.
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-K** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap (E3-I)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**). **E3-A, E3-G, E3-H, E3-I and E3-J are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
-- [ ] **T-00.E5 artifact present** (LSP allowlist validation)
+- [ ] **T-00.E5 artifacts present for cases E5-A … E5-E** (LSP capability as a three-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, language-server availability), each recording the tool-list contents and verbatim error so the four distinct remediations are distinguishable (CR-40)
 
 ---
 

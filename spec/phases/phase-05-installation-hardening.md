@@ -62,18 +62,31 @@ the merge now covers two classes, not just `modelRoles`:
   **`modelRoles.tech-lead` is NOT owned (CR-34)** — it has no mandatory runtime consumer
   after CR-06 (user-controlled main session) and CR-33 (no `tech-lead` agent file), so the
   installer never writes, conflicts on, tracks, or rolls it back.
-- `owned_required_settings` — `task.isolation.apply: false`, `task.isolation.mode: auto`.
-  **Project target only.** For the user/global target these keys are skipped unless
-  `-EnableCaptureFirstIsolation` is passed, because writing them globally changes every
-  isolated task in every repository on the machine. Conflict on
-  `task.isolation.apply: true` → print the CONFIG CONFLICT block from §C-3 and do not
-  overwrite.
+- `owned_required_settings` — `task.isolation.apply: false`, `task.isolation.mode: auto`,
+  **`task.enableLsp: true` (CR-40)**. **Project target only.** For the user/global target these
+  keys are skipped unless the matching opt-in flag is passed — `-EnableCaptureFirstIsolation`
+  for the isolation keys, `-EnableSubagentLsp` for `task.enableLsp` — because writing them
+  globally changes every isolated task, and spawns LSP servers for every subagent, in every
+  repository on the machine. Conflict on `task.isolation.apply: true` → print the CONFIG
+  CONFLICT block from §C-3 and do not overwrite.
+
+  **`task.enableLsp` conflicts degrade rather than refuse.** An existing `false` is a
+  deliberate user cost decision (the setting's own description is *"Off by default to keep
+  subagents cheap"*). Report the conflict, preserve the user's value, and let the workflow run
+  in the disclosed reduced-capability mode (`07-retrieval-and-code-understanding.md §A-1`).
+  Unlike `task.isolation.apply: true`, this is a quality reduction, not a correctness hazard.
+
+  **`async.enabled` and `task.batch` are NOT owned (CR-39).** Stage barriers come from
+  per-agent `blocking: true` frontmatter, not from suppressing a user-global execution mode;
+  `task.batch` is verified as a runtime precondition with a documented fallback. The installer
+  must not write either key.
 
 The manifest `installer_delta` must record `before: null` for a key that was absent, so
 rollback removes it rather than writing OMP's default back explicitly (§D).
 
 **Acceptance**: merging into an existing project config adds the **four** worker role keys
-**and** the two isolation keys, writes **no** `modelRoles.tech-lead` key, preserves every
+**and** the two isolation keys **and** `task.enableLsp: true`, writes **no**
+`modelRoles.tech-lead` key, writes **no** `async.enabled` or `task.batch` key, preserves every
 existing key, and reports conflicts per key. A
 user-target merge without the opt-in flag writes zero `task.isolation.*` keys and prints the
 preflight notice. Round-trip rollback removes exactly the keys the installer inserted.

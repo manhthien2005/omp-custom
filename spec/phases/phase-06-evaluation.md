@@ -35,6 +35,16 @@ allowlist, no bundled-name collision, every `autoloadSkills` name resolvable, ev
 **worker agent** (`explorer`, `implementer`, `verifier`, `reviewer`) carrying a valid
 `output:` frontmatter schema.
 
+**CR-39/CR-40 — two more static checks, both catching defaults that work against the template:**
+
+- **`blocking: true` on all four worker files.** Missing ⇒ that worker becomes a background job
+  (`async.enabled` defaults `true`; `blocking` has no parser default), and every stage barrier in
+  `04-workflow-sizing.md` breaks with a clean-looking early return rather than an error. Exactly
+  the silent-structural defect L0 is for.
+- **LSP allowlist ↔ setting coherence.** If any agent lists `lsp`, the template's project
+  `config.yml` must set `task.enableLsp: true` — its default is `false`, so otherwise the
+  allowlist grants what the settings layer withholds.
+
 **CR-28 correction:** L0 must NOT require "every dispatch carries inline `outputSchema`" — that inverts DR-2. The correct L0 check is: every worker agent has a canonical `output:` frontmatter block (the primary enforcement path per DR-2 and `spec/06`). Caller inline `outputSchema` is an override, not the default — its presence is not required and its absence is not a defect.
 
 **Acceptance**: L0 detects all eight P0 defects when reintroduced. Report wording
@@ -63,9 +73,20 @@ not installer-owned and has no mandatory runtime consumer after CR-06 and CR-33
 `tech-lead` is optional and its absence is **not** a failure. Asserting five would
 re-require the key CR-34 removed and would contradict the four-agent count above.
 
+**CR-39/CR-40 — L1 also asserts the execution-mode and capability settings**, because both are
+defaults that work *against* this template and both fail silently:
+
+- `effectiveAgent.blocking === true` for all four discovered workers. Check the **parsed**
+  value, not the file text: `task/index.ts:707` tests exact `=== true`, so a truthy-but-not-`true`
+  frontmatter value passes a text grep and still becomes a background job.
+- effective `task.batch == true` — else the Orchestrated wire has no `tasks[]` and no stable index.
+- effective `task.enableLsp == true` in the project target — the settings half of the LSP
+  conjunction (§07 §A-1).
+
 **Acceptance**: L1 confirms **four** agents (no `tech-lead`), three commands, three skills,
 **four** required resolvable worker model roles (`explorer`, `implementer`, `verifier`,
-`reviewer`; `tech-lead` optional), and the effective isolation settings above.
+`reviewer`; `tech-lead` optional), the effective isolation settings above, `blocking === true`
+on every worker, `task.batch == true`, and `task.enableLsp == true`.
 
 ### T-06.3 — Add L2 (contract) + L3 (behavioral) workflow fixtures
 
@@ -140,7 +161,11 @@ wrong answers.
 ## Exit Criteria
 
 - [ ] L0 catches all eight P0 defects
-- [ ] L1 confirms OMP discovery (5 agents, 3 commands, 3 skills, 5 model roles)
+- [ ] L0 fails a worker agent missing `blocking: true` (CR-39) and an `lsp` allowlist entry
+      without `task.enableLsp: true` (CR-40)
+- [ ] L1 confirms OMP discovery: **4 agents** (no `tech-lead` — CR-33), 3 commands, 3 skills,
+      **4 required worker model roles** (`tech-lead` optional — CR-34), `blocking === true` on
+      every worker, and effective `task.batch` / `task.enableLsp` / isolation settings
 - [ ] L2 (contract) proves schema rejection and retry actually occur
 - [ ] L3 (behavioral) fixtures pass, including ambiguity and failing-verification cases
 - [ ] L4 adversarial cases detected

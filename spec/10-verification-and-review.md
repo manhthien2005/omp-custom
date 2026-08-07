@@ -233,6 +233,21 @@ Reviewing code that does not pass its own tests wastes the reviewer on defects t
 
 Corollary: if verification returns `FAIL`, **do not dispatch the Reviewer**. Return to the Implementer with the failure evidence. The template's command files should make this branch explicit rather than implying a linear pipeline.
 
+**CR-39 — this ordering requires `blocking: true`, or the branch is unreachable.** The corollary
+above is a decision made *on the Verifier's result*, which means the orchestrator must actually
+hold that result before choosing. It does not by default: `async.enabled` defaults to `true` and
+`blocking` has no parser default, so a Verifier without `blocking: true` returns a "spawned
+background agent" acknowledgement and the orchestrator proceeds — dispatching the Reviewer
+against an unverified tree, and later receiving the `FAIL` as an async injection after the
+review it was supposed to prevent.
+
+The same applies to the Reviewer: `decision: APPROVED` gating the final report is a barrier, so
+a non-blocking Reviewer allows a report to be written before any findings exist. Both agents
+therefore carry `blocking: true` (`03-agent-topology.md`, `08-isolation-and-concurrency.md §C-1`).
+An evidence discipline whose gates can be bypassed by a default execution mode is not a
+discipline — this is the same class of error as CR-35, where a stated guarantee outran its
+mechanism.
+
 ---
 
 ## F. Evidence Discipline Applies to the Orchestrator Too
@@ -254,3 +269,4 @@ Beyond the schema, one behavioral rule: **the orchestrator does not re-derive ve
 6. Review decision is a function of findings: `APPROVED` ⇒ no blockers; `CHANGES_REQUESTED` ⇒ at least one.
 7. Reviewer runs risk-based: never in Quick, conditionally in Standard, always in Orchestrated.
 8. Verification precedes review; a `FAIL` short-circuits back to the Implementer and skips review entirely.
+9. **CR-39 — the Verifier and Reviewer MUST declare `blocking: true`.** Both the verify→review gate and the review→report gate are decisions made on a worker's completed result. Without `blocking: true` the `task` call returns before the result exists (`async.enabled` defaults `true`; `blocking` has no default), so the gate is skipped and the result arrives afterwards as an async injection. See §E.

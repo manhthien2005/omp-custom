@@ -127,7 +127,7 @@ Token cost is paid only in the three agents whose output the invariant governs.
   provision: an agent whose `tools:` list omits `lsp` cannot call it regardless of the
   setting. Explorer's prompt instructs LSP use while its allowlist forbids it.
 - Any agent needing LSP must list `lsp` explicitly **and** run with
-  `task.enableLsp: true`. The baseline already sets the latter.
+  `task.enableLsp: true`. **The latter is NOT a given (CR-40)** — it defaults to `false`, so the project install must own it; see `07-retrieval-and-code-understanding.md §A-1`.
 
 ## 7. Model Roles
 
