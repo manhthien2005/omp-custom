@@ -106,9 +106,33 @@ unmerged.
 ## E. Flows
 
 Each flow below is the corrected version of the corresponding command file.
-Changes from current: no `policy:` references, explicit `isolated: true` on
-Implementer dispatch, explicit `outputSchema` reliance, and named escalation
-points.
+Changes from current: no `policy:` references, **per-workflow** explicit
+isolation on Implementer dispatch (`false` in Standard, `true` in Orchestrated —
+CR-02), explicit `outputSchema` reliance, and named escalation points.
+
+**CR-02 — isolation is not uniform across sizes.** An earlier revision of this
+file dispatched the Standard Implementer with `isolated: true`. That contradicted
+the canonical isolation policy in `08-isolation-and-concurrency.md §B`, which the
+capture-first architecture (CR-09/27/30) is built on:
+
+```yaml
+Standard:
+  implementer:
+    isolated: false          # single writer; no concurrency to defend against
+Orchestrated:
+  parallel_implementer:
+    isolated: true
+    apply: false             # capture-first; Tech Lead integrates serially
+```
+
+Standard has exactly one Implementer and no concurrent writer, so isolation buys
+nothing and costs a git-repo requirement (`prepareIsolationContext` throws
+without one), worktree materialization, and an integration step that can fail.
+Isolation in Standard would also drag Standard onto the capture-first path — the
+`task.isolation.apply: false` preflight, artifact retention, and integration
+ordering — none of which Standard needs. The contradiction was load-bearing
+because this file defines flow steps and verification criteria that an
+implementation agent follows literally.
 
 ### Quick
 
@@ -131,11 +155,17 @@ one-file change, a task spawn costs more than it saves.
 2. Explore             — task → explorer (no isolation)
 3. Mini-spec           — inline; 2–5 Given/When/Then criteria; out-of-scope
 4. Plan                — ≤7 steps with checkpoints
-5. Implement           — task → implementer (isolated: true)
+5. Implement           — task → implementer (isolated: false — CR-02)
 6. Verify              — task → verifier (no isolation)
 7. Review              — task → reviewer (no isolation), risk-gated
 8. Summarize           — criteria results, evidence, unresolved
 ```
+
+Step 5 is **not** isolated. One Implementer writing to the checkout it was
+dispatched against is the whole point of Standard: there is no second writer to
+corrupt, and the edits are already in the working tree when the Verifier runs.
+Standard therefore never enters the capture-first path and never needs the
+`task.isolation.apply` preflight (`08-isolation-and-concurrency.md §E-9`).
 
 Review is gated on: public API change, security-relevant code, or a diff the
 Verifier passed but the session finds hard to reason about. Not gated on size.
@@ -143,22 +173,39 @@ Verifier passed but the session finds hard to reason about. Not gated on size.
 ### Orchestrated
 
 ```
+0. Preflight           — nested-repo scan + effective-settings check; may disable parallel (§E-9, §D-1)
 1. Triage + decompose  — identify genuinely independent workstreams
 2. Explore in parallel — task batch → N explorers, distinct scopes
 3. Architecture review — synthesize; write the spec; assign quality gates
 4. Task graph          — dependencies explicit; only independent nodes parallel
-5. Implement           — task batch → implementers (isolated: true each)
-6. Verify              — task → verifier, after merge, against the whole
-7. Review              — task → reviewer, independent
-8. Integrate + report  — cross-workstream validation, evidence report
+5. Implement in parallel — task batch → implementers (isolated: true, apply: false)
+                          → capture only; nothing lands in the parent tree
+6. Integrate serially  — main Tech Lead applies retained artifacts in
+                          original task-index order (§E-10); stop on first conflict
+7. Verify              — task → verifier, once, against the integrated tree
+8. Review              — task → reviewer, independent
+9. Report              — cross-workstream validation, evidence report
 ```
 
 Concurrency is capped at 4 by the frozen baseline (`task.maxConcurrency`).
 Step 5's parallel implementers are the reason `isolated: true` matters most
 here: concurrent writers to one checkout corrupt each other.
 
-Step 6 runs *after* merge, once, against the integrated result. Verifying each
-isolated worktree separately proves each piece works alone and nothing about
+**Steps 5→6 are the capture-first split (CR-29).** Workers do not apply their own
+changes; `apply: false` retains a patch or branch artifact per worker and the
+main-session Tech Lead integrates them one at a time. Integration order is the
+**original task-list index**, never worker completion order — see
+`08-isolation-and-concurrency.md §E-10`. On the first conflict, integration stops,
+the remaining artifacts are preserved unapplied, and the partial parent state is
+reported; the Verifier does **not** run on a partially integrated tree.
+
+Step 0 can veto parallelism entirely. Two conditions force the sequential
+non-isolated fallback: effective `task.isolation.apply` is not `false`
+(§E-9), or the repository contains a nested git repository or submodule (§D-1).
+Both are mechanical checks, both run before fan-out.
+
+Step 7 runs *after* integration, once, against the integrated result. Verifying
+each isolated worktree separately proves each piece works alone and nothing about
 the whole.
 
 ---
@@ -180,7 +227,13 @@ the whole.
 
 - Each command file's "when to use" matches the table in section C.
 - No command file contains a `policy:` reference.
-- Standard and Orchestrated dispatch Implementers with `isolated: true`.
+- Standard dispatches its Implementer with `isolated: false`; Orchestrated
+  dispatches its parallel Implementers with `isolated: true` and does **not**
+  rely on worker-side apply (CR-02).
+- Orchestrated integration happens in the main session, in original task-index
+  order, after all workers settle — not inside the workers (CR-29).
+- Orchestrated preflight runs before fan-out and can downgrade to the sequential
+  non-isolated flow (CR-31 settings check, CR-32 nested-repo check).
 - Escalation triggers are named explicitly in each command.
 - A fixture per size confirms the flow runs end to end (`13-validation-and-evaluation.md`).
 

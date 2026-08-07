@@ -31,22 +31,80 @@ it did not verify is worse than no orchestration at all.
 The Verifier must run every verification command fresh in its own session and read
 the actual output. It must never infer a pass from the Implementer's report.
 
-Mechanically supported by: separate in-process AgentSession (no shared transcript — CR-08: OMP subagents run on the main thread, not in an OS subprocess),
-`autoloadSkills: evidence-before-completion`, and a `verification-result` schema whose
-required fields cannot be satisfied without real command output.
+Mechanically supported by: separate AgentSession with no shared transcript (CR-08),
+`autoloadSkills: evidence-before-completion`, and a `verification-result` schema that
+requires `commands_run` with exit codes and per-criterion evidence.
+
+**CR-35 — what the schema proves, and what it does not.** An earlier revision of this
+task claimed the schema's "required fields cannot be satisfied without real command
+output." That claim is false and is withdrawn. `buildOutputValidator()`
+(`tools/output-schema-validator.ts`) compiles the declared schema and runs
+`validateJsonSchemaValue()` against the yielded object. It is generic JSON Schema
+validation: it knows about types, `required`, closure, and per-section labels. It has no
+access to the child's tool-call events and no concept of `commands_run` provenance. A
+Verifier that runs zero `bash` calls and yields a syntactically perfect object with
+invented commands, exit codes, and evidence strings **passes validation**.
+
+The honest contract, stated in three separable layers:
+
+```yaml
+schema_layer:
+  proves: the evidence claim is structurally complete and internally consistent
+  does_not_prove: the commands were executed
+independence_layer:
+  proves: the Verifier did not author the implementation (separate session, no shared transcript)
+  does_not_prove: its evidence strings came from real tool events
+provenance_layer:
+  v0_status: behavioral — the prompt requires fresh execution; not runtime-attested
+  audit_path: the child transcript is addressable at `history://<verifier-id>` and
+              renders one line per tool call with arguments
+              (`session/session-history-format.ts` — `toolCallLine()`), so a
+              claimed-vs-executed comparison is mechanically possible from the parent
+  gate: T-04.8 (below) must confirm the transcript carries enough tool-call detail
+        before any spec text claims fabrication is detectable
+```
+
+So "no false completion" is defended by independence plus structural discipline, not by
+execution attestation. Where the spec states the guarantee — `10-verification-and-review.md §A`,
+`README §14` — it MUST use that wording.
 
 **Acceptance**: `verification-result` requires `commands_run` with exit codes and
 per-criterion evidence; the Verifier prompt forbids inference; `PASS` is invalid when
-any criterion lacks evidence.
+any criterion lacks evidence; **no spec text claims the schema proves execution**.
 
 ### T-04.2 — Enforce failure classification
 
-Every failure classifies as `impl`, `env`, or `flaky`. The three lead to different
-actions: fix the code, fix the environment, re-run and investigate nondeterminism.
-Without classification, an environment failure gets "fixed" by changing correct code.
+Every failure classifies as `impl`, `env`, `flaky`, or `preexisting`. Each leads to a
+different action: fix the code, fix the environment, re-run and investigate
+nondeterminism, or attribute the failure away from the current diff. Without
+classification, an environment failure gets "fixed" by changing correct code.
 
-**Acceptance**: classification is required for each failure; the prompt defines the
-three categories and their distinct consequences.
+**CR-36 — `preexisting` is required, not optional.** The three-value enum could not
+represent the most common deterministic case in a real repository: a test that was
+already failing on the base commit, in a subsystem the diff does not touch, failing
+identically after the change. It is not `impl` (the current code did not cause it), not
+`env` (the toolchain is fine), and not `flaky` (it is perfectly deterministic). Forced
+into `impl` — the only remaining option that does not lie about determinism — the
+prescribed remediation sends the Implementer to modify out-of-scope code until the
+symptom moves. That is precisely the expensive misattribution the taxonomy exists to
+prevent, manufactured by the taxonomy itself.
+
+```yaml
+preexisting:
+  meaning: the failure reproduces on the base commit, independent of this change
+  evidence_required: base-commit run showing the identical failure
+  attribution: NOT the current diff
+  next_action: surface as project risk / coverage blocker; do NOT dispatch the Implementer
+  decision_effect: does not force FAIL for this change; MUST appear in the result
+```
+
+The `evidence_required` line is what keeps `preexisting` from becoming a universal
+excuse: claiming it obliges the Verifier to show the base-commit failure, which is a
+command with output like any other criterion.
+
+**Acceptance**: classification is required for each failure; the prompt defines all four
+categories and their distinct consequences; `preexisting` requires base-commit evidence
+and does not route to the Implementer.
 
 ### T-04.3 — Make review diff-first
 
@@ -92,17 +150,53 @@ Lead must treat those fields as unverified and re-check independently.
 
 **Acceptance**: the handling rule appears in the commands and in `10-verification-and-review.md`.
 
+### T-04.8 — Measure what the child transcript can prove (CR-35 experiment)
+
+T-04.1 downgrades the provenance claim because schema validation cannot attest execution.
+This task establishes what the **available** provenance mechanism can actually support, so
+the high-risk audit path in T-04.1 rests on measurement rather than on the same optimism
+the schema claim rested on.
+
+Source facts to start from (OMP v17.2.10):
+
+- Each subagent's transcript is persisted as `<artifactsDir>/<id>.jsonl`
+  (`task/executor.ts` — `subtaskSessionFile`), and `history://<id>` renders it
+  (`internal-urls/history-protocol.ts`), falling back to an on-disk scan for
+  unregistered agents.
+- `formatSessionHistoryMarkdown()` renders each `toolCall` block with its **name and
+  arguments**, collapsing the matching `toolResult` into the same line
+  (`session/session-history-format.ts` — `toolCallLine`).
+
+So tool *names* and *arguments* are recoverable. What must be measured, not assumed:
+
+| # | Question | Why it matters |
+|---|---|---|
+| 1 | Is the full `bash` command text recoverable from the rendered transcript, or is it truncated? | A truncated command cannot be matched against a `commands_run` entry. |
+| 2 | Is command **output**/exit code recoverable, or only the invocation? | Determines whether a claimed `exit_code` is checkable or only the fact of invocation is. |
+| 3 | What does the transcript cost to read at realistic verification length? | An audit that costs more than re-running the command should re-run the command instead. |
+| 4 | Is `history://<id>` reachable for an isolated, torn-down worker? | Isolated agents are not revivable; the disk-scan fallback must be confirmed for them. |
+| 5 | Can a deterministic matcher fire without false positives on legitimate results? | A noisy check is one the Tech Lead learns to skip. |
+
+**Acceptance**: a recorded measurement per question. If (1) and (2) hold, T-04.1's
+high-risk audit is a real cross-check and the wording may be strengthened to name it as
+such. If they do not, the honest fallback is stated: **re-run the criterion command in the
+main session for high-risk work** and treat the Verifier's evidence as a claim to
+corroborate, not a proof. Either way the outcome is recorded — no provenance strength is
+asserted that this task did not measure.
+
 ---
 
 ## Deliverables
 
 - Verifier prompt and schema enforcing fresh, evidence-backed verification
-- Failure classification with distinct consequences
+- Failure classification with distinct consequences, including `preexisting`
 - Diff-first Reviewer with bounded expansion
 - Required, checkable false-positive control
 - Inlined risk-based gate matrix
 - Blocking-decision consistency rules
 - Override handling
+- Stated provenance boundary (structural validity vs execution attestation) plus the
+  fabricated-evidence fixture and the T-04.8 measurement backing it
 
 ---
 
@@ -114,19 +208,38 @@ Lead must treat those fields as unverified and re-check independently.
 4. Submit a clean diff; confirm `APPROVED` with populated `false_positive_checks`.
 5. Submit a security-touching diff at MEDIUM risk; confirm the security gate activates.
 6. Confirm a blocking finding cannot coexist with `APPROVED`.
+7. **Fabricated-evidence fixture (CR-35).** Run a Verifier that makes **zero** `bash`
+   calls and yields a schema-valid `PASS` with invented `commands_run`, exit codes, and
+   per-criterion evidence. Confirm the documented outcome: the yield is **accepted** by
+   schema validation. This is a characterization test of the provenance boundary, not a
+   defect to be fixed at schema level — it must keep passing (i.e. keep being accepted)
+   for as long as T-04.1's stated boundary is the honest one. If a future OMP version or
+   template mechanism rejects it, T-04.1's wording is upgraded and this fixture inverts.
+8. **Pre-existing failure fixture (CR-36).** Baseline contains a deterministic failing
+   test unrelated to the diff; the implemented change is clean and does not touch that
+   subsystem. Confirm classification is `preexisting` with baseline evidence — **not**
+   `impl` — and that the Implementer is not dispatched to "fix" it.
+9. Confirm a `preexisting` classification does not by itself force `FAIL`, and that it
+   appears in the report as a project risk with its baseline evidence.
 
 ---
 
 ## Exit Criteria
 
 - [ ] Verifier runs fresh and cites real output
-- [ ] `PASS` impossible without per-criterion evidence
-- [ ] Failures classified impl/env/flaky
+- [ ] `PASS` **structurally** impossible without per-criterion evidence fields — and the
+      provenance boundary (fields are a claim, not an attestation) is stated in both
+      `10-verification-and-review.md` and the Verifier prompt (CR-35)
+- [ ] Failures classified `impl` / `env` / `flaky` / `preexisting` (CR-36)
 - [ ] Review is diff-first with bounded expansion
 - [ ] `false_positive_checks` required and substantive
 - [ ] Gates activate by risk level
 - [ ] Blocking/decision consistency enforced
 - [ ] `schemaOverridden` treated as unvalidated
+- [ ] Fabricated-evidence fixture recorded with its documented (accepted) outcome
+- [ ] Pre-existing-failure fixture classifies `preexisting`, not `impl`
+- [ ] T-04.8 transcript-provenance measurement recorded, and T-04.1's high-risk audit
+      wording matches what it measured
 
 ---
 
@@ -138,3 +251,6 @@ Lead must treat those fields as unverified and re-check independently.
 | Reviewer produces noise that trains users to ignore it | Required false-positive control and severity tiers |
 | Gates fire on irrelevant tasks | Risk-based matrix, LOW gets none |
 | Strict schemas cause retry loops | `yield` bounds retries at 3, then surfaces the override |
+| **CR-35 — the spec overclaims what schemas prove, so a fabricated `PASS` reads as verified** | T-04.1 states the boundary explicitly; the fabricated-evidence fixture keeps it visible; high-risk work corroborates via transcript audit or main-session re-run (T-04.8) |
+| **CR-36 — `preexisting` is misclassified as `impl`, sending the Implementer to change out-of-scope working code** | Fourth category with baseline-evidence requirement; fixture asserts the classification; `preexisting` never routes to the Implementer |
+| Baseline capture for `preexisting` is itself expensive on large suites | Baseline is captured once per workflow before implementation, reused across verification rounds; scope to the criterion commands, not the whole suite |

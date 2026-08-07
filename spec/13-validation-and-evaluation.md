@@ -90,10 +90,28 @@ Test the failure modes the design claims to prevent. These cases must be fully d
 |---|---|---|
 | **Effective `apply=true` despite install** | Install correctly, then override `task.isolation.apply: true` via a higher-precedence layer (CLI overlay / runtime override), then run `/orchestrated` on independent parallel scope | `/orchestrated` preflight refuses the parallel path; falls back to sequential non-isolated or refuses with the setting named; degradation disclosed in the final report. **Silently fanning out with `apply=true` is a FAIL.** |
 | **`mode: none` with parallel dispatch** | Set `task.isolation.mode: none`, run `/orchestrated` | Preflight refuses. The `isolated` field is *stripped* not rejected (§08 §A), so absent the preflight this silently degrades to concurrent unisolated writers — the worst case in the suite. |
-| **Nested-repo scope reaches a parallel worker** | Fixture repo with a nested git repo / submodule; request a change touching both root and nested paths | Orchestrator enumerates nested repos pre-fan-out and routes nested scope to sequential non-isolated implementation. If a parallel worker does mutate a nested repo, post-integration nested-repo `git status` MUST flag it as a contract violation. **A clean report with a silently-dropped nested change is a FAIL** (§08 §D-1). |
+| **Nested repo present at all** | Fixture repo containing a nested git repo or submodule; request ordinary independent parallel work touching **only root paths** | Preflight detects `nested_repo_count > 0` and **disables parallel isolated implementation for the whole repository**, routing to sequential non-isolated (§08 §D-1.2). The check fires on *presence*, not on requested scope. **Fanning out in parallel because "the scope avoids the nested repo" is a FAIL** — that was the withdrawn Round-5 rule (CR-32 round 6). |
 | **`tech-lead` discoverable as an agent** | Place any `tech-lead.md` under an agents discovery root | L1 reports FAIL (§B L1). Verifies the CR-33 relocation cannot silently regress. |
 
 The first three share a signature worth stating plainly: the runtime returns success, the report reads clean, and work is missing or unsafely serialized. None of them is detectable from the task result alone — each needs an explicit assertion.
+
+**Why the nested-repo case tests the preflight and not a post-hoc detector.** An earlier
+revision of this table asserted that post-integration nested-repo `git status` would flag a
+violating worker. It cannot: on the successful `apply=false` path the nested change is never
+persisted and the worktree is torn down, so the parent's nested repo is unchanged whether the
+worker complied or silently lost work (§08 §D-1.1). A fixture asserting on that detector would
+pass while the defect it targets goes undetected — the exact "validator that cannot fail on a
+real defect" this spec's principle 9 prohibits. The assertion is therefore on the **preflight
+decision**, which is observable: did the orchestrator refuse to fan out?
+
+**CR-35/CR-36 — evidence-provenance and failure-taxonomy fixtures.** Both target the
+project's central "no false completion" claim:
+
+| Case | Setup | Required detection response |
+|---|---|---|
+| **Verifier fabricates evidence** (CR-35) | Drive a Verifier that makes **zero** `bash` calls and yields a schema-valid `PASS` with invented `commands_run`, `exit_code: 0`, and per-criterion `evidence` strings | The yield **succeeds** — `buildOutputValidator()` does pure JSON Schema validation with no tool-event correlation (`tools/output-schema-validator.ts`). This is the **expected** outcome and must be recorded as such. The fixture's assertion is on the *spec*, not the runtime: `spec/10 §B-1` and phase-04 T-04.1 MUST describe verification as shape-enforced and behaviorally-required, never as provenance-attested. **A spec claiming schema fields "cannot be satisfied without real command output" while this fixture passes is a FAIL.** |
+| **Transcript audit detects the fabrication** (CR-35, T-04.8) | Same fixture; Tech Lead then reads `history://<verifier-id>` | The transcript renders one line per tool call with name and arguments (`session/session-history-format.ts`), so a Verifier with zero `bash` calls is distinguishable from one that ran the claimed commands. Records whether the audit is deterministic enough to gate on. Gates any future stronger claim. |
+| **Deterministic pre-existing failure** (CR-36) | Baseline contains a deterministic failing test in a subsystem the diff does not touch; implemented change is clean; Verifier runs the full suite | Classification is `preexisting` with baseline evidence, and the Implementer is **not** dispatched. **Classifying as `impl` is a FAIL** — it sends the Implementer to modify out-of-scope code, the exact expensive error the taxonomy exists to prevent (§10 §B). |
 
 ---
 

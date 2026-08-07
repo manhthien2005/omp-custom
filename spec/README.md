@@ -145,7 +145,9 @@ User
 Main OMP session  ── IS the Tech Lead
   ├── AGENTS.md   — coding constitution + role map (persistent)
   ├── RULES.md    — sticky invariants (short)
-  ├── config.yml  — modelRoles: tech-lead/explorer/implementer/verifier/reviewer
+  ├── config.yml  — modelRoles: explorer/implementer/verifier/reviewer  (4 worker roles;
+  │                 tech-lead is an OPTIONAL user alias, not installer-owned — CR-34)
+  │                 task.isolation.apply: false / mode: auto  (project target — CR-31)
   │
   ├── /quick         → inline. inspect → implement → verify. 0 subagents.
   ├── /standard      → task: explorer → implementer → verifier → [reviewer if risk]
@@ -379,14 +381,36 @@ Each verified by direct source reading, with the file and line recorded in
 
 ## 14. Definition of "Production Ready"
 
-1. All P0 and P1 findings in `00-current-state-audit.md` resolved or explicitly waived with rationale.
-2. OQ-1…OQ-5 answered by recorded experiment, not inference.
-3. Each of the three workflows executes end-to-end with no silent no-ops.
-4. Structured output demonstrably enforced: a deliberately malformed worker result is rejected and retried.
-5. Installer: dry-run, diff, backup, manifest, rollback, idempotent re-run, config merged not clobbered.
-6. Validation tiers report independently; no aggregate score conceals a tier failure.
-7. L0–L3 evaluation green; L4 shows quality neutral-or-better at equal-or-lower tokens per accepted outcome.
-8. Every remaining abstraction has a named runtime consumer, or is documented as non-runtime.
+These are the **canonical production-ready gates**, identified `PR-1`…`PR-8`. Every other
+file MUST reference them **by ID** rather than restating them in prose (CR-23/CR-37).
+Paraphrase is how "all four validation levels" and "every OQ resolved or explicitly open"
+drifted into `phase-07` and contradicted this section; ID references cannot drift.
+
+| ID | Gate |
+|---|---|
+| **PR-1** | All P0 and P1 findings in `00-current-state-audit.md` resolved, or explicitly waived with recorded rationale. |
+| **PR-2** | **OQ-1…OQ-5 each `resolved_with_recorded_evidence`** — answered by recorded experiment, not inference. An OQ marked "explicitly open" does **not** satisfy this gate. |
+| **PR-3** | Each of the three workflows executes end-to-end with no silent no-ops. |
+| **PR-4** | Structured output demonstrably enforced: a deliberately malformed worker result is rejected and retried. |
+| **PR-5** | Installer: dry-run, diff, backup, manifest, rollback, idempotent re-run, config merged not clobbered. |
+| **PR-6** | Validation tiers report independently, and **L0–L3 operational gates are green**. No aggregate score conceals a tier failure. |
+| **PR-7** | **L4 comparative criterion** meets its threshold: quality neutral-or-better at equal-or-lower tokens per accepted outcome. |
+| **PR-8** | Every remaining abstraction has a named runtime consumer, or is documented as non-runtime. |
+
+**Never state a validation-level count.** The taxonomy is **L0 Static, L1 Discovery,
+L2 Contract, L3 Behavioral, L4 Adversarial/Comparative** — five levels, split across two
+gates because they are gates of different kinds: PR-6 covers the four operational levels
+that must be green, PR-7 covers the comparative benchmark that must meet a threshold.
+Phrases like "all four validation levels passing" conflate them and are prohibited
+(CR-23). See `13-validation-and-evaluation.md`.
+
+**PR-2 is not waivable by a caveat (CR-37).** "Production ready with caveats X and Y" is a
+legitimate verdict for known bounded limitations, but it cannot absorb an unresolved
+High-impact runtime experiment. An open required OQ means a load-bearing runtime assumption
+is unverified, which is exactly the class of unknown that a readiness claim asserts is
+closed. If any required OQ is open, the verdict is **NOT READY** — with the specific OQ
+named. Changing that policy requires changing this section, not a local exception in a
+phase file.
 
 ---
 

@@ -127,7 +127,11 @@ Verify how missing/unknown model roles resolve in the OMP main session and for w
 
 Test cases:
 1. known built-in role with config present — record selected model
-2. known custom role (`@tech-lead`) with config present — record selected model
+2. known custom role with config present — record selected model. **Use a required worker
+   role (`@implementer`), not `@tech-lead` (CR-34):** `tech-lead` is an optional alias with
+   no mandatory runtime consumer, so testing the required path with it would prove role
+   resolution for a role the template does not own. Test `@tech-lead` separately, if at all,
+   as the optional-alias case.
 3. referenced custom role absent from config — record selected model or error
 4. arbitrary `@unknown` pattern (not a built-in, not in config) — record parser/resolver terminal behavior (error vs silent fallback)
 5. role resolves to unavailable provider/model — record error or fallback (distinguishes alias-resolution success from downstream provider failure)
@@ -149,18 +153,34 @@ Baseline cases (original scope):
 3. isolation backend unavailable — record fallback behavior
 4. non-git repository — record fallback behavior
 
-#### E3-A — Settings control surface (CR-30)
+#### E3-A — Settings control surface (CR-30) + concrete read mechanism (CR-31)
 
-Assert the effective values are readable at runtime and that no per-item `apply` exists:
+Assert the effective values are readable at runtime and that no per-item `apply` exists.
+The read mechanism is **no longer open** — `docs/settings.md` documents that
+`omp config get` reports the merged effective value, and `--json` gives a parseable shape.
+Run from the intended project root:
 
+```bash
+omp config get task.isolation.mode  --json    # expect value != "none"
+omp config get task.isolation.apply --json    # expect value == false
 ```
-effective task.isolation.mode  != "none"
-effective task.isolation.apply == false
-```
+
+Record for each: exit code, the raw JSON, and the parsed `value`. Unknown keys exit
+non-zero (`docs/settings.md`), so a non-zero exit is itself a signal the preflight must
+treat as "cannot prove" → refuse parallel.
 
 Also confirm that passing `apply: false` inside a task **item** is silently stripped (arktype `"+": "delete"`), not honored — i.e. that the settings layer is the only control point.
 
-**Records**: how `/orchestrated` reads effective settings (the exact mechanism the preflight will use).
+**Additionally record the cwd sensitivity (CR-31 §2.5).** OMP settings discovery checks
+only `<cwd>/.omp/`, never ancestors (`docs/settings.md`, "A project setting is not taking
+effect"). Run the same two commands from a subdirectory (e.g. `packages/foo/`) of a repo
+whose `.omp/config.yml` sets `apply: false`, and record whether the effective value
+changes. If it does, the preflight MUST also verify the session cwd is the intended
+project root, and the refusal message MUST name cwd as the likely cause.
+
+**Records**: the exact command, exit code, and JSON shape `/orchestrated` will parse; the
+observed cwd sensitivity. This case is BLOCKING — every downstream preflight claim depends
+on it.
 
 #### E3-B — Capture-only root patch durability
 
@@ -220,18 +240,61 @@ Record exactly:
 - is any nested patch file materialized under the artifacts dir?
 - after teardown, can the parent locate and `git apply` the nested change?
 
-**Expected per source reading (OMP v17.2.10):** no — `persistNestedPatches()` is reachable only from `isolationRecoveryHint()` (failure path), and the `apply=false` summary's `else if` chain reports only `patchPath` when the root also changed. If the experiment confirms this, the CR-32 Option A exclusion (nested-repo mutation FORBIDDEN for parallel isolated Implementers) stands as normative. If a future OMP version materializes them, the exclusion may be lifted with recorded evidence.
+**Expected per source reading (OMP v17.2.10):** no — `persistNestedPatches()` is reachable only from `isolationRecoveryHint()` (failure path), and the `apply=false` summary's `else if` chain reports only `patchPath` when the root also changed. If the experiment confirms this, the CR-32 **Option A1** policy (any nested repo present ⇒ parallel isolated implementation DISABLED for that repository) stands as normative — see `08-isolation-and-concurrency.md §D-1.2`.
+
+**Also record the preflight-vs-runtime agreement.** The orchestrator's nested-repo
+enumeration MUST be a superset of what OMP's own capture walks. Run the §D-1.2 preflight
+commands and compare against what `captureDeltaPatch()` actually produced `nestedPatches`
+entries for. Any repo OMP captured that the preflight missed is a preflight defect — record
+it, because the A1 gate is only as good as its enumeration. Cases to include: a tracked
+submodule, a plain nested repo, a nested repo under `node_modules` (OMP skips it), and a
+nested repo two levels deep.
+
+**Lift path (Option A2, NOT adopted for v0).** Also record, as future-facing evidence only:
+whether a `tool_call` extension hook discovered *inside* the isolation worktree can block a
+`write`/`edit`/`bash` call targeting a nested path. Source indicates it should be possible —
+`runIsolatedSubprocess()` passes `preloadedExtensionPaths: undefined`
+(`task/isolation-runner.ts:168`), which triggers full discovery with `cwd` = the isolation
+dir, and `ExtensionToolWrapper` blocks on `{ block: true }` and fails closed on a throw
+(`extensibility/extensions/wrapper.ts:200-232`). Confirming this would allow narrowing A1
+from a repository-wide disable back to a mechanically-enforced scope exclusion. **A negative
+or ambiguous result changes nothing** — A1 remains the v0 policy either way.
 
 #### E3-H — Config precedence and preflight refusal (CR-31 — decisive)
+
+Run every case through the concrete preflight command, not by reading files:
+
+```bash
+omp config get task.isolation.mode  --json
+omp config get task.isolation.apply --json
+```
 
 ```
 global apply=true + project apply=false  → effective false   (project wins)
 project config absent, global/default true → effective true
   → /orchestrated preflight MUST refuse the parallel path
   → falls back to sequential non-isolated, and discloses it
+CLI overlay (--config) apply=true over project apply=false → effective true
+  → preflight MUST refuse (this is why file inspection is insufficient)
 ```
 
-Also record whether a CLI/runtime overlay can override project config — this is why the preflight reads *effective* values rather than trusting the installed file.
+**Also record the cwd-scoping case (CR-31 §2.5).** `docs/settings.md` states settings
+discovery checks only the current working directory's `.omp/`, **not ancestor directories**.
+So a correct install at `<repo>/.omp/config.yml` is invisible to a session launched from
+`<repo>/packages/foo/`. Launch from a subdirectory and assert:
+
+```
+cwd = <repo>/packages/foo
+→ omp config get task.isolation.apply --json  reports the DEFAULT (true), not the project value
+→ preflight refuses
+→ the refusal message names cwd scoping as the likely cause, not just the setting
+```
+
+**Also record the tool-availability case.** If `omp config get` cannot be executed at all
+from the workflow's bash tool (not on PATH, non-zero exit, unparseable output), the preflight
+has no evidence and MUST refuse the parallel path. Record the exact observed failure shape so
+the command can distinguish "read succeeded, value is wrong" from "read failed" — they get
+the same refusal but different user-facing messages.
 
 **Artifact**: isolation behavior transcript per scenario, including the E3-G nested-repo determination and the E3-H precedence table.
 

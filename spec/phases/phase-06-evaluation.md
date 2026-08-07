@@ -57,8 +57,15 @@ Tech Lead path.
 install still breaks the Orchestrated path: `task.isolation.mode != "none"` and, in the project
 target, `task.isolation.apply == false`. See `13-validation-and-evaluation.md §L1`.
 
-**Acceptance**: L1 confirms **four** agents (no `tech-lead`), three commands, three skills, five
-resolvable model roles, and the effective isolation settings above.
+**CR-34 — the required resolvable role count is four, not five.** `modelRoles.tech-lead` is
+not installer-owned and has no mandatory runtime consumer after CR-06 and CR-33
+(`12-installation-and-rollback.md §C-1`). L1 asserts that the four worker roles resolve;
+`tech-lead` is optional and its absence is **not** a failure. Asserting five would
+re-require the key CR-34 removed and would contradict the four-agent count above.
+
+**Acceptance**: L1 confirms **four** agents (no `tech-lead`), three commands, three skills,
+**four** required resolvable worker model roles (`explorer`, `implementer`, `verifier`,
+`reviewer`; `tech-lead` optional), and the effective isolation settings above.
 
 ### T-06.3 — Add L2 (contract) + L3 (behavioral) workflow fixtures
 

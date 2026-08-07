@@ -151,12 +151,16 @@ Orchestrated path is unsafe, and OMP's default is `true`.
 ### C-1. Ownership classes
 
 ```yaml
-owned_model_roles:              # both targets
-  modelRoles.tech-lead
+owned_model_roles:              # both targets — REQUIRED: one per spawnable worker agent
   modelRoles.explorer
   modelRoles.implementer
   modelRoles.verifier
   modelRoles.reviewer
+
+optional_model_roles:           # CR-34 — convenience alias, NOT installer-owned
+  modelRoles.tech-lead:
+    installer_owned: false
+    required_for_workflow: false
 
 owned_required_settings:        # PROJECT target only — see C-2
   task.isolation.apply: false   # correctness precondition for parallel capture-first
@@ -165,6 +169,39 @@ owned_required_settings:        # PROJECT target only — see C-2
 user_preserved:
   everything_else               # never read, never written, never reordered
 ```
+
+**CR-34 — `modelRoles.tech-lead` is no longer installer-owned.** Two earlier decisions
+jointly removed its mandatory runtime consumer:
+
+- **CR-06/DR-1** — the main session is the Tech Lead, and its model is *user-controlled*.
+  The template explicitly does **not** guarantee `@tech-lead` routing for the main session
+  (`phases/phase-01-runtime-correctness.md` T-01.7): agent frontmatter is applied only at
+  spawn time, and the main session is never spawned.
+- **CR-33** — `agents/tech-lead.md` is removed from agent discovery entirely, so no
+  `model: "@tech-lead"` frontmatter is ever parsed by `loadAgentsFromDir()`.
+
+A model role only has an effect when something resolves it — either spawn-time agent
+frontmatter, or a user explicitly selecting the alias. After CR-06 and CR-33, neither is
+required by any workflow path, so `@tech-lead` has **zero mandatory runtime consumers**.
+Only the four spawnable worker roles remain required.
+
+Keeping it installer-owned would violate architecture principle 3 ("every artifact maps to
+a verified OMP primitive, or is explicitly labelled documentation / build input / dead"):
+the installer would create the key, conflict on it, track it in the manifest, include it in
+rollback, and require the user to reason about it — all for a value nothing reads.
+
+It is retained as an **optional convenience alias** because OMP does support arbitrary
+custom roles (`config/model-resolver.ts:925`), so a user who wants `@tech-lead` available
+for manual model selection in their main session can add it. The template documents it in
+`docs/roles/tech-lead.md`; the installer neither writes nor validates it. Consequences:
+
+- **Not written** on either target, with or without conflict.
+- **Not in `installer_delta`**, therefore not in rollback.
+- **Not validated** — role-reference validation (`spec/09 §B`) checks only roles actually
+  referenced by a discovered `agents/*.md` file. Since no agent file references
+  `@tech-lead` after CR-33, a missing `modelRoles.tech-lead` is **not** a validation
+  failure. An agent file that *does* reference it would be a CR-33 regression, caught by
+  the L1 check that `tech-lead` must not appear in the discovered agent list.
 
 `task.isolation.merge` is **not** owned. The integration procedure in
 `08-isolation-and-concurrency.md §E-10` handles both `patch` and `branch`; T-00.E3-C records

@@ -57,8 +57,11 @@ report conflicts rather than resolving silently.
 **CR-31 — two ownership classes, target-aware.** Per `12-installation-and-rollback.md §C`,
 the merge now covers two classes, not just `modelRoles`:
 
-- `owned_model_roles` — the five `modelRoles.*` keys. Both targets. Conflict → preserve the
-  user's value, report.
+- `owned_model_roles` — the **four** worker `modelRoles.*` keys (`explorer`, `implementer`,
+  `verifier`, `reviewer`). Both targets. Conflict → preserve the user's value, report.
+  **`modelRoles.tech-lead` is NOT owned (CR-34)** — it has no mandatory runtime consumer
+  after CR-06 (user-controlled main session) and CR-33 (no `tech-lead` agent file), so the
+  installer never writes, conflicts on, tracks, or rolls it back.
 - `owned_required_settings` — `task.isolation.apply: false`, `task.isolation.mode: auto`.
   **Project target only.** For the user/global target these keys are skipped unless
   `-EnableCaptureFirstIsolation` is passed, because writing them globally changes every
@@ -69,8 +72,9 @@ the merge now covers two classes, not just `modelRoles`:
 The manifest `installer_delta` must record `before: null` for a key that was absent, so
 rollback removes it rather than writing OMP's default back explicitly (§D).
 
-**Acceptance**: merging into an existing project config adds the five role keys **and** the
-two isolation keys, preserves every existing key, and reports conflicts per key. A
+**Acceptance**: merging into an existing project config adds the **four** worker role keys
+**and** the two isolation keys, writes **no** `modelRoles.tech-lead` key, preserves every
+existing key, and reports conflicts per key. A
 user-target merge without the opt-in flag writes zero `task.isolation.*` keys and prints the
 preflight notice. Round-trip rollback removes exactly the keys the installer inserted.
 

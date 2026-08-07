@@ -209,8 +209,9 @@ currently unused — which is the desired headroom, not waste.
 
 ## H. Non-Overlap Check
 
-The Definition of Done requires the five roles to have non-overlapping
-responsibilities. Under Option A there are four workers plus the session:
+The Definition of Done requires the roles to have non-overlapping
+responsibilities. Under Option A there are four spawnable workers plus the main session (five
+role slots, but `tech-lead` is optional and user-owned — CR-34):
 
 | Concern | Owner | Anyone else? |
 |---|---|---|

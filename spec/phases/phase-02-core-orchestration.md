@@ -63,7 +63,7 @@ assert effective task.isolation.apply == false
 
 On failure: **do not launch parallel isolated Implementers.** Fall back to sequential non-isolated implementation, or refuse and name the setting the user must opt into. Disclose the degradation in the final report. Deployment target policy (project config owns the key; user/global requires explicit opt-in flag) is specified in `08-isolation-and-concurrency.md §E-9` and `12-installation-and-rollback.md §C`.
 
-**CR-32 — Nested-repo mutation is FORBIDDEN for parallel isolated Implementers.** On the successful `apply=false` path, OMP v17.2.10 never materializes nested-repo patches to disk (`persistNestedPatches()` is reachable only from the failure/recovery path), and the `apply=false` summary reports only the root patch when the root also changed — so a nested-repo change is silently lost with no signal. The orchestrator MUST enumerate nested repos before fan-out (`git submodule status --recursive`, `find . -mindepth 2 -name .git`), exclude those paths from every parallel worker's scope, name them in `out_of_scope`, and route nested-repo work to sequential non-isolated implementation. Full source trace in `08-isolation-and-concurrency.md §D-1`.
+**CR-32 — Any nested git repo or submodule disables parallel isolated implementation for the whole repository.** On the successful `apply=false` path, OMP v17.2.10 never materializes nested-repo patches to disk (`persistNestedPatches()` is reachable only from the failure/recovery path), and the `apply=false` summary reports only the root patch when the root also changed — so a nested-repo change is silently lost with no signal. Post-integration `git status` on the nested repo **cannot distinguish compliance from silent loss** (the parent tree looks identical in both cases), so scope-exclusion instructions and post-hoc detection are not accepted as enforcement (§08 §D-1.1). The safe v0 policy is **Option A1**: the orchestrator enumerates nested repos before fan-out (`git submodule status --recursive`, `find . -mindepth 2 -name .git -not -path './node_modules/*'`), and **any non-empty result disables parallel isolated implementation for that run**, routing to sequential non-isolated implementation instead. Full source trace and enforcement analysis in `08-isolation-and-concurrency.md §D-1`.
 
 **Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `/orchestrated` performs the effective-settings preflight and has a disclosed fallback path (T-00.E3-A/E3-H); nested-repo paths are enumerated and excluded from parallel scope (T-00.E3-G).
 
@@ -199,7 +199,7 @@ Execute each workflow against a real task in a scratch repository:
 7. **CR-32 — nested-repo exclusion**: create a repo with a nested git repo (`vendor/component/.git`).
    Run `/orchestrated` on a change spanning root + nested paths. Expect the orchestrator to
    enumerate the nested repo, exclude it from every parallel worker's scope, name it in
-   `out_of_scope`, and route that scope to sequential non-isolated implementation. A parallel
+   `scope`, and route that scope to sequential non-isolated implementation (A1 policy). A parallel
    worker silently editing the nested repo is a FAIL.
 8. **CR-29 — integration order determinism**: dispatch three parallel Implementers where
    completion order deliberately differs from task-list order (e.g. task[2] finishes first).
@@ -218,7 +218,7 @@ Execute each workflow against a real task in a scratch repository:
 - [ ] Implementers isolated in parallel; observation-phase agents (Explorer, Verifier, Reviewer) not isolated
 - [ ] `task.isolation.apply: false` confirmed at session/project settings (T-00.E3); parallel Implementers return captured artifacts without auto-apply
 - [ ] **CR-31** — `/orchestrated` performs the effective-settings preflight (`mode != none`, `apply == false`) and never fans out in parallel when it fails; the fallback or refusal is disclosed in the report
-- [ ] **CR-32** — nested repos are enumerated before fan-out, excluded from every parallel worker's scope and named in `out_of_scope`; nested-repo work routes to sequential implementation
+- [ ] **CR-32** — orchestrator performs nested-repo preflight (Option A1); any non-empty nested-repo result disables parallel isolated implementation for that run and routes to sequential non-isolated; withdrawn enforcement: scope exclusion and post-integration `git status`
 - [ ] **CR-29** — integration order is original task-list index order, normatively stated in `orchestrated.md` and independent of worker completion order
 - [ ] **CR-29** — conflict on artifact *i* stops integration of *i+1…n*; all unapplied artifacts remain readable and are reported by path
 - [ ] Tech Lead integrates artifacts sequentially; Verifier runs only after full integration

@@ -86,7 +86,7 @@ For parallel Implementers, independence means **disjoint file sets**. Because `m
 | Patch apply conflict | Two isolated Implementers touched the same file | `git apply` failure at merge | **CR-09 — Batch merge is explicit partial-integration, not atomic:** Prior successful merges remain applied. The orchestrator does NOT rollback successful merges when a later merge conflicts. After merge A succeeds and merge B conflicts, the parent state is B+A, not original base B. Recovery: (1) re-partition work excluding the conflicting file, (2) retry B's scope sequentially on the new base, or (3) report conflict and surface to user. The user's own VCS owns the undo mechanism if full rollback is required. |
 | Partial edits from a failed non-isolated Implementer | Implementer fails mid-loop in Standard | Verifier reports FAIL; working tree dirty | Report the partial state explicitly with the file list. Do not attempt automated cleanup — the user's VCS owns undo. |
 | Recursion exhaustion | A worker tries to spawn at depth 2+ | Task tool refuses | Workers other than the orchestrator carry an empty `spawns:`, so this should be unreachable. If it occurs, it indicates a topology regression. |
-| **Nested-repo change lost under `apply=false`** | Isolated worker edits a file inside a nested git repo / submodule | **Not detectable from the task result** — see §D-1 below | **Parallel isolated Implementers MUST NOT modify nested git repositories (CR-32, Option A).** Scope partitioning excludes nested repo paths; such scope routes to sequential non-isolated implementation. |
+| **Nested-repo change lost under `apply=false`** | Isolated worker edits a file inside a nested git repo / submodule | **Not detectable — before or after the fact.** The result never reports it and the parent tree looks identical to correct behavior (§D-1, §D-1.1) | **Presence of ANY nested git repo or submodule disables parallel isolated implementation for the repository (CR-32, Option A1).** Orchestrator preflight enumerates before fan-out; a non-empty result routes the whole run to sequential non-isolated implementation. Scope exclusion and post-hoc `git status` are explicitly NOT accepted as enforcement. |
 
 ---
 
@@ -120,32 +120,117 @@ else                                 → "no changes captured."
 
 Whenever the root also changed, `result.patchPath` is set, so the **second** branch wins and the nested-repo count is **never mentioned**. A Tech Lead integrating `<agentId>.patch` gets a silently incomplete integration and no signal that anything is missing.
 
-**Resolution adopted: Option A — exclude nested-repo mutation from parallel capture-first (v0).**
+#### D-1.1 Why scope-exclusion is NOT sufficient enforcement (CR-32 round 6)
+
+A previous revision of this section enforced the exclusion by **telling the worker not to
+do it** — scope partitioning plus `out_of_scope` in the task packet — and detected
+violations by checking nested-repo `git status` after integration. Both halves are
+inadequate, and the second is worthless:
+
+**The instruction is not a constraint.** The Implementer carries `edit`, `write`, and
+`bash` inside its workspace. OMP v17.2.10 has **no per-task path write allowlist**: the
+task item wire schema is `{name?, agent?, task, effort?, outputSchema?, schemaMode?, isolated?}`
+(`task/types.ts`, `docs/tools/task.md`) and carries no path scope. The only built-in
+write boundary is agent-level and all-or-nothing — `isReadOnlyAgent()` in
+`task/read-only-policy.ts` checks whether the agent's declared `tools:` are a subset of
+`READ_ONLY_TOOL_NAMES`; an Implementer fails that test by definition. So `out_of_scope`
+is a behavioral instruction to the same model whose misbehavior it is meant to prevent.
+
+**The post-integration detector has zero discriminating power.** Trace a violating worker:
+
+| Stage | Root repo | Nested repo |
+|---|---|---|
+| Worker edits | `src/a.ts` changed | `vendor/lib/b.ts` changed |
+| OMP captures | durable `<agentId>.patch` | in-memory `nestedPatches` only |
+| `apply=false` summary | "captured at `<path>`" | **not mentioned** (`else if` — §D-1) |
+| Worktree teardown | — | change destroyed |
+| Parent after worker | unchanged | unchanged |
+| Parent after integration | changed | **unchanged** |
+
+The final row is *identical* whether the worker correctly left the nested repo alone or
+touched it and lost the change. `git submodule status` after integration therefore cannot
+distinguish compliance from silent loss. It is not a weak detector; it is not a detector.
+
+An in-worker guard (compare nested repos against spawn baseline before `yield`) is useful
+defense-in-depth but is also self-reported by the same model, so it cannot carry a
+"nested changes cannot silently disappear" claim either.
+
+#### D-1.2 Resolution adopted — Option A1: nested repos disable parallel isolation
+
+The guarantee must come from **never entering the dangerous runtime path**, not from
+worker compliance. That is mechanically enforceable at template level because it is a
+decision the orchestrator makes *before* fan-out, using its own tool calls:
 
 ```yaml
 parallel_isolated_implementer:
-  nested_repo_mutation: FORBIDDEN
-  rationale: no durable artifact on the successful apply=false path (OMP v17.2.10)
-  enforcement:
-    - orchestrator preflight: enumerate nested repos before fan-out
-    - scope partitioning MUST exclude nested repo paths from parallel worker scope
-    - task packet out_of_scope names each nested repo path explicitly
-  detection:
-    - post-integration: `git submodule status` / nested-repo `git status` unchanged
-    - any nested-repo diff after integration = contract violation, report to user
-  fallback:
-    - nested-repo scope routes to sequential non-isolated implementation
+  precondition: nested_repo_count == 0
+  on_violation:
+    parallel_isolated_implementation: DISABLED        # for the whole repository
+    route_to: sequential non-isolated implementation  # Standard-style, single writer
+    disclose: name the nested repo paths and the reason
+  rationale: >
+    On the successful apply=false path OMP v17.2.10 neither persists nested patches
+    nor reports their existence, and the worktree is torn down. A lost nested change
+    is undetectable from the parent afterwards, so the only safe v0 policy is to keep
+    the repository off that path entirely.
+  enforcement_class: mechanical (orchestrator preflight, pre-dispatch)
+  NOT_enforcement:
+    - task packet out_of_scope        # instruction, not constraint
+    - post-integration git status     # cannot distinguish compliance from loss
 ```
 
-Option B (prove/materialize nested artifacts) is **not available at template level** — it requires an OMP runtime change to call `persistNestedPatches()` on the successful capture path and surface the paths in the task result. T-00.E3-G records the observed behavior; if a future OMP version materializes them, this exclusion can be lifted.
+This is deliberately coarser than the previous rule. The previous rule tried to keep
+parallelism available in repositories that merely *contain* a nested repo by fencing the
+scope; that trade is unavailable because the failure it guards against is silent. A
+repository with any nested repo gets the sequential path — slower, and correct.
 
-**Preflight enumeration:**
+**Scope of the check.** The preflight MUST be a **superset** of what OMP's own capture
+walks, so the two cannot disagree. OMP enumerates non-submodule nested repos with
+`discoverNestedRepos()` (`task/worktree.ts`): it walks from the repo root, skips
+`node_modules` and `.git`, treats any directory containing a `.git` entry as a nested
+repo, and does not recurse past one once found; tracked submodules are enumerated
+separately. The preflight therefore covers both classes:
 
 ```bash
-# nested repos / submodules under the orchestration root
+# 1. tracked submodules (recursive)
 git submodule status --recursive
-find . -mindepth 2 -name .git -not -path './.git/*'
+
+# 2. non-submodule nested repos, mirroring discoverNestedRepos() semantics:
+#    skip node_modules, do not descend past a nested repo
+find . -mindepth 2 -name .git -not -path './.git/*' -not -path './node_modules/*' -prune
 ```
+
+A non-empty result from either command disables parallel isolated implementation.
+
+**Option A2 — path-level write boundary — is technically reachable but NOT adopted for v0.**
+GPT's round-6 review concluded that "current OMP task tool does not provide that
+path-level write sandbox in the reviewed primitives." That is correct about the *task
+tool* and incomplete about *OMP*. Two source facts combine into a real mechanical boundary:
+
+1. `ExtensionToolWrapper` emits a `tool_call` event **before** execution and aborts the
+   call when any handler returns `{ block: true }`; a handler that throws also blocks
+   (fail-closed) — `extensibility/extensions/wrapper.ts:200-232`, `docs/hooks.md`.
+2. Isolated spawns **re-discover** extensions inside the worktree:
+   `runIsolatedSubprocess()` passes `preloadedExtensionPaths: undefined`
+   (`task/isolation-runner.ts:168`), which routes to full session discovery in `sdk.ts`
+   with `cwd` = the isolation dir. Discovery is suppressed only when `restrictToolNames`
+   is set (`task/executor.ts:3029`), which for this template's non-plan-mode Orchestrated
+   dispatch it is not.
+
+So a `tool_call` hook could deny `write`/`edit`/`bash` targeting nested paths, in-worker,
+before the write lands. It is **not adopted for v0** for three reasons: it introduces a
+new installed component class (hooks) that the template does not otherwise ship; the
+worktree-relative discovery path and the `bash`-argument coverage are unverified in the
+target environment; and `docs/hooks.md` states the default runtime now routes `--hook`
+through the extension runner, so the exact authoring surface needs confirmation before
+the template can depend on it. Recorded as the **lift path**, gated on T-00.E3-G.
+
+**Option B (OMP runtime fix)** — persist every `nestedPatches` entry on the successful
+`apply=false` path and surface the artifact paths in the task result — remains the clean
+resolution and is out of template scope. T-00.E3-G records observed behavior per OMP
+version; if a future version materializes nested artifacts, or Option A2 is verified,
+this exclusion can be narrowed from "repository-wide disable" back to "scope exclusion
+with a real boundary."
 
 ---
 
@@ -201,6 +286,26 @@ find . -mindepth 2 -name .git -not -path './.git/*'
    effective task.isolation.mode  != "none"
    effective task.isolation.apply == false
    ```
+
+   **The read mechanism is concrete and source-verified (CR-31 round 6).** An earlier revision of this section left the settings-read API as an open uncertainty and permitted a user assertion as a fallback proof. Both are now closed. OMP exposes the effective (fully merged) value on the command line:
+
+   ```bash
+   omp config get task.isolation.mode  --json
+   omp config get task.isolation.apply --json
+   ```
+
+   Verified against OMP v17.2.10 `docs/settings.md`:
+   - `omp config get <key>` — *"Print the **effective** value of one key. Unknown keys exit non-zero. `--json` emits `{ key, value, type, description }`."* (§"Subcommands")
+   - *"Both read merged effective settings."* (§"Reading and writing settings") — `/settings` and `omp config` share the resolution path.
+   - Precedence resolved by that read: `built-in defaults < global config < project config < CLI overlays < runtime overrides`.
+
+   The Implementer-facing contract: parse `value` from the JSON, assert `mode != "none"` and `apply == false`. Non-zero exit, unparseable output, or `omp` not being on `PATH` is a **preflight failure**, not a pass.
+
+   **A user assertion is NOT a valid proof path.** The reason CR-31 exists is that *file-level intent ≠ effective value* — project config can be overridden by a CLI overlay or runtime override that no file inspection reveals. A user statement about what they configured cannot resolve precedence, so it cannot substitute for the read. If the effective value cannot be obtained, the parallel path is unavailable.
+
+   **CWD is part of the precondition.** OMP loads project settings from `<cwd>/.omp/config.yml` and **does not walk ancestor directories** (`docs/settings.md` §Troubleshooting: *"Settings discovery only checks the current working directory's `.omp/`, not ancestor directories"*). A template installed at `repo/.omp/config.yml` is therefore invisible to a session launched from `repo/packages/foo/`. Consequences:
+   - The preflight MUST run with the process cwd at the intended project root — the same directory the install targeted.
+   - The effective-value check already catches the mismatch (the key reads as its default `true`), but the **failure report MUST name this root cause explicitly** rather than reporting a generic "apply is true", because the corrective action is different: relaunch from the project root, not edit the config.
 
    **On preflight failure — do not launch parallel isolated Implementers.** Two permitted responses, both of which MUST be disclosed in the final report:
    - fall back to sequential non-isolated implementation (single Implementer, direct writes), or

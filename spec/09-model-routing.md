@@ -56,14 +56,23 @@ Every role in `config.yml` points at the same model:
 
 ```yaml
 modelRoles:
-  tech-lead:   omniroute/codex/gpt-5.6-sol-high
-  explorer:    omniroute/codex/gpt-5.6-sol-high
-  implementer: omniroute/codex/gpt-5.6-sol-high
-  verifier:    omniroute/codex/gpt-5.6-sol-high
-  reviewer:    omniroute/codex/gpt-5.6-sol-high
+  explorer:    omniroute/codex/gpt-5.6-sol-high   # required — spawned worker
+  implementer: omniroute/codex/gpt-5.6-sol-high   # required — spawned worker
+  verifier:    omniroute/codex/gpt-5.6-sol-high   # required — spawned worker
+  reviewer:    omniroute/codex/gpt-5.6-sol-high   # required — spawned worker
+  # tech-lead: OPTIONAL user alias (CR-34) — not installer-owned, no mandatory consumer
 ```
 
-Five aliases, one destination. The routing layer currently provides **zero differentiation**.
+Four aliases, one destination. The routing layer currently provides **zero differentiation**.
+
+**CR-34 — `tech-lead` is not among the required roles.** A model role has an effect only
+when something resolves it, and resolution happens at exactly two points: spawn-time agent
+frontmatter, or explicit user model selection. After CR-06/DR-1 (main-session model is
+user-controlled, and the main session is never spawned) and CR-33 (`agents/tech-lead.md` is
+removed from discovery, so no frontmatter references `@tech-lead`), neither point is on a
+required workflow path. The four spawnable worker roles are required; `tech-lead` is an
+optional convenience alias a user may add for manual selection. See
+`12-installation-and-rollback.md §C-1`.
 
 This is not a defect, and the template's own comments are honest about it: the environment exposes one model through OmniRoute, so there is nothing to differentiate *yet*. The abstraction is correct and worth keeping — it is the seam that makes differentiation possible later without touching five agent files.
 
@@ -142,7 +151,7 @@ Outcome of T-00.E2 feeds directly into: (a) the installer coupling requirement i
 
 1. Custom model roles are supported (verified) but require `config.yml` to be installed.
 2. The installer MUST couple `agents` → `config`; validation MUST check every `@role` reference resolves.
-3. All five roles currently target one model — the abstraction is a seam, not a realized benefit. Do not claim otherwise.
+3. **Four** required worker roles currently target one model — the abstraction is a seam, not a realized benefit. Do not claim otherwise. `tech-lead` is an optional user alias, not installer-owned (CR-34).
 4. `thinking-level` assignments are correct as written; per-task `effort` overrides are available via the `task` call.
 5. OmniRoute is the sole gateway; model fallback stays disabled.
 6. Routing changes require benchmark evidence in the adoption ledger.

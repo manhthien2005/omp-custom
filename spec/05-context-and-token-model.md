@@ -171,7 +171,13 @@ allowlist only.
 
 When a result is large but must persist, write it to a file and pass the path.
 
-| Artifact | Threshold | Destination | Isolation-safe? |
+**Thresholds are provisional v0 starting values pending phase-03 calibration (CR-19)** —
+same status as the §C budget table. They are engineering estimates of where a result stops
+being worth carrying inline, not measured optima. Phase-03 T-03.7 records offload frequency
+and whether crossing a threshold predicts a worse outcome, then adjusts. Do not cite them as
+validated.
+
+| Artifact | Threshold (provisional) | Destination | Isolation-safe? |
 |---|---|---|---|
 | Exploration evidence | >2,000 tokens | `.task/<id>/exploration.md` | Standard workflow only |
 | Verification output | >500 tokens | quote key lines only; full output to `.task/<id>/verify.log` | Standard workflow only |

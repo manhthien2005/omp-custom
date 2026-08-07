@@ -16,6 +16,66 @@ This is the same reason `09-model-routing.md` recommends a different model famil
 
 ---
 
+## A-1. What the Verification Schema Proves — and What It Does Not (CR-35)
+
+The template's headline claim is "no false completion." That claim must be stated at exactly the
+strength the runtime supports, because overstating it is itself a false-completion vector: a
+reader who believes evidence is machine-attested will stop checking it.
+
+**The false claim, now withdrawn.** Earlier revisions of this spec and `phases/phase-04-quality-system.md`
+said the `verification-result` schema has "required fields that cannot be satisfied without real
+command output." That is not true, and the source is unambiguous. OMP's output-schema path is
+generic JSON Schema validation over the yielded value:
+
+- `buildOutputValidator(schema)` compiles the declared schema and returns
+  `validate(value) → JsonSchemaValidationResult` (`tools/output-schema-validator.ts`).
+- `YieldTool` runs that validator against the yielded `data` and retries on mismatch
+  (`tools/yield.ts`, `MAX_SCHEMA_RETRIES = 3`).
+- The validator's inputs are the schema and the value. It has no access to the session's tool-call
+  history, no notion of `commands_run`, and no correlation between a claimed `exit_code` and any
+  `bash` invocation.
+
+So a Verifier that runs **zero** commands and emits a syntactically perfect
+`{commands_run: [{command: "npm test", exit_code: 0, evidence: "12 passed"}], decision: "PASS"}`
+passes validation. The schema constrains *shape*, and shape is not provenance.
+
+**What the architecture does guarantee.** Three real properties, none of which is attestation:
+
+| Mechanism | Real guarantee | Not a guarantee of |
+|---|---|---|
+| Separate child session per Verifier | The verifying context did not author the implementation — no shared transcript, no intention to protect | that any command in the result was executed |
+| Required `commands_run` / per-criterion evidence | Every criterion must be *addressed*; omissions become visible; retries fire on malformed output | that the cited output came from a process |
+| `evidence-before-completion` autoloaded skill + prompt | Behavioral instruction to run fresh and quote real bytes | mechanical enforcement of it |
+
+**Honest v0 formulation**, which replaces the withdrawn claim everywhere it appeared:
+
+```text
+False-completion resistance in v0 is behavioral and independence-based, not tool-event attested.
+The schema enforces that an evidence claim is present, complete, and internally consistent.
+It does not prove the claimed commands ran.
+```
+
+**The available provenance mechanism, and why it is not yet load-bearing.** OMP retains a
+per-subagent JSONL transcript and exposes it as `history://<agent-id>`; the renderer emits one line
+per tool call including tool name and arguments, pairing each call with its result
+(`session/session-history-format.ts`, `internal-urls/history-protocol.ts`). Transcripts survive the
+agent leaving the registry — resolution falls back to scanning artifact dirs for `<id>.jsonl`. That
+is a genuine cross-check surface: the Tech Lead can read the Verifier's transcript and compare
+claimed `commands_run` against `bash` calls actually present.
+
+It is **not** promoted to a contract in v0 because the check has not been demonstrated in the
+target environment: whether the rendered form preserves enough of each `bash` invocation to match
+a claimed command string, and what the transcript costs in tokens for a realistic verification run,
+are both unmeasured. T-04.8 (`phases/phase-04-quality-system.md`) is the experiment; until it
+reports, transcript audit is an available high-risk escalation, not a guarantee the spec leans on.
+
+**Where the boundary must be visible.** This limitation is documented in the Verifier contract
+(below), in `phases/phase-04-quality-system.md` T-04.1/T-04.8, as an L4 adversarial fixture in
+`13-validation-and-evaluation.md`, and in the known-limitations list produced by
+`phases/phase-07-stabilization.md` T-07.7 — so a user reads it before relying on absent behavior.
+
+---
+
 ## B. The Verifier Contract
 
 The existing `verifier.md` is well-constructed. Its core rule is the load-bearing part:
@@ -30,15 +90,57 @@ Three properties make this correct:
 
 ### Failure classification is the highest-value requirement
 
-The schema requires each failure be classified `impl | env | flaky`. This distinction determines the next action and nothing else in the system captures it:
+The schema requires each failure be classified `impl | env | flaky | preexisting`. This distinction determines the next action and nothing else in the system captures it:
 
 | Classification | Meaning | Correct next action |
 |---|---|---|
 | `impl` | The code is wrong. | Return to Implementer with the failure evidence. |
 | `env` | Missing dependency, wrong config, absent tool. | Fix the environment. **Not** an implementation failure. Do not send the Implementer chasing a phantom bug. |
 | `flaky` | Non-deterministic. | Re-run to confirm; if it reproduces intermittently, report as a known risk rather than a blocker. |
+| `preexisting` | Deterministic, and **failed on the baseline before this change** (CR-36). | Do **not** route to the Implementer. Record baseline evidence, exclude from this change's attribution, surface as a project risk / coverage blocker. |
 
 Conflating `env` with `impl` is the expensive error: it sends an Implementer to "fix" working code, which usually means it changes something until the symptom moves.
+
+#### Why `preexisting` is a required fourth category, not a variant of the other three (CR-36)
+
+A three-way `impl | env | flaky` taxonomy is not exhaustive over real verification runs. The
+missing case is concrete and common: the baseline already has a deterministic failing test in a
+subsystem the diff does not touch, and it still fails identically afterwards. That failure is
+not `impl` (the current change did not cause it), not `env` (the toolchain is fine and
+reproducible), and not `flaky` (it is perfectly deterministic).
+
+Forcing it into `impl` — the only remaining label with a "return to Implementer" action — produces
+exactly the expensive error the taxonomy exists to prevent, and worse than the `env`/`impl`
+confusion: the Implementer is dispatched to modify code the packet declared out of scope, on
+evidence that the change never touched it. A schema that makes the honest answer unrepresentable
+manufactures that dispatch.
+
+`preexisting` carries a distinct evidence obligation:
+
+```yaml
+preexisting:
+  requires:
+    baseline_evidence: >
+      the same command, same failure, observed on the pre-change baseline
+      (baseline run recorded before implementation, or an explicit re-run at the base commit)
+    relation_to_diff: >
+      statement that the failing subsystem is not touched by this change,
+      or naming the overlap if it is
+  effect_on_decision: >
+    does not force FAIL for this change; MUST appear in the report and,
+    where a criterion depends on it, in coverage_gaps
+  routing: never to the Implementer as a bug to fix
+```
+
+An unsubstantiated `preexisting` — claimed with no baseline evidence — is the label's own abuse
+vector: it converts any real regression into "was already broken." Baseline evidence is therefore
+mandatory for this classification specifically, and a `preexisting` claim without it is treated as
+unclassified, not as cleared.
+
+A fifth category (`test_or_spec`, for an invalid test or wrong acceptance criterion) is
+**deliberately not added in v0.** It is real but rarer, its remediation overlaps `impl` and
+"ask the user," and each additional label costs classification accuracy on every run. Revisit
+with phase-06 evidence.
 
 ### Coverage gaps must be reported, not hidden
 
@@ -144,7 +246,8 @@ Beyond the schema, one behavioral rule: **the orchestrator does not re-derive ve
 ## G. Contract Summary
 
 1. The Verifier's value is independence from authorship, not command execution.
-2. Failure classification (`impl | env | flaky`) is mandatory — it determines the next action.
+2. Failure classification (`impl | env | flaky | preexisting`) is mandatory — it determines the next action. `preexisting` exists because a deterministic baseline failure is none of the other three, and mislabeling it `impl` sends the Implementer to change out-of-scope code (CR-36).
+2b. **The schema proves shape, not provenance (CR-35).** Required evidence fields guarantee a claim is present and complete; they do not prove the claimed commands ran. v0 false-completion resistance is behavioral and independence-based. Do not describe it as attested — see §A-1.
 3. `coverage_gaps` MUST be reported; `PASS` requires every criterion `PASS`, and any `SKIP` caps the result at `PARTIAL`.
 4. Reviewer false-positive checks are structural and required, including the pre-existing-lint check.
 5. Review is diff-first with question-driven expansion — never whole-file reads for "context."

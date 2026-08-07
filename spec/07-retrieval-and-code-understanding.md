@@ -76,8 +76,71 @@ The existing `context-budget.yml` retrieval order is correct and worth preservin
 
 Two clarifications the current wording leaves implicit:
 
-- **Levels are gates, not preferences.** An agent MUST NOT reach level 4 without having tried levels 1–3. "I assumed the local docs were stale" is not a justification; checking is cheap.
+- **Levels are a default priority with bounded escalation — not exhaustion gates (CR-20).** See §B-1 below.
 - **Level 5 requires disclosure.** Web-sourced facts enter the artifact as untrusted content per `15-security-and-failure-recovery.md`. Any claim resting on level 5 must name its source in the result.
+
+### B-1. CR-20 — Source fitness, not ritual escalation
+
+An earlier revision of this file said *"Levels are gates, not preferences. An agent MUST
+NOT reach level 4 without having tried levels 1–3."* That is withdrawn. It contradicted
+`05-context-and-token-model.md §D`, which already states the ordering is guidance within a
+bounded retrieval budget, and it fails on three counts:
+
+**Authority is not monotonic in locality.** A local README can be stale; bundled dependency
+docs can describe a different installed patch version; source code shows what an
+implementation *does* while official docs define what the public contract *guarantees*;
+security advisories and current-compatibility facts may exist only externally. "Local is
+always more authoritative" is false as a general rule.
+
+**Cost is not monotonic either.** One targeted official-doc lookup can be cheaper than
+grep + LSP + local-doc reads + excavating a dependency's source. Mandatory exhaustion can
+*increase* tokens per accepted outcome — the metric §05 §A optimizes.
+
+**"Exhausted" has no falsifiable definition.** An agent cannot prove it exhausted local
+sources. A gate that can be satisfied by asserting "I exhausted local sources" is not a
+gate; it is a prompt for a sentence. It is untestable, so L2/L3 validation cannot check it.
+
+The rule is therefore **default priority + bounded escalation + named skip reasons**:
+
+```yaml
+default_order: [local_code_types, local_docs, official_versioned_docs, context7, web]
+
+escalation_bound:
+  rule: >
+    After N targeted retrievals at the current level fail to answer the specific
+    question, move to the next fitting source. Do not continue widening at the
+    same level.
+  N: 3                      # v0 starting value, calibrated in phase-03 (CR-19)
+  targeted: >
+    a query with a named subject — symbol, file, or exact string. Broad
+    re-greps of the same corpus do not count as new attempts.
+
+permitted_skips:            # each MUST be named in the result's retrieval note
+  - local source absent for the dependency in question
+  - local docs contradict installed version, or version cannot be confirmed
+  - question is explicitly about current/external behavior
+  - question is about a guaranteed public contract, not observed implementation
+  - security advisory or freshness is the actual subject
+  - user explicitly asked for the authoritative or latest source
+```
+
+Skipping is legitimate **and must be disclosed**: the result names the level skipped and
+which permitted reason applied. That is checkable — a skip with no named reason is a
+contract violation — whereas "exhaustion" was not.
+
+Source fitness by question type:
+
+| Question | Best first source |
+|---|---|
+| What does this installed function call? | LSP / local source |
+| What behavior does library vX.Y guarantee? | official versioned docs |
+| Is there a newly disclosed vulnerability? | current advisory / web |
+| What type does this installed package expose? | local types |
+| What is the latest upstream behavior? | current upstream source / docs |
+
+The failure this ordering exists to prevent is unchanged: a web search for something the
+type definition next to the callsite already answered. That remains the common error, and
+the default order still guards against it.
 
 **ENVIRONMENT ASSUMPTION (CR-18):** Context7 availability depends on an MCP server being wired into the session. This is true for the development environment used during spec construction, but is NOT guaranteed for every OMP session. Level 4 is aspirational unless the runtime confirms the Context7 MCP server is connected. Agents MUST NOT assume Context7 is available; they should treat it as optional and fall back to level 3 if unavailable. It remains **off the default path** regardless: reaching for versioned external docs before reading the local `node_modules` types is the exact inversion this ordering exists to prevent.
 
@@ -127,7 +190,7 @@ If a future project genuinely needs a durable architecture overview, that belong
 ## E. Contract Summary
 
 1. `lsp` MUST be added to `explorer`, `implementer`, and `reviewer` allowlists — otherwise `task.enableLsp = true` is inert.
-2. Retrieval levels are gates: no skipping to Context7 or the web without exhausting local sources.
+2. Retrieval levels are a **default priority with bounded escalation**, not exhaustion gates (CR-20, §B-1). Skipping a level is permitted for a named reason from the `permitted_skips` list and MUST be disclosed in the result; an undisclosed skip is a contract violation. "I exhausted local sources" is not a checkable claim and is not required.
 3. Symbol lookup answers "who/where/what exports"; `grep` answers "what text exists". They are not interchangeable.
 4. Prefer ranged reads; reserve whole-file reads for short files, structural reasoning, or rewrites.
 5. No persistent repository-map artifact. The Explorer's ranked evidence is the map.

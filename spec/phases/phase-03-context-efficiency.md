@@ -84,6 +84,60 @@ above. Without a before, none of this is demonstrable.
 
 **Acceptance**: recorded measurements for both states on the same fixtures.
 
+### T-03.8 — Calibrate the budgets, do not merely audit compliance with them
+
+**CR-19 — the numeric targets in `05-context-and-token-model.md §C` and the offload
+thresholds in T-03.5 are v0 engineering hypotheses, not measured optima.** They were chosen
+from role complexity, and no source fact can establish that `AGENTS.md 600–1,200` or
+`exploration offload >2,000` minimizes tokens per accepted outcome for this workflow and
+model family.
+
+The failure mode this task exists to prevent is circular validation:
+
+```
+choose target 600  →  constrain output to <600  →  observe output fits 600
+                   →  conclude the target is correct        # proves nothing
+```
+
+That measures *compliance*, and compliance with an arbitrary number is not evidence the
+number is good. T-03.2/T-03.3/T-03.6 legitimately check compliance; this task checks the
+targets themselves.
+
+Record, per workflow run, not just totals:
+
+```yaml
+per_run:
+  - total_tokens
+  - accepted_outcome            # the §A metric's denominator: did the user accept it
+  - retries                     # schema retries, verifier FAIL→reimplement cycles
+  - packet_tokens
+  - worker_result_tokens
+  - verifier_evidence_tokens
+  - offloaded_bytes
+  - quality_failure_reason       # incl. truncation- or offload-induced loss
+
+analyze:
+  - distributions (p50 / p90 / p95), never a single sample
+  - accepted runs vs rejected runs, compared separately
+  - whether crossing a threshold actually predicts worse quality or higher total cost
+```
+
+The decisive question is the third: if runs that exceed a target show no worse acceptance
+rate and no higher total cost, the target is too tight and is costing tokens (compression
+work, offload round-trips) for no benefit. If runs that respect it still fail on truncated
+context, it is too loose. Either finding adjusts the number.
+
+**Threshold-crossing must be observed, not prevented.** T-03.5's offload thresholds are
+enforced in the *implementation*; this task requires that at least some fixtures run with
+the threshold relaxed, or the distribution has no data above the line and the comparison is
+impossible.
+
+**Acceptance**: recorded distributions (not single samples) for every field above;
+acceptance rate and total cost compared across threshold-crossing and threshold-respecting
+runs; each `§05 §C` target and each T-03.5 offload threshold is either confirmed by that
+evidence or revised, with the revision recorded. No target is described as validated on the
+basis of compliance alone.
+
 ---
 
 ## Deliverables
@@ -94,6 +148,8 @@ above. Without a before, none of this is demonstrable.
 - Offload thresholds implemented
 - Right-sized `AGENTS.md` / `RULES.md`
 - Before/after measurements
+- Budget calibration record: distributions per field, and each `§05 §C` target
+  confirmed-by-evidence or revised (CR-19)
 
 ---
 
@@ -103,6 +159,13 @@ above. Without a before, none of this is demonstrable.
 2. Confirm no accepted-outcome regression (efficiency must not cost correctness).
 3. Inspect a real task packet: no transcript, no full-file dump.
 4. Inspect a real Verifier result: key lines, not whole logs.
+5. **CR-19 — confirm the calibration record contains threshold-crossing runs.** A record
+   in which every run respects every target cannot calibrate anything; it only proves the
+   enforcement works. At least some fixtures MUST have run with a relaxed threshold so the
+   distribution has data on both sides of the line.
+6. **CR-19 — confirm no target is reported as validated on compliance alone.** For each
+   `§05 §C` target, the record states either the evidence that confirmed it (acceptance
+   rate and total cost across both sides of the threshold) or the revision made.
 
 ---
 
@@ -115,6 +178,10 @@ above. Without a before, none of this is demonstrable.
 - [ ] Offload implemented
 - [ ] `AGENTS.md` / `RULES.md` within budget
 - [ ] Tokens per accepted outcome measured before and after, with no correctness regression
+- [ ] **Budget calibration record produced (CR-19)**: p50/p90/p95 per instrumented field,
+      acceptance and retry rate per run, and threshold-crossing runs present
+- [ ] **Every `§05 §C` numeric target either confirmed by that evidence or revised** — no
+      target promoted from "provisional default" to "validated" on compliance alone
 
 ---
 
