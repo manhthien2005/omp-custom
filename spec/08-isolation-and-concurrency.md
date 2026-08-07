@@ -93,8 +93,33 @@ For parallel Implementers, independence means **disjoint file sets**. Because `m
 
 1. Isolation is requested **per task call**, never inferred from `mode`.
 2. `mode: auto` selects a *backend*; it never decides *whether* to isolate.
-3. Parallel writers MUST set `isolated: true`. Non-writing agents (Explorer, Verifier, Reviewer) MUST NOT isolate — they must observe the real merged parent state.
+3. Parallel writers MUST set `isolated: true`. **Observation-phase agents** (Explorer, Verifier, Reviewer) MUST NOT isolate — they must observe the real merged parent state. The exclusion is based on **assigned responsibility**, not mechanical capability: Verifier and Reviewer carry `bash` and can produce filesystem side effects; they are not isolated because they must inspect the real integrated state, not a copy. Any unexpected mutation is a contract violation, caught by pre/post `git status` checks.
 4. Isolation requires git. Absent git, fall back to sequential and disclose it.
 5. `apply: true` means isolation stages-then-merges; it is not a review sandbox.
 6. Effective-config validation MUST assert `task.isolation.mode != none`, because the silent-absence failure has no runtime signal.
-7. **CR-09/CR-27 — Parallel integration is NOT internally serialized by OMP.** `runStructuredSubagent()` calls `mergeIsolatedChanges()` directly from each spawn (verified: `task/structured-subagent.ts`, `task/isolation-runner.ts` in OMP v17.2.10). There is no orchestrator-level merge mutex in that path. Git lock contention can cause one apply to fail, but that is lock *contention*, not safe serialization. **Recommended architecture for parallel implementers:** set `task.isolation.apply: false` on parallel worker dispatches; the Tech Lead collects all isolated results then integrates them one at a time in a single coordinator step. This separates parallel coding from serial shared-state mutation. If `apply=false` is not available in the runtime configuration, implement an explicit merge queue at the orchestrator level, or fall back to sequential (non-parallel) implementation and document the degradation. **Do not claim OMP serializes integration internally** without a source-verified lock primitive.
+7. **CR-09/CR-27/CR-30 — Parallel integration is NOT internally serialized by OMP; `apply=false` is a session/settings control, not a per-task-item field.** `runStructuredSubagent()` calls `mergeIsolatedChanges()` directly from each spawn (verified: `task/structured-subagent.ts`, `task/isolation-runner.ts` in OMP v17.2.10). There is no orchestrator-level merge mutex in that path. Git lock contention can cause one apply to fail, but that is lock *contention*, not safe serialization.
+
+   **Control surface (CR-30 — OMP v17.2.10):** The model-facing task item schema exposes `{name?, agent?, task, effort?, outputSchema?, schemaMode?, isolated?}`. There is **no per-item `apply` field**. Effective apply policy resolves as:
+   ```
+   applyChanges = request.isolation?.apply
+     ?? (invocationKind === "task"
+         ? session.settings.get("task.isolation.apply")
+         : true)
+   ```
+   Therefore `apply=false` must be set at the **session/project settings level** (`task.isolation.apply: false`), not inside individual task item dispatches. **Do NOT put `apply: false` inside task item bodies** — that field is not part of the documented model-facing task wire in v17.2.10.
+
+   **Recommended architecture:** Configure `task.isolation.apply: false` at project/session settings. Under this template's isolation matrix (only parallel Implementers use `isolated: true`), that setting is coherent — it exclusively affects isolated spawns. Parallel Implementers then return retained patch/branch artifacts without auto-applying to the parent. The Tech Lead collects all artifacts and integrates them one at a time in a deterministic serial coordinator step. T-00.E3 must verify the exact settings path and capture-only behavior before parallel implementation is attempted.
+
+   If `apply=false` cannot be confirmed via T-00.E3, fall back to sequential (non-parallel) implementation and document the degradation. **Do not claim OMP serializes integration internally** without a source-verified lock primitive.
+
+8. **Isolation settings contract (CR-30):** These settings are project/session level, not per-task-item fields:
+
+   ```yaml
+   task:
+     isolation:
+       apply: false   # capture-only; Tech Lead integrates artifacts serially
+       merge: patch   # or branch — T-00.E2 confirms behavior
+       mode: auto     # backend selector (CoW/overlayfs/ProjFS/worktree); confirmed by T-00.E3
+   ```
+
+   Per-task dispatch: parallel Implementers set `isolated: true`; all other agents omit `isolated` (defaults to non-isolated).

@@ -17,10 +17,7 @@ injection.
 
 ## Rationale
 
-Phase-01 removed the defects; this phase supplies what was missing. The commands
-currently describe a workflow in prose without the mechanics that make it happen:
-no `outputSchema` on dispatch, no `isolated: true`, no `autoloadSkills`, no
-non-git-repo fallback. Prose alone does not orchestrate.
+Phase-01 removed the defects; this phase supplies what was missing. The commands currently describe a workflow in prose without the mechanics that make it happen: no `output:` frontmatter schemas on worker agents, no `isolated: true` on parallel Implementers, no `autoloadSkills`, no non-git-repo fallback, and no defined sequential integration procedure for captured parallel-worker artifacts. Prose alone does not orchestrate.
 
 ---
 
@@ -55,8 +52,9 @@ Fix:
 - pass `isolated: true` explicitly on every Implementer dispatch in `orchestrated.md`
 - never isolate Explorer, Verifier, or Reviewer (they observe the real merged/written state; Verifier and Reviewer have `bash` for running commands and reading output, but MUST NOT write implementation artifacts — isolation would cause them to verify/review a copy, not the real tree that will ship)
 
-**Acceptance**: every parallel Implementer dispatch carries `isolated: true`;
-Explorer, Verifier, and Reviewer dispatches carry no isolation.
+**CR-30 — Session settings (not per-task-item):** capture-only isolation requires setting `task.isolation.apply: false` at the project/session settings level — it is **not** a per-task-item dispatch field in OMP v17.2.10. T-00.E3 must verify this settings path before parallel implementation is attempted. Under this template's matrix (only parallel Implementers use `isolated: true`), the setting exclusively affects parallel worker spawns.
+
+**Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `task.isolation.apply: false` is confirmed at session/project settings level (T-00.E3).
 
 ### T-02.3 — Add the non-git-repo fallback
 
@@ -130,8 +128,12 @@ Execute each workflow against a real task in a scratch repository:
 1. `/quick` on a one-line fix — expect zero subagents, verification evidence present.
 2. `/standard` on a two-file change — expect Explorer → Implementer → Verifier, each
    returning a schema-valid result.
-3. `/orchestrated` on an independent three-module change — expect parallel isolated
-   Implementers and applied changes.
+3. `/orchestrated` on an independent three-module change — expect:
+   - parallel isolated Implementers complete and return **retained patch/branch artifacts**;
+   - parent working tree is **unchanged** after workers finish (no auto-apply — `task.isolation.apply: false`);
+   - Tech Lead integrates artifacts one at a time in a deterministic order;
+   - Verifier runs **only after all integration is complete** on the final merged parent;
+   - final working tree reflects the fully integrated result of all Implementers' work.
 4. `/orchestrated` in a non-git directory — expect the documented fallback, not a throw.
 5. Force a verification failure — expect the rework loop, not a false `completed`.
 
@@ -141,7 +143,9 @@ Execute each workflow against a real task in a scratch repository:
 
 - [ ] All three workflows run end to end without silent failure
 - [ ] Every dispatch returns a schema-valid result
-- [ ] Implementers isolated in parallel; read-only workers not
+- [ ] Implementers isolated in parallel; observation-phase agents (Explorer, Verifier, Reviewer) not isolated
+- [ ] `task.isolation.apply: false` confirmed at session/project settings (T-00.E3); parallel Implementers return captured artifacts without auto-apply
+- [ ] Tech Lead integrates artifacts sequentially; Verifier runs only after full integration
 - [ ] Non-git-repo fallback works
 - [ ] Discipline skills injected via `autoloadSkills`
 - [ ] Rework loop bounded and defined
@@ -156,5 +160,5 @@ Execute each workflow against a real task in a scratch repository:
 |---|---|
 | `autoloadSkills` adds fixed cost per subagent | Only for agents that can falsely claim completion |
 | Isolation setup latency | Only for parallel writes, where the alternative is corruption |
-| Parallel isolated patches conflict on apply | Partition scope per Implementer; sequential fallback |
+| Parallel isolated patches conflict during sequential integration | **Serialized integration is the normal design**, not a fallback. Conflict on a given artifact pauses remaining integration; unapplied artifacts are preserved. Recovery: re-partition scope, retry the conflicting artifact on the new base, or escalate to user. |
 | Strict schema mode causes retry loops | Bounded at 3 by `yield`; override surfaces to parent |

@@ -191,16 +191,19 @@ graph TD
 
 ---
 
-## 7. Critical Path
+## 7. Dependency Paths into Phase-06
 
-`phase-00 → phase-01 → phase-02 → phase-06`
+There is no single "critical path" until task durations are estimated. The actual dependency edges that lead into P6 are:
 
-Phase-00 is non-negotiably first: it converts my remaining assumptions into
-observed behavior. Phase-01 clears the P0 defects. Phase-02 replaces the dead
-abstractions with native mechanisms. Phase-06 is where any claim of improvement
-first becomes defensible — before it, all quality claims are assertions.
+- **P0 → P1 → P2 → P3 → P6**
+- **P0 → P1 → P2 → P4 → P6**
+- **P0 → P1 → P5 → P6**
 
-Phase-03/04/05 are parallelizable after phase-02. Phase-05 depends only on phase-01.
+P3 and P4 may begin after P2. P5 depends only on P1 and may run in parallel with P2/P3/P4 where resources permit.
+
+Phase-00 is non-negotiably first: it converts remaining assumptions into observed behavior. Phase-01 clears the P0 defects. Phase-02 replaces the dead abstractions with native mechanisms and defines the integration procedure for parallel workers. Phase-06 is where any claim of improvement first becomes defensible — before it, all quality claims are assertions.
+
+Note: P5 (installation hardening) depends only on P1, not P2. Stating all three of P3/P4/P5 as "after P2" would unnecessarily constrain P5 and contradict its independence.
 
 ---
 

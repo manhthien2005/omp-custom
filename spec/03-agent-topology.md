@@ -71,8 +71,7 @@ copy. Explorer stays unisolated.
 Both must observe the *post-merge* working tree — the state the Implementer's
 changes actually landed in. An isolated Verifier would clone the workspace and
 verify a copy, which is the opposite of the guarantee its contract promises.
-Both stay unisolated and run after `task.isolation.apply` has merged the
-Implementer's patch.
+Both stay unisolated and run after the Implementer's work has landed in the parent working tree — directly for Standard (non-isolated single writer), or after the Tech Lead has completed sequential integration of all captured artifacts for Orchestrated (`task.isolation.apply: false`).
 
 This ordering is load-bearing: Verifier must run *after* the merge, never in
 parallel with the Implementer.

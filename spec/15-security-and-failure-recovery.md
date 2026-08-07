@@ -69,7 +69,7 @@ Rules:
 4. Eval fixtures use synthetic data only.
 5. `.gitignore` must exclude `evals/results/` if runs can capture environment detail.
 
-**Installer-specific (CR-14)**: the backup created by `install-template.ps1` covers **only the installer write-set** (the specific files the installer is about to overwrite or create). It does NOT back up the entire `~/.omp/agent/` tree. This is the correct scope: credential files (`models.yml`, `agent.db*`, `sessions/`) are never in the write-set because they are protected by the installer's explicit exclusion list — copying them just to enable rollback would be unnecessary and dangerous.
+**Installer-specific (CR-14)**: the backup created by `install-template.ps1` covers **only the installer write-set** — the specific paths the installer may **CREATE, OVERWRITE, or MERGE**. It does NOT back up the entire `~/.omp/agent/` tree. The MERGE target (`config.yml`) is explicitly part of the write-set: even though MERGE rollback relies on a per-key structured preimage/delta rather than a whole-file duplicate, `config.yml` state must be included in backup bookkeeping. Credential files (`models.yml`, `agent.db*`, `sessions/`) are never in the write-set because they are protected by the installer's explicit exclusion list — copying them just to enable rollback would be unnecessary and dangerous.
 
 The backup path must:
 - never be created inside the repository working tree,
