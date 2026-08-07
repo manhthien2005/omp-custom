@@ -1,6 +1,6 @@
 # 09 — Model Routing
 
-> OPUS PROPOSED SPEC v1 | All claims verified against OMP source in `_research/upstreams/oh-my-pi`.
+> OPUS PROPOSED SPEC v1 | Runtime mechanics verified against OMP source in `_research/upstreams/oh-my-pi`; environment-specific model/gateway availability claims explicitly marked.
 
 ---
 
@@ -109,27 +109,32 @@ These are well-chosen and need no change. The baseline `task.enableEffort = true
 
 Non-negotiable, and correctly reflected in `model-routing.yml`:
 
-- All model access goes through OmniRoute at `http://127.0.0.1:20128`.
+- All model access goes through OmniRoute.
 - No direct provider API calls.
 - `retry.modelFallback = false` and `retry.usageAwareFallback = false` stay off — silent cross-model fallback would invalidate any benchmark comparison and make failures hard to attribute.
 
-**ENVIRONMENT ASSUMPTION (CR-18):** The OmniRoute gateway address (`http://127.0.0.1:20128`) and the available model identifiers (e.g., `omniroute/codex/gpt-5.6-sol-high`) are properties of this specific deployment environment, not portable constants. Any spec claim that a particular model string is available via OmniRoute is an environment observation, not a design invariant. A production installation may expose different model IDs. The template's model-role abstraction (`@tech-lead`, `@explorer`, etc.) exists precisely to insulate agent files from these environment-specific strings.
+**ENVIRONMENT ASSUMPTION (CR-18):** The OmniRoute gateway address and available model identifiers are properties of this specific deployment environment, not portable design invariants. The specific endpoint (`http://127.0.0.1:20128`) and model ID (`omniroute/codex/gpt-5.6-sol-high`) shown in this spec are examples from the development environment. A production installation may expose different endpoints and model IDs. The template's model-role abstraction (`@tech-lead`, `@explorer`, etc.) exists precisely to insulate agent files from these environment-specific strings.
 
-The single-gateway constraint is what keeps routing auditable: one place to see what ran, one place to change it.
+The single-gateway architectural constraint is what keeps routing auditable: one place to see what ran, one place to change it.
 
 ---
 
 ## F. Model-Role Fallback Test Matrix
 
-**CR-24** — Before committing to the model-role mechanism in phase-02, T-00.E2 (see `spec/phases/phase-00-foundation.md`) must run the following cases to characterize exact fallback behavior when `config.yml` is absent or incomplete:
+**CR-24** — Before committing to the model-role mechanism in phase-02, **T-00.E2** (see `spec/phases/phase-00-foundation.md`) defines the canonical fallback test matrix. This section cross-references those cases and notes what each verifies:
 
-| Case | Setup | Expected (claimed) | Must verify |
-|---|---|---|---|
-| E2-1 | `config.yml` installed, all 5 roles defined | `@tech-lead` resolves to configured model | Role resolution successful, model receives request |
-| E2-2 | `config.yml` missing (agents-only install) | `@tech-lead` resolves to... what? | Hard error vs silent fallback to `default`; which failure mode? |
-| E2-3 | `config.yml` present but `tech-lead` key absent | `@tech-lead` → `undefined` from `getModelRole` | Propagation: error or silent `default`? |
-| E2-4 | Role defined at project level only (not user level) | Resolves via project `config.yml` | `getModelRoleAlias` merge order: project beats user? |
-| E2-5 | Role name collision with built-in (e.g., `default`) | Template `default` key shadows built-in | Custom role wins or OMP built-in wins? |
+| Case | Setup | Must verify |
+|---|---|---|
+| T-00.E2 case 1 | Built-in role + config present | Known happy path |
+| T-00.E2 case 2 | Custom role + config present | Custom happy path |
+| T-00.E2 case 3 | Custom role absent from config | Role lookup behavior (error vs fallback) |
+| T-00.E2 case 4 | Arbitrary `@unknown` (not built-in, not configured) | Parser/resolver terminal behavior |
+| T-00.E2 case 5 | Configured role → unavailable provider/model | Downstream resolution failure (distinct from alias lookup failure) |
+| T-00.E2 case 6 | User-level vs project-level conflict | Precedence: `getModelRoleAlias` merge order |
+| T-00.E2 case 7 | Built-in/custom collision (e.g., `default`) | Namespace collision: custom wins or built-in wins? |
+| T-00.E2 case 8 | Main-session selection vs worker selection | Coordinator path vs worker path (if different) |
+
+**Stable disagreement on case 8 granularity:** Opus holds that case 8 (main-session vs worker resolver path) should be part of the experiment only if evidence suggests they diverge. GPT's preference is to always verify both paths independently. The experiment design includes case 8 to resolve this empirically.
 
 Outcome of T-00.E2 feeds directly into: (a) the installer coupling requirement in §B, (b) validation static-check wording, and (c) whether a graceful fallback mode (inform user but continue) is viable vs a hard abort.
 

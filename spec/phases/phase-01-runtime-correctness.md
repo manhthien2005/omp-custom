@@ -62,13 +62,12 @@ is `read, grep, glob`. `parseAgentFields` treats `tools` as a closed allowlist (
 auto-appended `yield`), and `task.enableLsp` defaults to **false**, so `lsp` is
 doubly unavailable.
 
-Fix (both halves required):
-- add `lsp` to `explorer.md` and `implementer.md` tool lists
+Fix (all three parts required):
+- add `lsp` to `explorer.md`, `implementer.md`, **and `reviewer.md`** tool lists — per the CR-17 authoritative table in `spec/07§A` (Reviewer requires `lsp references` for blast-radius checks)
 - document `task.enableLsp: true` as a required setting, and state the graceful
   degradation to grep/glob when it is off
 
-**Acceptance**: no agent prompt names a tool absent from its own allowlist. The LSP
-prerequisite is documented where a user will see it before installing.
+**Acceptance**: no agent prompt names a tool absent from its own allowlist. Explorer, Implementer, and Reviewer each carry `lsp` in their `tools:` lists. The LSP prerequisite is documented where a user will see it before installing.
 
 ### T-01.4 — Reverse the read-summarize inversion (P1-6, promoted)
 
@@ -132,17 +131,19 @@ has a valid JSON Schema in its `output:` frontmatter. Commands may carry inline
 `outputSchema` for explicit overrides; this is not required for every dispatch.
 Zero agents rely on prose "Return schema:" as the sole contract.
 
-### T-01.8 — Resolve the tech-lead dead abstraction (P0-2)
+### T-01.8 — Resolve the tech-lead dead abstraction (P0-2) + main-session model/thinking contract (CR-06)
 
 `tech-lead.md` exists but no command spawns it; the main session performs the role.
-Its `model: "@tech-lead"` therefore never applies.
+Its `model: "@tech-lead"` and `thinking-level: high` frontmatter **never apply** — agent frontmatter is only processed at spawn time, not for the main session.
 
-Fix: adopt DR-1 — the main session **is** the Tech Lead. Repurpose the file as a
-nested-orchestration agent for deep sub-workflows, or delete it. Either way, state
-explicitly in `AGENTS.md` that the main session owns the role.
+**CR-06 open question:** When the main session IS the Tech Lead, what exact runtime mechanism ensures it uses `@tech-lead` routing and `high` thinking level? Two options:
 
-**Acceptance**: no ambiguity about who the Tech Lead is; if the file stays, its
-purpose and invocation path are documented.
+- **Option A — Deterministic launch contract:** Document and enforce that the main session MUST be started with the `@tech-lead` model role and `high` effort. The workflow entrypoint or installation docs must state this as a hard requirement, not a recommendation.
+- **Option B — User-controlled:** Accept that main-session model/thinking is user-controlled. State explicitly in `AGENTS.md` that the template does NOT guarantee `@tech-lead` routing for the main Tech Lead session. Update any architecture claim that assumes guaranteed routing.
+
+Fix: choose one option, implement it, and document the choice in `AGENTS.md`.
+
+**Acceptance**: the spec and `AGENTS.md` answer unambiguously: "What model and thinking level does the Tech Lead use, and what guarantees it?" Phase-01 exit criteria must include a test confirming whichever contract was chosen (e.g., for Option A: attempt a command with a non-tech-lead session and confirm the expected behavior; for Option B: confirm no claims assume guaranteed routing).
 
 ### T-01.9 — Honor the installer's `$Force` parameter (F-04)
 

@@ -169,10 +169,33 @@ uninstall-template.ps1
 Two modes:
 
 - **Backup restore** (available today): restore files from the backup. Simple and reliable for OVERWRITE operations (exact bit-for-bit restoration). **Limitation**: cannot detect conflicts when the user modified a file post-install — applying backup wholesale may clobber legitimate user edits.
-- **Manifest revert** (to add): operation-aware rollback.
-  - **OVERWRITE**: restore original content from backup, but **verify SHA-256 first**. If current file ≠ installed SHA, report CONFLICT (user modified post-install) and skip restoration unless forced.
-  - **MERGE** (config.yml): reverse only the keys the installer added/modified. If the user edited `modelRoles` post-install, report CONFLICT — cannot safely revert a merge when the target has diverged.
+- **Manifest revert** (to add): operation-aware rollback using per-operation records in the manifest.
+  - **OVERWRITE**: restore original content from backup, but **verify SHA-256 first**. If current file ≠ installed SHA, report CONFLICT (user modified post-install) and skip restoration. No "force" mode is provided — the user must manually resolve OVERWRITE conflicts.
+  - **MERGE** (config.yml): key-level rollback using the installer delta recorded in the manifest (see manifest schema below). For each installer-owned inserted key: if current value == installed value → remove key; if key no longer exists → no-op; else → CONFLICT on that key (preserve user value, report). For installer-modified keys: if current value == installed value → restore previous value; if current value == previous value → already restored, no-op; else → CONFLICT on that key.
   - **CREATE**: delete only if current SHA matches installed SHA; otherwise report MODIFIED and skip.
+
+**Manifest delta requirement (CR-13):** The manifest MUST record, per MERGE operation:
+
+```json
+{
+  "operation": "MERGE",
+  "path": "config.yml",
+  "installer_delta": {
+    "inserted": {
+      "modelRoles.explorer": "omniroute/codex/...",
+      "modelRoles.implementer": "omniroute/codex/..."
+    },
+    "modified": {
+      "some.existing.key": {
+        "before": "old-value",
+        "installed": "new-value"
+      }
+    }
+  }
+}
+```
+
+A file-level hash alone is insufficient to reconstruct installer key ownership for MERGE rollback.
 
 Rollback must be dry-run by default, never delete a file absent from the manifest, and never silently clobber user modifications.
 

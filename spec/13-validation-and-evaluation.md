@@ -28,9 +28,9 @@ mean the workflow runs.
 
 ---
 
-## B. Four Validation Levels
+## B. Validation Taxonomy (L0–L4)
 
-**CR-23 — Canonical Validation Taxonomy (L0–L4):** The authoritative level names are defined here and must be used consistently across all spec files and phase plans.
+**CR-23 — Canonical Validation Taxonomy (L0–L4):** The authoritative level names are defined here and must be used consistently across all spec files and phase plans. This taxonomy defines **five levels** (L0 through L4).
 
 ### Level 0 — Static (exists today, keep and extend)
 
@@ -117,7 +117,22 @@ acceptance denominator is the failure mode this metric exists to prevent.
 
 ### A/B Comparisons
 
-**CR-22 — Formal A/B Protocol:** Each A/B comparison MUST: (1) isolate exactly one variable — any other difference confounds the result; (2) run both arms on identical fixture tasks in the same session or back-to-back; (3) record results from both arms before interpreting either; (4) report distribution (mean ± std) across ≥3 runs per arm — a single run is not evidence; (5) state what was being tested and whether results cross the threshold defined in the evaluation plan.
+**CR-22 — Formal A/B Protocol:** Each A/B comparison MUST:
+1. isolate exactly one variable — any other difference confounds the result
+2. run both arms on identical fixture tasks with **fresh, independent state per run** — same-session or back-to-back runs risk conversation state, cache, warmed provider state, filesystem mutation, or tool output confounds; fresh isolated runs are required unless the variable being tested explicitly concerns within-session behavior
+3. **randomize or counterbalance arm ordering** — always running baseline-first creates order effects
+4. record results from both arms before interpreting either
+5. report **per-fixture paired delta** plus aggregate across ≥3 independent runs per arm — three runs is a **pilot/smoke minimum** suitable for "this doesn't obviously regress"; it is NOT sufficient evidence for a strong "quality neutral-or-better" claim
+6. state the null hypothesis and the threshold used to judge the result
+7. capture **reproducibility metadata** per run: `omp_sha`, `template_sha`, `provider`, `gateway_version`, `model_id`, `reasoning_level`, `timeout_policy`, `retry_policy`, `cache_policy`, `tool_environment`
+
+**Pilot vs final evidence standard:**
+- `≥3 runs/arm` = **pilot/smoke evidence** — sufficient to catch obvious regressions, not sufficient for production-quality comparative claims
+- For any final "quality neutral-or-better" claim, N must be determined from a predeclared precision criterion OR runs must continue until the paired-delta confidence interval width meets a predeclared bound (e.g., 95% CI < 10% of the metric's expected range)
+
+**Preferred summary metric** (because fixtures are paired): per-fixture paired delta, aggregate paired delta, confidence interval or bootstrap interval, failure rate, and token delta — rather than only separate arm means and standard deviations.
+
+**Stable disagreement on power analysis requirement:** Opus holds that requiring formal power analysis or CI-width stopping rules for all comparisons is over-engineering for an initial evaluation framework. These techniques are appropriate once the fixture suite is stable and the claim is for production quality gates. GPT's preference for full statistical rigor is noted and the protocol is designed to be extendable to that standard.
 
 | Comparison | Question it answers |
 |---|---|

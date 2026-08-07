@@ -157,7 +157,7 @@ Worker agents (.omp/agents/*.md, spawned via `task`):
   ├── implementer.md  tools: read, grep, glob, edit, write, bash, lsp
   │                                                   output: <agent-result schema>  isolated: false (Standard) / true (Orchestrated; see §08 §B)
   ├── verifier.md     tools: read, grep, glob, bash   output: <verification schema>  isolated: false
-  └── reviewer.md     tools: read, grep, glob, bash   output: <review schema>        isolated: false
+  └── reviewer.md     tools: read, grep, glob, bash, lsp   output: <review schema>     isolated: false
 
 Skills (.omp/skills/<name>/SKILL.md):
   ├── task-triage/              lazy — triggered on ambiguity
@@ -236,16 +236,59 @@ genuinely open — requiring live experiment, not more reading:
 
 **CR-25 — Decision Record categorization:** DRs are split into two classes. *Runtime-fact-grounded* decisions are constrained by verified OMP source behavior — the opposite choice would be demonstrably wrong or require OMP changes. *Normative design choices* are well-supported judgment calls where a reasonable counterargument exists and peer review adds real value.
 
-### A. Runtime-Fact-Grounded Decisions
+### A. Decisions Informed by Runtime Facts
 
-These positions are backed by specific source-verified claims (file + line recorded in `00-current-state-audit.md`). Changing them requires changing the source evidence, not just the reasoning.
+**CR-25 — Epistemic separation:** Each decision below distinguishes what OMP source *proves* (a runtime fact, source-cited) from what was *chosen* (a normative decision, rationale-justified). Source evidence constrains the design space; it does not by itself determine the correct choice.
 
-| # | Decision | Opus Position | Source Evidence | Confidence |
-|---|---|---|---|---|
-| DR-2 | Schema enforcement mechanism | **`output:` frontmatter as default; task `outputSchema` for per-call override.** YAML → `docs/contracts/` as generator source | `tools/yield.ts` (MAX_SCHEMA_RETRIES=3), `discovery/helpers.ts:289` | High |
-| DR-3 | Fate of `.omp/policies/` | **Delete the folder.** Inline each policy into its single consumer | Zero discovery hooks in any provider — exhaustive grep | High |
-| DR-6 | Explorer isolation | **No isolation** — read-only, isolation is pure overhead | §08: `isolated: true` valid only for writers; git-repo requirement adds cost with zero benefit for read-only | High |
-| DR-7 | LSP in worker allowlists | **Add `lsp` to Explorer, Implementer, and Reviewer.** Baseline sets `task.enableLsp = true`; the per-agent allowlist is what withholds it | `lsp/index.ts:1639` (allowlist gating), `settings-schema.ts:4617` | High |
+---
+
+**DR-2 — Schema enforcement mechanism**
+
+*Source facts:*
+- OMP parses `output:` from agent frontmatter into `ParsedAgentFields.output` (`discovery/helpers.ts:289`)
+- `YieldTool` compiles this into a validator with up to 3 retries on mismatch (`tools/yield.ts:MAX_SCHEMA_RETRIES=3`)
+- Caller task `outputSchema` takes precedence over agent `output:` when present (`task/structured-subagent.ts:176-188`)
+- Session-level `outputSchema` is a third source (lowest precedence)
+
+*Design choice (normative):* Use agent `output:` frontmatter as the canonical schema source per agent. Treat caller `outputSchema` as an explicit per-call override only. Keep YAML under `docs/contracts/` as the human-authored generator source, not runtime files.
+
+*Alternative rejected:* Inline `outputSchema` in every task dispatch. Rejected because: duplicates the source of truth, increases maintenance burden, and contradicts the agent-frontmatter-as-contract model.
+
+---
+
+**DR-3 — Fate of `.omp/policies/`**
+
+*Source fact:* Zero discovery hooks for `policies/` in any OMP provider — exhaustive grep of all discovery providers confirms no loader exists.
+
+*Design choice (normative):* Delete the folder; inline each policy as prose into its single consumer.
+
+*Alternative not rejected (legitimate):* Move to `docs/` as human-readable reference without runtime claims. This is valid — the content is valuable. The chosen approach inlines it to (a) prevent `.omp/` placement from implying runtime meaning, and (b) eliminate synchronization risk between YAML and consuming prose. The spec author acknowledges reasonable peers could prefer `docs/` rehoming.
+
+---
+
+**DR-6 — Explorer isolation**
+
+*Source facts:*
+- `isolated: true` requires a git repository (`task/isolation-runner.ts: prepareIsolationContext` throws otherwise)
+- Isolation materializes a worktree copy — real setup cost on every invocation
+- Explorer only reads; it does not write to disk
+
+*Design choice (normative):* No isolation for Explorer. Read-only agents gain nothing from isolation; the git-repo requirement and materialization cost add overhead with zero benefit.
+
+*Alternative not rejected (legitimate):* Isolate Explorer for strict reproducibility. Rejected on cost/benefit grounds, not because source proves it wrong.
+
+---
+
+**DR-7 — LSP in worker allowlists**
+
+*Source facts:*
+- `lsp` tool is gated on BOTH `session.enableLsp` (baseline: `true`) AND per-agent `tools:` allowlist membership (`lsp/index.ts:1639`)
+- No agent currently lists `lsp` — the session-level permission is inert for all agents
+- Explorer's own instructions reference `lsp references` and `lsp hover` — unfollowable with current allowlist
+
+*Design choice (normative):* Add `lsp` to Explorer, Implementer, and Reviewer. Reviewer needs `lsp references` for blast-radius checks (callers of a modified symbol). Verifier is excluded (command runner; symbol nav is outside its contract).
+
+*Alternative not rejected (legitimate):* Disable `task.enableLsp` and remove LSP language from Explorer. Rejected because LSP provides genuine token savings (targeted symbol lookup vs whole-file reads) that the Explorer's symbol-first contract depends on.
 
 ### B. Normative Design Choices
 
@@ -253,7 +296,7 @@ These positions are well-reasoned but involve trade-offs where a legitimate coun
 
 | # | Decision | Opus Position | Confidence |
 |---|---|---|---|
-| DR-1 | Tech Lead: main session vs spawned agent | **Main session (PARTIAL).** Spawning costs a recursion level, duplicates context, and orphans ownership of the final answer. **CR-06 OPEN QUESTION**: routing mechanism for @tech-lead mentions in worker prompts is undefined when Tech Lead is the main session — no spawn hook exists for main-session targeting | High |
+| DR-1 | Tech Lead: main session vs spawned agent | **Main session (PARTIAL).** Spawning costs a recursion level, duplicates context, and orphans ownership of the final answer. **CR-06 OPEN QUESTION**: When the main session IS the Tech Lead, how does it deterministically receive the intended model routing (`@tech-lead`) and thinking level (`high`) that tech-lead.md frontmatter specifies? Agent frontmatter applies only at spawn time. Without an explicit mechanism, the main Tech Lead uses whatever model/thinking the user launched with, violating the architecture's model-role abstraction. Resolution options: (A) enforce launch contract (require session starts with @tech-lead + high effort), or (B) document that main-session Tech Lead is user-controlled, not template-controlled, and update all claims assuming guaranteed @tech-lead routing. | High |
 | DR-4 | `evidence-before-completion` delivery | **`autoloadSkills` on worker agents**, not `alwaysApply`, not lazy | Medium |
 | DR-5 | `read-summarize: false` on Explorer/Verifier | **Remove from Explorer** (contradicts token goals); **keep on Verifier** (needs exact output bytes) | Medium |
 | DR-8 | Keep 5 agents, or collapse Verifier into Implementer? | **Keep separate.** Independence is the entire value; self-verification is the failure mode being defended against | Medium |

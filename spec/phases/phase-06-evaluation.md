@@ -9,8 +9,7 @@
 
 ## Objective
 
-Build the four-level validation stack and a benchmark harness that executes real OMP
-sessions, so quality claims rest on measurement rather than on file-existence counts.
+Build the L0–L4 validation stack (per the canonical taxonomy in `spec/13-validation-and-evaluation.md §B`) and a benchmark harness that executes real OMP sessions, so quality claims rest on measurement rather than on file-existence counts.
 
 ---
 

@@ -1,6 +1,6 @@
 # 07 — Retrieval and Code Understanding
 
-> OPUS PROPOSED SPEC v1 | All claims verified against OMP source in `_research/upstreams/oh-my-pi`.
+> OPUS PROPOSED SPEC v1 | Runtime mechanics verified against OMP source in `_research/upstreams/oh-my-pi`; environment-specific availability claims (Context7) explicitly marked.
 
 ---
 
@@ -60,7 +60,7 @@ The table below is the **required final state** after phase-01/phase-02 work, no
 | `verifier` | **No** | Runs commands, reads output. Symbol navigation is outside its contract and invites scope creep. |
 | `tech-lead` (main session) | N/A | Main session, not governed by agent allowlist. |
 
-DR-7 status: **DECIDED** — add `lsp` to explorer, implementer, reviewer. Phase-02 implements this; phase-01 experiment T-00.E4 validates that the `task.enableLsp = true` baseline setting propagates correctly to subagents before committing to it.
+DR-7 status: **DECIDED** — add `lsp` to explorer, implementer, reviewer. Phase-01 T-01.3 implements this; **T-00.E5** (see `spec/phases/phase-00-foundation.md`) validates that `task.enableLsp = true` propagates and the `lsp` tool is callable within subagents before committing. (T-00.E4 is the RULES.md sentinel experiment and is unrelated to LSP.)
 
 ---
 

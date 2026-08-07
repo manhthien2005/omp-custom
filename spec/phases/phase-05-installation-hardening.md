@@ -40,12 +40,13 @@ lists every file with a hash.
 
 ### T-05.2 — Implement manifest-based rollback
 
-`uninstall-template.ps1` should: locate the manifest, remove only files it recorded
-whose hash still matches, leave user-modified files in place and report them, then
-restore from backup if one exists.
+`uninstall-template.ps1` should: locate the manifest, then for each recorded file apply operation-aware rollback per CR-13:
+- **OVERWRITE** operations: remove only if hash still matches; report CONFLICT and preserve when user-modified
+- **MERGE** operations (config.yml): key-level revert using installer delta from manifest; preserve user additions; report conflicts on diverged keys
+- **CREATE** operations: delete only if hash still matches
+- Restore from backup when appropriate (for OVERWRITE files that match installed hash)
 
-**Acceptance**: uninstall removes template files, preserves user-modified ones, and
-reports both sets. Round-trip returns the directory to its pre-install state.
+**Acceptance**: uninstall removes template files that haven't been modified, preserves user-modified ones, performs key-level MERGE rollback for config.yml, and reports all conflicts. Round-trip returns the directory to its pre-install state when no user modifications occurred.
 
 ### T-05.3 — Implement real config merging
 

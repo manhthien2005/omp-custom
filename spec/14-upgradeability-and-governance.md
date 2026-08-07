@@ -90,20 +90,19 @@ may be false, and this part of the template may break."
 
 ```
 1. detect        — compare current OMP commit to pinned_commit
-2. scope         — diff ONLY watched_paths, not the whole repo
-3. summarize     — for each changed watched path: what claim might be affected?
+2. scope         — diff the full upstream commit range; flag watched_paths changes FIRST as high-priority anchors, then inspect non-watched changes for transitive or call-chain impact on watched behavior
+3. summarize     — for each changed file (watched or non-watched): what claim might be affected?
 4. classify      — useful | duplicate | incompatible | irrelevant
-5. re-verify     — re-run Level 1 + Level 2 validation against the new OMP
+5. re-verify     — re-run Level 1 + Level 2 validation against the new OMP for ALL candidate claims from step 3
 6. port          — manually adjust the template; never auto-apply
 7. regression    — run Level 3 fixtures; compare metrics to the recorded baseline
 8. review        — human review of the diff + evidence
 9. promote       — update pinned_commit + last_reviewed, or reject and stay pinned
 ```
 
-**Never** skip step 5. A watched-path diff that looks cosmetic can still change
-behavior — a renamed key, a flipped default, a moved throw.
+**Never** skip step 5. A watched-path diff that looks cosmetic can still change behavior — a renamed key, a flipped default, a moved throw. A non-watched change (caller, adapter, helper) can also alter behavior without touching watched paths.
 
-**CR-21 — Watched-path diff is TRIAGE ONLY:** A diff in a watched path signals that a claim *may* be affected and must be re-verified. It is not evidence that the template is broken, and it does not determine which behavior changed. Step 3 ("summarize which claims may be affected") must produce a list of candidate claims; step 5 ("re-verify") must test those claims against the new OMP. Do not treat the diff output itself as a verdict — it is an entry point to re-verification, not a replacement for it.
+**CR-21 — Full-range discovery, watched-path triage:** Discovery MUST cover the full upstream commit range, not just watched paths. A behavior-changing commit can modify callers, adapters, initialization, transitive helpers, or insert new files into the call chain — none of which may touch watched paths. Watched paths are **triage anchors** (high-priority review), not the boundary of discovery. Step 2 diffs the full range; step 3 processes watched-path hits first, then assesses non-watched changes for transitive impact. The diff is triage input, not a verdict on breakage.
 
 ---
 

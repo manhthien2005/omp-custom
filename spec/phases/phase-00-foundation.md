@@ -120,14 +120,17 @@ Test cases:
 
 ### T-00.E2 — Model-role merge order
 
-Verify how missing/unknown model roles resolve in the OMP main session and for workers.
+Verify how missing/unknown model roles resolve in the OMP main session and for workers. This is the **canonical fallback test matrix** — `spec/09-model-routing.md §F` references these cases.
 
 Test cases:
 1. known built-in role with config present — record selected model
 2. known custom role (`@tech-lead`) with config present — record selected model
 3. referenced custom role absent from config — record selected model or error
-4. arbitrary `@unknown` pattern — record selected model or error
-5. role resolves to unavailable provider/model — record error or fallback
+4. arbitrary `@unknown` pattern (not a built-in, not in config) — record parser/resolver terminal behavior (error vs silent fallback)
+5. role resolves to unavailable provider/model — record error or fallback (distinguishes alias-resolution success from downstream provider failure)
+6. **user-level** role vs **project-level** role with same name — assert which wins (project beats user?) by defining the role differently at each level
+7. role name collision with OMP built-in (e.g., `default`) — custom role wins or OMP built-in wins?
+8. main-session model selection path (coordinator) vs worker agent model selection — verify they use the same resolver or document the difference
 
 **Artifact**: model-selection transcript per case; final statement for §09/§14/§15 normalization.
 
@@ -167,6 +170,24 @@ Procedure:
 - C → parent did not discover RULES.md; investigate discovery mode
 
 **Blocks**: DR-4 final justification; phase-02 worker initialization.
+
+### T-00.E5 — LSP allowlist validation (CR-17)
+
+Verify that `task.enableLsp = true` baseline setting actually makes the `lsp` tool callable within spawned subagents when `lsp` is present in the agent's `tools:` allowlist.
+
+Procedure:
+1. Spawn an agent (e.g., explorer) with `tools: [read, grep, glob, lsp]` and `task.enableLsp = true` baseline.
+2. Instruct the agent to call `lsp references` on a known symbol.
+3. Capture whether the tool call succeeds or is rejected as unavailable.
+4. Compare with control: same agent without `lsp` in allowlist (expect rejection).
+
+**Artifact**: LSP tool availability transcript per case (with-allowlist vs without-allowlist).
+
+**Discriminator**:
+- Success with `lsp` in allowlist → phase-01 T-01.3 proceeds safely
+- Rejection despite allowlist → investigate `task.enableLsp` propagation or allowlist gating logic
+
+**Blocks**: phase-01 T-01.3 (LSP allowlist fix for explorer, implementer, reviewer).
 
 ---
 
@@ -209,6 +230,7 @@ Manual checks:
 - [ ] **T-00.E2 artifact present** (model-role merge order)
 - [ ] **T-00.E3 artifact present** (Windows/ProjFS isolation)
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
+- [ ] **T-00.E5 artifact present** (LSP allowlist validation)
 
 ---
 

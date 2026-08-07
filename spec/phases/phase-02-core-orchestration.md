@@ -28,9 +28,11 @@ non-git-repo fallback. Prose alone does not orchestrate.
 
 ### T-02.1 — Wire autoloadSkills for guaranteed discipline
 
-`alwaysApply` has no subagent wiring; `autoloadSkills` demonstrably injects a skill
-body into the subagent via `sendCustomMessage` (`task/executor.ts`). This is the only
-deterministic mechanism.
+**CR-01/CR-26 correction:** Whether `alwaysApply` rules propagate to subagents depends on the T-00.E4 experiment result from phase-00:
+- *Outcome A (rules ARE prompt-visible in child)*: `autoloadSkills` is still the preferred delivery mechanism for policy packaging, token-budget control, and explicit per-agent precedence — but NOT because parent rules categorically cannot reach child sessions.
+- *Outcomes B/C (rules do NOT propagate or are not prompt-visible)*: `autoloadSkills` remains the required delivery mechanism for enforcing discipline invariants in workers.
+
+In either case, `autoloadSkills` injects a skill body via `sendCustomMessage` (`task/executor.ts`) and is the recommended delivery path. The key change from prior drafts: **do not state this is the "only deterministic mechanism"** — that claim was upstream of T-00.E4 evidence and may be false.
 
 Assign:
 - `implementer`: `evidence-before-completion, systematic-debugging`
@@ -51,11 +53,10 @@ not a correctness strategy.
 Fix:
 - document `task.isolation.mode: auto` as a prerequisite for parallel implementation
 - pass `isolated: true` explicitly on every Implementer dispatch in `orchestrated.md`
-- never isolate Explorer, Verifier, or Reviewer (read-only; isolation wastes setup
-  and hides nothing)
+- never isolate Explorer, Verifier, or Reviewer (they observe the real merged/written state; Verifier and Reviewer have `bash` for running commands and reading output, but MUST NOT write implementation artifacts — isolation would cause them to verify/review a copy, not the real tree that will ship)
 
 **Acceptance**: every parallel Implementer dispatch carries `isolated: true`;
-read-only dispatches carry none.
+Explorer, Verifier, and Reviewer dispatches carry no isolation.
 
 ### T-02.3 — Add the non-git-repo fallback
 
@@ -71,11 +72,11 @@ fallback.
 
 ### T-02.4 — Complete the dispatch contracts in commands
 
-Each dispatch must specify: agent, task packet content, `outputSchema`,
-`schemaMode: "strict"`, `isolated` (write-capable only), and `effort` when
-`task.enableEffort` is on.
+**CR-03/CR-26 correction:** Per DR-2 and phase-01 T-01.7, each worker agent carries its canonical schema in `output:` frontmatter — this is the primary enforcement path. Task dispatch commands use inline `outputSchema` **only** as an explicit caller override (e.g., a one-off call needing a narrower schema).
 
-**Acceptance**: no dispatch relies on an unstated default.
+Each dispatch must specify: agent, task packet content, `isolated` (write-capable only), and `effort` when `task.enableEffort` is on. `schemaMode: "strict"` should be passed when strict enforcement is required. Inline `outputSchema` is used only when overriding the agent's `output:` frontmatter.
+
+**Acceptance**: every dispatch specifies agent, task packet, isolation intent (when write-capable), and effort (when enabled). Inline `outputSchema` appears only for explicit overrides, not as a universal requirement.
 
 ### T-02.5 — Implement Quick as genuinely inline
 
