@@ -1,38 +1,97 @@
-# omp-workflow-template
+# omp-custom
 
-A production-grade, OMP-native workflow template.
+> Production-ready workflow template for [OMP (Oh My Pi)](https://github.com/oh-my-pi/oh-my-pi) — adds multi-agent coordination, structured quality gates, and evidence-backed code review to any OMP project.
 
-## Status
+---
 
-**Workflow v0 — in construction.**
+## What it does
 
-## What this is
+When you install this template into a project, OMP gains:
 
-A carefully designed set of OMP configuration files — agents, workflows, skills, schemas, and policies — extracted from research across leading AI coding-agent repositories and reimplemented natively for OMP.
+| What | How many | Purpose |
+|---|---|---|
+| **Agents** | 5 | Specialized roles: coordinator, investigator, implementer, verifier, reviewer |
+| **Commands** | 3 | `/quick` (5 steps), `/standard` (8 steps), `/orchestrated` (full delegation) |
+| **Skills** | 3 | Task triage, systematic debugging, completion evidence |
+| **Schemas** | 4 | Typed structured outputs for every agent |
+| **Policies** | 5 | Token budgets, model routing, quality gates, escalation rules |
 
-OMP remains the sole runtime and orchestration engine. OmniRoute remains the sole model gateway. No second runtime is introduced.
+All of it runs natively inside OMP — no extra runtime, no extra dependencies.
 
-## What this is not
+---
 
-- A copy of any external framework.
-- A second coding agent layered on OMP.
-- An automatic installer that touches live OMP files without review.
+## How to install
 
-## Structure
+```powershell
+# Preview what will be copied (safe, no changes)
+.\scripts\install-template.ps1 -DryRun
+
+# Install for real (backs up your existing .omp/ first)
+.\scripts\install-template.ps1 -TargetDir "D:\Your\Project"
+```
+
+To undo:
+
+```powershell
+.\scripts\uninstall-template.ps1 -TargetDir "D:\Your\Project"
+```
+
+---
+
+## How to validate
+
+```powershell
+.\scripts\validate-template.ps1 -Verbose
+# Expected: 63 passed · 0 warnings · 0 failures
+```
+
+---
+
+## Project layout
 
 ```
-template/.omp/     — installable OMP configuration
-docs/              — architecture, research, token strategy, installation
-registry/          — upstream provenance, licenses, adoption ledger
-evals/             — evaluation fixtures and deterministic tests
-scripts/           — install, validate, benchmark, rollback tooling
-_research/         — upstream clones (gitignored; tracked via registry)
+template/.omp/        ← the installable OMP config (copy this into your project)
+  agents/             ← 5 agent definitions
+  commands/           ← 3 slash commands
+  skills/             ← 3 skill definitions
+  schemas/            ← 4 YAML schemas
+  policies/           ← 5 policy files
+  AGENTS.md           ← shared context + coding constitution
+  RULES.md            ← 8 sticky invariants (always loaded)
+  config.yml          ← model role mappings
+
+scripts/              ← install · validate · benchmark · rollback
+docs/                 ← architecture, installation guide, design report
+registry/             ← upstream provenance, license classification, adoption ledger
+evals/                ← evaluation fixtures for regression testing
 ```
 
-## Installation
+---
 
-See `docs/installation.md` — supports dry-run, selective install, and rollback.
+## Choosing a command
 
-## Research provenance
+| Scenario | Command |
+|---|---|
+| Quick fix, clear requirement | `/quick` |
+| Normal feature or bug | `/standard` |
+| Complex, multi-file, needs full review | `/orchestrated` |
 
-All adopted mechanisms are recorded in `registry/adoption-ledger.yml` with source, license, and rationale.
+Not sure? Run `/quick task-triage` first — the triage skill picks the right command for you.
+
+---
+
+## Design principles
+
+- **OMP-native** — no second runtime layered on top
+- **OmniRoute-only** — single model gateway, model roles decoupled from agent definitions
+- **Token-aware** — every file has a measured budget; shake compaction configured
+- **12-Factor Agents** — agents own their prompts, context, and control flow
+- **Evidence before completion** — no task is done until output is verified against the original goal
+
+---
+
+## Provenance
+
+Every adopted mechanism is recorded in [`registry/adoption-ledger.yml`](registry/adoption-ledger.yml) with source repo, license, and rationale. 17 mechanisms were rejected with documented reasons in [`registry/rejected-mechanisms.yml`](registry/rejected-mechanisms.yml).
+
+See [`docs/report-design.md`](docs/report-design.md) for the full design report.
