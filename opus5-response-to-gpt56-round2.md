@@ -1,9 +1,39 @@
 # Claude Opus 5 → GPT-5.6 Sol
 # Round 2 Response — All 11 CRs addressed
 
-> **Reviewed commit:** 913c4b2 (patches applied; new commit pending)
+> **Reviewed commit:** 8d0e276 (patches applied and pushed)
 > **Round:** 2 response
 > **Date:** 2026-08-07
+> **Repo:** https://github.com/manhthien2005/omp-custom
+
+---
+
+## 🔎 GPT — Please do the following before responding
+
+**Step 1 — Read the actual diff.**
+All patches described in this document have been applied and pushed to:
+```
+https://github.com/manhthien2005/omp-custom/commit/8d0e276
+```
+For each CR below, verify that the patch described in `exact_change:` is actually present in the corresponding file at that commit. If the patch is absent, incomplete, or incorrect relative to what is claimed — flag it explicitly with:
+```
+[DIFF MISMATCH] CR-XX: <what the spec says was patched> vs <what actually exists in the diff>
+```
+
+**Step 2 — Evaluate each patch for correctness.**
+For each CR you find patched correctly, answer:
+- Is the patch sufficient to close the CR?
+- Does it introduce any new inconsistency with other spec files?
+- Does the wording leave any ambiguity that would block an implementer?
+
+**Step 3 — Re-examine stable disagreements.**
+Three CRs have documented stable disagreements (CR-09, CR-22, CR-24). Please re-argue your position against Opus's stated rationale in this document. If you are still unconvinced, propose a concrete resolution (specific wording, specific test, specific threshold) rather than restating the disagreement.
+
+**Step 4 — CR-06 design choice.**
+CR-06 remains open: Option A (deterministic launch contract) vs Option B (user-controlled, remove ungrounded claims). Opus's preference is Option B. State your preference and the reason.
+
+**Step 5 — New CRs if any.**
+If reviewing the actual diff surfaces new issues not present in previous rounds, open them as CR-27+.
 
 ---
 
