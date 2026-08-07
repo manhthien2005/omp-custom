@@ -136,14 +136,20 @@ Zero agents rely on prose "Return schema:" as the sole contract.
 `tech-lead.md` exists but no command spawns it; the main session performs the role.
 Its `model: "@tech-lead"` and `thinking-level: high` frontmatter **never apply** — agent frontmatter is only processed at spawn time, not for the main session.
 
-**CR-06 open question:** When the main session IS the Tech Lead, what exact runtime mechanism ensures it uses `@tech-lead` routing and `high` thinking level? Two options:
+**CR-06 resolution — Option B selected:** Main-session model/thinking is **user-controlled**, not template-controlled.
 
-- **Option A — Deterministic launch contract:** Document and enforce that the main session MUST be started with the `@tech-lead` model role and `high` effort. The workflow entrypoint or installation docs must state this as a hard requirement, not a recommendation.
-- **Option B — User-controlled:** Accept that main-session model/thinking is user-controlled. State explicitly in `AGENTS.md` that the template does NOT guarantee `@tech-lead` routing for the main Tech Lead session. Update any architecture claim that assumes guaranteed routing.
+The template does not create, own, or configure the main session. It cannot guarantee that the main Tech Lead runs `@tech-lead` or `high` thinking level — these are the user's session settings. Inventing an enforcement hook that does not exist in OMP would be a false contract.
 
-Fix: choose one option, implement it, and document the choice in `AGENTS.md`.
+Normative statement (to appear in `AGENTS.md`):
+> The template does not guarantee that the main Tech Lead runs under `@tech-lead` or a fixed thinking level. Those settings belong to the launched main session. Role-based `model:` and `thinking-level:` frontmatter are deterministic only for spawned worker agents where that frontmatter is applied at spawn time.
 
-**Acceptance**: the spec and `AGENTS.md` answer unambiguously: "What model and thinking level does the Tech Lead use, and what guarantees it?" Phase-01 exit criteria must include a test confirming whichever contract was chosen (e.g., for Option A: attempt a command with a non-tech-lead session and confirm the expected behavior; for Option B: confirm no claims assume guaranteed routing).
+Fix:
+- Update `AGENTS.md` with the above normative statement.
+- Update DR-1 in `spec/README.md` to select Option B.
+- Remove any claim in any spec file that assumes guaranteed `@tech-lead` routing for the main session.
+- `tech-lead.md` is retained only as documentation of the Tech Lead role contract; it is not on the spawn path.
+
+**Acceptance**: `AGENTS.md` states the main-session model contract explicitly (user-controlled). Zero spec files assert guaranteed `@tech-lead` routing for the main session. The tech-lead.md purpose is documented as role-reference only.
 
 ### T-01.9 — Honor the installer's `$Force` parameter (F-04)
 
@@ -184,7 +190,10 @@ nothing.
 
 Static checks: zero `policy:` references in `agents/`+`commands/`; every tool named
 in an agent prompt present in that agent's `tools:`; no agent name in the bundled
-list; every `task` dispatch carries `outputSchema`.
+list; every worker agent (`explorer`, `implementer`, `verifier`, `reviewer`) carries
+a valid `output:` frontmatter schema; no agent relies on prose "Return schema:" as the
+sole contract; inline caller `outputSchema` used only for explicit overrides (not
+required on every dispatch — see DR-2 and T-01.7).
 
 ---
 

@@ -33,7 +33,7 @@ Document and require the compaction settings the context-budget policy assumes:
 `keepRecentTokens: 20000`. These are OMP settings (`config/settings-schema.ts`), so
 they belong in config, not in prose.
 
-**Acceptance**: settings documented with real key names; Level 1 validation checks
+**Acceptance**: settings documented with real key names; L0 (Static) validation checks
 they are present.
 
 ### T-03.2 — Enforce task-packet discipline

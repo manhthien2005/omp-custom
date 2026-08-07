@@ -57,11 +57,14 @@ Add a header to each `template/.omp/policies/*.yml`:
 
 ### T-00.4 — Reclassify schemas as documentation
 
-Add an equivalent header to each `template/.omp/schemas/*.yml`, stating that runtime
-enforcement happens through `outputSchema` inlined in the `task` call, and that these
-files are the human-authoritative source for that shape.
+Add an equivalent header to each `template/.omp/schemas/*.yml`, stating that:
+- runtime enforcement happens through the worker agent's **`output:` frontmatter** (the canonical schema source per DR-2);
+- caller task `outputSchema` is an explicit per-call override, not the default path;
+- these YAML files are the human-authoritative source that generates the inline `output:` blocks; nothing reads them at runtime.
 
-**Acceptance**: all four schema files carry the header.
+**CR-28 correction:** the header must NOT say "enforcement happens through `outputSchema` inlined in the task call" — that inverts DR-2. The canonical enforcement path is `agent output: frontmatter → YieldTool validator`. Caller `outputSchema` is the override/escape-hatch.
+
+**Acceptance**: all four schema files carry the corrected header. No schema file claims caller `outputSchema` is the primary enforcement path.
 
 ### T-00.5 — Correct the documentation claims
 

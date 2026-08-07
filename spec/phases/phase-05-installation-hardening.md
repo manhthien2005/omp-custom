@@ -88,7 +88,7 @@ inputs.
 and the OmniRoute endpoint are prerequisites for the template to behave as specified.
 A user who installs without them gets degraded behavior with no signal.
 
-**Acceptance**: prerequisites appear in installation docs and are checked by Level 1
+**Acceptance**: prerequisites appear in installation docs and are checked by L0 (Static)
 validation.
 
 ---
@@ -143,4 +143,4 @@ apply file lists.
 | YAML merge loses comments | Targeted key insertion, not parse-and-reserialize; report conflicts |
 | Manifest drifts from disk | Hash check at uninstall; mismatch means preserve, not delete |
 | Confirmation prompt breaks automation | Explicit non-interactive flag, documented as deliberate |
-| Users skip prerequisites | Level 1 validation reports missing settings |
+| Users skip prerequisites | L0 (Static) validation reports missing settings |

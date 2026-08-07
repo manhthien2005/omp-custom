@@ -32,7 +32,10 @@ Retain file-existence, token-budget, and YAML checks — they catch real regress
 but rename the output so passing no longer implies working. Add the checks that would
 have caught phase-01's defects: no `policy:` references, no tool named outside its own
 allowlist, no bundled-name collision, every `autoloadSkills` name resolvable, every
-dispatch carrying `outputSchema`.
+**worker agent** (`explorer`, `implementer`, `verifier`, `reviewer`) carrying a valid
+`output:` frontmatter schema.
+
+**CR-28 correction:** L0 must NOT require "every dispatch carries inline `outputSchema`" — that inverts DR-2. The correct L0 check is: every worker agent has a canonical `output:` frontmatter block (the primary enforcement path per DR-2 and `spec/06`). Caller inline `outputSchema` is an override, not the default — its presence is not required and its absence is not a defect.
 
 **Acceptance**: L0 detects all eight P0 defects when reintroduced. Report wording
 states it verifies structure, not behavior.
@@ -96,10 +99,10 @@ wrong answers.
 
 ## Deliverables
 
-- Level 1 with defect-catching static checks, honestly labeled
-- Level 2 discovery validation
-- Level 3 workflow fixtures including negative cases
-- Level 4 adversarial fixtures
+- L0 (Static) with defect-catching static checks, honestly labeled
+- L1 (Discovery) validation
+- L2 (Contract) + L3 (Behavioral) workflow fixtures including negative cases
+- L4 (Adversarial/Comparative) fixtures
 - Executing benchmark harness
 - Baseline comparison
 - Primary metric implemented
@@ -108,9 +111,9 @@ wrong answers.
 
 ## Verification
 
-1. Reintroduce each P0 defect; confirm Level 1 or 2 catches it.
-2. Run all Level 3 fixtures; confirm expected outcomes including the two negatives.
-3. Run all Level 4 fixtures; confirm each failure mode is detected.
+1. Reintroduce each P0 defect; confirm L0 or L1 catches it.
+2. Run all L3 (Behavioral) fixtures; confirm expected outcomes including the two negatives.
+3. Run all L4 (Adversarial) fixtures; confirm each failure mode is detected.
 4. Run the benchmark on both arms; confirm records populate automatically.
 5. Confirm the metric is computed, not asserted.
 
@@ -136,4 +139,4 @@ wrong answers.
 | Fixtures are nondeterministic (LLM variance) | Multiple runs; report distribution, not a single number |
 | Benchmark costs real tokens | Small fixtures; run deliberately, not on every commit |
 | Baseline arm is unflattering | That is the finding; report it honestly |
-| Level 3/4 fixtures rot as workflows change | Fixtures assert outcomes, not internal steps |
+| L3/L4 fixtures rot as workflows change | Fixtures assert outcomes, not internal steps |

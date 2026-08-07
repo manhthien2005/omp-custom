@@ -32,7 +32,7 @@ mean the workflow runs.
 
 **CR-23 — Canonical Validation Taxonomy (L0–L4):** The authoritative level names are defined here and must be used consistently across all spec files and phase plans. This taxonomy defines **five levels** (L0 through L4).
 
-### Level 0 — Static (exists today, keep and extend)
+### L0 — Static (exists today, keep and extend)
 
 Filesystem and text properties. Fast, no OMP required, runs in CI.
 
@@ -51,7 +51,7 @@ Add:
   o200k/cl100k counting; `chars / 4` misestimates markdown tables and code fences badly.
 - **Secret scan** — no API keys, tokens, or credentials in any template file.
 
-### Level 1 — Discovery (new, highest value per effort)
+### L1 — Discovery (new, highest value per effort)
 
 Install into a scratch directory, then confirm **OMP itself** sees every component.
 This is the layer that would have caught D-1 on day one.
@@ -65,7 +65,7 @@ Assertions:
 
 A component that OMP cannot see is broken regardless of how well-formed its file is.
 
-### Level 2 — Contract (new)
+### L2 — Contract (new)
 
 Exercise the structured-output path (§06) without judging code quality:
 - A `task` call with an inline `outputSchema` returns a schema-valid object.
@@ -73,14 +73,14 @@ Exercise the structured-output path (§06) without judging code quality:
 - An `agent-result` claiming `status: completed` with empty `verification_results` is
   rejected by the schema, not merely discouraged by prose.
 
-### Level 3 — Behavioral (new, the real measure)
+### L3 — Behavioral (new, the real measure)
 
 Run the ten fixture tasks from the plan end-to-end and measure outcomes. This is the only
 level that can answer "is the workflow better than no workflow".
 
-### Level 4 — Adversarial (new)
+### L4 — Adversarial (new)
 
-Test the failure modes the design claims to prevent. These cases must be fully deterministic (no model-grading): an Implementer that reports false success, an environment failure, a non-git-repo isolation dispatch, a schema-violating result, and conflicting parallel patches. Each case must produce a specified detection response. Level 4 also covers A/B comparison runs where a single variable is isolated and results are compared statistically (see §C).
+Test the failure modes the design claims to prevent. These cases must be fully deterministic (no model-grading): an Implementer that reports false success, an environment failure, a non-git-repo isolation dispatch, a schema-violating result, and conflicting parallel patches. Each case must produce a specified detection response. L4 also covers A/B comparison runs where a single variable is isolated and results are compared statistically (see §C).
 
 ---
 
@@ -178,10 +178,10 @@ The plan requires that failed evaluations not be hidden. Therefore:
 
 | # | Criterion |
 |---|---|
-| AC-1 | Level 0 catches a missing `---` fence, a dangling `policy:` reference, and a tool-allowlist contradiction |
-| AC-2 | Level 1 fails when the installer omits slash commands (regression test for §12 D-1) |
-| AC-3 | Level 1 fails when a custom model role is unresolved |
-| AC-4 | Level 2 proves schema rejection and retry actually occur |
+| AC-1 | L0 catches a missing `---` fence, a dangling `policy:` reference, and a tool-allowlist contradiction |
+| AC-2 | L1 fails when the installer omits slash commands (regression test for §12 D-1) |
+| AC-3 | L1 fails when a custom model role is unresolved |
+| AC-4 | L2 proves schema rejection and retry actually occur |
 | AC-5 | Benchmark executes real OMP sessions and records results without manual authoring |
 | AC-6 | All ten plan fixture types exist with deterministic acceptance checks |
 | AC-7 | False-completion rate is computed automatically per run |

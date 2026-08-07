@@ -93,9 +93,9 @@ may be false, and this part of the template may break."
 2. scope         — diff the full upstream commit range; flag watched_paths changes FIRST as high-priority anchors, then inspect non-watched changes for transitive or call-chain impact on watched behavior
 3. summarize     — for each changed file (watched or non-watched): what claim might be affected?
 4. classify      — useful | duplicate | incompatible | irrelevant
-5. re-verify     — re-run Level 1 + Level 2 validation against the new OMP for ALL candidate claims from step 3
+5. re-verify     — re-run L0 (Static) + L1 (Discovery) validation against the new OMP for ALL candidate claims from step 3
 6. port          — manually adjust the template; never auto-apply
-7. regression    — run Level 3 fixtures; compare metrics to the recorded baseline
+7. regression    — run L3 (Behavioral) fixtures; compare metrics to the recorded baseline
 8. review        — human review of the diff + evidence
 9. promote       — update pinned_commit + last_reviewed, or reject and stay pinned
 ```
@@ -127,7 +127,7 @@ from the original plan (Definition of Done #18), and it constrains implementatio
 coupling the removal procedure must state, or removal leaves a dangling name.
 `resolveAutoloadSkills` filters unresolved names out (`.filter(skill => skill !== undefined)`),
 so a dangling entry fails **silently** — the discipline just stops being injected.
-That silent-failure mode is exactly why Level 2 validation must cross-check
+That silent-failure mode is exactly why L1 (Discovery) validation must cross-check
 `autoloadSkills` names against the skills directory.
 
 ---
@@ -196,7 +196,7 @@ verified_claims:
   - task outputSchema enforcement
 ```
 
-Level 1 validation should warn when the live OMP version differs from
+L0 (Static) validation should warn when the live OMP version differs from
 `omp_verified_version`, because that is precisely when the verified claims need
 re-checking.
 

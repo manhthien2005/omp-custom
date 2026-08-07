@@ -34,8 +34,7 @@ The ordering is forced by dependency, not preference:
    measures nothing.
 2. **Wiring before optimization.** Structured output must actually be enforced
    before "results are compact" is a testable claim.
-3. **Validation before evaluation.** Level 1/2 validation must pass before Level 3
-   fixtures produce trustworthy numbers.
+3. **Validation before evaluation.** L0/L1 validation must pass before L3 fixtures produce trustworthy numbers.
 4. **Evaluation before expansion.** No new mechanism (memory, advisor, specialist
    skills) until v0 has a measured baseline.
 
@@ -47,7 +46,7 @@ The ordering is forced by dependency, not preference:
 |---|---|---|
 | `scripts/install-template.ps1` | Fix component map; protect `config.yml`; honor `$Force`; add manifest; validate component names | P0-1, P0-4, F-04 |
 | `scripts/uninstall-template.ps1` | Align params with installer; manifest-driven restore | P1-11 |
-| `scripts/validate-template.ps1` | Add Level 1 + Level 2 tiers | P1-12 |
+| `scripts/validate-template.ps1` | Add L0 (Static) + L1 (Discovery) tiers | P1-12 |
 | `scripts/benchmark.ps1` | Replace with real execution or rename to reflect reality | P1-13 |
 | `template/.omp/agents/explorer.md` | Add `lsp` to tools; remove `read-summarize: false`; add `autoloadSkills` | P0-3, P1-6 |
 | `template/.omp/agents/implementer.md` | Add `lsp` to tools; add `autoloadSkills`; note isolation | P0-3, P1-8 |
@@ -68,7 +67,7 @@ The ordering is forced by dependency, not preference:
 
 | Risk | Mitigation |
 |---|---|
-| Fixing the installer reveals further breakage that static validation hid | Expected; Level 1 validation exists to surface it |
+| Fixing the installer reveals further breakage that static validation hid | Expected; L0 (Static) validation exists to surface it |
 | Renaming `reviewer` breaks existing command references | Rename atomically across agent file + all commands |
 | Inlining schemas makes commands longer | Commands are lazy-loaded, not persistent — acceptable |
 | Removing `read-summarize: false` changes worker behavior | That is the point; verify by measurement |
@@ -90,7 +89,7 @@ rollback (§12).
 
 1. All eight P0 items resolved with evidence.
 2. All P1 items resolved or explicitly deferred with a recorded reason.
-3. Level 1 + Level 2 validation pass; Level 3 fixtures run and produce recorded numbers.
+3. L0 (Static) + L1 (Discovery) validation pass; L3 (Behavioral) fixtures run and produce recorded numbers.
 4. Docs contain no claim that contradicts verified runtime behavior.
 5. `registry/upstreams.yml` records the pinned OMP commit and watched paths.
 6. Every component has a documented removal procedure.

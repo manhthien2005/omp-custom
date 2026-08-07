@@ -132,7 +132,7 @@ Ordered behavior:
 5. **Backup** — timestamped copy of files in the installer write-set only (not entire destination). **CR-14**: Backup scope limited to template-owned files to avoid preserving unrelated state or bloating backup size.
 6. **Apply** — copy files; merge `config.yml`; never touch protected paths.
 7. **Manifest** — write the JSON record described in D-6.
-8. **Post-validate** — confirm OMP discovers the installed components (§13 Level 1).
+8. **Post-validate** — confirm OMP discovers the installed components (§13 L1 Discovery).
 
 Protected paths, never written: `models.yml`, `config.yml` (merge only), `agent.db*`,
 `sessions/`, `auth.json`, any `.env`.

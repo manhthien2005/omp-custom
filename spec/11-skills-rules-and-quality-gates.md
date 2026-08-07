@@ -140,7 +140,7 @@ that description, and it is testable without running a workflow.
 | `task-triage` | "Make the API better" (ambiguous) | "Fix the typo on line 12" (unambiguous) |
 
 Store as `evals/triggers/<skill>.yml` with `should_trigger` / `should_not_trigger`
-prompt lists. This is a Level 3 check (see spec 13) — it needs a model in the loop, so
+prompt lists. This is an L3 (Behavioral) check (see spec 13) — it needs a model in the loop, so
 it cannot run in static validation.
 
 ---

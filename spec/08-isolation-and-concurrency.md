@@ -28,11 +28,11 @@ The practical consequence is the inverse of the original concern: isolation is n
 
 Isolation is decided per task call by the orchestrator, using one question: **does this agent write to disk, and could a sibling be writing concurrently?**
 
-| Agent | Writes to disk? | `isolated` | Rationale |
+| Agent | Writes implementation artifacts? | `isolated` | Rationale |
 |---|---|---|---|
 | `explorer` | No | `false` | Read-only. Isolation would cost a worktree materialization and buy nothing. |
-| `verifier` | No (runs commands only) | `false` | Must observe the **real merged tree** — the state that will actually ship. Isolating the Verifier would verify a copy nobody deploys. |
-| `reviewer` | No | `false` | Same as Verifier: reviews the real diff. |
+| `verifier` | No (but has `bash`; MUST NOT write implementation artifacts) | `false` | Must observe the **real merged tree** — the state that will actually ship. Isolating the Verifier would verify a copy nobody deploys. The correct reason NOT to isolate is observability, not the absence of write capability: a `bash`-capable Verifier can produce side-effects. Pre/post `git status` checks catch unexpected mutations. |
+| `reviewer` | No (but has `bash`; MUST NOT write implementation artifacts) | `false` | Same observability reason as Verifier: reviews the real diff, not a copy. Any unexpected write is a contract violation caught by `git status` diff. |
 | `implementer` (single, Standard) | Yes | `false` | Sole writer, nothing to conflict with. Direct writes keep the diff immediately visible to Verifier and to the user. |
 | `implementer` (parallel, Orchestrated) | Yes | **`true`** | Concurrent writers **must** be isolated or they corrupt each other's edits. |
 
@@ -93,8 +93,8 @@ For parallel Implementers, independence means **disjoint file sets**. Because `m
 
 1. Isolation is requested **per task call**, never inferred from `mode`.
 2. `mode: auto` selects a *backend*; it never decides *whether* to isolate.
-3. Parallel writers MUST set `isolated: true`. Read-only agents MUST NOT.
+3. Parallel writers MUST set `isolated: true`. Non-writing agents (Explorer, Verifier, Reviewer) MUST NOT isolate — they must observe the real merged parent state.
 4. Isolation requires git. Absent git, fall back to sequential and disclose it.
 5. `apply: true` means isolation stages-then-merges; it is not a review sandbox.
 6. Effective-config validation MUST assert `task.isolation.mode != none`, because the silent-absence failure has no runtime signal.
-7. **CR-09 — Batch merge semantics are explicit partial-integration:** When N isolated workers complete in parallel, their results are merged individually (not atomically as a transaction). If merge A succeeds and merge B conflicts, A remains applied — the parent state is B+A, not original base. Recovery must handle the new base state. If atomic batch semantics are required, implement a checkpoint/restore mechanism at the orchestrator level. **Integration concurrency model:** The orchestrator serializes merge/apply operations to the parent worktree — workers may execute in parallel, but integration into the shared parent happens sequentially (one apply completes before the next begins). This prevents git index/worktree lock conflicts and ensures deterministic partial-integration ordering. OMP's task layer enforces this serialization internally via the task result handling path.
+7. **CR-09/CR-27 — Parallel integration is NOT internally serialized by OMP.** `runStructuredSubagent()` calls `mergeIsolatedChanges()` directly from each spawn (verified: `task/structured-subagent.ts`, `task/isolation-runner.ts` in OMP v17.2.10). There is no orchestrator-level merge mutex in that path. Git lock contention can cause one apply to fail, but that is lock *contention*, not safe serialization. **Recommended architecture for parallel implementers:** set `task.isolation.apply: false` on parallel worker dispatches; the Tech Lead collects all isolated results then integrates them one at a time in a single coordinator step. This separates parallel coding from serial shared-state mutation. If `apply=false` is not available in the runtime configuration, implement an explicit merge queue at the orchestrator level, or fall back to sequential (non-parallel) implementation and document the degradation. **Do not claim OMP serializes integration internally** without a source-verified lock primitive.

@@ -69,17 +69,14 @@ Rules:
 4. Eval fixtures use synthetic data only.
 5. `.gitignore` must exclude `evals/results/` if runs can capture environment detail.
 
-**Installer-specific**: the backup created by `install-template.ps1 -Target user`
-copies the entire `~/.omp/agent/` tree — including `models.yml` and `agent.db`.
-That backup therefore **contains credentials** and must:
+**Installer-specific (CR-14)**: the backup created by `install-template.ps1` covers **only the installer write-set** (the specific files the installer is about to overwrite or create). It does NOT back up the entire `~/.omp/agent/` tree. This is the correct scope: credential files (`models.yml`, `agent.db*`, `sessions/`) are never in the write-set because they are protected by the installer's explicit exclusion list — copying them just to enable rollback would be unnecessary and dangerous.
+
+The backup path must:
 - never be created inside the repository working tree,
 - never be committed,
-- be explicitly flagged to the user as containing secrets.
+- be reported to the user at install time so they can locate it.
 
-This is a real risk in the current installer: `$backup_dir = "$dest_omp.backup-$timestamp"`
-places the backup next to the source, which is acceptable for `~/.omp/agent` but
-would be inside the repo for a project-target install. The spec requires the backup
-path be reported and `.gitignore`-covered.
+`$backup_dir = "$dest_omp.backup-$timestamp"` places the backup adjacent to the destination, which is acceptable for the write-set-only scope. The spec requires the backup path appear in the install manifest.
 
 ---
 
@@ -106,14 +103,14 @@ system has more opportunity to act destructively than a single session does.
 **Failure**: `-Components workflows` matches no directory → zero commands installed;
 install reports success.
 **Recovery**: unknown-component validation + post-install file-count assertion.
-**Detection**: Level 1 validation (do commands exist at the destination?).
+**Detection**: L0 (Static) — do the expected command files exist at the destination?
 
 ### D-2. Agent name collision with bundled agent
 
 **Failure**: project `reviewer.md` silently shadows OMP's bundled `reviewer`
 (`task/discovery.ts` precedence: project > user > bundled, first-wins by name).
 **Recovery**: intentional, but must be documented; validation warns on collision.
-**Detection**: Level 2 validation compares agent names to the bundled list
+**Detection**: L1 (Discovery) — compare agent names to the bundled list
 (`scout`, `designer`, `reviewer`, `security-reviewer`, `librarian`, `task`, `sonic`).
 
 ### D-3. Isolation failure outside a git repo
@@ -128,7 +125,7 @@ isolated work.
 
 **Failure**: `resolveAutoloadSkills` filters unresolved names silently → discipline
 never injected, no error.
-**Recovery**: Level 2 validation cross-checks names against the skills directory.
+**Recovery**: L1 (Discovery) validation cross-checks names against the skills directory.
 **Detection**: static; must be a validation FAIL, not a warning.
 
 ### D-5. Schema-validation override
@@ -141,10 +138,12 @@ independently rather than trusting fields.
 
 ### D-6. Model role misroute
 
-**Failure**: a role missing from `config.yml` falls back to `default` silently.
-**Recovery**: acceptable degradation, but must be visible.
-**Detection**: Level 1 validation cross-checks `@role` references in agent
-frontmatter against `config.yml` keys.
+**Failure**: a role missing from `config.yml` may fall back to `default`, error, or fail
+downstream — exact behavior is not assumed and must be established by T-00.E2.
+**Recovery**: policy selected after T-00.E2 records observed behavior. Until then,
+treat as an open failure mode requiring experimental resolution.
+**Detection**: L1 (Discovery) — cross-check `@role` references in agent frontmatter
+against `config.yml` keys. After T-00.E2: update recovery policy to match observed behavior.
 
 ### D-7. Verification failure loop
 
@@ -197,7 +196,7 @@ offload for large artifacts; workers return compact results only.
 - [ ] Backup path documented as containing credentials; `.gitignore`-covered
 - [ ] No upstream script executed during research or build
 - [ ] Untrusted-source handling stated in agent prompts
-- [ ] Worker results cannot instruct the Tech Lead (schema-structural)
+- [ ] Worker-produced strings treated as untrusted data even after schema validation; actions independently authorized by coordinator (see §A Note CR-12)
 - [ ] Destructive actions gated in RULES.md
 - [ ] Eval fixtures use synthetic data
 - [ ] `_research/upstreams/**` excluded from the distributable template
