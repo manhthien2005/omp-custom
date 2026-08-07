@@ -1,0 +1,512 @@
+# Upstream registry — all external research repositories
+# Do not edit commit hashes manually; run scripts/update-upstreams.ps1 to refresh.
+# clone_date: 2026-08-07
+
+upstreams:
+
+  - id: oh-my-pi
+    repository: can1357/oh-my-pi
+    url: https://github.com/can1357/oh-my-pi
+    default_branch: main
+    pinned_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+    license: MIT
+    tier: A-runtime
+    authority_for:
+      - OMP native configuration model
+      - agent definition format and discovery
+      - skill format and discovery
+      - context-file (AGENTS.md / RULES.md) contract
+      - model roles
+      - task/batch/isolation orchestration
+      - compaction strategies (shake, snapcompact, context-full, handoff)
+      - LSP integration
+      - hashline edit mode
+    watched_paths:
+      - docs/config-usage.md
+      - docs/context-files.md
+      - docs/skills.md
+      - docs/task-agent-discovery.md
+      - docs/compaction.md
+      - docs/settings.md
+    adopted_mechanisms:
+      - AGENTS.md / RULES.md context injection model
+      - .omp/agents/*.md agent definition frontmatter
+      - .omp/skills/*/SKILL.md skill layout (native provider, requireDescription)
+      - model roles (modelRoles.<role>: <selector>)
+      - config.yml layering (global → project → overlay → runtime)
+      - shake compaction strategy
+      - task isolation mode
+    rejected_mechanisms: []
+    local_components:
+      - template/.omp/config.yml
+      - template/.omp/AGENTS.md
+      - template/.omp/agents/*.md
+      - template/.omp/skills/*/SKILL.md
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: watch-docs-only
+
+  - id: superpowers
+    repository: obra/superpowers
+    url: https://github.com/obra/superpowers
+    default_branch: main
+    pinned_commit: 44c9b2d6e889982ac18c27d05a19fefe335194e1
+    license: MIT
+    tier: B-methodology
+    authority_for:
+      - systematic-debugging skill
+      - verification-before-completion skill
+      - plan writing methodology
+    watched_paths:
+      - skills/systematic-debugging/SKILL.md
+      - skills/verification-before-completion/SKILL.md
+      - skills/writing-plans/SKILL.md
+      - skills/executing-plans/SKILL.md
+      - skills/receiving-code-review/SKILL.md
+      - skills/requesting-code-review/SKILL.md
+      - skills/test-driven-development/SKILL.md
+    adopted_mechanisms:
+      - systematic-debugging 4-phase process (paraphrased / OMP-native)
+      - verification-before-completion iron law (paraphrased / OMP-native)
+    rejected_mechanisms:
+      - subagent-driven-development orchestration (duplicate OMP task)
+      - dispatching-parallel-agents (duplicate OMP task.batch)
+      - finishing-a-development-branch (duplicate of OMP-native git workflow)
+      - hooks/session-start bootstrap enforcement
+    local_components:
+      - template/.omp/skills/systematic-debugging/SKILL.md
+      - template/.omp/skills/evidence-before-completion/SKILL.md
+    local_modifications:
+      - Rewrote principles in project-native language; removed Claude-Code-specific trigger language
+    last_reviewed: "2026-08-07"
+    update_policy: watch-skill-content
+
+  - id: anthropics-skills
+    repository: anthropics/skills
+    url: https://github.com/anthropics/skills
+    default_branch: main
+    pinned_commit: b29e7cf65e5cb78a5ac33d582270551bc74a14eb
+    license: no-license-file  # THIRD_PARTY_NOTICES.md present; content treated as conceptual-inspiration only
+    tier: B-methodology
+    authority_for:
+      - SKILL.md format specification
+      - skill packaging standards
+      - progressive disclosure
+      - positive/negative trigger design
+    watched_paths:
+      - skills/*/SKILL.md
+      - README.md
+      - spec/
+    adopted_mechanisms:
+      - SKILL.md frontmatter schema (name, description, license fields)
+      - skill-per-directory layout
+      - progressive disclosure (short description → lazy-loaded body)
+    rejected_mechanisms:
+      - canvas-design skill (domain-specific, unrelated)
+      - algorithmic-art skill (domain-specific, unrelated)
+    local_components:
+      - template/.omp/skills/task-triage/SKILL.md
+      - template/.omp/skills/systematic-debugging/SKILL.md
+      - template/.omp/skills/evidence-before-completion/SKILL.md
+    local_modifications:
+      - Applied OMP-native frontmatter; added activation/non-activation boundaries per OMP requireDescription
+    last_reviewed: "2026-08-07"
+    update_policy: watch-format-changes
+
+  - id: spec-kit
+    repository: github/spec-kit
+    url: https://github.com/github/spec-kit
+    default_branch: main
+    pinned_commit: 81d5cdbbf2c96f7ce1a2801c6185f2951f1f61be
+    license: MIT
+    tier: B-methodology
+    authority_for:
+      - project constitution pattern
+      - clarification gate
+      - spec template (user stories, acceptance scenarios, requirements, success criteria)
+      - planning and task decomposition structure
+    watched_paths:
+      - templates/constitution-template.md
+      - templates/spec-template.md
+      - templates/plan-template.md
+      - templates/tasks-template.md
+      - templates/commands/clarify.md
+      - templates/commands/specify.md
+      - templates/commands/plan.md
+    adopted_mechanisms:
+      - constitution template (paraphrased as project-native constitution)
+      - spec template structure (user stories with priority, acceptance scenarios, success criteria)
+      - clarification gate concept
+    rejected_mechanisms:
+      - full specify CLI (not an OMP primitive)
+      - taskstoissues integration (external service dependency)
+      - constitution-sync preset (managed via OpenSpec delta lifecycle instead)
+    local_components:
+      - docs/architecture.md
+    local_modifications:
+      - Merged with OpenSpec delta lifecycle into a single internal spec system
+    last_reviewed: "2026-08-07"
+    update_policy: watch-templates
+
+  - id: openspec
+    repository: Fission-AI/OpenSpec
+    url: https://github.com/Fission-AI/OpenSpec
+    default_branch: main
+    pinned_commit: d57889664cab4f2f061d236ec3ff82a5578701bb
+    license: MIT
+    tier: B-methodology
+    authority_for:
+      - brownfield change lifecycle
+      - delta specs (ADDED/MODIFIED/REMOVED)
+      - change folder structure (proposal, design, tasks, delta specs)
+      - archive lifecycle
+      - source-of-truth maintenance
+    watched_paths:
+      - docs/concepts.md
+      - docs/writing-specs.md
+      - docs/workflows.md
+      - schemas/spec-driven/schema.yaml
+      - skills/openspec-*/SKILL.md
+    adopted_mechanisms:
+      - delta spec concept (ADDED/MODIFIED/REMOVED sections)
+      - change folder structure (proposal.md, design.md, tasks.md, delta specs)
+      - archive lifecycle (changes/ → changes/archive/)
+      - source-of-truth model (openspec/specs/)
+    rejected_mechanisms:
+      - full OpenSpec CLI (not an OMP primitive; adopt concepts natively)
+      - custom schemas CLI (standardize on one schema for v0)
+      - worksets system (unnecessary complexity for v0)
+    local_components:
+      - docs/architecture.md  # merged spec+openspec description
+    local_modifications:
+      - Synthesized with Spec Kit into one internal specification system
+      - No external CLI dependency; artifacts are plain Markdown files
+    last_reviewed: "2026-08-07"
+    update_policy: watch-concepts
+
+  - id: agent-skills-context-engineering
+    repository: muratcankoylan/Agent-Skills-for-Context-Engineering
+    url: https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering
+    default_branch: main
+    pinned_commit: a1841d1ea3dadc70098d94b60fa7a4ab8875dc50
+    license: MIT
+    tier: C-patterns
+    authority_for:
+      - context-budget policy design
+      - context-degradation prevention
+      - progressive retrieval
+      - filesystem offloading patterns
+      - structured tool-result design
+    watched_paths:
+      - README.md
+      - skills/
+    adopted_mechanisms:
+      - context-budget policy structure
+      - context-degradation checklist
+      - progressive retrieval ordering (local → docs → web)
+      - structured tool-result principles
+    rejected_mechanisms:
+      - hidden autonomous memory (violates security constraint)
+      - uncontrolled self-improvement
+      - KV-cache runtime optimizations (OmniRoute-specific)
+    local_components:
+      - template/.omp/policies/context-budget.yml
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: watch-skills-dir
+
+  - id: addyosmani-agent-skills
+    repository: addyosmani/agent-skills
+    url: https://github.com/addyosmani/agent-skills
+    default_branch: main
+    pinned_commit: d2478bf0c73a6357df39a3ed6aff16acaa218843
+    license: MIT
+    tier: C-patterns
+    authority_for:
+      - production quality gate definitions
+      - API compatibility checklist
+      - security hardening patterns
+      - performance review patterns
+      - ADR documentation standards
+      - release/rollback readiness checks
+    watched_paths:
+      - skills/api-surface-evolution/
+      - skills/architecture-health/
+      - skills/secure-code-review/
+      - skills/performance-profiling/
+      - skills/release-readiness/
+    adopted_mechanisms:
+      - API compatibility checklist items
+      - security review focus areas
+      - release readiness criteria
+      - rollback readiness criteria
+    rejected_mechanisms:
+      - full personas framework (duplicate orchestration)
+      - full specification workflow (duplicate of spec-kit/openspec synthesis)
+      - full TDD workflow (duplicate of superpowers TDD)
+      - routing/orchestration layer
+    local_components:
+      - template/.omp/policies/quality-gates.yml
+    local_modifications:
+      - Extracted quality-gate criteria only; no persona or orchestration layer
+    last_reviewed: "2026-08-07"
+    update_policy: watch-skills-dir
+
+  - id: promptfoo
+    repository: promptfoo/promptfoo
+    url: https://github.com/promptfoo/promptfoo
+    default_branch: main
+    pinned_commit: 1c30e183c4a464d953898398399dc6aa69786471
+    license: MIT
+    tier: B-methodology
+    authority_for:
+      - external evaluation infrastructure
+      - deterministic assertions
+      - model-graded assertions
+      - A/B workflow comparison
+      - regression test structure
+    watched_paths:
+      - docs/
+      - src/assertions.ts
+    adopted_mechanisms:
+      - evaluation fixture structure (input / expected / assertions)
+      - deterministic assertion types
+      - model-graded assertion guidance
+    rejected_mechanisms:
+      - running promptfoo as OMP runtime dependency (external tool only)
+      - red-teaming module (out of scope for v0)
+    local_components:
+      - evals/
+      - scripts/benchmark.ps1
+    local_modifications:
+      - Using local deterministic test scripts; promptfoo optional for model-graded evaluation
+    last_reviewed: "2026-08-07"
+    update_policy: ignore
+
+  - id: ECC
+    repository: affaan-m/ECC
+    url: https://github.com/affaan-m/ECC
+    default_branch: main
+    pinned_commit: 9aac8585ab887d9c51252730240b25d9cca180da
+    license: MIT
+    tier: C-patterns
+    authority_for:
+      - model routing patterns
+      - token/context profiles
+      - security hardening patterns
+    watched_paths:
+      - README.md
+      - docs/
+    adopted_mechanisms:
+      - model routing patterns (via OMP model roles)
+      - security hardening checklist items
+    rejected_mechanisms:
+      - hooks system (OMP hooks are the authority)
+      - memory systems (memory.backend=off in baseline)
+      - instinct system
+      - full agents catalog
+      - full skill catalog
+      - MCP bundle
+      - orchestration runtime
+      - continuous learning
+    local_components: []
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: ignore
+
+  - id: mini-swe-agent
+    repository: SWE-agent/mini-swe-agent
+    url: https://github.com/SWE-agent/mini-swe-agent
+    default_branch: main
+    pinned_commit: a83fcae82d2a08f0ee0c688f9d137b3566c097f8
+    license: MIT
+    tier: C-patterns
+    authority_for:
+      - complexity governor (minimal worker loop principle)
+      - linear and auditable execution
+      - small tool surface
+      - explicit termination
+    watched_paths:
+      - docs/
+      - README.md
+    adopted_mechanisms:
+      - minimal worker loop as architecture governor
+      - explicit task/result contracts
+      - small tool surface principle
+    rejected_mechanisms:
+      - installing mini-swe-agent as a second coding runtime
+    local_components:
+      - template/.omp/agents/implementer.md  # informed by minimal worker loop
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: ignore
+
+  - id: andrej-karpathy-skills
+    repository: multica-ai/andrej-karpathy-skills
+    url: https://github.com/multica-ai/andrej-karpathy-skills
+    default_branch: main
+    pinned_commit: 2c606141936f1eeef17fa3043a72095b4765b9c2
+    license: no-license-file  # Copyright all rights reserved; treated as conceptual inspiration
+    tier: C-patterns
+    authority_for:
+      - coding constitution (Karpathy principles)
+    watched_paths:
+      - CLAUDE.md
+    adopted_mechanisms:
+      - think before coding (inspiration; rewritten)
+      - simplicity first (inspiration; rewritten)
+      - surgical changes (inspiration; rewritten)
+      - goal-driven execution (inspiration; rewritten)
+    rejected_mechanisms:
+      - copying the CLAUDE.md text verbatim (no license; rewrote principles independently)
+    local_components:
+      - template/.omp/AGENTS.md  # coding constitution section
+    local_modifications:
+      - Principles independently rewritten; content does not copy original text
+    last_reviewed: "2026-08-07"
+    update_policy: ignore
+
+  - id: 12-factor-agents
+    repository: humanlayer/12-factor-agents
+    url: https://github.com/humanlayer/12-factor-agents
+    default_branch: main
+    pinned_commit: d20c728368bf9c189d6d7aab704744decb6ec0cc
+    license: Apache-2.0 (code), CC-BY-SA-4.0 (content)
+    tier: C-patterns
+    authority_for:
+      - workflow architecture principles
+      - control-flow and context ownership
+    watched_paths:
+      - content/factor-02-own-your-prompts.md
+      - content/factor-03-own-your-context-window.md
+      - content/factor-04-tools-are-structured-outputs.md
+      - content/factor-08-own-your-control-flow.md
+      - content/factor-09-compact-errors.md
+      - content/factor-10-small-focused-agents.md
+    adopted_mechanisms:
+      - own prompts (used as architecture principle)
+      - own context window (used as architecture principle)
+      - tools as structured outputs (YAML schemas)
+      - own control flow (Tech Lead contract)
+      - compact errors (agent-result schema)
+      - small focused agents (agent-contract design)
+    rejected_mechanisms:
+      - installing as a runtime dependency
+      - full factor list as operational checklists
+    local_components:
+      - template/.omp/schemas/agent-result.schema.yml
+      - template/.omp/AGENTS.md
+    local_modifications:
+      - Applied as architecture principles, not code; content paraphrased under CC-BY-SA-4.0
+    last_reviewed: "2026-08-07"
+    update_policy: ignore
+
+  - id: aider
+    repository: Aider-AI/aider
+    url: https://github.com/Aider-AI/aider
+    default_branch: main
+    pinned_commit: 5dc9490bb35f9729ef2c95d00a19ccd30c26339c
+    license: Apache-2.0
+    tier: C-patterns
+    authority_for:
+      - repository-map design principles
+      - symbol-first exploration
+      - token-budgeted context
+      - architect/editor separation
+    watched_paths:
+      - aider/repomap.py
+      - docs/repomap.md
+    adopted_mechanisms:
+      - repository-map principles (symbol/signature summaries, token budget)
+      - references-and-callers-before-full-file-reads principle
+    rejected_mechanisms:
+      - running Aider as a second coding agent
+      - importing aider codebase
+    local_components:
+      - template/.omp/agents/explorer.md  # informed by repo-map principles
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: ignore
+
+  - id: agents-md
+    repository: agentsmd/agents.md
+    url: https://github.com/agentsmd/agents.md
+    default_branch: main
+    pinned_commit: d1ac7f063d20e70015ed6732664049ae4ba9d74e
+    license: MIT
+    tier: C-patterns
+    authority_for:
+      - repository-local agent instruction patterns
+      - practical project command documentation
+      - architecture rules in AGENTS.md
+    watched_paths:
+      - README.md
+    adopted_mechanisms:
+      - practical project command section in AGENTS.md
+      - architecture rules pattern
+    rejected_mechanisms: []
+    local_components:
+      - template/.omp/AGENTS.md
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: ignore
+
+  - id: serena
+    repository: oraios/serena
+    url: https://github.com/oraios/serena
+    default_branch: main
+    pinned_commit: c7af2c09ef45faa4367c0e2a9f770fb73a62a612
+    license: MIT
+    tier: D-conditional
+    authority_for:
+      - optional semantic retrieval (MCP-based)
+    watched_paths:
+      - README.md
+    adopted_mechanisms: []  # Evaluate only; not integrated in v0
+    rejected_mechanisms:
+      - default integration (OMP LSP + native search is sufficient for v0)
+    local_components: []
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: evaluate-when-needed
+
+  - id: repomix
+    repository: yamadashy/repomix
+    url: https://github.com/yamadashy/repomix
+    default_branch: main
+    pinned_commit: a27ecec777f2e2b22871f3b280767c1625e23c8b
+    license: MIT
+    tier: D-conditional
+    authority_for:
+      - repository subset snapshots for onboarding
+      - architecture audits
+      - external reviews
+    watched_paths:
+      - README.md
+    adopted_mechanisms: []  # Evaluate only; not integrated in v0
+    rejected_mechanisms:
+      - full-repository dumps by default (violates context-budget policy)
+    local_components: []
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: evaluate-when-needed
+
+  - id: context7
+    repository: upstash/context7
+    url: https://github.com/upstash/context7
+    default_branch: master
+    pinned_commit: 8d52608e4e27557e6c1e807c8241cffb5544a9a3
+    license: MIT
+    tier: D-conditional
+    authority_for:
+      - current versioned library documentation retrieval
+    watched_paths:
+      - README.md
+    adopted_mechanisms: []  # Evaluate only; documented in retrieval-order policy
+    rejected_mechanisms:
+      - default first-pass retrieval (local code and types take priority)
+    local_components:
+      - template/.omp/policies/context-budget.yml  # retrieval-order policy
+    local_modifications: []
+    last_reviewed: "2026-08-07"
+    update_policy: evaluate-when-needed

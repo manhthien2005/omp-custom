@@ -1,0 +1,52 @@
+# Review Result Schema
+# Returned by the Reviewer agent. Evidence-backed, false-positive-controlled.
+
+schema: review-result
+version: "1.0"
+
+required_fields:
+  - decision              # enum: APPROVED | APPROVED_WITH_NOTES | CHANGES_REQUESTED
+  - affected_files        # list: files reviewed
+  - false_positive_checks # list: concerns that were checked and confirmed NOT to be issues
+
+optional_fields:
+  - blocking_findings     # list: {id, severity, file, line, description, evidence, suggested_fix}
+  - non_blocking_findings # list: {id, severity, file, line, description, evidence}
+  - evidence              # list: key facts supporting the decision
+  - spec_mismatches       # list: acceptance criteria from task packet not met by the implementation
+  - test_gaps             # list: behavior paths with no test coverage
+  - security_risks        # list: {description, severity (LOW|MEDIUM|HIGH|CRITICAL), evidence}
+  - recommended_action    # enum: ACCEPT | REWORK_BLOCKING | ACCEPT_WITH_FOLLOWUP
+  - confidence            # enum: HIGH | MEDIUM | LOW
+
+finding_severity:
+  BLOCKING:     "Must be addressed before acceptance: correctness bug, security issue, spec mismatch, breaking change"
+  NON_BLOCKING: "Should be addressed in a follow-up: minor maintainability, style, or test coverage gap"
+  OBSERVATION:  "For awareness only; no action expected"
+
+field_rules:
+  - "decision: APPROVED requires blocking_findings to be empty"
+  - "decision: CHANGES_REQUESTED requires at least one entry in blocking_findings"
+  - "every blocking_finding must include evidence (file:line or output excerpt)"
+  - "false_positive_checks must name the concern and state why it was cleared"
+  - "test_gaps are informational; they do not block APPROVED unless the task packet specifies test coverage as a quality gate"
+  - "Reviewer must not modify code; suggested_fix is advisory only"
+  - "Linter output already present before this change must not be reported as a new finding"
+
+example:
+  decision: APPROVED
+  affected_files:
+    - "src/services/UserService.ts"
+    - "src/services/__tests__/UserService.test.ts"
+  false_positive_checks:
+    - concern: "Possible breaking change: returning null instead of throwing"
+      cleared: "Existing callers (checked via grep 'getProfile') already handle null return; null was the documented behavior before the regression"
+  evidence:
+    - "Change is minimal: 3 lines added, 0 lines removed from main logic"
+    - "New test covers the repaired path"
+    - "No API surface change: return type was already `Profile | null`"
+  spec_mismatches: []
+  test_gaps: []
+  security_risks: []
+  recommended_action: ACCEPT
+  confidence: HIGH

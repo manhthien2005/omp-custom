@@ -1,0 +1,61 @@
+# Model Routing Policy
+# Defines how model roles map to concrete models.
+# The config.yml modelRoles section is the execution layer.
+# This policy documents the intent and routing criteria.
+
+policy: model-routing
+version: "1.0"
+
+# ── Routing authority ─────────────────────────────────────────────────────────
+runtime: OMP
+gateway: OmniRoute  # http://127.0.0.1:20128
+config_location: ".omp/config.yml → modelRoles"
+
+# ── Role definitions ──────────────────────────────────────────────────────────
+roles:
+  tech-lead:
+    purpose: "Highest reasoning; plans, coordinates, and validates"
+    profile: "High-capability, high-reasoning model"
+    default_model: "omniroute/codex/gpt-5.6-sol-high"
+
+  explorer:
+    purpose: "Fast symbol lookup and codebase mapping"
+    profile: "Fast model sufficient; accuracy over speed"
+    default_model: "omniroute/codex/gpt-5.6-sol-high"
+    notes: "Can be mapped to a faster/cheaper model once evaluated"
+
+  implementer:
+    purpose: "Code editing with verification loop"
+    profile: "High-capability model; must handle multi-file edits reliably"
+    default_model: "omniroute/codex/gpt-5.6-sol-high"
+
+  verifier:
+    purpose: "Independent verification; deterministic tool use"
+    profile: "Reliable model; must execute commands accurately"
+    default_model: "omniroute/codex/gpt-5.6-sol-high"
+
+  reviewer:
+    purpose: "Code review; requires strong reasoning about security and correctness"
+    profile: "High-capability model"
+    default_model: "omniroute/codex/gpt-5.6-sol-high"
+
+# ── Routing constraints ────────────────────────────────────────────────────────
+constraints:
+  - "OmniRoute is the only model gateway. No direct provider API calls."
+  - "Model fallback is disabled (retry.modelFallback = false per baseline)"
+  - "Usage-aware fallback is disabled (retry.usageAwareFallback = false per baseline)"
+  - "Role aliases must be resolved before dispatch; unknown aliases fail fast"
+  - "The global config.yml baseline must not be modified to change routing; use project config.yml overlay"
+
+# ── Effort mapping ────────────────────────────────────────────────────────────
+# OMP maps task effort to model-supported thinking levels.
+effort_mapping:
+  lo: "Lowest supported effort for the resolved model"
+  med: "Middle supported effort"
+  hi: "Highest supported effort (capped by task.maxEffort = max in baseline)"
+
+# ── When to customize roles ───────────────────────────────────────────────────
+customization:
+  - "Change role → model mappings in .omp/config.yml modelRoles only after benchmark evidence"
+  - "Do not change roles mid-session"
+  - "Record model change rationale in registry/adoption-ledger.yml"

@@ -1,0 +1,37 @@
+# Evaluation fixture: multi-file root-cause bug
+# Task type: BUG-ROOT-CAUSE
+# Workflow: Standard
+# Benchmark: correct-file-localization, root-cause-accuracy, unnecessary-diff
+
+fixture_id: eval-002-root-cause-bug
+title: "Fix a bug where the root cause is in a different file than the symptom"
+task_type: bug-root-cause
+expected_workflow: standard
+
+scenario: >
+  A test fails in module B. The root cause is in module A passing malformed data.
+  Naïve fix would patch module B. Correct fix patches module A.
+
+task_prompt: >
+  The API endpoint /api/users returns 500 on empty usernames.
+  Error occurs in src/validators.py validate_user().
+  Fix the issue.
+
+acceptance_criteria:
+  - "POST /api/users with empty username returns 400, not 500"
+  - "POST /api/users with valid username returns 201"
+  - "Root cause is fixed at the origin, not patched at the symptom"
+  - "Existing user API tests pass"
+
+verification_command: "pytest tests/test_user_api.py -v"
+
+expected_metrics:
+  agents_spawned: 2-3  # Explorer + Implementer + Verifier
+  tool_calls: 8-20
+  retries: 0
+  accepted_outcome: true
+  correct_file_localization: true  # Finds root cause in caller, not symptom
+
+comparison_dimensions:
+  - "Standard with Explorer vs Quick without (correct-file-localization rate)"
+  - "With systematic-debugging skill vs without (fix-at-symptom rate)"

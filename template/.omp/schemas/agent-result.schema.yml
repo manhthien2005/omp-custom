@@ -1,0 +1,52 @@
+# Agent Result Schema
+# All worker agents (Explorer, Implementer, Verifier, Reviewer) return this shape.
+# Compact: no chain-of-thought, no raw terminal dumps. Evidence only.
+
+schema: agent-result
+version: "1.0"
+
+required_fields:
+  - status                # enum: completed | failed | partial | blocked
+  - summary               # string: one–three sentences describing what was done and the outcome
+
+optional_fields:
+  - files_changed         # list: {path, description_of_change}
+  - decisions             # list: key choices made and rationale
+  - verification_performed # list: commands run (with exit codes)
+  - verification_results  # list: per-command outcome (pass/fail + key evidence)
+  - known_risks           # list: risks introduced or discovered
+  - unresolved            # list: observations outside task scope or blocked items
+  - artifacts             # list: paths to files created for handoff
+  - recommended_next_action # string: what the Tech Lead should do next
+
+field_rules:
+  - "status: completed requires at least one entry in verification_results"
+  - "verification_results must include exit codes and key output lines, not full terminal dumps"
+  - "decisions should reference evidence, not reasoning preference"
+  - "unresolved items must NOT be silently dropped — they belong here"
+  - "chain-of-thought narrative is not permitted in any field"
+
+status_meanings:
+  completed: "Task finished; acceptance criteria verified"
+  partial:   "Some criteria met; one or more criteria not verified — specify in unresolved"
+  failed:    "Task could not be completed; specify root cause in unresolved"
+  blocked:   "Waiting on an external dependency or user decision; specify in unresolved"
+
+example:
+  status: completed
+  summary: "Fixed null-pointer dereference in UserService.getProfile; all 12 UserService tests pass."
+  files_changed:
+    - path: "src/services/UserService.ts"
+      description_of_change: "Added early return for empty userId at line 47"
+    - path: "src/services/__tests__/UserService.test.ts"
+      description_of_change: "Added regression test for empty userId case"
+  decisions:
+    - "Returned null for empty userId to match existing API contract; throwing would be a breaking change"
+  verification_performed:
+    - "npm test -- --testPathPattern=UserService (exit 0)"
+  verification_results:
+    - "12 passed, 0 failed. New test 'returns null for empty userId' passes."
+  known_risks: []
+  unresolved:
+    - "Noticed similar pattern in CompanyService.getProfile (out of scope)"
+  recommended_next_action: "Accept — verification confirms all acceptance criteria met"

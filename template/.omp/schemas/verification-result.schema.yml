@@ -1,0 +1,51 @@
+# Verification Result Schema
+# Returned by the Verifier agent. Evidence-first, no assumptions.
+
+schema: verification-result
+version: "1.0"
+
+required_fields:
+  - decision              # enum: PASS | FAIL | PARTIAL
+  - commands_run          # list: {command, exit_code, duration_ms (optional)}
+  - acceptance_criteria_results  # list: {criterion, result (PASS|FAIL|SKIP), evidence}
+
+optional_fields:
+  - environment           # string: runtime info relevant to the result (OS, version, env vars)
+  - failures              # list: {command, output_excerpt, classification (impl|env|flaky)}
+  - evidence              # list: key output lines supporting the decision
+  - coverage_gaps         # list: acceptance criteria with no verification command covering them
+  - confidence            # enum: HIGH | MEDIUM | LOW
+  - confidence_rationale  # string: why confidence is at this level
+  - recommended_action    # enum: ACCEPT | REWORK | INVESTIGATE | RERUN
+
+field_rules:
+  - "decision: PASS requires all acceptance_criteria_results to be PASS"
+  - "decision: FAIL requires at least one FAIL in acceptance_criteria_results"
+  - "decision: PARTIAL allowed when some criteria pass and others have no coverage"
+  - "evidence must contain actual output lines, not summaries"
+  - "failures must classify each failure: impl (code bug), env (missing dep/config), flaky (non-deterministic)"
+  - "coverage_gaps must be reported; they do not automatically cause FAIL"
+  - "commands_run must include exit codes"
+
+example:
+  decision: PASS
+  commands_run:
+    - command: "npm test -- --testPathPattern=UserService"
+      exit_code: 0
+  acceptance_criteria_results:
+    - criterion: "Given empty userId, getProfile returns null"
+      result: PASS
+      evidence: "✓ UserService › getProfile › returns null for empty userId (12ms)"
+    - criterion: "Given valid userId, getProfile returns profile as before"
+      result: PASS
+      evidence: "✓ UserService › getProfile › returns profile for valid userId (8ms)"
+    - criterion: "All existing UserService tests pass"
+      result: PASS
+      evidence: "12 passed, 0 failed"
+  evidence:
+    - "Test suite: PASS — 12 passed, 0 failed, 0 skipped"
+    - "Exit code: 0"
+  coverage_gaps: []
+  confidence: HIGH
+  confidence_rationale: "All three criteria have direct test coverage and passed clean"
+  recommended_action: ACCEPT

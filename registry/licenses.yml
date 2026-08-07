@@ -1,0 +1,172 @@
+# License registry — all upstream repositories
+# For each adopted mechanism: record whether it is conceptual-inspiration,
+# paraphrased-implementation, adapted-content, copied-content, or linked-external-dependency.
+# Generated: 2026-08-07
+
+licenses:
+
+  - id: oh-my-pi
+    url: https://github.com/can1357/oh-my-pi
+    license: MIT
+    spdx: MIT
+    adoption_type: conceptual-inspiration
+    notes: >
+      OMP is the runtime authority. We configure it; we do not copy its source code.
+      Agent and skill file formats are OMP-native conventions (not copyrightable interfaces).
+      AGENTS.md and config.yml are configuration files authored by this project.
+
+  - id: superpowers
+    url: https://github.com/obra/superpowers
+    license: MIT
+    spdx: MIT
+    adoption_type: paraphrased-implementation
+    notes: >
+      systematic-debugging and verification-before-completion skill bodies are
+      paraphrased and rewritten in project-native language. No verbatim copy of
+      SKILL.md bodies. MIT license permits reuse with attribution; attribution
+      recorded in adoption-ledger.yml.
+
+  - id: anthropics-skills
+    url: https://github.com/anthropics/skills
+    license: no-license-file
+    spdx: UNLICENSED
+    adoption_type: conceptual-inspiration
+    notes: >
+      No LICENSE file present in repository. THIRD_PARTY_NOTICES.md covers
+      third-party components only. The SKILL.md format and progressive-disclosure
+      pattern are treated as conceptual inspiration. No content copied.
+      Flag: do not copy substantial text from skill bodies without explicit permission.
+
+  - id: spec-kit
+    url: https://github.com/github/spec-kit
+    license: MIT
+    spdx: MIT
+    adoption_type: paraphrased-implementation
+    notes: >
+      Constitution and spec template structures paraphrased and rewritten.
+      No verbatim copy of template content. MIT license permits reuse with attribution.
+
+  - id: openspec
+    url: https://github.com/Fission-AI/OpenSpec
+    license: MIT
+    spdx: MIT
+    adoption_type: conceptual-inspiration
+    notes: >
+      Delta-spec concept (ADDED/MODIFIED/REMOVED sections) and change-folder
+      structure are adopted as architecture concepts. Artifacts in this project
+      are original. No CLI code imported.
+
+  - id: agent-skills-context-engineering
+    url: https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering
+    license: MIT
+    spdx: MIT
+    adoption_type: conceptual-inspiration
+    notes: >
+      Context-budget and retrieval-order policies inspired by this repository.
+      Policy YAML files in this project are original.
+
+  - id: addyosmani-agent-skills
+    url: https://github.com/addyosmani/agent-skills
+    license: MIT
+    spdx: MIT
+    adoption_type: conceptual-inspiration
+    notes: >
+      Quality-gate criteria extracted as concept list. Policy YAML files original.
+
+  - id: promptfoo
+    url: https://github.com/promptfoo/promptfoo
+    license: MIT
+    spdx: MIT
+    adoption_type: linked-external-dependency
+    notes: >
+      Promptfoo used as optional external evaluation tool only. Not bundled.
+      Evaluation fixture format inspired by promptfoo conventions.
+
+  - id: ECC
+    url: https://github.com/affaan-m/ECC
+    license: MIT
+    spdx: MIT
+    adoption_type: conceptual-inspiration
+    notes: >
+      Pattern mine only. No code or content imported.
+
+  - id: mini-swe-agent
+    url: https://github.com/SWE-agent/mini-swe-agent
+    license: MIT
+    spdx: MIT
+    adoption_type: conceptual-inspiration
+    notes: >
+      Minimal worker-loop principle used as complexity governor. No code imported.
+
+  - id: andrej-karpathy-skills
+    url: https://github.com/multica-ai/andrej-karpathy-skills
+    license: no-license-file
+    spdx: UNLICENSED
+    adoption_type: conceptual-inspiration
+    notes: >
+      No LICENSE file present. CLAUDE.md content is copyright the repository owner.
+      The four Karpathy coding principles (think before coding, simplicity first,
+      surgical changes, goal-driven execution) are general software engineering
+      concepts, not copyrightable expression. This project independently rewrote
+      these principles. No verbatim copy of CLAUDE.md text.
+      Flag: do not reproduce original wording.
+
+  - id: 12-factor-agents
+    url: https://github.com/humanlayer/12-factor-agents
+    license: Apache-2.0 (code) / CC-BY-SA-4.0 (content)
+    spdx: Apache-2.0 AND CC-BY-SA-4.0
+    adoption_type: paraphrased-implementation
+    notes: >
+      Content (documentation, factor descriptions) is CC BY-SA 4.0.
+      Architecture principles adopted and paraphrased; attribution required under CC-BY-SA-4.0.
+      Attribution: "12-Factor Agents by Dex Horthy / HumanLayer (CC BY-SA 4.0)
+      https://github.com/humanlayer/12-factor-agents"
+      No code imported; no verbatim text reproduction.
+
+  - id: aider
+    url: https://github.com/Aider-AI/aider
+    license: Apache-2.0
+    spdx: Apache-2.0
+    adoption_type: conceptual-inspiration
+    notes: >
+      Repository-map design principles adopted as concept. No code imported.
+
+  - id: agents-md
+    url: https://github.com/agentsmd/agents.md
+    license: MIT
+    spdx: MIT
+    adoption_type: conceptual-inspiration
+    notes: >
+      AGENTS.md structural patterns used as inspiration. Content original.
+
+  - id: serena
+    url: https://github.com/oraios/serena
+    license: MIT
+    spdx: MIT
+    adoption_type: linked-external-dependency
+    notes: >
+      Conditional tool. Evaluate only; not integrated in v0.
+
+  - id: repomix
+    url: https://github.com/yamadashy/repomix
+    license: MIT
+    spdx: MIT
+    adoption_type: linked-external-dependency
+    notes: >
+      Conditional tool. Evaluate only; not integrated in v0.
+
+  - id: context7
+    url: https://github.com/upstash/context7
+    license: MIT
+    spdx: MIT
+    adoption_type: linked-external-dependency
+    notes: >
+      Conditional MCP tool. Evaluate only; documented in retrieval-order policy.
+
+# Attribution notice for CC BY-SA content
+attributions:
+  - source: 12-Factor Agents
+    author: Dex Horthy / HumanLayer contributors
+    url: https://github.com/humanlayer/12-factor-agents
+    license: CC BY-SA 4.0
+    usage: Architecture principles paraphrased in template/.omp/AGENTS.md and schema designs

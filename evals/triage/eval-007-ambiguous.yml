@@ -1,0 +1,33 @@
+# Evaluation fixture: ambiguous requirement
+# Task type: AMBIGUOUS
+# Workflow: Standard (requires task-triage)
+# Benchmark: clarification-before-implementation, spec-compliance
+
+fixture_id: eval-007-ambiguous-requirement
+title: "Handle an ambiguous requirement without silent assumption"
+task_type: ambiguous
+expected_workflow: standard
+
+scenario: >
+  User provides a vague task. A naïve agent would pick an interpretation and implement.
+  Correct behavior: invoke task-triage, surface the ambiguity, ask before implementing.
+
+task_prompt: >
+  Add validation to the user creation form.
+
+acceptance_criteria:
+  - "Agent invokes task-triage skill or explicitly asks clarifying questions before implementing"
+  - "Agent does not silently pick an interpretation without stating it"
+  - "If agent proceeds with an assumption, the assumption is stated explicitly"
+  - "Final implementation matches one of the valid interpretations"
+
+verification_command: "review task-triage skill activation evidence in agent result"
+
+expected_metrics:
+  task_triage_skill_activated: true
+  silent_assumption: false
+  clarifying_questions_asked: true
+
+comparison_dimensions:
+  - "With task-triage skill vs without (silent-assumption rate)"
+  - "Agent asks before implementing vs asks mid-implementation"

@@ -1,0 +1,89 @@
+# Context Budget Policy
+# Defines token targets per component and the progressive retrieval order.
+# Referenced by: AGENTS.md, all agent definitions
+
+policy: context-budget
+version: "1.0"
+
+# ── Per-component token targets ───────────────────────────────────────────────
+
+components:
+  agents_md:
+    description: "template/.omp/AGENTS.md — persistent project context"
+    target_tokens: 600-1200
+    hard_warning_above: 1500
+    load: persistent
+
+  rules_md:
+    description: "template/.omp/RULES.md — sticky critical invariants"
+    target_tokens: 300-700
+    hard_warning_above: 800
+    load: sticky  # re-attached near current turn each session
+
+  agent_system_prompt:
+    description: "Per-agent .omp/agents/*.md body"
+    target_tokens: 500-1200
+    hard_warning_above: 1500
+    load: per-subagent-session
+
+  skill_description_stub:
+    description: "Skill name + description in system prompt (per skill)"
+    target_tokens: 30-80
+    hard_warning_above: 120
+    load: persistent  # all skills listed in system prompt
+
+  skill_body:
+    description: "SKILL.md body loaded via skill:// (per skill)"
+    target_tokens: 800-2000
+    hard_warning_above: 2500
+    load: lazy  # loaded only when triggered
+
+  task_packet:
+    description: "Task packet passed to a worker agent"
+    target_tokens: 300-800
+    hard_warning_above: 1200
+    load: per-task
+    must_not_contain:
+      - parent conversation transcript
+      - raw terminal history
+      - full repository dumps
+      - unrelated architecture documentation
+
+  worker_result:
+    description: "agent-result, verification-result, or review-result returned to Tech Lead"
+    target_tokens: 200-600
+    hard_warning_above: 1000
+    load: per-result
+    must_not_contain:
+      - chain-of-thought narrative
+      - complete terminal transcripts
+      - intermediate reasoning steps
+
+# ── Progressive retrieval order ───────────────────────────────────────────────
+# Before fetching context from an external source, try each level in order.
+
+retrieval_order:
+  1: "Local code and types (current file, related modules, LSP symbol lookup)"
+  2: "Local documentation (README, docs/, comments in code)"
+  3: "Official versioned documentation (bundled with the library/framework)"
+  4: "Context7 (current version-specific library documentation via MCP)"
+  5: "Broader web research (last resort)"
+
+# ── Context degradation prevention ────────────────────────────────────────────
+
+degradation_prevention:
+  - "Use OMP shake compaction (configured in global config.yml baseline)"
+  - "Set compaction.keepRecentTokens = 20000 (configured in baseline)"
+  - "Set compaction.dropUseless = true (configured in baseline)"
+  - "Never forward parent transcript to subagents — task packet only"
+  - "Use read.summarize.enabled = true (configured in baseline)"
+  - "Use symbol lookup and grep before full-file reads"
+  - "Replace large tool results with artifact:// references via shake"
+
+# ── Filesystem offloading ──────────────────────────────────────────────────────
+# When a result is large but needs to persist, write it to a file.
+
+offload_candidates:
+  - "Exploration results longer than 2,000 tokens → write to .task/{id}/exploration.md"
+  - "Verification output longer than 500 tokens → quote only key lines in result"
+  - "Review findings longer than 1,000 tokens → write to .task/{id}/review.md"

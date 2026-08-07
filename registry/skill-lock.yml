@@ -1,0 +1,28 @@
+# Skill Lock — content hashes for installed skills
+# Prevents unreviewed changes to skill bodies.
+# Regenerate with: scripts/update-skill-lock.ps1 (post-v0)
+# Format: SHA256 of the UTF-8 content of each SKILL.md file.
+
+version: "1.0"
+generated: "2026-08-07"
+note: "Run scripts/update-skill-lock.ps1 after any skill change to regenerate this file. A mismatch between recorded and actual hashes triggers a validation warning."
+
+skills:
+  - name: task-triage
+    path: template/.omp/skills/task-triage/SKILL.md
+    # hash populated by scripts/update-skill-lock.ps1
+    hash: null
+    last_reviewed: "2026-08-07"
+    reviewer: "initial-construction"
+
+  - name: systematic-debugging
+    path: template/.omp/skills/systematic-debugging/SKILL.md
+    hash: null
+    last_reviewed: "2026-08-07"
+    reviewer: "initial-construction"
+
+  - name: evidence-before-completion
+    path: template/.omp/skills/evidence-before-completion/SKILL.md
+    hash: null
+    last_reviewed: "2026-08-07"
+    reviewer: "initial-construction"

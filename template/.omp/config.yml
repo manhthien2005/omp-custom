@@ -1,0 +1,32 @@
+# OMP Workflow Template — Project Model Roles
+# Install to: .omp/config.yml in your project directory
+# This file defines role aliases only. Do NOT duplicate the global config.yml baseline settings here.
+# Edit the role → model mappings to match your OmniRoute model catalog.
+
+modelRoles:
+  # Tech Lead: highest reasoning, plans and coordinates
+  tech-lead: omniroute/codex/gpt-5.6-sol-high
+
+  # Explorer: fast symbol and reference lookup
+  explorer: omniroute/codex/gpt-5.6-sol-high
+
+  # Implementer: edit-verify loop
+  implementer: omniroute/codex/gpt-5.6-sol-high
+
+  # Verifier: independent verification, deterministic tools
+  verifier: omniroute/codex/gpt-5.6-sol-high
+
+  # Reviewer: code review against diff
+  reviewer: omniroute/codex/gpt-5.6-sol-high
+
+# ─── Optional project-level overrides ───────────────────────────────────────
+# Uncomment and adjust as needed. Only set values that differ from your global
+# config.yml baseline. The global config remains the primary source of truth.
+#
+# task:
+#   maxConcurrency: 4    # default from global baseline
+#   maxRecursionDepth: 2
+#
+# read:
+#   summarize:
+#     enabled: true

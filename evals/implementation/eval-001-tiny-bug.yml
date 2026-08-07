@@ -1,0 +1,35 @@
+# Evaluation fixture: tiny one-file bug
+# Task type: BUG-SIMPLE
+# Workflow: Quick
+# Benchmark: accepted_outcome, test_pass_rate, tool_calls, input_tokens, output_tokens, retries
+
+fixture_id: eval-001-tiny-bug
+title: "Fix a one-file bug with a clear stack trace"
+task_type: bug-simple
+expected_workflow: quick
+
+scenario: >
+  A unit test fails with a clear error pointing to a specific function.
+  The fix is a single-line change in one file.
+
+task_prompt: >
+  The test `test_divide_by_zero` in tests/math_utils_test.py is failing.
+  Error: ZeroDivisionError at line 12 in src/math_utils.py.
+  Fix it.
+
+acceptance_criteria:
+  - "test_divide_by_zero passes after the fix"
+  - "All other math_utils tests continue to pass"
+  - "The fix handles division by zero without raising"
+
+verification_command: "pytest tests/math_utils_test.py -v"
+
+expected_metrics:
+  agents_spawned: 0-1
+  tool_calls: 3-8
+  retries: 0
+  accepted_outcome: true
+
+comparison_dimensions:
+  - "Quick workflow vs Standard workflow (token cost)"
+  - "With systematic-debugging skill vs without"

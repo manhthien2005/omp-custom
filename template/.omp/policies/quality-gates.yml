@@ -1,0 +1,105 @@
+# Quality Gates Policy
+# Defines which review checks apply to which task risk levels.
+# The Reviewer agent consults this policy to determine which gates to activate.
+
+policy: quality-gates
+version: "1.0"
+
+# ── Gate definitions ──────────────────────────────────────────────────────────
+
+gates:
+
+  api-compatibility:
+    description: "Verify no breaking changes to public API, wire format, or external contracts"
+    triggers_on:
+      - "Public function/method signature changed"
+      - "REST endpoint path, method, or required params changed"
+      - "Serialization format changed"
+      - "Database schema changed"
+    checks:
+      - "Are all existing callers still compatible? (grep for usages)"
+      - "Is there a migration path for breaking changes?"
+      - "Is the change documented and versioned?"
+    default_enabled_for: [HIGH, CRITICAL]
+    optional_for: [MEDIUM]
+
+  security:
+    description: "Check for common security vulnerabilities introduced by the change"
+    triggers_on:
+      - "Input validation or sanitization changed"
+      - "Authentication or authorization logic changed"
+      - "Cryptographic operations added or changed"
+      - "File path or process execution with user input"
+      - "Secrets or credentials handling"
+    checks:
+      - "Path traversal: are file paths validated before use?"
+      - "Injection: are shell/SQL/template inputs properly escaped?"
+      - "Auth: are permission checks present and correct?"
+      - "Secrets: are credentials referenced by name only, never hardcoded?"
+    default_enabled_for: [MEDIUM, HIGH, CRITICAL]
+    optional_for: [LOW]
+
+  performance:
+    description: "Identify potential performance regressions introduced by the change"
+    triggers_on:
+      - "Hot-path code changed (tight loops, frequent calls)"
+      - "Database query structure changed"
+      - "Memory allocation patterns changed"
+      - "Network call frequency changed"
+    checks:
+      - "Are N+1 query patterns introduced?"
+      - "Is unnecessary work done in the hot path?"
+      - "Is caching invalidated correctly?"
+    default_enabled_for: [HIGH, CRITICAL]
+    optional_for: [LOW, MEDIUM]
+
+  adr-documentation:
+    description: "Verify that significant architectural decisions are documented"
+    triggers_on:
+      - "New design pattern introduced"
+      - "External dependency added or removed"
+      - "Architectural boundary changed"
+    checks:
+      - "Is the decision documented in an ADR or equivalent?"
+      - "Are the alternatives considered and the rationale stated?"
+    default_enabled_for: []
+    optional_for: [MEDIUM, HIGH, CRITICAL]
+    notes: "Enable explicitly when orchestrated workflow involves architectural decisions"
+
+  release-readiness:
+    description: "Verify the change is ready to ship"
+    triggers_on:
+      - "Feature work targeting production release"
+      - "Infrastructure or configuration change"
+    checks:
+      - "Are feature flags or rollout controls in place where needed?"
+      - "Are monitoring, alerting, and observability updates included?"
+      - "Is documentation updated (README, changelog, API docs)?"
+    default_enabled_for: [HIGH, CRITICAL]
+    optional_for: [MEDIUM]
+
+  rollback-readiness:
+    description: "Verify the change can be reverted safely"
+    triggers_on:
+      - "Database migration"
+      - "Infrastructure change"
+      - "External service integration change"
+    checks:
+      - "Is there a documented rollback procedure?"
+      - "Are schema migrations reversible?"
+      - "Can the feature be disabled without a code deploy?"
+    default_enabled_for: [HIGH, CRITICAL]
+    optional_for: [MEDIUM]
+
+# ── Default gate matrix ────────────────────────────────────────────────────────
+default_matrix:
+  LOW:      []
+  MEDIUM:   [security]
+  HIGH:     [api-compatibility, security, performance, release-readiness, rollback-readiness]
+  CRITICAL: [api-compatibility, security, performance, adr-documentation, release-readiness, rollback-readiness]
+
+# ── Override rule ──────────────────────────────────────────────────────────────
+override_rule: >
+  Tech Lead may enable additional gates or disable defaults for a specific task
+  by listing them explicitly in the task packet quality_gates field.
+  Disabling a default gate for HIGH or CRITICAL risk requires stating the reason.

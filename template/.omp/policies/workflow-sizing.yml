@@ -1,0 +1,56 @@
+# Workflow Sizing Policy
+# Governs Tech Lead's workflow selection decision.
+
+policy: workflow-sizing
+version: "1.0"
+
+# ── Selection criteria ────────────────────────────────────────────────────────
+
+quick:
+  use_when:
+    - Scope is a single file or a tightly bounded change
+    - Risk is LOW (no API surface, no cross-module behavior change, no migration)
+    - Root cause or change target is immediately clear from the task description
+    - No external test suite coordination required
+    - Affected code is obvious without exploration
+  flow: "triage → inspect → implement → verify → report"
+  subagents: "0 or 1 (Tech Lead handles inline when scope permits)"
+  reviewer: "Not included by default"
+
+standard:
+  use_when:
+    - Multiple files or modules may be affected
+    - Behavior change or new user-visible feature
+    - Root cause is not immediately clear (requires exploration)
+    - Tests, API compatibility, or external dependencies need attention
+    - Risk is MEDIUM
+  flow: "triage → exploration → mini-spec → plan → implement → verify → focused-review → summary"
+  subagents: "Explorer + Implementer + Verifier; Reviewer when risk warrants"
+  reviewer: "Risk-based: enable for API changes, security-touching code, new public interfaces"
+
+orchestrated:
+  use_when:
+    - Task crosses module boundaries
+    - Architecture change or new major system component
+    - Multiple genuinely independent implementation workstreams exist
+    - Risk is HIGH or CRITICAL (API breaking change, security, data migration, infrastructure)
+    - Parallel exploration would materially reduce total wall time
+  flow: "parallel-exploration → arch-review → dependency-graph → isolated-impl → verification → independent-review → integration → evidence-report"
+  subagents: "Multiple Explorers + multiple Implementers + Verifier + Reviewer"
+  reviewer: "Always included"
+
+# ── When in doubt ─────────────────────────────────────────────────────────────
+tie_breaking: "Select the larger workflow when between two sizes"
+
+# ── Risk levels ───────────────────────────────────────────────────────────────
+risk_levels:
+  LOW:      "Single-file, no behavior change, no public API affected"
+  MEDIUM:   "Multi-file, behavior change, internal API affected"
+  HIGH:     "Cross-module, public API, security, performance, or migration"
+  CRITICAL: "Production-data, authentication, authorization, infrastructure"
+
+# ── Override conditions ────────────────────────────────────────────────────────
+override_rules:
+  - "A HIGH-risk task must use Orchestrated even if scope appears narrow"
+  - "A CRITICAL-risk task requires explicit user confirmation before proceeding"
+  - "An ambiguous task must go through task-triage before workflow selection"

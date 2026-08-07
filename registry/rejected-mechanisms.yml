@@ -1,0 +1,124 @@
+# Rejected Mechanisms
+# Records mechanisms that were considered and explicitly rejected.
+# Purpose: prevent re-proposing the same bad ideas in future phases.
+
+rejected:
+
+  - id: reject-001
+    mechanism: "Subagent-Driven Development (SDD) from superpowers"
+    source: obra/superpowers
+    rejection_date: "2026-08-07"
+    reason: "Duplicate orchestration. OMP task.batch already handles parallel agents. SDD introduces a second orchestration engine with its own loop control, which creates conflicting compaction decisions and context-forwarding collisions."
+    condition_to_revisit: "Never — OMP remains the sole orchestrator."
+
+  - id: reject-002
+    mechanism: "dispatching-parallel-agents skill from superpowers"
+    source: obra/superpowers
+    rejection_date: "2026-08-07"
+    reason: "Duplicate of OMP task.batch. No additive value."
+    condition_to_revisit: "Never."
+
+  - id: reject-003
+    mechanism: "finishing-a-development-branch skill from superpowers"
+    source: obra/superpowers
+    rejection_date: "2026-08-07"
+    reason: "Git workflow and branch management is the user's responsibility. OMP task isolation handles commits. A mandatory branch-finishing skill imposes an opinionated workflow that conflicts with project-specific git conventions."
+    condition_to_revisit: "Could be offered as an optional project-level skill post-v0."
+
+  - id: reject-004
+    mechanism: "ECC hooks system"
+    source: affaan-m/ECC
+    rejection_date: "2026-08-07"
+    reason: "OMP hooks are the authority for hook-based behavior. Installing ECC hooks would bypass OMP's hook loading mechanism and create an uncontrolled execution path."
+    condition_to_revisit: "Never — OMP hooks are the authority."
+
+  - id: reject-005
+    mechanism: "ECC memory systems (Mnemosyne-style)"
+    source: affaan-m/ECC
+    rejection_date: "2026-08-07"
+    reason: "memory.backend=off in the config baseline. Autonomous memory creates uncontrolled context growth, security concerns (sensitive data persisted without review), and unpredictable agent behavior."
+    condition_to_revisit: "Post-v0 only after: reproducible quality improvement benchmark, security review of what gets persisted, and explicit user opt-in."
+
+  - id: reject-006
+    mechanism: "ECC instinct system"
+    source: affaan-m/ECC
+    rejection_date: "2026-08-07"
+    reason: "Autonomous self-improvement violates the controlled-promotion governance constraint. Instinct-driven behavior changes are not auditable."
+    condition_to_revisit: "Never — violates governance constraints."
+
+  - id: reject-007
+    mechanism: "ECC full orchestration runtime"
+    source: affaan-m/ECC
+    rejection_date: "2026-08-07"
+    reason: "Second runtime layered on OMP. Violates the core architectural constraint: OMP must remain the sole coding-agent runtime."
+    condition_to_revisit: "Never."
+
+  - id: reject-008
+    mechanism: "Full spec-kit CLI (specify, specify init, etc.)"
+    source: github/spec-kit
+    rejection_date: "2026-08-07"
+    reason: "External Python CLI dependency. Adds installation complexity, version pinning overhead, and a dependency outside the OMP ecosystem. The conceptual mechanisms (clarification gate, spec template, constitution) are adopted natively."
+    condition_to_revisit: "Could be added as an optional workflow extension post-v0 if users request it."
+
+  - id: reject-009
+    mechanism: "Full OpenSpec CLI (openspec init, openspec ff, etc.)"
+    source: Fission-AI/OpenSpec
+    rejection_date: "2026-08-07"
+    reason: "External Node CLI dependency. Same reasoning as spec-kit CLI rejection. Delta-spec concepts adopted natively in template documentation and workflow descriptions."
+    condition_to_revisit: "Could be added as an optional extension post-v0."
+
+  - id: reject-010
+    mechanism: "Serena semantic retrieval (v0)"
+    source: oraios/serena
+    rejection_date: "2026-08-07"
+    reason: "OMP LSP + native search is sufficient for v0. Serena adds MCP dependency and setup complexity. Evaluate only when OMP LSP cannot resolve a real retrieval problem."
+    condition_to_revisit: "Post-v0 when a specific retrieval failure case is documented."
+
+  - id: reject-011
+    mechanism: "Repomix full-repository dumps (default usage)"
+    source: yamadashy/repomix
+    rejection_date: "2026-08-07"
+    reason: "Full repository dumps flood context (20,000–200,000 tokens). Violates the context-budget policy. Repomix is allowed only for onboarding, architecture audits, and external reviews — not as a default exploration tool."
+    condition_to_revisit: "Conditional use (onboarding/audits) is already approved."
+
+  - id: reject-012
+    mechanism: "Context7 as default first-pass retrieval"
+    source: upstash/context7
+    rejection_date: "2026-08-07"
+    reason: "Local code and types take priority in the retrieval order. Using Context7 first incurs unnecessary MCP overhead and token cost when local documentation suffices."
+    condition_to_revisit: "Already placed in retrieval order as position 4 (last resort before web)."
+
+  - id: reject-013
+    mechanism: "Verbatim copy of anthropics/skills SKILL.md bodies"
+    source: anthropics/skills
+    rejection_date: "2026-08-07"
+    reason: "No LICENSE file in the repository. Cannot copy substantial content without explicit permission. Only the SKILL.md format (frontmatter schema, structural pattern) is adopted."
+    condition_to_revisit: "If Anthropic adds a LICENSE file permitting use."
+
+  - id: reject-014
+    mechanism: "Verbatim copy of andrej-karpathy-skills CLAUDE.md"
+    source: multica-ai/andrej-karpathy-skills
+    rejection_date: "2026-08-07"
+    reason: "No LICENSE file. Copyright all rights reserved by default. The four coding principles are general software engineering concepts, not copyrightable expression — they are independently rewritten."
+    condition_to_revisit: "Never — principles independently rewritten; no need for the original text."
+
+  - id: reject-015
+    mechanism: "Persistent memory and autolearn"
+    source: can1357/oh-my-pi (baseline setting)
+    rejection_date: "2026-08-07"
+    reason: "memory.backend=off and autolearn.enabled=false in the config baseline per plan constraints. Autonomous memory creates security, privacy, and context-cost risks without demonstrated quality improvement."
+    condition_to_revisit: "Post-v0 after benchmark evidence of quality improvement > token cost increase."
+
+  - id: reject-016
+    mechanism: "Always-on multi-reviewer workflow"
+    source: various
+    rejection_date: "2026-08-07"
+    reason: "Reviewer enabled selectively (risk-based). Mandatory review on every Quick/Standard task adds 3,000–8,000 tokens with marginal quality gain for low-risk changes."
+    condition_to_revisit: "Can be enabled per-project via workflow configuration."
+
+  - id: reject-017
+    mechanism: "Full promptfoo integration as runtime dependency"
+    source: promptfoo/promptfoo
+    rejection_date: "2026-08-07"
+    reason: "Promptfoo is external evaluation infrastructure, not part of OMP runtime. Adding it as a dependency would require Node.js, npm, and promptfoo installation in every project. Local deterministic scripts are the primary evaluation tool."
+    condition_to_revisit: "Promptfoo is approved for optional model-graded evaluation runs."

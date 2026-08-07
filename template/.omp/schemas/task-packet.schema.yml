@@ -1,0 +1,63 @@
+# Task Packet Schema
+# Controls what the Tech Lead passes to each worker agent.
+# Validate with: scripts/validate-template.ps1
+
+schema: task-packet
+version: "1.0"
+
+required_fields:
+  - id            # string: unique identifier, e.g. "impl-001"
+  - objective     # string: one-sentence goal
+  - why           # string: why this task matters to the overall objective
+  - workflow_size # enum: quick | standard | orchestrated
+  - scope         # string or list: which files, modules, or system areas are in scope
+  - acceptance_criteria  # list: each item is a testable Given/When/Then or assertion
+
+optional_fields:
+  - out_of_scope          # list: explicit exclusions
+  - relevant_context      # string: concise background (not full transcript)
+  - relevant_files        # list: file:line references from Explorer
+  - relevant_symbols      # list: symbol names with brief context
+  - dependencies          # list: other task IDs that must complete first
+  - constraints           # list: invariants that must not be violated
+  - verification_commands # list: exact commands to run (include flags)
+  - risk_level            # enum: LOW | MEDIUM | HIGH | CRITICAL
+  - quality_gates         # list: api-compatibility | security | performance | adr | release-readiness | rollback-readiness
+  - expected_artifacts    # list: files expected to be created or modified
+  - effort                # enum: lo | med | hi — maps to OMP task.enableEffort
+  - allowed_subagents     # list or "*": agents this task may spawn (empty = none)
+
+field_rules:
+  - "id must be unique within the session"
+  - "objective must be a single sentence"
+  - "relevant_context must NOT contain parent conversation transcript"
+  - "acceptance_criteria must each be independently verifiable"
+  - "verification_commands must be exact executable commands, not descriptions"
+  - "risk_level defaults to MEDIUM when not specified"
+  - "quality_gates is empty by default; enable only when relevant to risk_level"
+
+example:
+  id: impl-001
+  objective: "Fix the null-pointer dereference in UserService.getProfile when userId is empty"
+  why: "Production crash affecting 3% of profile API calls"
+  workflow_size: standard
+  scope:
+    - "src/services/UserService.ts"
+    - "src/services/__tests__/UserService.test.ts"
+  out_of_scope:
+    - "Authentication flow"
+    - "Profile picture handling"
+  relevant_context: "Crash introduced in commit a3f2b1. Stack trace points to line 47."
+  relevant_files:
+    - "src/services/UserService.ts:47"
+    - "src/services/__tests__/UserService.test.ts:89"
+  acceptance_criteria:
+    - "Given an empty userId, when getProfile is called, then it returns null (not throws)"
+    - "Given a valid userId, when getProfile is called, then it returns the profile as before"
+    - "All existing UserService tests continue to pass"
+  verification_commands:
+    - "npm test -- --testPathPattern=UserService"
+  risk_level: MEDIUM
+  quality_gates: []
+  effort: med
+  allowed_subagents: ""

@@ -1,0 +1,191 @@
+# Adoption Ledger — records every mechanism adopted from upstream sources
+# Each entry explains what was adopted, from where, and why.
+
+ledger:
+
+  - id: adopt-001
+    mechanism: "OMP agent definition format (.omp/agents/*.md frontmatter)"
+    source: can1357/oh-my-pi
+    source_commit: 3a8591a
+    adopted_to:
+      - template/.omp/agents/tech-lead.md
+      - template/.omp/agents/explorer.md
+      - template/.omp/agents/implementer.md
+      - template/.omp/agents/verifier.md
+      - template/.omp/agents/reviewer.md
+    adoption_type: conceptual-inspiration  # OMP-native format; configuration not code
+    rationale: "Native OMP agent discovery requires this exact frontmatter schema. Five custom agents define roles, model aliases, tools, and spawn policies."
+    date: "2026-08-07"
+
+  - id: adopt-002
+    mechanism: "OMP SKILL.md format and progressive disclosure (skill:// URLs)"
+    source: can1357/oh-my-pi
+    source_commit: 3a8591a
+    adopted_to:
+      - template/.omp/skills/task-triage/SKILL.md
+      - template/.omp/skills/systematic-debugging/SKILL.md
+      - template/.omp/skills/evidence-before-completion/SKILL.md
+    adoption_type: conceptual-inspiration
+    rationale: "OMP native provider requires name + description frontmatter. Progressive disclosure loads skill body on demand via skill:// URLs, reducing persistent context."
+    date: "2026-08-07"
+
+  - id: adopt-003
+    mechanism: "AGENTS.md context injection and RULES.md sticky rules"
+    source: can1357/oh-my-pi
+    source_commit: 3a8591a
+    adopted_to:
+      - template/.omp/AGENTS.md
+      - template/.omp/RULES.md
+    adoption_type: conceptual-inspiration
+    rationale: "AGENTS.md provides persistent project context. RULES.md provides sticky critical invariants re-attached near each turn. These are the primary vehicles for the coding constitution."
+    date: "2026-08-07"
+
+  - id: adopt-004
+    mechanism: "OMP model roles (modelRoles.<role> in config.yml)"
+    source: can1357/oh-my-pi
+    source_commit: 3a8591a
+    adopted_to:
+      - template/.omp/config.yml
+      - template/.omp/policies/model-routing.yml
+    adoption_type: conceptual-inspiration
+    rationale: "Decouples agent definitions from concrete models. Role aliases (@tech-lead, @explorer, etc.) allow model changes without editing agent files."
+    date: "2026-08-07"
+
+  - id: adopt-005
+    mechanism: "Systematic debugging 4-phase process"
+    source: obra/superpowers
+    source_commit: 44c9b2d
+    license_check: MIT
+    adopted_to:
+      - template/.omp/skills/systematic-debugging/SKILL.md
+    adoption_type: paraphrased-implementation
+    rationale: "Root-cause-first debugging is a critical quality control mechanism. Prevents symptom fixes, guess-and-check cycles, and architectural thrashing. Rewritten in project-native language."
+    date: "2026-08-07"
+
+  - id: adopt-006
+    mechanism: "Evidence-before-completion / verification iron law"
+    source: obra/superpowers
+    source_commit: 44c9b2d
+    license_check: MIT
+    adopted_to:
+      - template/.omp/skills/evidence-before-completion/SKILL.md
+      - template/.omp/agents/verifier.md
+    adoption_type: paraphrased-implementation
+    rationale: "Prevents false completion claims — one of the highest-cost failure modes in agentic coding. The Verifier agent contract and the skill both enforce this principle."
+    date: "2026-08-07"
+
+  - id: adopt-007
+    mechanism: "SKILL.md format (name, description, progressive disclosure)"
+    source: anthropics/skills
+    source_commit: b29e7cf
+    license_check: no-license  # Only format is adopted; no content copied
+    adopted_to:
+      - template/.omp/skills/*/SKILL.md
+    adoption_type: conceptual-inspiration
+    rationale: "Anthropic's skill packaging standard is widely compatible with OMP and other runtimes. Positive/negative trigger design improves accurate skill activation."
+    date: "2026-08-07"
+
+  - id: adopt-008
+    mechanism: "Project constitution template"
+    source: github/spec-kit
+    source_commit: 81d5cdb
+    license_check: MIT
+    adopted_to:
+      - template/.omp/AGENTS.md  # Coding Constitution section
+    adoption_type: paraphrased-implementation
+    rationale: "Constitution pattern establishes project-wide principles that govern all work. Prevents conflicting architectural decisions across sessions."
+    date: "2026-08-07"
+
+  - id: adopt-009
+    mechanism: "Clarification gate and acceptance scenarios (Given/When/Then)"
+    source: github/spec-kit
+    source_commit: 81d5cdb
+    license_check: MIT
+    adopted_to:
+      - template/.omp/skills/task-triage/SKILL.md
+      - template/.omp/schemas/task-packet.schema.yml
+    adoption_type: paraphrased-implementation
+    rationale: "Clarification before implementation prevents rework. Given/When/Then acceptance scenarios make completion criteria verifiable."
+    date: "2026-08-07"
+
+  - id: adopt-010
+    mechanism: "Delta specs (ADDED/MODIFIED/REMOVED) and change-folder structure"
+    source: Fission-AI/OpenSpec
+    source_commit: d578896
+    license_check: MIT
+    adopted_to:
+      - docs/architecture.md
+    adoption_type: conceptual-inspiration
+    rationale: "Delta specs enable brownfield change tracking without restating the full spec. Change folders keep all artifacts for a change together."
+    date: "2026-08-07"
+
+  - id: adopt-011
+    mechanism: "Context-budget policy and progressive retrieval order"
+    source: muratcankoylan/Agent-Skills-for-Context-Engineering
+    source_commit: a1841d1
+    license_check: MIT
+    adopted_to:
+      - template/.omp/policies/context-budget.yml
+    adoption_type: conceptual-inspiration
+    rationale: "Formal context-budget policy prevents context degradation. Progressive retrieval order prevents expensive web calls when local code suffices."
+    date: "2026-08-07"
+
+  - id: adopt-012
+    mechanism: "Production quality gates (API, security, performance, ADR, release, rollback)"
+    source: addyosmani/agent-skills
+    source_commit: d2478bf
+    license_check: MIT
+    adopted_to:
+      - template/.omp/policies/quality-gates.yml
+      - template/.omp/agents/reviewer.md
+    adoption_type: conceptual-inspiration
+    rationale: "Production quality gates prevent common categories of production incidents. Risk-based enablement keeps cost proportional to task risk."
+    date: "2026-08-07"
+
+  - id: adopt-013
+    mechanism: "12-Factor Agents architecture principles (own prompts, context, control flow; structured outputs; compact errors; small agents)"
+    source: humanlayer/12-factor-agents
+    source_commit: d20c728
+    license_check: Apache-2.0 (code), CC-BY-SA-4.0 (content)
+    adopted_to:
+      - template/.omp/AGENTS.md
+      - template/.omp/schemas/agent-result.schema.yml
+      - template/.omp/schemas/task-packet.schema.yml
+    adoption_type: paraphrased-implementation
+    attribution: "12-Factor Agents by Dex Horthy / HumanLayer (CC BY-SA 4.0) https://github.com/humanlayer/12-factor-agents"
+    rationale: "Control-flow ownership, structured outputs, and compact errors are fundamental architecture principles that prevent hidden complexity and context bloat."
+    date: "2026-08-07"
+
+  - id: adopt-014
+    mechanism: "Minimal worker loop (mini-swe-agent complexity governor)"
+    source: SWE-agent/mini-swe-agent
+    source_commit: a83fcae
+    license_check: MIT
+    adopted_to:
+      - template/.omp/agents/implementer.md
+    adoption_type: conceptual-inspiration
+    rationale: "The minimal loop (inspect → edit → verify → compact) prevents speculative loops and unbounded work expansion. Explicit termination prevents runaway agents."
+    date: "2026-08-07"
+
+  - id: adopt-015
+    mechanism: "Symbol-first exploration and repository-map principles"
+    source: Aider-AI/aider
+    source_commit: 5dc9490
+    license_check: Apache-2.0
+    adopted_to:
+      - template/.omp/agents/explorer.md
+      - template/.omp/policies/context-budget.yml
+    adoption_type: conceptual-inspiration
+    rationale: "Symbol lookups and reference graphs before full-file reads reduce context consumption and improve targeted exploration accuracy."
+    date: "2026-08-07"
+
+  - id: adopt-016
+    mechanism: "Karpathy coding principles (think before coding, simplicity first, surgical changes, goal-driven execution)"
+    source: multica-ai/andrej-karpathy-skills
+    source_commit: 2c60614
+    license_check: no-license  # Principles rewritten independently
+    adopted_to:
+      - template/.omp/AGENTS.md
+    adoption_type: conceptual-inspiration
+    rationale: "These four principles address the most common LLM coding failure modes: over-engineering, scope creep, assumption-driven code, and false completion."
+    date: "2026-08-07"

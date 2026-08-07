@@ -1,0 +1,22 @@
+# External research clones — tracked only via registry, not source-controlled
+_research/upstreams/
+
+# OMP session and database artifacts
+*.db
+*.db-shm
+*.db-wal
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Secrets — never commit
+.env
+*.key
+*.pem
+credentials.*
+secrets.*
