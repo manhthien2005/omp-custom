@@ -2,6 +2,8 @@
 
 > **OPUS PROPOSED SPEC v1** — Independent verification of every ChatGPT hypothesis, plus new findings.
 > Every row below was verified against OMP source at `_research/upstreams/oh-my-pi` (shallow clone, `packages/coding-agent/src`) and against the raw bytes of `template/` in this repo. Claims I could not verify from source are labelled NEEDS EXPERIMENT and carry no severity.
+>
+> **Upstream provenance (CR-04)**: `https://github.com/can1357/oh-my-pi`, tag `v17.2.10`, HEAD SHA `3a8591a8af5b6d200088d12ca75a5517cb064fa8`, audit date 2026-08-07. Record this SHA in `registry/upstreams.yml` (T-00.1). A version string alone is weaker than a commit identity — use the SHA for all future "verified against v17.2.10" claims.
 
 ## Verification method
 

@@ -12,22 +12,47 @@ interchangeable, and the difference is the single most important fact in this do
 
 | Mechanism | Where it lands | Reaches subagents? | Source |
 |---|---|---|---|
-| `RULES.md` (sticky rule) | Main session, re-attached near current turn | **No** | `discovery/builtin.ts:387-418` forces `alwaysApply: true` |
+| `RULES.md` (sticky rule) | Main session, re-attached near current turn; **content forwarded to all spawned subagents** | **Yes** — via `rules: session.rules` propagation | `discovery/builtin.ts:387-418` (sticky for main); `task/structured-subagent.ts:438` (forwarded to child) |
 | Skill listing (name + description) | System prompt of whichever session lists it | Only if that session lists skills | `capability/skill.ts` |
 | `autoloadSkills:` frontmatter | Injected into subagent at startup as a custom message | **Yes, deterministically** | `task/executor.ts:3235-3248` |
 
-### The verified finding that drives this spec
+### CR-01 correction (2026-08-07): parent rules DO propagate to subagents
 
-`grep` for `alwaysApplyRules` in `task/executor.ts` and `task/structured-subagent.ts`
-returns **nothing**. Always-apply rules are assembled in `sdk.ts:1573-1590` and passed
-into the main session's system prompt (`system-prompt.ts:74-79`). Subagents get
-`systemPrompt: agent.systemPrompt` — the agent file body — and nothing from the
-main session's rulebook.
+The original finding was derived by grepping for `alwaysApplyRules` in
+`task/executor.ts` and `task/structured-subagent.ts` — that grep returns nothing, but
+that is the wrong level of analysis.
 
-**Consequence:** a critical invariant placed only in `RULES.md` or only in a skill
-marked `alwaysApply: true` **does not reach the Implementer, Verifier, or Reviewer.**
-The current template relies on exactly this, so its most important invariant
-("no false completion") is absent from the agents that most need it.
+The actual propagation chain, confirmed in v17.2.10:
+
+1. `task/structured-subagent.ts:438` — `buildExecutorOptions` passes `rules: session.rules`
+   to the child `ExecutorOptions`.
+2. `task/executor.ts` — passes those options to `createAgentSession` (imported from `../sdk`).
+3. `sdk.ts` — `createAgentSession` runs `bucketRules(options.rules)` for the child session,
+   producing `rulebookRules` and `alwaysApplyRules` that reach the child's system prompt.
+
+**The claim "RULES.md does not reach the Implementer, Verifier, or Reviewer" was wrong.**
+Parent-discovered rules, including `RULES.md`, do propagate through subagent creation.
+
+### Why autoloadSkills remains the recommended mechanism despite propagation
+
+Rule forwarding is real but not a replacement for `autoloadSkills` for quality-gate
+delivery. The reasons this spec retains `autoloadSkills: evidence-before-completion`:
+
+1. **Forwarded rules include the entire parent rulebook.** Workers receive all parent
+   rules — not just the quality gate. The token cost is the full rule set, not just
+   the skill body.
+2. **`autoloadSkills` gives explicit, intentional delivery.** The skill body is exactly
+   what you intend. Forwarded rules are whatever the parent discovered at spawn time,
+   subject to discovery variations across project layouts.
+3. **Token accounting is opaque with forwarding.** With `autoloadSkills` the cost is
+   exactly one skill body per spawn. Forwarding cost depends on the full parent rule set.
+4. **The critical invariant must be present regardless of forwarding.** Even if
+   forwarding works, a worker that receives an overwhelming rulebook may deprioritize a
+   buried quality gate. Autoload makes it prominent.
+
+DR-4 resolution stands: use `autoloadSkills: evidence-before-completion`. The
+**justification** changes from "RULES.md doesn't propagate" to "explicit autoload is
+preferable over implicit forwarding for quality-gate delivery."
 
 ---
 
@@ -157,8 +182,15 @@ Reviewer believes a gate is missing, it reports that as a non-blocking finding.
 
 ## F. RULES.md Scope
 
-`RULES.md` reaches only the main session. That is acceptable for its actual contents —
-they are main-session concerns:
+`RULES.md` content is re-attached near every turn in the main session **and** forwarded
+to all spawned subagents via `rules: session.rules` (see §A correction above). The
+forwarded rules are processed through `bucketRules` in each child session.
+
+This changes the semantics of the table below: the "correct home" column now means
+"where the rule is *authoritative* and *guaranteed to apply*", not "only place it
+reaches." However, for the quality-gate invariants marked as **Also** autoloaded, the
+`autoloadSkills` delivery is still preferred because it is explicit, token-controlled,
+and independent of the full parent rule set that forwarding carries.
 
 | Invariant | Correct home |
 |---|---|

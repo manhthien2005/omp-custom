@@ -51,9 +51,9 @@ Four workers, spawned from the main session via `task`.
 | Agent | Tools | Writes? | Isolated? | Spawns |
 |---|---|---|---|---|
 | `explorer` | read, grep, glob | No | No | none |
-| `implementer` | read, grep, glob, edit, write, bash | Yes | Yes | none |
-| `verifier` | read, grep, glob, bash | No (must not) | No | none |
-| `reviewer` | read, grep, glob, bash | No (must not) | No | none |
+| `implementer` | read, grep, glob, edit, write, bash | Yes | **Conditional** — Standard: No; Orchestrated: Yes (see §08 §B) | none |
+| `verifier` | read, grep, glob, bash | **Prompt-only: must not** (bash enables side effects; see §C) | No | none |
+| `reviewer` | read, grep, glob, bash | **Prompt-only: must not** (bash enables side effects; see §C) | No | none |
 
 `yield` is appended automatically to every explicit `tools:` list by
 `parseAgentFields`. It does not need to be declared and declaring it is

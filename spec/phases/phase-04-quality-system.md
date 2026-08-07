@@ -3,7 +3,7 @@
 > OPUS PROPOSED SPEC v1 | Make verification and review produce trustworthy evidence.
 
 **Depends on**: phase-02
-**Blocks**: phase-05
+**Blocks**: phase-06
 
 ---
 
@@ -31,7 +31,7 @@ it did not verify is worse than no orchestration at all.
 The Verifier must run every verification command fresh in its own session and read
 the actual output. It must never infer a pass from the Implementer's report.
 
-Mechanically supported by: separate subprocess session (no shared transcript),
+Mechanically supported by: separate in-process AgentSession (no shared transcript — CR-08: OMP subagents run on the main thread, not in an OS subprocess),
 `autoloadSkills: evidence-before-completion`, and a `verification-result` schema whose
 required fields cannot be satisfied without real command output.
 

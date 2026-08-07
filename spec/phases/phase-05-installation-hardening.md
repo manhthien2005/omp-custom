@@ -2,7 +2,7 @@
 
 > OPUS PROPOSED SPEC v1 | Make install and rollback safe, complete, and reversible.
 
-**Depends on**: phase-04
+**Depends on**: phase-01
 **Blocks**: phase-06
 
 ---

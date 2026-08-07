@@ -103,6 +103,8 @@ may be false, and this part of the template may break."
 **Never** skip step 5. A watched-path diff that looks cosmetic can still change
 behavior — a renamed key, a flipped default, a moved throw.
 
+**CR-21 — Watched-path diff is TRIAGE ONLY:** A diff in a watched path signals that a claim *may* be affected and must be re-verified. It is not evidence that the template is broken, and it does not determine which behavior changed. Step 3 ("summarize which claims may be affected") must produce a list of candidate claims; step 5 ("re-verify") must test those claims against the new OMP. Do not treat the diff output itself as a verdict — it is an entry point to re-verification, not a replacement for it.
+
 ---
 
 ## E. Reversibility Requirement

@@ -48,6 +48,20 @@ The alternative — flipping `task.enableLsp` back to `false` and removing the L
 
 **Baseline note:** this change requires no baseline modification. `task.enableLsp = true` is already set; we are fixing the allowlists so the setting takes effect as intended.
 
+### CR-17 — Authoritative LSP Allowlist (DR-7 decision record)
+
+The table below is the **required final state** after phase-01/phase-02 work, not the current state. It is the authoritative specification that validation must assert.
+
+| Agent | `lsp` in allowlist (required) | Rationale |
+|---|---|---|
+| `explorer` | **Yes** | Symbol-first contract; `lsp references`/`lsp symbols` replace whole-file reads — token saving, not cost. |
+| `implementer` | **Yes** | `lsp references` required before modifying an exported symbol; `lsp.diagnosticsOnWrite = true` in baseline. |
+| `reviewer` | **Yes** | Blast-radius check (callers of a modified symbol) requires `lsp references`. |
+| `verifier` | **No** | Runs commands, reads output. Symbol navigation is outside its contract and invites scope creep. |
+| `tech-lead` (main session) | N/A | Main session, not governed by agent allowlist. |
+
+DR-7 status: **DECIDED** — add `lsp` to explorer, implementer, reviewer. Phase-02 implements this; phase-01 experiment T-00.E4 validates that the `task.enableLsp = true` baseline setting propagates correctly to subagents before committing to it.
+
 ---
 
 ## B. Progressive Retrieval Order
@@ -65,7 +79,7 @@ Two clarifications the current wording leaves implicit:
 - **Levels are gates, not preferences.** An agent MUST NOT reach level 4 without having tried levels 1–3. "I assumed the local docs were stale" is not a justification; checking is cheap.
 - **Level 5 requires disclosure.** Web-sourced facts enter the artifact as untrusted content per `15-security-and-failure-recovery.md`. Any claim resting on level 5 must name its source in the result.
 
-Context7 is available in this environment (an MCP server is wired in), which makes level 4 real rather than aspirational. It remains **off the default path**: reaching for versioned external docs before reading the local `node_modules` types is the exact inversion this ordering exists to prevent.
+**ENVIRONMENT ASSUMPTION (CR-18):** Context7 availability depends on an MCP server being wired into the session. This is true for the development environment used during spec construction, but is NOT guaranteed for every OMP session. Level 4 is aspirational unless the runtime confirms the Context7 MCP server is connected. Agents MUST NOT assume Context7 is available; they should treat it as optional and fall back to level 3 if unavailable. It remains **off the default path** regardless: reaching for versioned external docs before reading the local `node_modules` types is the exact inversion this ordering exists to prevent.
 
 ---
 

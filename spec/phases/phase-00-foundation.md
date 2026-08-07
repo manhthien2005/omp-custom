@@ -85,20 +85,100 @@ requires it for `status: completed`. Make the conditional requirement explicit.
 ### T-00.7 — Record the resolved decisions
 
 Record DR-1 … DR-7 (§README-10) with their evidence-based resolutions, so later
-phases do not relitigate them.
+phases do not relitigate them. Each DR must explicitly separate **runtime_facts**
+(source/test-backed — eligible for "verified from source" label) from **design_objectives**
+and **normative decisions** (not source-provable; require explicit rationale instead).
+See CR-25.
 
-**Acceptance**: each decision has a resolution and a source-file citation.
+**Acceptance**: each decision has a resolution; runtime facts carry source citations;
+normative decisions carry explicit rationale; no source citation used to justify a
+purely normative choice.
+
+---
+
+## Experiment Tasks (Phase-Gate Required)
+
+These experiments resolve open questions that later phases depend on. **Phase 00
+cannot close and dependent phases cannot begin until each experiment has a recorded
+artifact.** Record: exact OMP SHA, OS/runtime, provider/gateway version, raw
+(sanitized) output, interpretation, and which decision is changed or retained.
+
+### T-00.E1 — Schema precedence and provider enforcement
+
+Verify `resolveSchema` precedence and provider strict-mode behavior at the pinned SHA.
+
+Test cases:
+1. agent `output:` only (no caller `outputSchema`)
+2. caller `outputSchema` only (no agent `output:`)
+3. both present with intentionally different sentinel schemas — confirm caller wins
+4. session-level `outputSchema` only — confirm session is used when neither caller nor agent is set
+5. `schemaMode: strict` — confirm provider enforces rather than permissively accepts
+
+**Artifact**: structured-output experiment transcript with binary result per case.
+
+**Blocks**: phase-01 T-01.7 implementation; DR-2 runtime_facts section.
+
+### T-00.E2 — Model-role merge order
+
+Verify how missing/unknown model roles resolve in the OMP main session and for workers.
+
+Test cases:
+1. known built-in role with config present — record selected model
+2. known custom role (`@tech-lead`) with config present — record selected model
+3. referenced custom role absent from config — record selected model or error
+4. arbitrary `@unknown` pattern — record selected model or error
+5. role resolves to unavailable provider/model — record error or fallback
+
+**Artifact**: model-selection transcript per case; final statement for §09/§14/§15 normalization.
+
+**Blocks**: DR-1 and DR for model routing (§09); §14/§15 consistency.
+
+### T-00.E3 — Windows/ProjFS isolation backend
+
+Verify isolation backend availability and behavior on the target Windows environment.
+
+Test cases:
+1. standard workflow (single Implementer, `isolated: false`) — confirm parent worktree unchanged after success
+2. orchestrated workflow (parallel Implementers, `isolated: true`) — confirm isolation backend engages
+3. isolation backend unavailable — record fallback behavior
+4. non-git repository — record fallback behavior
+
+**Artifact**: isolation behavior transcript per scenario.
+
+**Blocks**: phase-02 parallel-implementer implementation; §08 batch-merge decision.
+
+### T-00.E4 — Rule sentinel propagation
+
+Verify whether a RULES.md rule actually appears in a spawned worker's system prompt.
+
+Procedure:
+1. Add a unique sentinel rule to `RULES.md`:
+   `RULE_SENTINEL_7F3A: before claiming task complete, emit the phrase QUALITY_GATE_SEEN.`
+2. Spawn a worker without `autoloadSkills` for a corresponding skill.
+3. Capture child system prompt or debug rule buckets (A: prompt-visible; B: stored but not visible; C: not discovered).
+4. Observe worker behavior.
+5. Compare token cost: forwarded RULES.md vs autoloadSkills.
+
+**Artifact**: child prompt/rule-bucket capture + behavioral observation + token diff.
+
+**Discriminator**:
+- A → rules propagate and are prompt-visible; DR-4 updated accordingly
+- B → rules propagate but are not prompt-visible; `autoloadSkills` still required
+- C → parent did not discover RULES.md; investigate discovery mode
+
+**Blocks**: DR-4 final justification; phase-02 worker initialization.
 
 ---
 
 ## Deliverables
 
-- Updated `registry/upstreams.yml` with pin + watched paths
+- Updated `registry/upstreams.yml` with pin + watched paths (SHA `3a8591a8af5b6d200088d12ca75a5517cb064fa8`)
 - Compatibility/verified-claims record
 - Nine reclassification headers (5 policies + 4 schemas)
 - Corrected docs
 - Fixed `agent-result.schema.yml`
-- Decision record
+- Decision record (runtime_facts separated from normative decisions per CR-25)
+- Experiment artifacts: T-00.E1 through T-00.E4 recorded transcripts
 
 ---
 
@@ -119,12 +199,16 @@ Manual checks:
 
 ## Exit Criteria
 
-- [ ] OMP pinned to an exact SHA with watched paths recorded
+- [ ] OMP pinned to exact SHA `3a8591a8af5b6d200088d12ca75a5517cb064fa8` with watched paths recorded
 - [ ] All verified claims traceable to a source file
 - [ ] Policies and schemas labeled documentation-only
 - [ ] No documentation claim contradicts verified runtime behavior
 - [ ] `agent-result` conditional requirement explicit
-- [ ] DR-1 … DR-7 resolved and recorded
+- [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
+- [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
+- [ ] **T-00.E2 artifact present** (model-role merge order)
+- [ ] **T-00.E3 artifact present** (Windows/ProjFS isolation)
+- [ ] **T-00.E4 artifact present** (rule sentinel propagation)
 
 ---
 

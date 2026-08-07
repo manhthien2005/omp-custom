@@ -30,6 +30,8 @@ mean the workflow runs.
 
 ## B. Four Validation Levels
 
+**CR-23 — Canonical Validation Taxonomy (L0–L4):** The authoritative level names are defined here and must be used consistently across all spec files and phase plans.
+
 ### Level 0 — Static (exists today, keep and extend)
 
 Filesystem and text properties. Fast, no OMP required, runs in CI.
@@ -76,6 +78,10 @@ Exercise the structured-output path (§06) without judging code quality:
 Run the ten fixture tasks from the plan end-to-end and measure outcomes. This is the only
 level that can answer "is the workflow better than no workflow".
 
+### Level 4 — Adversarial (new)
+
+Test the failure modes the design claims to prevent. These cases must be fully deterministic (no model-grading): an Implementer that reports false success, an environment failure, a non-git-repo isolation dispatch, a schema-violating result, and conflicting parallel patches. Each case must produce a specified detection response. Level 4 also covers A/B comparison runs where a single variable is isolated and results are compared statistically (see §C).
+
 ---
 
 ## C. Benchmark: Current State and Required Redesign
@@ -110,6 +116,8 @@ worse than a run that is expensive and right. Reporting raw token counts without
 acceptance denominator is the failure mode this metric exists to prevent.
 
 ### A/B Comparisons
+
+**CR-22 — Formal A/B Protocol:** Each A/B comparison MUST: (1) isolate exactly one variable — any other difference confounds the result; (2) run both arms on identical fixture tasks in the same session or back-to-back; (3) record results from both arms before interpreting either; (4) report distribution (mean ± std) across ≥3 runs per arm — a single run is not evidence; (5) state what was being tested and whether results cross the threshold defined in the evaluation plan.
 
 | Comparison | Question it answers |
 |---|---|

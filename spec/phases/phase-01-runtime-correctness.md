@@ -107,14 +107,30 @@ the human-authoritative source (phase-00 labeled it).
 
 ### T-01.7 — Replace prose schema references with real enforcement (P0-7)
 
-Agents say "Return schema: `agent-result`". Nothing enforces this; OMP enforces only
-an `outputSchema` passed in the `task` call.
+Agents say "Return schema: `agent-result`". Nothing enforces this at runtime.
 
-Fix: inline JSON Schema `outputSchema` in every `task` dispatch in the commands, per
-`06-structured-output.md`. Keep the prose as a readability aid.
+**CR-03 correction**: OMP resolves output schema via `resolveSchema` in
+`task/structured-subagent.ts:176-188` with precedence:
+1. caller task `outputSchema` (key presence, not truthiness)
+2. agent frontmatter `output:` field
+3. session-level `outputSchema`
 
-**Acceptance**: every dispatch in `standard.md` and `orchestrated.md` carries an
-inline `outputSchema` with `schemaMode: "strict"`.
+The original claim "OMP enforces only an `outputSchema` passed in the task call" was
+wrong. An agent's `output:` frontmatter is a first-class, runtime-enforced schema
+source. Inlining a schema in every task dispatch duplicates the source of truth and
+contradicts DR-2.
+
+Fix:
+- Put the canonical schema in each worker agent's `output:` frontmatter (per DR-2
+  and `06-structured-output.md`). This is the primary enforcement path.
+- In task dispatch commands, use inline `outputSchema` **only** as an explicit caller
+  override (e.g., a one-off call that needs a narrower or different schema).
+- Add `schemaMode: "strict"` where strict enforcement is required.
+
+**Acceptance**: every worker agent (`explorer`, `implementer`, `verifier`, `reviewer`)
+has a valid JSON Schema in its `output:` frontmatter. Commands may carry inline
+`outputSchema` for explicit overrides; this is not required for every dispatch.
+Zero agents rely on prose "Return schema:" as the sole contract.
 
 ### T-01.8 — Resolve the tech-lead dead abstraction (P0-2)
 
@@ -182,7 +198,7 @@ list; every `task` dispatch carries `outputSchema`.
 - [ ] P0-7 real `outputSchema` enforcement
 - [ ] P0-8 `read-summarize` inversion corrected
 - [ ] F-04 `$Force` honored
-- [ ] Install → uninstall round-trip restores the original state
+- [ ] Install → basic rollback succeeds (config.yml backup restored; no data loss from a failed install) — CR-16: full round-trip fidelity guarantee moves to phase-05
 
 ---
 

@@ -53,9 +53,9 @@ and it is what the model uses to decide whether to pay for the body.
 
 ## C. Budgets
 
-Adopted from `context-budget.yml`, which is sound and needs no revision. Restated
-here because it must survive the reclassification of that file to documentation
-(F-08).
+Adopted from `context-budget.yml` as **provisional defaults pending Phase 06 evaluation** (CR-19).
+These targets represent initial baselines based on role complexity; actual optimal values
+will be validated through A/B testing before being promoted to production recommendations.
 
 | Component | Target | Warn above | Tier |
 |---|---|---|---|
@@ -147,7 +147,7 @@ A rule repeated in five agent prompts is paid six times.
 
 ## F. Progressive Retrieval
 
-Adopted verbatim from `context-budget.yml`; the ordering is correct.
+Adopted from `context-budget.yml` as **guidance** (CR-20: not rigid gates — authority ordering is task-dependent).
 
 ```
 1. Local code and types (LSP symbols, current file, related modules)
@@ -157,14 +157,13 @@ Adopted verbatim from `context-budget.yml`; the ordering is correct.
 5. Broader web research
 ```
 
-Each level is cheaper and more authoritative than the next. The rule is: do not
-descend a level until the current one is exhausted. Most retrieval failures in
-practice are jumps from level 1 to level 5 — a web search for something the
-type definition next to the callsite already answered.
+**Guidance, not exhaustion gates**: prefer project executable truth for "what this repo currently does"; prefer version-matched official docs for external API/runtime semantics. If the current level cannot answer the question within a reasonable retrieval budget, escalate rather than continuing to search. Most retrieval failures are jumps from level 1 to level 5 — a web search for something the type definition next to the callsite already answered. But "exhaust level N before descending" is not the rule — the rule is: use the most authoritative source for the specific question type, within a bounded retrieval budget.
 
 Levels 4 and 5 are not wired in v0. Context7 is available as an MCP tool in this
 environment but is not part of the template; `web_search` is in the Tech Lead's
 allowlist only.
+
+> **ENVIRONMENT ASSUMPTION (CR-18)**: Context7 availability and `web_search` access depend on the runtime environment. These are not public-source-verifiable facts — verify with a sanitized runtime discovery transcript.
 
 ---
 
@@ -172,17 +171,32 @@ allowlist only.
 
 When a result is large but must persist, write it to a file and pass the path.
 
-| Artifact | Threshold | Destination |
-|---|---|---|
-| Exploration evidence | >2,000 tokens | `.task/<id>/exploration.md` |
-| Verification output | >500 tokens | quote key lines only; full output to `.task/<id>/verify.log` |
-| Review findings | >1,000 tokens | `.task/<id>/review.md` |
+| Artifact | Threshold | Destination | Isolation-safe? |
+|---|---|---|---|
+| Exploration evidence | >2,000 tokens | `.task/<id>/exploration.md` | Standard workflow only |
+| Verification output | >500 tokens | quote key lines only; full output to `.task/<id>/verify.log` | Standard workflow only |
+| Review findings | >1,000 tokens | `.task/<id>/review.md` | Standard workflow only |
 
 This is how a worker returns a large finding without putting it in the parent's
 context: the result carries `artifacts: [".task/impl-001/review.md"]` and the
 Tech Lead reads it only if it needs to.
 
 `.task/` must be gitignored. It is session scratch, not project content.
+
+**CR-10 — Isolated workers must use the OMP artifact manager, not `.task/`.**
+
+An isolated worker operates in a temporary worktree that is torn down after the task
+lifecycle completes. A gitignored `.task/<id>/...` file inside the isolated worktree
+does not propagate through git branch/patch merge, and is destroyed when the worktree
+is cleaned up. The path reference passed in the result is invalid in the parent.
+
+For Orchestrated (isolated) Implementers: use the OMP native artifact manager
+(executor options for parent artifact manager adoption, available in `sdk.ts`).
+The child session adopts the parent artifact manager, and artifacts are stored in
+the parent artifact domain — remaining valid after isolation teardown.
+
+The `.task/<id>/...` pattern is safe **only** for non-isolated (Standard) workers
+where the working tree persists through the full Tech Lead lifecycle.
 
 ---
 

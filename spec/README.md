@@ -155,7 +155,7 @@ Main OMP session  ── IS the Tech Lead
 Worker agents (.omp/agents/*.md, spawned via `task`):
   ├── explorer.md     tools: read, grep, glob, lsp   output: <exploration schema>   isolated: false
   ├── implementer.md  tools: read, grep, glob, edit, write, bash, lsp
-  │                                                   output: <agent-result schema>  isolated: true
+  │                                                   output: <agent-result schema>  isolated: false (Standard) / true (Orchestrated; see §08 §B)
   ├── verifier.md     tools: read, grep, glob, bash   output: <verification schema>  isolated: false
   └── reviewer.md     tools: read, grep, glob, bash   output: <review schema>        isolated: false
 
@@ -234,15 +234,28 @@ genuinely open — requiring live experiment, not more reading:
 
 ## 10. Decisions Requiring ChatGPT Review
 
+**CR-25 — Decision Record categorization:** DRs are split into two classes. *Runtime-fact-grounded* decisions are constrained by verified OMP source behavior — the opposite choice would be demonstrably wrong or require OMP changes. *Normative design choices* are well-supported judgment calls where a reasonable counterargument exists and peer review adds real value.
+
+### A. Runtime-Fact-Grounded Decisions
+
+These positions are backed by specific source-verified claims (file + line recorded in `00-current-state-audit.md`). Changing them requires changing the source evidence, not just the reasoning.
+
+| # | Decision | Opus Position | Source Evidence | Confidence |
+|---|---|---|---|---|
+| DR-2 | Schema enforcement mechanism | **`output:` frontmatter as default; task `outputSchema` for per-call override.** YAML → `docs/contracts/` as generator source | `tools/yield.ts` (MAX_SCHEMA_RETRIES=3), `discovery/helpers.ts:289` | High |
+| DR-3 | Fate of `.omp/policies/` | **Delete the folder.** Inline each policy into its single consumer | Zero discovery hooks in any provider — exhaustive grep | High |
+| DR-6 | Explorer isolation | **No isolation** — read-only, isolation is pure overhead | §08: `isolated: true` valid only for writers; git-repo requirement adds cost with zero benefit for read-only | High |
+| DR-7 | LSP in worker allowlists | **Add `lsp` to Explorer, Implementer, and Reviewer.** Baseline sets `task.enableLsp = true`; the per-agent allowlist is what withholds it | `lsp/index.ts:1639` (allowlist gating), `settings-schema.ts:4617` | High |
+
+### B. Normative Design Choices
+
+These positions are well-reasoned but involve trade-offs where a legitimate counter-position exists. ChatGPT review adds genuine value here.
+
 | # | Decision | Opus Position | Confidence |
 |---|---|---|---|
-| DR-1 | Tech Lead: main session vs spawned agent | **Main session.** Spawning costs a recursion level, duplicates context, and orphans ownership of the final answer | High |
-| DR-2 | Schema enforcement mechanism | **`output:` frontmatter as default; task `outputSchema` for per-call override.** YAML → `docs/contracts/` as generator source | High |
-| DR-3 | Fate of `.omp/policies/` | **Delete the folder.** Inline each policy into its single consumer | High |
+| DR-1 | Tech Lead: main session vs spawned agent | **Main session (PARTIAL).** Spawning costs a recursion level, duplicates context, and orphans ownership of the final answer. **CR-06 OPEN QUESTION**: routing mechanism for @tech-lead mentions in worker prompts is undefined when Tech Lead is the main session — no spawn hook exists for main-session targeting | High |
 | DR-4 | `evidence-before-completion` delivery | **`autoloadSkills` on worker agents**, not `alwaysApply`, not lazy | Medium |
 | DR-5 | `read-summarize: false` on Explorer/Verifier | **Remove from Explorer** (contradicts token goals); **keep on Verifier** (needs exact output bytes) | Medium |
-| DR-6 | Explorer isolation | **No isolation** — read-only, isolation is pure overhead | High |
-| DR-7 | LSP in worker allowlists | **Add `lsp` to Explorer and Implementer.** Baseline already sets `task.enableLsp = true`; the allowlist is what blocks it | High |
 | DR-8 | Keep 5 agents, or collapse Verifier into Implementer? | **Keep separate.** Independence is the entire value; self-verification is the failure mode being defended against | Medium |
 
 ---

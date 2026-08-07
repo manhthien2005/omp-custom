@@ -113,11 +113,27 @@ Non-negotiable, and correctly reflected in `model-routing.yml`:
 - No direct provider API calls.
 - `retry.modelFallback = false` and `retry.usageAwareFallback = false` stay off — silent cross-model fallback would invalidate any benchmark comparison and make failures hard to attribute.
 
+**ENVIRONMENT ASSUMPTION (CR-18):** The OmniRoute gateway address (`http://127.0.0.1:20128`) and the available model identifiers (e.g., `omniroute/codex/gpt-5.6-sol-high`) are properties of this specific deployment environment, not portable constants. Any spec claim that a particular model string is available via OmniRoute is an environment observation, not a design invariant. A production installation may expose different model IDs. The template's model-role abstraction (`@tech-lead`, `@explorer`, etc.) exists precisely to insulate agent files from these environment-specific strings.
+
 The single-gateway constraint is what keeps routing auditable: one place to see what ran, one place to change it.
 
 ---
 
-## F. Contract Summary
+## F. Model-Role Fallback Test Matrix
+
+**CR-24** — Before committing to the model-role mechanism in phase-02, T-00.E2 (see `spec/phases/phase-00-foundation.md`) must run the following cases to characterize exact fallback behavior when `config.yml` is absent or incomplete:
+
+| Case | Setup | Expected (claimed) | Must verify |
+|---|---|---|---|
+| E2-1 | `config.yml` installed, all 5 roles defined | `@tech-lead` resolves to configured model | Role resolution successful, model receives request |
+| E2-2 | `config.yml` missing (agents-only install) | `@tech-lead` resolves to... what? | Hard error vs silent fallback to `default`; which failure mode? |
+| E2-3 | `config.yml` present but `tech-lead` key absent | `@tech-lead` → `undefined` from `getModelRole` | Propagation: error or silent `default`? |
+| E2-4 | Role defined at project level only (not user level) | Resolves via project `config.yml` | `getModelRoleAlias` merge order: project beats user? |
+| E2-5 | Role name collision with built-in (e.g., `default`) | Template `default` key shadows built-in | Custom role wins or OMP built-in wins? |
+
+Outcome of T-00.E2 feeds directly into: (a) the installer coupling requirement in §B, (b) validation static-check wording, and (c) whether a graceful fallback mode (inform user but continue) is viable vs a hard abort.
+
+## G. Contract Summary
 
 1. Custom model roles are supported (verified) but require `config.yml` to be installed.
 2. The installer MUST couple `agents` → `config`; validation MUST check every `@role` reference resolves.

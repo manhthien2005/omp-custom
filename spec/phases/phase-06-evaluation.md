@@ -25,7 +25,9 @@ hand-write result files. Both need replacing before any quality claim is defensi
 
 ## Tasks
 
-### T-06.1 — Keep Level 1 static validation, honestly scoped
+**CR-23 — Canonical level taxonomy:** All level references in this file follow the L0–L4 taxonomy defined in `spec/13-validation-and-evaluation.md §B`. Prior drafts of this file used "Level 1–4" for what the canonical taxonomy calls L0–L3; those references are corrected below.
+
+### T-06.1 — Keep L0 (static) validation, honestly scoped
 
 Retain file-existence, token-budget, and YAML checks — they catch real regressions —
 but rename the output so passing no longer implies working. Add the checks that would
@@ -33,19 +35,19 @@ have caught phase-01's defects: no `policy:` references, no tool named outside i
 allowlist, no bundled-name collision, every `autoloadSkills` name resolvable, every
 dispatch carrying `outputSchema`.
 
-**Acceptance**: Level 1 detects all eight P0 defects when reintroduced. Report wording
+**Acceptance**: L0 detects all eight P0 defects when reintroduced. Report wording
 states it verifies structure, not behavior.
 
-### T-06.2 — Add Level 2 OMP discovery validation
+### T-06.2 — Add L1 (OMP discovery) validation
 
 Assert OMP actually discovers what was installed: agents by name, commands by name,
 skills by name, config roles resolving. This is the layer that catches "installed but
 invisible."
 
-**Acceptance**: Level 2 confirms five agents, three commands, three skills, and five
+**Acceptance**: L1 confirms five agents, three commands, three skills, and five
 resolvable model roles.
 
-### T-06.3 — Add Level 3 workflow fixtures
+### T-06.3 — Add L2 (contract) + L3 (behavioral) workflow fixtures
 
 Execute each workflow against fixtures with known-correct outcomes: a one-line fix for
 `/quick`, a two-file change for `/standard`, an independent three-module change for
@@ -55,7 +57,7 @@ and a failing-verification task that must not report completion.
 **Acceptance**: each fixture asserts a specific observable outcome, including the two
 negative cases.
 
-### T-06.4 — Add Level 4 adversarial fixtures
+### T-06.4 — Add L4 (adversarial) fixtures
 
 Test the failure modes the design claims to prevent: an Implementer that claims
 success falsely (Verifier must contradict), an environment failure (must classify as
@@ -78,6 +80,8 @@ with no manual authoring.
 
 Measure each fixture with the template and with plain OMP (no template). Without the
 baseline there is no evidence the orchestration helps rather than just costing more.
+
+**CR-22 — Formal A/B protocol (applies to all comparisons):** Each A/B comparison MUST: (1) isolate exactly one variable; (2) run both arms on identical fixture tasks back-to-back or in the same session window; (3) record results from both arms before interpreting either; (4) report distribution (mean ± std) across ≥3 runs per arm — a single run is not evidence; (5) state the null hypothesis and the threshold used to judge the result. See `spec/13-validation-and-evaluation.md §C` for the full comparison matrix.
 
 **Acceptance**: recorded results for both arms on identical fixtures.
 
@@ -115,12 +119,13 @@ wrong answers.
 
 ## Exit Criteria
 
-- [ ] Level 1 catches all eight P0 defects
-- [ ] Level 2 confirms OMP discovery
-- [ ] Level 3 fixtures pass, including ambiguity and failing-verification cases
-- [ ] Level 4 adversarial cases detected
+- [ ] L0 catches all eight P0 defects
+- [ ] L1 confirms OMP discovery (5 agents, 3 commands, 3 skills, 5 model roles)
+- [ ] L2 (contract) proves schema rejection and retry actually occur
+- [ ] L3 (behavioral) fixtures pass, including ambiguity and failing-verification cases
+- [ ] L4 adversarial cases detected
 - [ ] Benchmark executes real sessions
-- [ ] Baseline measured
+- [ ] Baseline measured (template vs plain OMP, ≥3 runs per arm)
 - [ ] Tokens per accepted outcome computed for both arms
 
 ---

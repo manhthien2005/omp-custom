@@ -129,7 +129,7 @@ Ordered behavior:
 2. **Validate** the template first — refuse to install if `validate-template.ps1` fails.
 3. **Plan** — classify every file CREATE / OVERWRITE / MERGE / SKIP(protected) / CONFLICT.
 4. **Dry-run by default** — print the plan and exit 0 without touching disk.
-5. **Backup** — timestamped copy of the entire destination before any write.
+5. **Backup** — timestamped copy of files in the installer write-set only (not entire destination). **CR-14**: Backup scope limited to template-owned files to avoid preserving unrelated state or bloating backup size.
 6. **Apply** — copy files; merge `config.yml`; never touch protected paths.
 7. **Manifest** — write the JSON record described in D-6.
 8. **Post-validate** — confirm OMP discovers the installed components (§13 Level 1).
@@ -164,15 +164,17 @@ uninstall-template.ps1
   -DryRun               (default: TRUE)
 ```
 
+**CR-13 — Rollback per-operation semantics:**
+
 Two modes:
 
-- **Backup restore** (available today): restore the whole destination from the backup.
-  Simple and reliable, but also reverts unrelated changes made after install.
-- **Manifest revert** (to add): delete only files the manifest recorded as CREATE and
-  restore only those recorded as OVERWRITE/MERGE, verifying SHA-256 first. Files the
-  user modified after install are reported, not clobbered.
+- **Backup restore** (available today): restore files from the backup. Simple and reliable for OVERWRITE operations (exact bit-for-bit restoration). **Limitation**: cannot detect conflicts when the user modified a file post-install — applying backup wholesale may clobber legitimate user edits.
+- **Manifest revert** (to add): operation-aware rollback.
+  - **OVERWRITE**: restore original content from backup, but **verify SHA-256 first**. If current file ≠ installed SHA, report CONFLICT (user modified post-install) and skip restoration unless forced.
+  - **MERGE** (config.yml): reverse only the keys the installer added/modified. If the user edited `modelRoles` post-install, report CONFLICT — cannot safely revert a merge when the target has diverged.
+  - **CREATE**: delete only if current SHA matches installed SHA; otherwise report MODIFIED and skip.
 
-Rollback must be dry-run by default and must never delete a file absent from the manifest.
+Rollback must be dry-run by default, never delete a file absent from the manifest, and never silently clobber user modifications.
 
 ---
 
