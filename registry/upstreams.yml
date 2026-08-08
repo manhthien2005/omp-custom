@@ -235,6 +235,19 @@ upstreams:
       - ADR documentation standards
       - release/rollback readiness checks
     watched_paths:
+      # Corrected 2026-08-08: ALL FIVE prior paths were invented — none resolves at the
+      # pinned SHA d2478bf, so this entry has never had a working watch. The real skill
+      # directories, matched to the adopted_mechanisms above by reading each description:
+      - skills/api-and-interface-design/   # was: api-surface-evolution
+      - skills/security-and-hardening/     # was: secure-code-review
+      - skills/code-review-and-quality/    # was: architecture-health
+      - skills/performance-optimization/   # was: performance-profiling
+      - skills/shipping-and-launch/        # was: release-readiness
+      - skills/documentation-and-adrs/     # ADR standards; was not watched at all
+      # The eval harness is the mechanism spec/13 actually depends on (SD-3/SD-9):
+      - scripts/run-evals.js
+      - evals/cases/
+    superseded_paths:  # none of these ever resolved
       - skills/api-surface-evolution/
       - skills/architecture-health/
       - skills/secure-code-review/
@@ -278,7 +291,12 @@ upstreams:
       - regression test structure
     watched_paths:
       - docs/
-      - src/assertions.ts
+      # Corrected 2026-08-08: `src/assertions.ts` does not exist at the pinned SHA and
+      # never fired. `src/assertions` is a DIRECTORY of 58 files; the registry of
+      # assertion handlers is its index.
+      - src/assertions/index.ts
+    superseded_paths:
+      - src/assertions.ts  # never resolved
     adopted_mechanisms:
       - evaluation fixture structure (input / expected / assertions)
       - deterministic assertion types
