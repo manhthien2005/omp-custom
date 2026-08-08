@@ -416,4 +416,6 @@ Carried forward unchanged: option_1's enumerated call graph; option_2 having no 
 `observer_non_interference` as a proof obligation on the harness; `xd://` reachability;
 `preflight_invocation_count` instrumentation interacting with `observer_non_interference`.
 
-**This commit:** _(SHA recorded in the follow-up commit)_
+**This commit (F6-01…F6-03 patches):** `71fa060`
+**Prior commits in this lineage:** `e7f08c3` (F5), `612d429` (F4), `f579c26` (F3),
+`3cb2eff` (F2 — subject is a historical overclaim), `d66c93a` (F5 SHA record)
