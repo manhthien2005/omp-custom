@@ -127,9 +127,11 @@ summary does NOT begin with "Isolation:" (indicating apply=true path), fail the 
 do not fan out — and verify the parent tree is unchanged. If the isolated dispatch itself
 errors, parallel mode is unavailable. This exercises the same session, the same `task` tool,
 the same `session.settings`, and the same isolation path — so it attests behavior instead of
-reconstructing config. The read-only tool surface ensures the canary cannot mutate the parent
-regardless of the effective apply setting (CR-42). Full contract in
-`08-isolation-and-concurrency.md §E-9.2`.
+reconstructing config. The canary is a **behavioral guard**: its declared tools are `[read]`
+but the effective surface is `[read, hub]` (executor.ts:2689-2692 auto-adds hub when
+`!restrictToolNames`). The canary MUST NOT directly write files; under `apply=false` isolation
+any isolated-worktree changes are never applied to the parent. Full contract and CR-44 analysis
+in `08-isolation-and-concurrency.md §E-9.2`.
 
 The canary requires T-02.1b: it must be synchronous from the coordinator's perspective.
 `blocking: true` on the canary agent is required (§C-1.3).
@@ -289,7 +291,7 @@ Execute each workflow against a real task in a scratch repository:
 - [ ] Implementers isolated in parallel; observation-phase agents (Explorer, Verifier, Reviewer) not isolated
 - [ ] `task.isolation.apply: false` confirmed at session/project settings (T-00.E3); parallel Implementers return captured artifacts without auto-apply
 - [ ] **CR-31** — `/orchestrated` performs the effective-settings preflight (`mode != none`, `apply == false`) and never fans out in parallel when it fails; the fallback or refusal is disclosed in the report
-- [ ] **CR-38/CR-42** — `omp config get` is used as a diagnostic only; the **same-session read-only capture canary** is the gate. Canary uses tools: `[read]`, creates NO files, asserts merge-summary begins `"Isolation: ..."` (apply=false discriminator); a summary NOT beginning "Isolation:" fails the preflight and blocks fan-out. Parent tree must be unchanged after the canary regardless of outcome (CR-42 non-mutating requirement).
+- [ ] **CR-38/CR-42/CR-44** — `omp config get` is used as a diagnostic only; the **same-session behavioral-guard canary** is the gate. Canary declared tools `[read]`, effective surface `[read, hub]` (CR-44); MUST NOT directly write files; asserts merge-summary begins `"Isolation: ..."` (apply=false semantic class — three variants); a summary NOT beginning "Isolation:" fails the preflight and blocks fan-out. Parent tree unchanged after canary (behavioral guard — under apply=false no isolated changes are applied to parent by construction; see §08 §E-9.2).
 - [ ] **CR-39** — all four worker agents carry `blocking: true`; L0 checks the files, L1 checks discovery; `async.enabled` untouched; `task.batch == true` verified in preflight with a disclosed fallback
 - [ ] **CR-40/CR-41** — project install owns `task.enableLsp: true`; an existing `false` reports CONFLICT and is not overwritten; a run without LSP discloses reduced-capability mode naming which of the **four conditions** failed (`lsp.enabled` is the fourth, distinct from `task.enableLsp`)
 - [ ] **CR-32** — orchestrator performs nested-repo preflight (Option A1); any non-empty nested-repo result disables parallel isolated implementation for that run and routes to sequential non-isolated; withdrawn enforcement: scope exclusion and post-integration `git status`

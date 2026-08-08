@@ -315,18 +315,31 @@ finding. If they agree, record it: either the overlay did not take effect as doc
 subprocess inherits more context than `docs/settings.md:21` implies, and CR-38's premise needs
 revision.
 
-**CR-42 canary contract.** The canary is a read-only agent (tools: `[read]`). It creates NO
-files. The discrimination is via merge summary text:
+**CR-42/CR-44 canary contract.** The canary is an agent with declared tools `[read]`. Its
+**effective tool surface is `[read, hub]`** — `executor.ts:2689-2692` adds `hub` when
+`!restrictToolNames`, and ordinary TaskTool paths have `restrictToolNames=false`
+(`structured-subagent.ts:385`). The canary is therefore a **behavioral guard, not a mechanical
+sandbox**: it MUST NOT directly write files (no write/edit/bash/lsp in declared surface), and
+its prompt instructs "make no changes". Under `apply=false`, any files written into the isolated
+worktree are never applied to the parent — the parent-tree invariant holds by isolation design.
+Under `apply=true` detection, the canary's isolated context is merged; a cooperative canary
+model will not use hub. E3-I must record the effective canary tool surface to confirm hub is
+present and whether it is exercised.
+
+The discrimination is via merge summary text (SC-01: three apply=false variants all start
+"Isolation:"; the "no changes captured" fallback is only reached if `!patchPath && !branchName
+&& !nestedPatches`; in patch mode even a zero-diff run sets patchPath):
 
 ```text
-apply=false → merge-summary begins "Isolation: ..."   (§E-9.2 apply=false path)
+apply=false → merge-summary begins "Isolation: ..."   (§E-9.2 — semantic class discriminator)
 apply=true  → merge-summary is "No changes to apply." (§E-9.2 apply=true, no-change path)
 ```
 
 Assert that after the canary runs: `parent HEAD == before`, `parent git status == before`,
-`no files created or modified in parent`. On the apply=true path the canary must still produce
-zero parent mutations. If the canary creates any file in the parent even on the failure path,
-that is a CR-42 violation and §08 §E-9.2 must be revised before phase-02.
+`no files directly created or modified in parent by the canary itself`. On the apply=true path
+the canary must still produce zero direct parent mutations. **Also assert: the effective canary
+tool surface contains `hub`** (confirming CR-44 executor auto-widening). If the canary directly
+modifies any parent file, that is a violation of §08 §E-9.2's behavioral-guard contract.
 
 Run the same shape a second time with an **in-session** override instead of a CLI overlay
 (change the setting via `/settings` mid-session, then dispatch). `Settings.set()` writes the
@@ -338,9 +351,11 @@ summary-discrimination assertion is stable across repeated runs (a flaky gate is
 none).
 
 **Records**: whether `omp config get` can be trusted as a gate (expected: no, diagnostic only),
-whether the read-only canary reliably discriminates apply=false vs apply=true, and whether it
-leaves zero parent mutations in both cases. If the canary proves unreliable, the parallel path
-needs a different authority and §08 §E-9.2 must be revised before phase-02.
+whether the canary reliably discriminates apply=false vs apply=true, whether hub appears in the
+effective tool surface (expected: yes), whether hub is exercised by the model (expected: no),
+and whether the behavioral non-mutation contract holds in both cases. If the canary proves
+unreliable or hub causes issues, the parallel path needs a different authority and §08 §E-9.2
+must be revised before phase-02.
 
 #### E3-J — Async barrier and ordering (CR-39 — decisive)
 

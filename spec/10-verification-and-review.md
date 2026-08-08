@@ -184,6 +184,11 @@ entire fresh-execution contract collapses. A Verifier without bash can still yie
 schema-valid `PASS` — CR-35 already established that `buildOutputValidator()` has no tool-event
 correlation — which would be undetected false completion from the workflow's most trusted gate.
 
+**The Verifier MUST NOT yield `decision: PASS` when effective bash is unavailable.** This is a
+policy requirement, not a mechanical impossibility: the schema gate cannot enforce it (CR-35).
+Until a runtime preflight/provenance mechanism exists that makes this mechanically impossible,
+the requirement is normative: submit REFUSE or UNVERIFIED, never a normal VERIFIED PASS.
+
 **Required behavior when bash is unavailable:**
 
 ```yaml

@@ -457,15 +457,18 @@ with a real boundary."
    file written by the canary lands in the parent before the preflight can read it. The failure
    detection IS the parent mutation — that is the wrong polarity for a safety gate.
 
-   The fix is to remove write capability from the canary entirely. A read-only agent produces no
-   changes; the discrimination then relies entirely on the merge summary text, which is already
-   textually distinct on the two paths (source-verified):
+   The fix is to remove direct write capability from the canary. The discrimination relies on
+   the merge summary text, which is textually distinct on the two paths (source-verified,
+   `structured-subagent.ts:625-632`):
 
    ```text
-   apply=false, no changes → "Isolation: no changes captured."
-                              (structured-subagent.ts else-branch: !branchName, !patchPath, !nestedPatches)
-   apply=true,  no changes → "No changes to apply."
-                              (isolation-runner.ts: !result.branchName or no-change branch path)
+   apply=false → merge-summary begins "Isolation: ..."   (semantic class — three variants exist:
+                   branch mode:   "Isolation: changes captured on branch `<name>` (apply=false). Not merged."
+                   patch mode:    "Isolation: changes captured at `<path>` (apply=false). Not applied."
+                   no-artifact:   "Isolation: no changes captured."  ← only if !patchPath && !branchName && !nestedPatches
+                 In patch mode a zero-diff isolated run still has result.patchPath set (writeIsolationPatch
+                 always creates the file), so the "no changes captured" fallback is NOT the canonical zero-diff text.)
+   apply=true, no changes → "No changes to apply."
    ```
 
    ```yaml
@@ -473,16 +476,16 @@ with a real boundary."
      when: after the §D-1.2 nested-repo scan and §C-1.4 batch check pass
      agent:
        name: isolation-canary       # support agent — NOT a workflow worker role (see note below)
-       tools: [read]                # NO write, edit, bash, lsp — mechanically cannot mutate worktree
+       tools: [read]                # declared surface; effective surface is [read, hub] — see CR-44 note below
        blocking: true               # required: synchronous from coordinator's perspective (§C-1.3)
        isolated: true
      prompt: "Report the current working directory. Make no changes. Yield immediately."
      assert_all:
        - task completed (exit 0)
        - parent git status unchanged  — same HEAD, same working tree as before canary
-       - merge-summary contains "Isolation:"  (apply=false path discriminator)
+       - merge-summary begins with "Isolation:"  (apply=false semantic class discriminator)
      on_apply_true_detected:
-       - merge-summary does NOT contain "Isolation:" — indicates apply=true path
+       - merge-summary does NOT begin with "Isolation:" — indicates apply=true path
        - preflight FAILED — effective apply is true regardless of any persistent config
        - do NOT launch parallel workers
        - report: "Isolation preflight failed: effective apply=true detected.
@@ -490,20 +493,46 @@ with a real boundary."
                   Falling back to sequential non-isolated implementation."
      on_dispatch_error:
        - parallel mode unavailable (covers non-git, backend failure, mode: none)
-     cost: one minimal read-only spawn per Orchestrated run
+     cost: one minimal spawn per Orchestrated run
    ```
 
    **Why the assertions are discriminating** — the two paths produce different, model-visible
-   summaries with zero parent-tree change in both cases:
+   summaries:
 
    | Effective setting | Parent tree | `<merge-summary>` text |
    |---|---|---|
-   | `apply == false` (required) | **unchanged** | starts with `"Isolation: ..."` |
-   | `apply == true` (hazard) | **unchanged** (no write capability) | `"No changes to apply."` |
+   | `apply == false` (required) | **unchanged** | begins with `"Isolation: ..."` (semantic class) |
+   | `apply == true` (hazard) | unchanged — behavioral guard (see CR-44 note) | `"No changes to apply."` |
 
    The summary is rendered into the model-facing task result (`prompts/tools/task-summary.md` —
-   `<merge-summary>`), not buried in `details`. The parent-tree invariant (unchanged regardless
-   of outcome) is the CR-42 requirement: the preflight must not damage the state it is protecting.
+   `<merge-summary>`), not buried in `details`.
+
+   **CR-44 — hub is auto-added to the effective tool surface.** `executor.ts:2689-2692` adds
+   `hub` to the tool list whenever `!options.restrictToolNames && !toolNames.includes("hub")`.
+   For ordinary TaskTool invocations, `structured-subagent.ts:385` resolves
+   `restrictToolNames = policy.planMode || session.restrictToolNames === true`, which is `false`
+   in a normal Orchestrated workflow. Therefore `tools: [read]` in the canary frontmatter
+   produces an **effective surface of `[read, hub]`**, not `[read]` alone.
+
+   OMP documents that `hub` exposes process operations (`start`, `stop`, `restart`) that can
+   write files when `launch.enabled=true` (the default). A truly restricted canary — hub absent
+   from the effective surface — requires `restrictToolNames=true` at the executor level
+   (`ExecutorOptions.restrictToolNames`), which is not accessible via agent frontmatter in the
+   current template wire.
+
+   **Consequence: this canary is a behavioral guard, not a mechanical sandbox.** The canary
+   MUST NOT directly modify files (no write/edit/bash in the declared surface), and its prompt
+   instructs "make no changes". In practice, under `apply=false`, any files written into the
+   isolated worktree are never applied to the parent — the parent-tree invariant holds by
+   isolation design. Under `apply=true` detection (the hazard path), the canary's isolated
+   context is merged before preflight can block; a canary model that disobeys "make no changes"
+   via hub could in principle write hub-spawned content into the parent. This is the residual
+   risk of a behavioral guard vs a mechanical sandbox.
+
+   **Phase-00 E3-I must confirm empirically** that the canary prompt is sufficient behavioral
+   constraint and that hub is not exercised in practice (see phase-00 §E3-I). Until a
+   `restrictToolNames=true` invocation path is available via template, parallel capture-first
+   mode is classified as a **behavioral guard only**, not a sandbox-grade safety property.
 
    **Agent taxonomy note.** `isolation-canary` is an **internal preflight support agent**, not a
    workflow worker role. The four-worker constraint (CR-33: explorer, implementer, verifier,
@@ -515,9 +544,10 @@ with a real boundary."
    `blocking: true` on the canary is required (§C-1.3). CR-38 and CR-39 remain a single fix.
 
    **What the canary does not prove.** It attests `apply` and that isolation engaged, at canary
-   time, for a single spawn. It does not prove the setting cannot change mid-run, and it is not a
-   substitute for the nested-repo gate (§D-1.2) — a nested repo is undetectable by *any*
-   behavioral probe, which is exactly why that gate is structural.
+   time, for a single spawn. It is a behavioral guard (not a mechanical sandbox — see CR-44 note
+   above). It does not prove the setting cannot change mid-run, and it is not a substitute for
+   the nested-repo gate (§D-1.2) — a nested repo is undetectable by *any* behavioral probe,
+   which is exactly why that gate is structural.
 
    Full preflight sequence:
 
