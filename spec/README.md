@@ -201,7 +201,7 @@ graph TD
 
 ---
 
-## 7. Dependency Paths into Phase-06
+## 7. Dependency Paths into Phase-06 — CR-15
 
 There is no single "critical path" until task durations are estimated. The actual dependency edges that lead into P6 are:
 
@@ -214,6 +214,28 @@ P3 and P4 may begin after P2. P5 depends only on P1 and may run in parallel with
 Phase-00 is non-negotiably first: it converts remaining assumptions into observed behavior. Phase-01 clears the P0 defects. Phase-02 replaces the dead abstractions with native mechanisms and defines the integration procedure for parallel workers. Phase-06 is where any claim of improvement first becomes defensible — before it, all quality claims are assertions.
 
 Note: P5 (installation hardening) depends only on P1, not P2. Stating all three of P3/P4/P5 as "after P2" would unnecessarily constrain P5 and contradict its independence.
+
+**CR-15 resolution — single source of truth.** The `§6` Mermaid graph above is the
+**canonical** phase DAG. The prose paths in this section and the `**Depends on**` /
+`**Blocks**` headers in every `phases/phase-NN-*.md` file are *derived views* of it
+and MUST NOT contradict it. Both directions of every edge are stated: if `§6` has
+`Px --> Py`, then `phase-Px` names `phase-Py` in `**Blocks**` **and** `phase-Py`
+names `phase-Px` in `**Depends on**`. The nine canonical edges are:
+
+| Edge | `**Blocks**` in | `**Depends on**` in |
+|---|---|---|
+| P0 → P1 | phase-00 | phase-01 |
+| P1 → P2 | phase-01 | phase-02 |
+| P1 → P5 | phase-01 | phase-05 |
+| P2 → P3 | phase-02 | phase-03 |
+| P2 → P4 | phase-02 | phase-04 |
+| P3 → P6 | phase-03 | phase-06 |
+| P4 → P6 | phase-04 | phase-06 |
+| P5 → P6 | phase-05 | phase-06 |
+| P6 → P7 | phase-06 | phase-07 |
+
+Any edit to the graph must update both endpoints in the same commit. A one-sided
+edge is a spec defect, not a stylistic choice.
 
 ---
 

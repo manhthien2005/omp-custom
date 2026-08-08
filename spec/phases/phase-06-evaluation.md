@@ -2,7 +2,7 @@
 
 > OPUS PROPOSED SPEC v1 | Replace the benchmark placeholder with real measurement.
 
-**Depends on**: phase-05
+**Depends on**: phase-03, phase-04, phase-05 (all three converge here — see `README.md §6`)
 **Blocks**: phase-07
 
 ---

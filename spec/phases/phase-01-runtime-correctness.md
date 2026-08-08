@@ -3,7 +3,7 @@
 > OPUS PROPOSED SPEC v1 | Fix every defect that causes silent failure or data loss.
 
 **Depends on**: phase-00
-**Blocks**: phase-02
+**Blocks**: phase-02, phase-05 (P5 depends only on P1 — see `README.md §6`)
 
 ---
 

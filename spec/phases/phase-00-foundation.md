@@ -99,12 +99,17 @@ purely normative choice.
 
 ---
 
-## Experiment Tasks (Phase-Gate Required)
+## Experiment Tasks (Phase-Gate Required) — CR-05
 
 These experiments resolve open questions that later phases depend on. **Phase 00
 cannot close and dependent phases cannot begin until each experiment has a recorded
 artifact.** Record: exact OMP SHA, OS/runtime, provider/gateway version, raw
 (sanitized) output, interpretation, and which decision is changed or retained.
+
+**CR-05 resolution:** every experiment below carries an explicit `**Blocks**:` line
+naming the downstream tasks and spec sections it gates. Phase-00 does not merely
+*list* the open questions — it gates dependent implementation on their recorded
+answers. No dependent task may begin against an unresolved experiment.
 
 ### T-00.E1 — Schema precedence and provider enforcement
 

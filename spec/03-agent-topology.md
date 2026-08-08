@@ -81,10 +81,16 @@ parallel with the Implementer.
 
 ---
 
-## C. The bash-vs-write Tension
+## C. The bash-vs-write Tension — CR-07
 
 Verifier and Reviewer both hold `bash`. `bash` can write files. Their prompts
 forbid modification, but the tool surface permits it.
+
+**CR-07 resolution:** the word "read-only" is deliberately absent from the table
+in §B. An agent holding `bash` is not read-only in any mechanical sense, and
+calling it so would misrepresent the trust boundary. The table therefore states
+**Prompt-only: must not** — an accurate description of a behavioral constraint,
+not a mechanical one.
 
 This is a real gap and it cannot be closed by the tool allowlist alone — both
 agents genuinely need `bash` to run tests and read diffs. Mitigations, in
