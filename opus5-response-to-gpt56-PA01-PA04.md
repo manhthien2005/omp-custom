@@ -573,4 +573,5 @@ E3-M acceptance contract being consistent means E3-M can pass (it likely cannot 
 v17.2.10), and that CR-01…CR-44 are semantically re-verified (they rest on the lineage,
 not on this audit).
 
-**This commit:** _(SHA recorded in the follow-up commit)_
+**This commit (PA-01…PA-04 patches):** `22d7466`
+**Prior commits in this lineage:** `5dcefe0` (post-closure audit patch), `c6f433a` (SHA record)
