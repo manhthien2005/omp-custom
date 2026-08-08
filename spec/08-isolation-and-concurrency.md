@@ -520,19 +520,70 @@ with a real boundary."
    (`ExecutorOptions.restrictToolNames`), which is not accessible via agent frontmatter in the
    current template wire.
 
-   **Consequence: this canary is a behavioral guard, not a mechanical sandbox.** The canary
-   MUST NOT directly modify files (no write/edit/bash in the declared surface), and its prompt
-   instructs "make no changes". In practice, under `apply=false`, any files written into the
-   isolated worktree are never applied to the parent — the parent-tree invariant holds by
-   isolation design. Under `apply=true` detection (the hazard path), the canary's isolated
-   context is merged before preflight can block; a canary model that disobeys "make no changes"
-   via hub could in principle write hub-spawned content into the parent. This is the residual
-   risk of a behavioral guard vs a mechanical sandbox.
+   **Consequence: the behavioral canary is a diagnostic/characterization tool, NOT a
+   production gate.** A fail-closed control has the form: "authority unavailable or unsafe →
+   protected operation does NOT proceed." The behavioral canary has the form: "run an LLM
+   child with hub in its effective surface → infer the setting from the result → allow parallel
+   if it looks safe." That is a behavioral heuristic, not fail-closed authority.
 
-   **Phase-00 E3-I must confirm empirically** that the canary prompt is sufficient behavioral
-   constraint and that hub is not exercised in practice (see phase-00 §E3-I). Until a
-   `restrictToolNames=true` invocation path is available via template, parallel capture-first
-   mode is classified as a **behavioral guard only**, not a sandbox-grade safety property.
+   **Under `apply=false`, OMP's normal git delta merge is structurally prevented** — no
+   `mergeIsolatedChanges` call is made, so the isolated worktree's git-tracked changes cannot
+   propagate to the parent via OMP's merge path. **This does NOT sandbox process-level
+   side-effects:** a hub-spawned process executing from the isolated context is not restricted
+   to OMP's git-tracked paths. Do not claim "the canary cannot affect parent/host state
+   regardless of what it does" — that stronger statement requires a real OS-level sandbox.
+
+   **Under `apply=true` detection (the hazard path):** the canary's isolated context IS merged
+   before the preflight result can block anything. Hub-spawned content could land in the parent.
+   This is precisely why a behavioral heuristic is not safe authority for a gate whose job is
+   to prevent the CR-27 concurrent-auto-apply hazard.
+
+   **CR-44 fail-closed contract.** Until a mechanical live-session authority passes Phase-00
+   E3-L (see below), parallel capture-first mode is **DISABLED by default**:
+
+   ```yaml
+   parallel_orchestrated:
+     mechanical_authority_available: false  # until E3-L passes
+     parallel_mode: DISABLED
+     behavioral_canary:
+       authorization_power: NONE
+       purpose:
+         - characterization (Phase-00 E3-I)
+         - diagnostics
+         - future-mechanism experiment
+     fallback:
+       - sequential non-isolated implementation
+       - explicit refusal with disclosure
+   ```
+
+   The behavioral canary MAY run as part of Phase-00 E3-I or diagnostics, but its PASS MUST
+   NOT authorize the production parallel fan-out.
+
+   **E3-L — source-verified mechanical authority path (CR-44 Branch A).** A project custom
+   preflight tool can read the live parent-session `task.isolation.apply` directly:
+
+   ```text
+   session-tools.ts:1295-1307 — getCustomToolContext() sets:
+       settings: this.#host.settings   // live parent-session Settings instance
+   custom-tools/types.ts:99:
+       settings?: Settings   // "Prefer over the global singleton"
+   ```
+
+   `this.#host.settings` is the same `Settings` instance that `structured-subagent.ts:315-317`
+   reads when determining `applyChanges`. CLI `--config` overlays and in-session
+   `Settings.set()` overrides are ALL visible — this is not a subprocess snapshot. A custom
+   tool calling `ctx.settings.get("task.isolation.apply")` reads the true effective value.
+
+   Phase-00 E3-L must confirm empirically that the end-to-end path works as expected (value
+   correct under project config, `--config` overlay, and in-session override). After E3-L
+   PASS, the preflight replaces the behavioral canary with a custom-tool settings read:
+
+   ```yaml
+   e3_l_pass_consequence:
+     preflight_mechanism: ctx.settings.get("task.isolation.apply")  # mechanical
+     behavioral_canary: demoted to diagnostic/regression test
+     parallel_mode: ENABLED with mechanical authority
+   ```
 
    **Agent taxonomy note.** `isolation-canary` is an **internal preflight support agent**, not a
    workflow worker role. The four-worker constraint (CR-33: explorer, implementer, verifier,
@@ -544,24 +595,29 @@ with a real boundary."
    `blocking: true` on the canary is required (§C-1.3). CR-38 and CR-39 remain a single fix.
 
    **What the canary does not prove.** It attests `apply` and that isolation engaged, at canary
-   time, for a single spawn. It is a behavioral guard (not a mechanical sandbox — see CR-44 note
-   above). It does not prove the setting cannot change mid-run, and it is not a substitute for
-   the nested-repo gate (§D-1.2) — a nested repo is undetectable by *any* behavioral probe,
-   which is exactly why that gate is structural.
+   time, for a single spawn. It is a behavioral guard (not a mechanical sandbox). It does not
+   prove the setting cannot change mid-run, and it is not a substitute for the nested-repo gate
+   (§D-1.2) — a nested repo is undetectable by *any* behavioral probe, which is exactly why
+   that gate is structural. The canary's PASS does NOT authorize parallel fan-out in v0 (see
+   fail-closed contract above).
 
-   Full preflight sequence:
+   Full preflight sequence (v0 — before E3-L mechanical authority):
 
    ```
-   1. nested-repo scan             (§D-1.2)   structural  → any hit disables parallel
-   2. effective task.batch         (§C-1.4)   diagnostic  → false disables parallel
-   3. omp config get × 2           (§E-9)     diagnostic  → produces the actionable message
-   4. same-session capture canary  (§E-9.2)   AUTHORITY   → decides the gate
-   5. fan out
+   1. nested-repo scan             (§D-1.2)   structural   → any hit disables parallel
+   2. effective task.batch         (§C-1.4)   diagnostic   → false disables parallel
+   3. omp config get × 2           (§E-9)     diagnostic   → produces the actionable message
+   4. mechanical live-session      (E3-L)     AUTHORITY    → gates parallel fan-out
+      authority available?
+       └─ NO  → parallel DISABLED → sequential non-isolated + disclosure
+       └─ YES → verify apply=false via ctx.settings
+                → fan out
+   5. [diagnostic] behavioral canary (§E-9.2) → characterization only, does NOT gate
    ```
 
-   Steps 3 and 4 are not redundant: 3 explains *why* to the user, 4 decides *whether*. A run
-   where 3 passes and 4 fails is precisely the CR-38 overlay case, and the report must say so
-   rather than reporting a generic refusal.
+   Steps 3 and 5 are retained as diagnostics: step 3 explains *why* to the user when the
+   setting is wrong; step 5 (E3-I) characterizes the canary mechanism for future use. Neither
+   gates the production decision in v0.
 
 10. **CR-29 — Integration order is normative: original orchestrator task-list index.** "Deterministic order" is not a specification — alphabetical name, worker finish order, batch input order, and file-path order all satisfy the English word while producing different conflict and recovery behavior. The rule is fixed:
 

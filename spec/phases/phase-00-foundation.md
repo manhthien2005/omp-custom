@@ -353,9 +353,14 @@ none).
 **Records**: whether `omp config get` can be trusted as a gate (expected: no, diagnostic only),
 whether the canary reliably discriminates apply=false vs apply=true, whether hub appears in the
 effective tool surface (expected: yes), whether hub is exercised by the model (expected: no),
-and whether the behavioral non-mutation contract holds in both cases. If the canary proves
-unreliable or hub causes issues, the parallel path needs a different authority and §08 §E-9.2
-must be revised before phase-02.
+and whether the behavioral non-mutation contract holds in both cases. If hub is exercised,
+§08 §E-9.2 must be updated before phase-02.
+
+**E3-I authority: characterization/diagnostic only.** E3-I PASS does NOT authorize parallel
+fan-out. The behavioral canary has hub in its effective surface and is a heuristic, not a
+mechanical control. The production gate for parallel mode is E3-L (live custom-tool settings
+read). E3-I results feed into E3-L context and serve as a regression test after E3-L adopts
+the mechanical path.
 
 #### E3-J — Async barrier and ordering (CR-39 — decisive)
 
@@ -407,9 +412,83 @@ timing/ordering record.
 
 **Blocks**: phase-02 T-02.1b (barrier + batch precondition), T-02.2 (isolation preflight, including the CR-32 nested-repo disable and the CR-38 canary), T-02.3b (serial integration order); §08 §C-1/§E-7/§E-9/§E-9.2/§E-10; §12 §C config-ownership policy.
 
-**E3-A, E3-G, E3-H, E3-I, and E3-J are BLOCKING for phase-02 parallel implementation.** E3-J
-additionally blocks *every* workflow size, not just Orchestrated — Standard's stage arrows
-depend on the same barrier.
+**E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation.**
+E3-J additionally blocks *every* workflow size, not just Orchestrated — Standard's stage arrows
+depend on the same barrier. E3-L is the mechanical authority gate for parallel mode: without a
+passing E3-L, the canary (E3-I) is characterization-only and parallel fan-out is disabled.
+
+#### E3-L — Live-session settings authority via custom-tool ctx (CR-44 — Branch A gate)
+
+Source-verify and empirically confirm that a project custom tool can read the live parent
+session's `task.isolation.apply` — the same value that governs actual `applyChanges`.
+
+**Source pre-verification (v17.2.10 — already confirmed):**
+
+```text
+custom-tools/types.ts:99:
+    settings?: Settings
+    // "Settings instance for the current session. Prefer over the global singleton."
+
+session-tools.ts:1295-1307  getCustomToolContext():
+    settings: this.#host.settings    // live parent-session Settings instance
+
+structured-subagent.ts:315-317:
+    applyChanges: request.isolation?.apply
+        ?? request.session.settings.get("task.isolation.apply")
+```
+
+`this.#host.settings` is the **same** `Settings` instance that `structured-subagent.ts`
+reads for `applyChanges`. CLI `--config` overlays, in-session `Settings.set()` overrides, and
+all config layers are visible.
+
+**Procedure — three cases required:**
+
+```yaml
+case_1_project_config:
+  setup: task.isolation.apply: false in .omp/config.yml
+  preflight_tool: ctx.settings.get("task.isolation.apply")
+  expected: false
+
+case_2_cli_overlay:
+  setup: project config apply:false; launch with --config /tmp/overlay.yml apply:true
+  preflight_tool: ctx.settings.get("task.isolation.apply")
+  expected: true   # same overlay that defeats omp-config-get (CR-38)
+  compare: omp config get reports false (subprocess miss)
+
+case_3_in_session_override:
+  setup: project config apply:false; change via /settings mid-session (Settings.set())
+  preflight_tool: ctx.settings.get("task.isolation.apply")
+  expected: true   # in-memory override, no file change
+  compare: omp config get reports false (subprocess miss)
+```
+
+Case 2 and Case 3 are the decisive tests: they are the exact scenarios where `omp config get`
+gives a false PASS (CR-38). If `ctx.settings.get(...)` returns the correct value in both cases,
+the mechanical authority path is confirmed.
+
+**E3-L PASS consequence:**
+
+```yaml
+preflight_mechanism:
+  type: custom-tool live-settings read
+  call: ctx.settings.get("task.isolation.apply")
+  authority: mechanical (not behavioral)
+behavioral_canary_E3_I:
+  role: regression / characterization test only
+parallel_mode: ENABLED with mechanical authority
+```
+
+**E3-L FAIL consequence:**
+
+```yaml
+parallel_mode: DISABLED until alternative mechanical authority found
+behavioral_canary: diagnostic/experiment only — never authorizes parallel
+required_action: identify alternative (Option A restrictToolNames path or other)
+```
+
+**Artifact:** Three-case transcript with `ctx.settings` read values vs `omp config get` values
+vs actual `applyChanges` observed; confirmation that the custom tool executes in parent-session
+context (not subagent context).
 
 ### T-00.E4 — Rule sentinel propagation
 
