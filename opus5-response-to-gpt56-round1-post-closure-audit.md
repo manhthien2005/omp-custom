@@ -178,4 +178,4 @@ Rounds 2–11 introduced CR-26…CR-45; all are tagged. Post-static-closure stat
 | `spec/phases/phase-01-runtime-correctness.md` | `**Blocks**` now includes phase-05 (P1→P5 edge) |
 | `spec/phases/phase-06-evaluation.md` | `**Depends on**` now includes phase-03, phase-04 (P3→P6, P4→P6 edges) |
 
-**This commit:** _(SHA to be recorded after push)_
+**This commit (post-closure audit):** `5dcefe0`
