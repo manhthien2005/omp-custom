@@ -578,4 +578,5 @@ reads consistently to a reviewer who did not write it.
 Two things I explicitly do **not** claim: that E3-M can pass (feasibility is unresolved and
 I am not predicting it), and that any CR outside F2-01…F2-06 was re-verified in this round.
 
-**This commit:** _(SHA recorded in the follow-up commit)_
+**This commit (F2-01…F2-06 patches):** `3cb2eff`
+**Prior commits in this lineage:** `22d7466` (PA-01…PA-04 patches), `7f2a519` (SHA record)
