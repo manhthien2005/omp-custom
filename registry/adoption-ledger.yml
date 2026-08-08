@@ -46,6 +46,11 @@ ledger:
     source_commit: 3a8591a
     adopted_to:
       - template/.omp/config.yml
+      # KD-001 (corrected 2026-08-08): policies/ does not ship. Routing prose is
+      # inlined into the dispatching command; reference copy under docs/policies/.
+      - template/.omp/commands/orchestrated.md  # inlined routing prose
+      - docs/policies/model-routing.md          # reference copy
+    superseded_paths:
       - template/.omp/policies/model-routing.yml
     adoption_type: conceptual-inspiration
     rationale: "Decouples agent definitions from concrete models. Role aliases (@tech-lead, @explorer, etc.) allow model changes without editing agent files."
@@ -103,6 +108,10 @@ ledger:
     license_check: MIT
     adopted_to:
       - template/.omp/skills/task-triage/SKILL.md
+      # KD-001: schemas/ does not ship. task-packet is a dispatch *input*, not an
+      # agent output, so it has no `output:` frontmatter home — docs/ only.
+      - docs/schemas/task-packet.md
+    superseded_paths:
       - template/.omp/schemas/task-packet.schema.yml
     adoption_type: paraphrased-implementation
     rationale: "Clarification before implementation prevents rework. Given/When/Then acceptance scenarios make completion criteria verifiable."
@@ -125,6 +134,13 @@ ledger:
     source_commit: a1841d1
     license_check: MIT
     adopted_to:
+      # KD-001 (corrected 2026-08-08): policies/ does not ship. Budget numbers become
+      # validator thresholds (enforced); the retrieval order lives in spec/07 §B and
+      # is inlined into the Explorer prompt.
+      - docs/policies/context-budget.md   # reference copy
+      - scripts/validate-template.ps1     # budget numbers as enforced thresholds
+      - template/.omp/agents/explorer.md  # retrieval order as prose
+    superseded_paths:
       - template/.omp/policies/context-budget.yml
     adoption_type: conceptual-inspiration
     rationale: "Formal context-budget policy prevents context degradation. Progressive retrieval order prevents expensive web calls when local code suffices."
@@ -136,8 +152,17 @@ ledger:
     source_commit: d2478bf
     license_check: MIT
     adopted_to:
+      # KD-001 (corrected 2026-08-08): policies/ does not ship. The gate matrix is
+      # inlined into the two commands that dispatch gated work; reference under docs/.
+      - template/.omp/commands/standard.md
+      - template/.omp/commands/orchestrated.md
+      - docs/policies/quality-gates.md
+      # NOTE: currently ships as reviewer.md. 01-dna.md L2 renames it to diff-reviewer
+      # (OMP bundles its own agent named `reviewer`; the collision is the reason).
+      # The rename is a phase-01/02 task and has NOT been applied yet.
+      - template/.omp/agents/reviewer.md  # → diff-reviewer.md when the rename lands
+    superseded_paths:
       - template/.omp/policies/quality-gates.yml
-      - template/.omp/agents/reviewer.md
     adoption_type: conceptual-inspiration
     rationale: "Production quality gates prevent common categories of production incidents. Risk-based enablement keeps cost proportional to task risk."
     date: "2026-08-07"
@@ -149,6 +174,12 @@ ledger:
     license_check: Apache-2.0 (code), CC-BY-SA-4.0 (content)
     adopted_to:
       - template/.omp/AGENTS.md
+      # KD-001 (corrected 2026-08-08): schemas/ does not ship. The result shape becomes
+      # the implementer's `output:` frontmatter (KD-002); dispatch input goes to docs/.
+      # Writing the `output:` block is gated on OQ-A (which schema dialect it accepts).
+      - template/.omp/agents/implementer.md  # `output:` frontmatter — pending OQ-A
+      - docs/schemas/task-packet.md
+    superseded_paths:
       - template/.omp/schemas/agent-result.schema.yml
       - template/.omp/schemas/task-packet.schema.yml
     adoption_type: paraphrased-implementation
@@ -174,16 +205,27 @@ ledger:
     license_check: Apache-2.0
     adopted_to:
       - template/.omp/agents/explorer.md
+      # KD-001 (corrected 2026-08-08): policies/ does not ship.
+      - docs/policies/context-budget.md
+    superseded_paths:
       - template/.omp/policies/context-budget.yml
     adoption_type: conceptual-inspiration
-    rationale: "Symbol lookups and reference graphs before full-file reads reduce context consumption and improve targeted exploration accuracy."
+    rationale: >
+      Symbol lookups and reference graphs before full-file reads reduce context consumption
+      and improve targeted exploration accuracy. NOTE (2026-08-08, spec/key/repos/aider.md):
+      only aider's *heuristics* are adopted — long snake/camel identifiers, discount
+      `_private` and widely-defined symbols, damp high-frequency references, always include
+      build/config manifests. The ranking engine itself (PageRank over a def/ref graph,
+      re-distributed to per-symbol ranks) is REJECTED for v0 per KD-015: no OMP primitive
+      hosts an index, and aider pays 1-4k tokens per turn to keep its map resident.
+      Enumeration is not ranking; this entry claims the former only.
     date: "2026-08-07"
 
   - id: adopt-016
     mechanism: "Karpathy coding principles (think before coding, simplicity first, surgical changes, goal-driven execution)"
     source: multica-ai/andrej-karpathy-skills
     source_commit: 2c60614
-    license_check: no-license  # Principles rewritten independently
+    license_check: mit-in-file  # MIT at SKILL.md:4, plugin.json:8, README.md:169-171 (corrected 2026-08-08, KD-023)
     adopted_to:
       - template/.omp/AGENTS.md
     adoption_type: conceptual-inspiration

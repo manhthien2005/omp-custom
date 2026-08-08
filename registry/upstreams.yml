@@ -210,6 +210,11 @@ upstreams:
       - uncontrolled self-improvement
       - KV-cache runtime optimizations (OmniRoute-specific)
     local_components:
+      # KD-001 (corrected 2026-08-08): .omp/policies/ does not ship.
+      - docs/policies/context-budget.md   # reference copy
+      - scripts/validate-template.ps1     # budget numbers as enforced thresholds
+      - template/.omp/agents/explorer.md  # retrieval order as prose
+    superseded_paths:
       - template/.omp/policies/context-budget.yml
     local_modifications: []
     last_reviewed: "2026-08-07"
@@ -246,6 +251,12 @@ upstreams:
       - full TDD workflow (duplicate of superpowers TDD)
       - routing/orchestration layer
     local_components:
+      # KD-001 (corrected 2026-08-08): .omp/policies/ does not ship. The gate matrix is
+      # inlined into the two dispatching commands; reference copy under docs/.
+      - template/.omp/commands/standard.md
+      - template/.omp/commands/orchestrated.md
+      - docs/policies/quality-gates.md
+    superseded_paths:
       - template/.omp/policies/quality-gates.yml
     local_modifications:
       - Extracted quality-gate criteria only; no persona or orchestration layer
@@ -346,12 +357,17 @@ upstreams:
     url: https://github.com/multica-ai/andrej-karpathy-skills
     default_branch: main
     pinned_commit: 2c606141936f1eeef17fa3043a72095b4765b9c2
-    license: no-license-file  # Copyright all rights reserved; treated as conceptual inspiration
+    license: MIT  # granted in-file: SKILL.md:4, plugin.json:8, README.md:169-171; no root LICENSE file
     tier: C-patterns
     authority_for:
       - coding constitution (Karpathy principles)
     watched_paths:
+      # The payload lives in three hand-synced copies (CURSOR.md:26-28 names the
+      # obligation). Watching only CLAUDE.md misses an upstream change that lands in
+      # either of the others first, or a sync obligation being broken.
       - CLAUDE.md
+      - skills/karpathy-guidelines/SKILL.md
+      - .cursor/rules/karpathy-guidelines.mdc
     adopted_mechanisms:
       - think before coding (inspiration; rewritten)
       - simplicity first (inspiration; rewritten)
@@ -394,8 +410,12 @@ upstreams:
       - installing as a runtime dependency
       - full factor list as operational checklists
     local_components:
-      - template/.omp/schemas/agent-result.schema.yml
+      # KD-001 (corrected 2026-08-08): .omp/schemas/ does not ship. The result shape
+      # becomes the implementer's `output:` frontmatter (KD-002), pending OQ-A.
+      - template/.omp/agents/implementer.md  # `output:` frontmatter — pending OQ-A
       - template/.omp/AGENTS.md
+    superseded_paths:
+      - template/.omp/schemas/agent-result.schema.yml
     local_modifications:
       - Applied as architecture principles, not code; content paraphrased under CC-BY-SA-4.0
     last_reviewed: "2026-08-07"
@@ -415,7 +435,15 @@ upstreams:
       - architect/editor separation
     watched_paths:
       - aider/repomap.py
-      - docs/repomap.md
+      # Corrected 2026-08-08: `docs/repomap.md` does not exist at this SHA and never
+      # fired. Real path is under aider/website/. A watched path that cannot resolve is
+      # a governance check that silently passes.
+      - aider/website/docs/repomap.md
+      # Added: these are the files SD-11 (Explorer contract) actually derives from.
+      # A change here matters more to us than a change in repomap.py, whose mechanism
+      # we have decided not to implement (KD-015).
+      - aider/coders/context_coder.py
+      - aider/coders/context_prompts.py
     adopted_mechanisms:
       - repository-map principles (symbol/signature summaries, token budget)
       - references-and-callers-before-full-file-reads principle
@@ -501,12 +529,26 @@ upstreams:
     authority_for:
       - current versioned library documentation retrieval
     watched_paths:
-      - README.md
-    adopted_mechanisms: []  # Evaluate only; documented in retrieval-order policy
+      # Corrected 2026-08-08: root README.md is marketing + install instructions. The
+      # surface we depend on is the tool definition itself — a renamed tool or a changed
+      # two-step protocol would not reliably show up in README.md.
+      - packages/mcp/src/index.ts
+    adopted_mechanisms: []  # Evaluate only; retrieval order recorded in spec/07 §B
     rejected_mechanisms:
       - default first-pass retrieval (local code and types take priority)
     local_components:
-      - template/.omp/policies/context-budget.yml  # retrieval-order policy
+      # KD-001 (corrected 2026-08-08): .omp/policies/ does not ship. Position 4 in the
+      # retrieval order is recorded in spec/07 §B and inlined into the Explorer prompt.
+      - template/.omp/agents/explorer.md
+      - docs/policies/context-budget.md
+    superseded_paths:
+      - template/.omp/policies/context-budget.yml
+    transport_note: >
+      spec/07 §B:158 says "via MCP". Two transports exist at this SHA: the MCP server
+      (~940 tok persistent, paid per context including every subagent) and a CLI
+      (`npx ctx7@latest`, lazy — skill body only, one context). See
+      spec/key/repos/context7.md §5-3 and §6. The transport is an open cost decision;
+      position 4 in the retrieval order is unaffected either way.
     local_modifications: []
     last_reviewed: "2026-08-07"
     update_policy: evaluate-when-needed

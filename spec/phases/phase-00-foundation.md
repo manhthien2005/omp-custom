@@ -115,12 +115,30 @@ Fix, in `docs/**`, `README.md`, and `docs/final-report.md`:
 **Acceptance**: no doc statement contradicts `02-runtime-semantics.md`. Installer
 examples match the script's real parameters.
 
-### T-00.6 — Fix the agent-result schema contradiction
+### T-00.6 — Fix the agent-result conditional requirement (F-30)
 
-`agent-result.schema.yml` lists `verification_results` as optional while a field rule
-requires it for `status: completed`. Make the conditional requirement explicit.
+> **Runs after T-00.4.** The defect below was recorded against
+> `template/.omp/schemas/agent-result.schema.yml`, which T-00.4 deletes. The *defect*
+> is semantic and survives the move; only its address changes. Fixing the YAML in
+> place before T-00.4 would waste the work.
 
-**Acceptance**: the schema states the conditional requirement unambiguously (F-30).
+The result contract lists `verification_results` as optional while a field rule requires
+it for `status: completed`. Make the conditional requirement explicit in **both**
+re-homed locations:
+
+| Target | Form |
+|---|---|
+| `template/.omp/agents/implementer.md` `output:` frontmatter | the enforced shape (KD-002) — **gated on OQ-A**, same as T-00.4 |
+| `docs/schemas/agent-result.md` | the human-authoritative source the frontmatter is generated from |
+
+Note this interacts with **SD-2**: `status: completed` with an absent `patchPath` /
+`branchName` or an empty diff is not a completion. F-30 is the *schema* half of that
+rule; SD-2 is the *acceptance-check* half. Neither alone is sufficient — a schema proves
+shape, never provenance (KD-019).
+
+**Acceptance**: the conditional requirement is unambiguous in `docs/`, and either
+expressed in `implementer.md`'s `output:` block or recorded as blocked on OQ-A with the
+`docs/` copy as the source of record (F-30).
 
 ### T-00.7 — Record the resolved decisions
 
@@ -986,7 +1004,8 @@ disclosure contract in §07 §A-1.
 - `template/.omp/policies/` and `template/.omp/schemas/` **removed**; all 9 files (581 lines)
   re-homed per T-00.3 / T-00.4 (KD-001)
 - Corrected docs
-- Fixed `agent-result.schema.yml`
+- `agent-result` conditional requirement (F-30) made explicit at its re-homed address
+  (`implementer.md` `output:` pending OQ-A, plus `docs/schemas/agent-result.md`)
 - Decision record (runtime_facts separated from normative decisions per CR-25)
 - Experiment artifacts: T-00.E1 through T-00.E4 recorded transcripts
 

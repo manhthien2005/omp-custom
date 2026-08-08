@@ -20,7 +20,7 @@ two reference syntaxes (`policy:*`, `schema: \`name\``) that **do not exist in O
 I grepped every discovery provider in OMP source. `commands/`, `skills/`, `agents/`,
 `rules/`, `prompts/`, `hooks/`, `tools/`, `instructions/`, `extensions/` are
 discovered. `policies/` and `schemas/` have **zero** discovery hooks. They are inert
-files. Nine YAML documents totalling ~1,100 lines have no runtime consumer.
+files. Nine YAML documents totalling **581 lines** have no runtime consumer.
 
 Meanwhile OMP **does** offer the exact primitive the template wanted: an `output:`
 key in agent frontmatter, parsed into `ParsedAgentFields.output` and threaded to the

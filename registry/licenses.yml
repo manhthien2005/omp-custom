@@ -28,14 +28,31 @@ licenses:
 
   - id: anthropics-skills
     url: https://github.com/anthropics/skills
-    license: no-license-file
-    spdx: UNLICENSED
+    license: per-skill  # no root LICENSE; 16 per-skill LICENSE.txt files
+    spdx: Apache-2.0 AND LicenseRef-Anthropic-Proprietary
     adoption_type: conceptual-inspiration
+    corrected_date: "2026-08-08"  # KD-023 / SD-12
+    superseded_fields:
+      license: no-license-file
+      spdx: UNLICENSED
     notes: >
-      No LICENSE file present in repository. THIRD_PARTY_NOTICES.md covers
-      third-party components only. The SKILL.md format and progressive-disclosure
-      pattern are treated as conceptual inspiration. No content copied.
-      Flag: do not copy substantial text from skill bodies without explicit permission.
+      No root LICENSE file, but licensing is declared per skill: 16 LICENSE.txt files
+      exist. Verified at commit b29e7cf.
+
+      Apache-2.0 (12, copying permitted with attribution): algorithmic-art,
+      brand-guidelines, canvas-design, claude-api, frontend-design, internal-comms,
+      mcp-builder, skill-creator, slack-gif-creator, theme-factory,
+      web-artifacts-builder, webapp-testing.
+
+      Proprietary / all-rights-reserved (4, DO NOT COPY): docx, pdf, pptx, xlsx.
+      Their SKILL.md frontmatter says so explicitly ("license: Proprietary. LICENSE.txt
+      has complete terms").
+
+      THIRD_PARTY_NOTICES.md covers third-party components only.
+      The SKILL.md format and progressive-disclosure pattern remain conceptual
+      inspiration; skill-creator (the one we reference) is Apache-2.0, so copying it
+      would be permitted with attribution if we ever chose to.
+      Flag: per-skill check required before copying — the answer differs by skill.
 
   - id: spec-kit
     url: https://github.com/github/spec-kit
@@ -100,16 +117,27 @@ licenses:
 
   - id: andrej-karpathy-skills
     url: https://github.com/multica-ai/andrej-karpathy-skills
-    license: no-license-file
-    spdx: UNLICENSED
+    license: MIT  # granted in-file, not via a root LICENSE file
+    spdx: MIT
     adoption_type: conceptual-inspiration
+    corrected_date: "2026-08-08"  # KD-023 / SD-12
+    superseded_fields:
+      license: no-license-file
+      spdx: UNLICENSED
     notes: >
-      No LICENSE file present. CLAUDE.md content is copyright the repository owner.
+      MIT, granted in-file in three places at commit 2c60614:
+      skills/karpathy-guidelines/SKILL.md:4 (`license: MIT`),
+      .claude-plugin/plugin.json:8 (`"license": "MIT"`), and README.md:169-171
+      (also README.zh.md). There is no root LICENSE file, which is why the original
+      record read UNLICENSED — a license grant does not require that filename.
+
       The four Karpathy coding principles (think before coding, simplicity first,
       surgical changes, goal-driven execution) are general software engineering
-      concepts, not copyrightable expression. This project independently rewrote
-      these principles. No verbatim copy of CLAUDE.md text.
-      Flag: do not reproduce original wording.
+      concepts. This project independently rewrote them; no verbatim copy was made.
+      Copying would now be permitted with attribution, but is declined on cost
+      grounds: the upstream text is ~410 tok against a 600-1,200 tok AGENTS.md budget.
+      The prior "do not reproduce original wording" flag is withdrawn — it forbade
+      something MIT permits.
 
   - id: 12-factor-agents
     url: https://github.com/humanlayer/12-factor-agents

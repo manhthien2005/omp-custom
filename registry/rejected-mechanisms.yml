@@ -92,14 +92,44 @@ rejected:
     mechanism: "Verbatim copy of anthropics/skills SKILL.md bodies"
     source: anthropics/skills
     rejection_date: "2026-08-07"
-    reason: "No LICENSE file in the repository. Cannot copy substantial content without explicit permission. Only the SKILL.md format (frontmatter schema, structural pattern) is adopted."
-    condition_to_revisit: "If Anthropic adds a LICENSE file permitting use."
+    corrected_date: "2026-08-08"  # KD-023 / SD-12
+    reason: >
+      Adopting only the SKILL.md format (frontmatter schema, structural pattern) is a
+      design choice, not a licensing necessity. Copying is in fact permitted for most
+      skills: there is no root LICENSE file, but 16 per-skill LICENSE.txt files exist and
+      12 are Apache-2.0 (algorithmic-art, brand-guidelines, canvas-design, claude-api,
+      frontend-design, internal-comms, mcp-builder, skill-creator, slack-gif-creator,
+      theme-factory, web-artifacts-builder, webapp-testing). Four are proprietary /
+      all-rights-reserved and must not be copied: docx, pdf, pptx, xlsx.
+    superseded_reason: "No LICENSE file in the repository. Cannot copy substantial content without explicit permission."
+    correction_note: >
+      The original reason read a root-level LICENSE absence as a repo-wide grant absence.
+      Verified at commit b29e7cf: `find . -name 'LICENSE*'` returns 16 per-skill files;
+      each Apache-2.0 file is the standard 201-line text (frontend-design is 177 lines),
+      each proprietary file is 30 lines. skill-creator — the one we care about — is
+      Apache-2.0.
+    condition_to_revisit: >
+      Not license-blocked for the 12 Apache-2.0 skills; adoption is now purely a
+      token-budget question under KD-014's cap of 10. Never revisit for docx/pdf/pptx/xlsx.
 
   - id: reject-014
     mechanism: "Verbatim copy of andrej-karpathy-skills CLAUDE.md"
     source: multica-ai/andrej-karpathy-skills
     rejection_date: "2026-08-07"
-    reason: "No LICENSE file. Copyright all rights reserved by default. The four coding principles are general software engineering concepts, not copyrightable expression — they are independently rewritten."
+    corrected_date: "2026-08-08"  # KD-023 / SD-12
+    reason: >
+      The four coding principles are general software engineering concepts, not
+      copyrightable expression, and were independently rewritten. Copying the original
+      text is also permitted — the repo is MIT — but is unnecessary and would cost
+      persistent-tier tokens we do not need to spend (~410 tok at upstream length vs a
+      600-1,200 tok AGENTS.md budget).
+    superseded_reason: "No LICENSE file. Copyright all rights reserved by default."
+    correction_note: >
+      The original reason was factually wrong. There is no root LICENSE file, but MIT is
+      granted in-file in three places at commit 2c60614:
+      skills/karpathy-guidelines/SKILL.md:4 (`license: MIT`),
+      .claude-plugin/plugin.json:8 (`"license": "MIT"`), and README.md:169-171.
+      A license grant does not require a file named LICENSE.
     condition_to_revisit: "Never — principles independently rewritten; no need for the original text."
 
   - id: reject-015

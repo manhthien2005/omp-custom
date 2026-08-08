@@ -19,12 +19,15 @@ So this is a **repair-and-rewire migration**, not a rewrite. Concretely:
   definition is kept as content but **relocated** to `docs/roles/tech-lead.md` — four
   agent files remain under `template/.omp/agents/`, because any `.md` in an agents
   directory is a live spawnable agent (see row for `tech-lead.md` below).
-- **Rewire**: schemas → inline `outputSchema` in commands; policies → prose in
+- **Rewire**: schemas → worker agent **`output:` frontmatter** (KD-002; caller
+  `outputSchema` is a per-call override, not the default path — CR-28); policies → prose in
   commands and agent prompts; skills → `autoloadSkills` frontmatter.
 - **Fix**: installer component map, `config.yml` protection, LSP contradiction,
   `read-summarize` reversal, tech-lead ambiguity.
 - **Replace**: benchmark script, validation tiers.
-- **Reclassify**: `policies/` and `schemas/` from runtime to documentation.
+- **Remove**: `template/.omp/policies/` and `template/.omp/schemas/` cease to exist
+  (KD-001). Their content is re-homed, not relabelled in place — a header does not undo
+  what the directory path claims.
 
 ---
 
@@ -58,8 +61,8 @@ The ordering is forced by dependency, not preference:
 | `template/.omp/agents/tech-lead.md` | **MOVE to `docs/roles/tech-lead.md`** (CR-33) — every `.md` under an agents dir is loaded as an active `AgentDefinition` by `loadAgentsFromDir()`; a "documentation-only" agent file does not exist as a category. Remove from the installer's `agents` component manifest. | P0-2, CR-33 |
 | `template/.omp/commands/*.md` | Inline `outputSchema`; inline policy prose; explicit `isolated: true`; remove `policy:*` refs | P0-6, P0-7 |
 | `template/.omp/config.yml` | Add install guidance; keep role aliases | P0-4 |
-| `template/.omp/schemas/*.yml` | Reclassify as docs; add header stating no runtime role | P0-7 |
-| `template/.omp/policies/*.yml` | Reclassify as docs; add header; remove or wire `escalation.yml` | P0-6, F-29 |
+| `template/.omp/schemas/*.yml` | **DELETE from `.omp/`** (KD-001). Result shapes become worker `output:` frontmatter (KD-002, gated on OQ-A); YAML retained under `docs/` as the generating source. `task-packet` is a dispatch input, not an output — `docs/` only | P0-7, KD-001 |
+| `template/.omp/policies/*.yml` | **DELETE from `.omp/`** (KD-001). Re-home per phase-00 T-00.3: gates + routing + sizing inlined into the consuming command prose, budgets to `docs/` + validator thresholds, `escalation.yml` into agent "Must not" sections | P0-6, F-29, KD-001 |
 | `template/.omp/skills/*/SKILL.md` | Keep bodies; ensure descriptions carry trigger boundaries | — |
 | `docs/**` | Correct claims about schema/policy enforcement and validation meaning | Honesty |
 | `registry/upstreams.yml` | Add OMP watched paths + pinned commit | §14 |
