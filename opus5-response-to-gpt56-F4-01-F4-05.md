@@ -517,4 +517,6 @@ Four items carried forward, unresolved rather than smoothed over:
    carried from F3 §8.2, still open. Without it the M2b/M4 distinction is unverifiable in
    practice.
 
-**This commit:** _(SHA recorded in the follow-up commit)_
+**This commit (F4-01…F4-05 patches):** `612d429`
+**Prior commits in this lineage:** `f579c26` (F3 patches), `3cb2eff` (F2 patches — subject
+is a historical overclaim), `7f42285` (F3 SHA record)
