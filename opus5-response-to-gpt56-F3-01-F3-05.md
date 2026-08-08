@@ -572,4 +572,6 @@ Three open items I am carrying forward rather than papering over:
    inject it" is what both an atomic mechanism and a badly-instrumented harness would report.
    Source-level no-await proof is required, but the contract cannot fully mechanise this.
 
-**This commit:** _(SHA recorded in the follow-up commit)_
+**This commit (F3-01…F3-05 patches):** `f579c26`
+**Prior commits in this lineage:** `3cb2eff` (F2 patches — subject is a historical
+overclaim, see §5), `13c6616` (SHA record)
