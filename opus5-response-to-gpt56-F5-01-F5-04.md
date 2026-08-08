@@ -493,4 +493,6 @@ Carried forward, unresolved:
    carried from F3 §8.2. Note this now interacts with `observer_non_interference`: counting
    preflight invocations must not itself add a seam.
 
-**This commit:** _(SHA recorded in the follow-up commit)_
+**This commit (F5-01…F5-04 patches):** `e7f08c3`
+**Prior commits in this lineage:** `612d429` (F4), `f579c26` (F3), `3cb2eff` (F2 — subject is
+a historical overclaim), `5ee102f` (F4 SHA record)
