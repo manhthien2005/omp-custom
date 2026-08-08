@@ -11,10 +11,12 @@
 
 Freeze the facts. Record the exact OMP commit the template's runtime claims were
 verified against, correct every documentation claim that contradicts verified
-behavior, and reclassify `policies/` and `schemas/` as documentation.
+behavior, and **remove `policies/` and `schemas/` from `.omp/`**, re-homing their
+content to the tier that actually consumes it (KD-001).
 
-No behavior changes in this phase. This is the phase that makes later phases
-falsifiable.
+No behavior changes in this phase — nothing in `policies/` or `schemas/` was ever
+read at runtime, so removing them cannot change behavior. That is the point. This is
+the phase that makes later phases falsifiable.
 
 ---
 
@@ -45,26 +47,61 @@ Create the compatibility record from §14-H: `omp_verified_version`,
 **Acceptance**: every claim in `02-runtime-semantics.md` §A appears with its source
 file path.
 
-### T-00.3 — Reclassify policies as documentation
+### T-00.3 — Move policies out of `.omp/`
 
-Add a header to each `template/.omp/policies/*.yml`:
+> **KD-001 correction (2026-08-08).** This task previously read *"add a
+> `documentation` header to each `template/.omp/policies/*.yml`"* — the option KD-001
+> explicitly **rejects**: *"Placement inside `.omp/` is itself a claim about runtime
+> meaning. A header is read by maintainers; the directory path is read by everyone who
+> greps the tree."* `spec/README.md:169` already records `REMOVED: .omp/policies/`. The
+> header approach also contradicted this phase's own Objective if left in place. The task
+> is restated to match the decision.
 
-> This file is **documentation**. OMP has no policy loader and no `policy://`
-> scheme. Its content is authoritative for humans and is inlined into command and
-> agent prose at authoring time. Nothing reads this file at runtime.
+Delete `template/.omp/policies/` from the installed surface. Re-home its 5 files
+(363 lines) by content type:
 
-**Acceptance**: all five policy files carry the header. No file claims runtime effect.
+| File | Destination | Form |
+|---|---|---|
+| `quality-gates.yml` | inlined matrix in `standard.md` / `orchestrated.md`, reference copy in `docs/policies/` | prose in the consuming command |
+| `context-budget.yml` | `docs/` + validator thresholds | reference + enforced numbers |
+| `model-routing.yml` | inlined into the dispatching command prose | prose |
+| `workflow-sizing.yml` | inlined into the dispatching command prose | prose |
+| `escalation.yml` | agent "Must not" sections (per `03-token-quality-model.md`) | per-spawn prose |
 
-### T-00.4 — Reclassify schemas as documentation
+Every re-homed file keeps a provenance line naming the YAML it came from, so
+`registry/` entries stay traceable.
 
-Add an equivalent header to each `template/.omp/schemas/*.yml`, stating that:
-- runtime enforcement happens through the worker agent's **`output:` frontmatter** (the canonical schema source per DR-2);
-- caller task `outputSchema` is an explicit per-call override, not the default path;
-- these YAML files are the human-authoritative source that generates the inline `output:` blocks; nothing reads them at runtime.
+**Acceptance**: `template/.omp/policies/` does not exist. No agent prompt or command
+references `policy:` or a `policies/` path. Each of the 5 contents is locatable at its
+named destination. `registry/` `local_components` updated (see T-00.6).
 
-**CR-28 correction:** the header must NOT say "enforcement happens through `outputSchema` inlined in the task call" — that inverts DR-2. The canonical enforcement path is `agent output: frontmatter → YieldTool validator`. Caller `outputSchema` is the override/escape-hatch.
+### T-00.4 — Move schemas out of `.omp/`
 
-**Acceptance**: all four schema files carry the corrected header. No schema file claims caller `outputSchema` is the primary enforcement path.
+Same correction as T-00.3, same grounds. Delete `template/.omp/schemas/` (4 files,
+218 lines).
+
+Re-home: each result shape becomes the `output:` frontmatter of the agent that produces
+it (KD-002), with the YAML retained under `docs/` as the human-authoritative source that
+the inline blocks are generated from.
+
+| File | Becomes `output:` on |
+|---|---|
+| `agent-result.schema.yml` | `implementer.md` |
+| `verification-result.schema.yml` | `verifier.md` |
+| `review-result.schema.yml` | `diff-reviewer.md` |
+| `task-packet.schema.yml` | not an output — it is the dispatch *input*; re-home to `docs/` only |
+
+**CR-28 correction (retained):** the canonical enforcement path is
+`agent output: frontmatter → YieldTool validator`. Caller task `outputSchema` is an
+explicit per-call **override**, not the default path. No document may state the inverse.
+
+**OQ-A dependency:** which schema dialect `output:` accepts (JTD, JSON Schema, or both)
+is unresolved. Write the `output:` blocks only after OQ-A is settled; until then the
+YAML under `docs/` is the source of record and the frontmatter is a stub.
+
+**Acceptance**: `template/.omp/schemas/` does not exist. Three worker agents carry
+`output:` frontmatter (or a recorded OQ-A block). No file claims caller `outputSchema`
+is the primary enforcement path.
 
 ### T-00.5 — Correct the documentation claims
 
@@ -547,7 +584,7 @@ path_A_true_interceptor:
   blocking_source_gap: >
     Verified against pinned v17.2.10 (3a8591a): the blocking capability and the settings
     capability live on DIFFERENT public contexts, and no public surface joins them.
-    Four candidate surfaces were checked and all four are closed:
+    Four candidate surfaces were checked; surfaces 1-3 are CLOSED, surface 4 is UNRESOLVED:
       1. ExtensionContext (extensibility/extensions/types.ts:415-483) — the context the
          tool_call interceptor actually receives. Has NO settings field.
       2. ReadonlySessionManager (session/session-manager.ts:327-350) — reachable from
@@ -557,18 +594,59 @@ path_A_true_interceptor:
          ToolDefinition.execute at types.ts:576-582) — a re-registered tool CAN sit at
          the dispatch boundary, but its execute() also receives ctx: ExtensionContext,
          so it inherits the same missing-settings gap.
-      4. The global settings Proxy (config/settings.ts:2371) — importable in-process, but
-         NOT identity-equal to the session instance: cloneForCwd (settings.ts:603-620)
-         structuredClones each layer into a separate Settings object, and
-         liveSettingsInstances (settings.ts:2331) is a set of multiple live instances.
-         Reading the global therefore does not prove anything about the value the
-         dispatch will actually use.
+      4. The global settings Proxy (config/settings.ts:2371) — **UNRESOLVED, NOT closed.
+         Host-scoped.** See global_proxy_candidate below; an earlier revision wrongly
+         recorded this surface as closed.
     By contrast CustomToolContext (extensibility/custom-tools/types.ts:98-99) DOES expose
     settings?: Settings ("Prefer over the global singleton") — but exposes no task
     dispatch member, so a custom tool cannot be the dispatch boundary.
-    Consequence: on pinned v17.2.10 there is no known public path-A implementation.
-    E3-M must record this as FAIL/DEFER unless an unexamined surface is found and
-    demonstrated. Parallel mode stays DISABLED.
+    Consequence: surfaces 1-3 are closed. Path A feasibility therefore rests entirely on
+    surface 4, which is unresolved and host-dependent. E3-M remains NOT_ATTEMPTED and
+    parallel mode stays DISABLED — but this is NOT the same as "no candidate exists".
+
+global_proxy_candidate:
+  status: UNRESOLVED_AND_HOST_SCOPED   # must be settled empirically, not by inference
+  correction: >
+    An earlier revision claimed reading the global Proxy "proves nothing" and concluded
+    "no known public path-A implementation exists on pinned v17.2.10". That conclusion was
+    stronger than the source supports. cloneForCwd proves NON-UNIVERSALITY; it does not
+    disprove instance identity on the default main-CLI path, and the package exports the
+    proxy publicly (index.ts:17 — `export { Settings, settings }`).
+  positive_identity_chain_default_main_CLI:   # verified line-by-line at 3a8591a
+    - index.ts:17                     exports both Settings and the `settings` Proxy publicly
+    - config/settings.ts:404-416      Settings.init() creates instance, assigns
+                                      globalInstance = instance, returns THAT instance
+    - main.ts:1282-1283               settingsInstance = deps.settings ?? await Settings.init(...)
+    - main.ts:1545                    sessionOptions.settings = settingsInstance
+    - sdk.ts:1271-1272                createAgentSession uses options.settings when provided
+    - task/structured-subagent.ts:314-317
+                                      dispatch reads request.session.settings.get(
+                                        "task.isolation.apply")
+    - config/settings.ts:2371-2384    exported Proxy delegates property access to globalInstance
+    reading: >
+      On the default main-CLI path with no injected deps.settings, this chain is consistent
+      with the exported Proxy resolving to the SAME instance the dispatch reads. That makes
+      the candidate plausible — not proven. It must be demonstrated empirically.
+  negative_identity_paths:
+    - main.ts:399    ACP session/new does args.settings.cloneForCwd(cwd) → DIFFERENT instance
+    - sdk.ts:1271-1272  callers may inject options.settings / options.settingsManager
+                        instead of the singleton → identity NOT guaranteed
+    - config/settings.ts:603-620  cloneForCwd structuredClones layers into a distinct object
+    - main.ts:1282   deps.settings ?? ... — an injected deps.settings also bypasses the global
+  required_determination:   # all of it, before any PASS may be recorded
+    - define the supported host modes for /orchestrated v0
+    - test the imported proxy against the live session value under: project config,
+      CLI overlay, in-session override, default main CLI, ACP cloned session (if ACP is
+      supported), injected SDK settings (if SDK hosting is supported)
+    - prove the read executes INSIDE the actual task interception boundary (not adjacent)
+    - prove an unsafe value blocks before any worker spawn (gating cases M2, M2b, M4)
+    - fail closed in every host where instance identity cannot be established
+  v0_consequence: >
+    Feasibility is UNRESOLVED, not refuted. E3-M stays NOT_ATTEMPTED and parallel mode
+    stays DISABLED — the fail-closed posture is unchanged. What changed is the accuracy of
+    the reason: the candidate is untested and host-scoped, not non-existent. If v0 must
+    support ACP or arbitrary SDK hosts, this candidate is insufficient unless the
+    implementation detects unsupported hosts and fails closed.
   explicit_non_pass: >
     "Same JS event loop" or "same model turn" reasoning alone, without an actual
     interceptor running at the dispatch boundary, does NOT satisfy path A. Tool calls
@@ -601,32 +679,72 @@ worker_side_fingerprint:
     pre-spawn mechanical guard. May be adopted as an additional layer on top of a
     passing path A or path B; never as the mechanism that passes E3-M.
 
-path_C_behavioral_only:
+non_pass_behavioral_disclosure:
+  former_label: path_C_behavioral_only   # renamed — "path C" no longer denotes a mechanism
+  e3_m_pass_power: none
   approach: >
     Document that /orchestrated assumes no Settings mutations during execution; add a
     precondition note. Not a mechanical guard.
   limitation: >
     Same class as the behavioral canary — insufficient for enabling parallel mode
     mechanically. Acceptable only as disclosure, not as a gate.
+  why_renamed: >
+    `08-isolation-and-concurrency.md` previously listed "Path C: setting locked/forced for
+    the duration of the guarded dispatch" as a third PASS-eligible option while this file
+    used the same "path C" label for a non-PASS behavioral note — one identifier with two
+    incompatible meanings. The mechanical reading is withdrawn: Settings.override()
+    (config/settings.ts:518-528) applies overrides unconditionally with no lock, freeze, or
+    read-only guard on the mutation path, and the readOnly option only sets #persist
+    (settings.ts:384), which gates file writes rather than in-memory mutation. There is
+    therefore no lock/force primitive to verify. Any future lock/force implementation falls
+    under path A or path B by definition. Only paths A and B are PASS-eligible.
 ```
 
 **Test matrix (for path A or B — whichever is attempted):**
 
 ```yaml
 case_M1_no_mutation:
+  gating:   true
   setup:    project apply:false, no mutation during execution
   expected: dispatch proceeds normally; no false positive
 
 case_M2_mutation_between_t0_and_t3:
+  gating:   true
   setup:    project apply:false at preflight; Settings.override(apply, true) triggered
             after preflight read returns but before task dispatch
-  expected: interceptor or worker-side check detects mismatch; dispatch aborted or
-            worker refuses; parent tree unchanged
+  expected:
+    - the CURRENT live unsafe value is observed AT the protected dispatch boundary
+    - the task is blocked BEFORE any worker spawn
+  forbidden_as_pass:
+    - worker-side detection of the mismatch
+    - worker refusal after spawn
+    - "parent tree unchanged" as the only evidence
+  rationale: >
+    The protected event is the dispatch/spawn itself, not the eventual patch application.
+    "Parent tree unchanged" is not a substitute for "no worker spawned": an isolated worker
+    that was spawned and then declined to act still consumed the dispatch, and its refusal
+    is a model-directed action it can skip. Any expected result that a worker-side
+    fingerprint could satisfy would contradict the non-PASS list below.
 
 case_M2b_no_preflight_direct_bypass:
-  setup:    a model/workflow attempts a protected parallel task with NO preceding
-            preflight read at all — the guard is never invoked cooperatively
+  gating:   true
+  contract: option_A_live_unsafe_state
+  setup:
+    - NO preflight read occurs at any point — the guard is never invoked cooperatively
+    - live effective task.isolation.apply = TRUE at the moment of dispatch (unsafe)
   expected: the task boundary itself blocks dispatch before any worker spawn
+  premise_note: >
+    The unsafe state is explicit and is the live value, not the absence of a preflight.
+    This matters: under both eligible mechanisms (path A reads live at the boundary; path B
+    reads live and dispatches atomically) a missing observational preflight does NOT by
+    itself make a dispatch unsafe — if the live value were apply:false the dispatch would
+    be legitimately safe, which is what M1 already covers. Without naming the live value,
+    two correct implementations could produce opposite results for this same written case.
+    v0 deliberately does NOT adopt the alternative capability/token contract
+    (preflight mints an unforgeable authorization; absence of the token is itself unsafe),
+    because no such token primitive is specified or source-verified — adopting it would
+    add an unverified mechanism to a fail-closed gate. If a future round specifies one,
+    it must define capability creation, binding, lifetime, and anti-replay semantics.
   rationale: >
     This is the direct-bypass failure mode and it is distinct from M2. M2 tests whether
     a mutation between t0 and t3 is caught; M2b tests whether the mechanism has any
@@ -636,14 +754,44 @@ case_M2b_no_preflight_direct_bypass:
     passing M2 only proves the guard works on a path that already invoked it.
 
 case_M3_mutation_reverted:
+  gating:   false
+  authority: characterization_only
+  e3_m_pass_power: none
   setup:    project apply:false; override to true; revert to false before dispatch
   expected: document whether the chosen mechanism catches the revert or misses it;
             a known gap of the mechanism, not a failure if documented
+  note: >
+    A case whose outcome may be either "caught" or "missed", and whose miss is explicitly
+    never a failure, is characterization — it cannot confer or withhold a PASS. It is
+    recorded as a required *diagnostic* in the artifact so the mechanism's blind spots are
+    on record, but it has no independent PASS power. Do not read a documented miss here as
+    evidence for or against E3-M.
 
 case_M4_apply_true_before_call:
+  gating:   true
   setup:    apply=true in effect before any task call (no mid-execution mutation needed)
   expected: task blocked before any isolated worker spawn; this is the baseline case —
             a mechanism that fails M4 provides no protection at all
+```
+
+**Canonical acceptance-class mapping (normative — IDs are stable, classes are the contract).**
+The four gating classes below are what E3-M actually tests; the `M*` identifiers are retained
+only so that references in already-committed documents keep their meaning. Any future
+renumbering MUST preserve this class mapping:
+
+```yaml
+canonical_acceptance_class_mapping:
+  safe_stable_dispatch:            M1     # gating — must NOT false-positive
+  unsafe_mutation_before_dispatch: M2     # gating — must block pre-spawn
+  no_preflight_direct_bypass:      M2b    # gating — must block pre-spawn, no cooperation
+  preexisting_unsafe_state:        M4     # gating — baseline; failing it means no protection
+
+diagnostic_only:
+  mutation_reverted:               M3     # characterization; e3_m_pass_power: none
+
+gating_set:     [M1, M2, M2b, M4]         # all four must pass for E3-M PASS
+diagnostic_set: [M3]                      # must be recorded; cannot pass or fail the gate
+artifact_set:   [M1, M2, M2b, M3, M4]     # everything the artifact must contain
 ```
 
 **E3-M non-PASS mechanisms (explicit — must not be accepted as PASS):**
@@ -658,9 +806,15 @@ case_M4_apply_true_before_call:
 - a finite sample in which hub happened not to execute
 - a mechanism that only blocks when a preflight was cooperatively invoked first
   (i.e. fails case M2b — cooperative, not mechanical)
-- reading the global `settings` Proxy (config/settings.ts:2371) in place of the live
-  parent Settings instance — cloneForCwd (settings.ts:603-620) structuredClones layers
-  into a separate object, so the global is not provably the instance dispatch will read
+- reading the global `settings` Proxy (config/settings.ts:2371) and *assuming* it is the
+  instance dispatch will read — identity is host-scoped and must be demonstrated, not
+  assumed: ACP clones (main.ts:399), injected `options.settings`/`settingsManager`
+  (sdk.ts:1271-1272) and injected `deps.settings` (main.ts:1282) all yield a different
+  instance. NOTE: this entry rejects the *assumption*, not the surface — see
+  `global_proxy_candidate` above. A proxy read whose instance identity is empirically
+  proven for the declared supported host, which executes at the dispatch boundary, and
+  which fails closed on any host where identity cannot be established, is a path-A
+  candidate and is NOT excluded by this list
 - documenting a residual unsafe window as though disclosure converted a post-dispatch
   detector into a pre-spawn guard
 ```
@@ -674,7 +828,9 @@ guarded_dispatch: confirmed — path A (interceptor at the actual dispatch bound
                   worker spawn) or path B (atomic read-and-dispatch primitive).
                   Post-dispatch detection is NOT a PASS mechanism under either path.
 e3_l_prerequisite: satisfied
-required_cases: M1, M2, M3, M4 all recorded with expected results
+required_gating_cases: [M1, M2, M2b, M4]   # ALL four must pass — M2b is mandatory
+required_diagnostic_cases: [M3]            # must be recorded; no PASS power (characterization)
+artifact_must_record: [M1, M2, M2b, M3, M4]
 ```
 
 **E3-M FAIL or not attempted consequence:**
@@ -687,10 +843,13 @@ note: >
   E3-M is optional for v0 — parallel remains disabled if E3-M is deferred.
 ```
 
-**Artifact:** Mechanism design note + test transcript for chosen path; result for ALL cases
-M1, M2, M2b, M3, M4 (M2b — the no-preflight direct bypass — is mandatory, not optional);
-determination of whether a mechanical (not purely behavioral) guard is achievable with current
-OMP primitives.
+**Artifact:** Mechanism design note + test transcript for the chosen path (A or B only).
+Must record ALL FIVE cases — gating `[M1, M2, M2b, M4]` (all four must pass; M2b, the
+no-preflight direct bypass, is mandatory and not optional) plus diagnostic `[M3]` (recorded
+for characterization; no PASS power). Must also record: the declared supported host modes,
+the instance-identity evidence for whichever `Settings` object the mechanism reads (see
+`global_proxy_candidate.required_determination`), and the determination of whether a
+mechanical — not merely behavioral — guard is achievable with current OMP primitives.
 
 **Blocks (if E3-M is attempted):** phase-02 parallel fan-out. Without a passing E3-M, parallel
 mode remains DISABLED regardless of E3-L result.
@@ -824,7 +983,8 @@ disclosure contract in §07 §A-1.
 
 - Updated `registry/upstreams.yml` with pin + watched paths (SHA `3a8591a8af5b6d200088d12ca75a5517cb064fa8`)
 - Compatibility/verified-claims record
-- Nine reclassification headers (5 policies + 4 schemas)
+- `template/.omp/policies/` and `template/.omp/schemas/` **removed**; all 9 files (581 lines)
+  re-homed per T-00.3 / T-00.4 (KD-001)
 - Corrected docs
 - Fixed `agent-result.schema.yml`
 - Decision record (runtime_facts separated from normative decisions per CR-25)
@@ -851,13 +1011,14 @@ Manual checks:
 
 - [ ] OMP pinned to exact SHA `3a8591a8af5b6d200088d12ca75a5517cb064fa8` with watched paths recorded
 - [ ] All verified claims traceable to a source file
-- [ ] Policies and schemas labeled documentation-only
+- [ ] `template/.omp/policies/` and `template/.omp/schemas/` do not exist; contents re-homed
+      and no prompt references `policy:` / `schema:` (KD-001)
 - [ ] No documentation claim contradicts verified runtime behavior
 - [ ] `agent-result` conditional requirement explicit
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record ALL of M1, M2, M2b, M3, M4; if not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record ALL FIVE cases: gating `[M1, M2, M2b, M4]` (all four must PASS — M2b, the no-preflight direct bypass, is mandatory) plus diagnostic `[M3]` (recorded for characterization only, no PASS power). Only path A or path B is PASS-eligible; there is no path C. If not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
 - [ ] **T-00.E5 artifacts present for cases E5-A … E5-F** (LSP capability as a four-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, `lsp.enabled` gate (CR-41), language-server availability), each recording the tool-list contents and verbatim error so the five distinct remediations are distinguishable (CR-40/CR-41)
 

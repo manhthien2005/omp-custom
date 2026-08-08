@@ -599,33 +599,68 @@ with a real boundary."
    ```
 
    **Parallel mode enablement requires an atomic guarded dispatch mechanism** (E3-M — see
-   phase-00), NOT merely E3-L. Options:
-   - Path A: interceptor at the actual task dispatch boundary that reads the **same live
+   phase-00), NOT merely E3-L. There are exactly **two** pass-eligible mechanism classes:
+   - **Path A**: interceptor at the actual task dispatch boundary that reads the **same live
      parent `Settings` instance** and blocks before any worker spawn
-   - Path B: single primitive that reads settings AND dispatches the batch atomically
-   - Path C: setting locked/forced for the duration of the guarded dispatch
+   - **Path B**: single primitive that reads settings AND dispatches the batch atomically
 
-   Until one of A/B/C is source-verified and Phase-00 confirmed, parallel mode stays DISABLED.
+   Until path A or path B is source-verified AND Phase-00 confirms it against the gating
+   cases (`phases/phase-00-foundation.md` — M1, M2, M2b, M4), parallel mode stays DISABLED.
+
+   **There is no path C.** An earlier revision of this section listed "Path C: setting
+   locked/forced for the duration of the guarded dispatch" as a third pass-eligible option,
+   while `phases/phase-00-foundation.md` used the same label for a *behavioral disclosure*
+   that is explicitly non-PASS. One label cannot mean both a candidate mechanical guard and
+   a non-guard, so the mechanical reading is withdrawn — on two grounds:
+
+   1. **No source-supported lock primitive exists.** `Settings.override()`
+      (`config/settings.ts:518-528`) applies the override and calls `#rebuildMerged()`
+      unconditionally — there is no lock, freeze, or read-only check on the mutation path.
+      The `readOnly` option sets `#persist` (`settings.ts:384`), which gates only *file
+      writes* (`settings.ts:1958`, `:1980`, `:2070`), never in-memory mutation. So a
+      "locked/forced setting" cannot be implemented against the pinned runtime.
+   2. **Any real lock/force implementation is already covered.** If a future OMP version
+      adds one, it qualifies under the generic source-verified fail-closed equivalence rule
+      — it must still read live state at the dispatch boundary and fail closed before any
+      worker spawn, which is path A (or path B if read and dispatch are one primitive). It
+      needs no separate identifier.
+
+   Behavioral disclosure ("assume no Settings mutation during execution") is retained
+   **only** on the explicit non-PASS list in `phases/phase-00-foundation.md`.
 
    **Post-dispatch detection is not an option.** A worker-side settings fingerprint checked
    as the worker's first action is `defense_in_depth` only: the isolated worker has already
    been spawned, and the check is a model-directed action the worker can skip. Documenting
    the residual window does not convert it into a pre-spawn guard. It can never pass E3-M.
 
-   **Source-authority gap (verified at v17.2.10 `3a8591a`).** Path A has no known public
-   implementation: the blocking capability and the live-settings capability sit on
-   *different* public contexts, and four candidate surfaces are all closed —
-   `ExtensionContext` (`extensibility/extensions/types.ts:415-483`, no `settings` field);
+   **Source-authority gap (verified at v17.2.10 `3a8591a`).** The blocking capability and
+   the live-settings capability sit on *different* public contexts. **Three** of four
+   candidate surfaces are closed: `ExtensionContext`
+   (`extensibility/extensions/types.ts:415-483`, no `settings` field);
    `ReadonlySessionManager` (`session/session-manager.ts:327-350`, a 21-member `Pick` with
-   no settings accessor); a re-registered built-in via `invokeTool`
+   no settings accessor); and a re-registered built-in via `invokeTool`
    (`types.ts:479-482`, but `ToolDefinition.execute` at `types.ts:576-582` also receives
-   `ExtensionContext`); and the global `settings` Proxy (`config/settings.ts:2371`, not
-   identity-equal to the session instance — `cloneForCwd` at `settings.ts:603-620`
-   `structuredClone`s layers into a separate object). `CustomToolContext`
+   `ExtensionContext`). `CustomToolContext`
    (`extensibility/custom-tools/types.ts:98-99`) *does* expose `settings?: Settings` but has
-   no task-dispatch member. Consequence: E3-M is expected to record **FAIL/DEFER** on the
-   pinned version, and parallel mode stays DISABLED — see `phases/phase-00-foundation.md`
-   E3-M `blocking_source_gap`.
+   no task-dispatch member, so a custom tool cannot be the dispatch boundary.
+
+   **The fourth surface is UNRESOLVED, not closed.** The package publicly exports the global
+   `settings` Proxy (`index.ts:17`; `config/settings.ts:2371`). An earlier revision of this
+   section recorded it as closed on the strength of `cloneForCwd` (`settings.ts:603-620`) —
+   that was an overreach. `cloneForCwd` proves the proxy is **not universally** the dispatch
+   instance; it does not disprove identity on the default main-CLI path, where
+   `Settings.init()` assigns and returns the same object (`settings.ts:404-416`), `main.ts`
+   binds it via `sessionOptions.settings = settingsInstance` (`main.ts:1282-1283`, `:1545`),
+   and dispatch reads `request.session.settings.get(...)`
+   (`task/structured-subagent.ts:314-317`). Identity is therefore **host-scoped**: plausible
+   on default main CLI, definitely different under ACP (`main.ts:399` clones) or injected
+   SDK settings (`sdk.ts:1271-1272`) or injected `deps.settings` (`main.ts:1282`).
+
+   Consequence: path-A feasibility is **UNRESOLVED and must be settled empirically**, not by
+   inference in either direction. E3-M remains **NOT_ATTEMPTED** and parallel mode stays
+   **DISABLED** — the fail-closed posture is unchanged, but the reason is "untested and
+   host-scoped candidate", not "no candidate exists". Full determination requirements in
+   `phases/phase-00-foundation.md` E3-M `global_proxy_candidate.required_determination`.
 
    **Agent taxonomy note.** `isolation-canary` is an **internal preflight support agent**, not a
    workflow worker role. The four-worker constraint (CR-33: explorer, implementer, verifier,

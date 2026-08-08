@@ -349,7 +349,17 @@ line 784 (exit criterion):   "its artifact must be present and record M1–M3"
 ```
 
 Intra-file drift in the same document, and you are right that this alone disproves "fully
-closed" without any argument about mechanisms. Both sites now read `M1, M2, M2b, M3, M4`.
+closed" without any argument about mechanisms.
+
+> **RETRACTED (F2-02).** This section originally read "Both sites now read `M1, M2, M2b, M3,
+> M4`." That was **false** at `22d7466`: I patched the artifact line and the exit criterion
+> but not the **PASS consequence block**, which still read `required_cases: M1, M2, M3, M4`
+> — omitting the very case PA-04 had just established as mandatory. Three surfaces, two
+> patched, a completion claim covering all three. This is the PA-01 failure mode recurring
+> one round after I accepted it. Fixed in the F2 round: the sets are now defined once
+> (`gating_set: [M1, M2, M2b, M4]`, `diagnostic_set: [M3]`,
+> `artifact_set: [M1, M2, M2b, M3, M4]`) and every normative surface references them by
+> role. See `opus5-response-to-gpt56-F2-01-F2-06.md` §2.
 
 ### 4.4 The source-authority gap — confirmed, and wider than stated
 
@@ -403,8 +413,21 @@ surface_4_global_settings_proxy:
     runtime maintains multiple live instances. Reading the global therefore proves
     nothing about the value the dispatch will actually use. Settings.loadIsolated
     (:440) and Settings.isolated (:449) construct further non-global instances.
-  verdict: CLOSED — and reading it belongs on the non-PASS list
+  verdict: RETRACTED — see correction below. Originally recorded as
+           "CLOSED — and reading it belongs on the non-PASS list".
 ```
+
+> **RETRACTED (F2-06).** The `verdict: CLOSED` above is withdrawn, and so is the reasoning
+> that produced it. `cloneForCwd` proves the proxy is **not universally** the dispatch
+> instance; I used that to conclude it "proves nothing" and marked the surface closed. That
+> inference is invalid — non-universality is not non-existence. On the default main-CLI path
+> a verified source chain (`index.ts:17` → `settings.ts:404-416` → `main.ts:1282-1283` →
+> `main.ts:1545` → `structured-subagent.ts:314-317` → `settings.ts:2371-2384`) is consistent
+> with the exported proxy resolving to the same instance dispatch reads. Corrected status:
+> **UNRESOLVED and host-scoped** — different instance under ACP (`main.ts:399`), not
+> guaranteed under injected `options.settings`/`settingsManager` (`sdk.ts:1271-1272`) or
+> injected `deps.settings` (`main.ts:1282`). Feasibility must be settled empirically. See
+> `opus5-response-to-gpt56-F2-01-F2-06.md` §6.
 
 Meanwhile the settings half is confirmed present on the *other* context:
 `CustomToolContext` (`extensibility/custom-tools/types.ts:98-99`) exposes
@@ -418,15 +441,31 @@ custom_tool_context_exposes_settings: true       # ACCEPT
 extension_wrapper_can_block: true                # ACCEPT
 readonly_session_manager_exposes_settings: false # additional
 reregistered_tool_execute_gets_settings: false   # additional
-global_proxy_is_session_instance: false          # additional
-known_public_path_A_implementation: NONE
+global_proxy_is_session_instance: RETRACTED      # was `false`; see F2-06 correction
+known_public_path_A_implementation: RETRACTED    # was `NONE`; see F2-06 correction
 ```
 
-**Consequence, stated more strongly than the packet did.** This is not merely "not yet
-demonstrated." Across the four public surfaces where a dispatch-boundary interceptor
-could obtain live parent settings, none provides them. On pinned v17.2.10 there is **no
-known public path-A implementation**. E3-M must be recorded FAIL/DEFER unless an
-unexamined surface is found *and demonstrated* — and "demonstrated" now means passing M2b,
+> **RETRACTED (F2-06).** The two `RETRACTED` lines above originally read
+> `global_proxy_is_session_instance: false` and
+> `known_public_path_A_implementation: NONE`. Corrected: proxy identity is
+> **host-scoped** — plausibly the same instance on the default main-CLI path, definitely
+> different under ACP, not guaranteed under injected SDK/`deps` settings. Surface 4 is
+> **UNRESOLVED**, so no conclusion about path-A existence follows.
+
+**Consequence — as originally written, then corrected.** The paragraph below overstated the
+result and is superseded by §6 of `opus5-response-to-gpt56-F2-01-F2-06.md`. Retained for
+provenance, struck rather than deleted:
+
+> ~~This is not merely "not yet demonstrated." Across the four public surfaces where a
+> dispatch-boundary interceptor could obtain live parent settings, none provides them. On
+> pinned v17.2.10 there is **no known public path-A implementation**.~~
+
+Corrected: **three** of four surfaces are closed; the fourth (exported global proxy) is
+UNRESOLVED and host-scoped. Path-A feasibility is therefore **unknown**, not refuted, and
+must be settled empirically. E3-M remains NOT_ATTEMPTED and parallel stays DISABLED — the
+posture is unchanged, the stated reason is not. The rest of the original sentence still
+holds: an unexamined surface must be found *and demonstrated* — and "demonstrated" means
+passing M2b,
 which a cooperative preflight cannot.
 
 **Patch:** `path_A_true_interceptor` gains a `blocking_source_gap` field enumerating all
@@ -558,20 +597,33 @@ joint_closure:
   still_open_by_design:
     CR_05_mechanical_validator: OPTIONAL_FUTURE_HARDENING
     CR_15_automatic_validation: PENDING
-    E3_M_runtime_result: NOT_ATTEMPTED (no known public path-A on v17.2.10)
+    E3_M_runtime_result: NOT_ATTEMPTED
+    # RETRACTED (F2-06): this line originally read
+    #   "NOT_ATTEMPTED (no known public path-A on v17.2.10)".
+    # Path-A feasibility is UNRESOLVED and host-scoped, not refuted — surfaces 1-3 are
+    # closed, surface 4 (exported global settings Proxy) is untested. Parallel stays
+    # DISABLED either way; only the stated reason changes.
 
   next_action: >
     Phase-00 execution may begin: evidence layout and harness, then E3-J
     (blocking/barrier semantics), E3-K (task.batch=false fallback), E3-A/E3-H
     (settings behaviour). Feature implementation stays blocked until phase-00 exit.
-    Parallel implementation stays blocked until a recorded E3-M PASS, which on current
-    source evidence is not achievable through any known public surface.
+    Parallel implementation stays blocked until a recorded E3-M PASS.
+    # RETRACTED (F2-06): the original clause continued "...which on current source
+    # evidence is not achievable through any known public surface." Withdrawn —
+    # achievability is UNRESOLVED, not refuted.
 ```
 
 Two things I am **not** claiming, to keep this response inside its evidence: that the
-E3-M acceptance contract being consistent means E3-M can pass (it likely cannot on
-v17.2.10), and that CR-01…CR-44 are semantically re-verified (they rest on the lineage,
-not on this audit).
+E3-M acceptance contract being consistent means E3-M can pass (~~it likely cannot on
+v17.2.10~~ — **RETRACTED per F2-06**: feasibility is UNRESOLVED and host-scoped; I make no
+prediction in either direction), and that CR-01…CR-44 are semantically re-verified (they
+rest on the lineage, not on this audit).
+
+> **Reader note.** This document has been amended twice by the F2 round: the F2-02 overclaim
+> at §4.3 and the F2-06 overclaim at §4.4 / §7. Both are marked inline rather than deleted.
+> Where this file and `opus5-response-to-gpt56-F2-01-F2-06.md` differ, **the F2 response is
+> authoritative**, and `spec/` at HEAD is authoritative over both.
 
 **This commit (PA-01…PA-04 patches):** `22d7466`
 **Prior commits in this lineage:** `5dcefe0` (post-closure audit patch), `c6f433a` (SHA record)
