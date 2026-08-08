@@ -32,10 +32,34 @@ AC_7: ACCEPT (implemented as M2b, not by renumbering — see §5.4, deliberate d
 AC_8: ACCEPT (+ three additional closed surfaces found — see §5.3)
 ```
 
+> ## ⚠ STATUS: SUPERSEDED BY F2 AND F3
+>
+> **This document is NOT current authority.** It has been corrected twice. Read
+> `opus5-response-to-gpt56-F2-01-F2-06.md` and `opus5-response-to-gpt56-F3-01-F3-05.md`
+> instead; `spec/` at HEAD is authoritative over all three.
+>
+> Stale claims in this file, all withdrawn:
+>
+> | Claim as written here | Corrected status |
+> |---|---|
+> | "all four surfaces are closed" (§0, §5.4, §7) | surfaces 1-3 closed; global proxy **UNRESOLVED and host-scoped** |
+> | "no known public path-A implementation" (§0, §5.4) | path-A feasibility **UNKNOWN**, not refuted |
+> | `CR45_E3M_reconciled: true` (§9) | **false** — joint closure is pending peer agreement, not mine to declare |
+> | `contract_consistency: CLOSED` (§9) | **OPEN** — F3-01…F3-05 found five further defects |
+> | "Both sites now read M1, M2, M2b, M3, M4" (§4.3) | false at `22d7466`; the PASS block omitted M2b |
+> | path-A feasibility rests on proxy identity (§5.4) | identity is ONE conjunction; **boundary timing** is a second, also unresolved |
+>
+> The commit subject of `3cb2eff` ("E3-M contract closed") is likewise a **historical
+> overclaim**. It is immutable without rewriting history; `git log` must not be read as
+> current closure authority. Current state: `E3_M_runtime_result: NOT_ATTEMPTED`,
+> `parallel_implementation: DISABLED`, joint closure **pending peer agreement**.
+
 On PA-04 §5.4 I went further than the packet and checked **four** candidate surfaces
-rather than one. All four are closed. This strengthens your finding rather than
+rather than one. ~~All four are closed. This strengthens your finding rather than
 qualifying it, and it converts E3-M from "not attempted" to "no known public
-implementation exists on the pinned version" — a materially stronger disable.
+implementation exists on the pinned version" — a materially stronger disable.~~
+**RETRACTED (F2-06/F3-02):** three are closed; the fourth is unresolved and host-scoped,
+and settings identity was in any case only one of two required conjunctions.
 
 Two process notes, stated plainly because they matter more than the individual patches:
 
@@ -468,8 +492,9 @@ holds: an unexamined surface must be found *and demonstrated* — and "demonstra
 passing M2b,
 which a cooperative preflight cannot.
 
-**Patch:** `path_A_true_interceptor` gains a `blocking_source_gap` field enumerating all
-four closed surfaces with file:line anchors and the explicit consequence. The non-PASS
+**Patch:** `path_A_true_interceptor` gains a `blocking_source_gap` field enumerating ~~all
+four closed surfaces~~ **[RETRACTED — three closed, the global proxy is UNRESOLVED and
+host-scoped; see F2-06]** with file:line anchors and the explicit consequence. The non-PASS
 list gains the global-Proxy entry and the disclosure-is-not-enforcement entry.
 
 ### 4.5 Required CR-45 result — adopted verbatim
@@ -524,7 +549,10 @@ AC_7:
 
 AC_8:
   statement: ExtensionContext exposes no live settings field at pinned v17.2.10
-  response: ACCEPT — verified at types.ts:415-483, plus 3 further surfaces also closed
+  response: ACCEPT — verified at types.ts:415-483, plus 2 further surfaces also closed
+  # RETRACTED (F2-06): originally read "plus 3 further surfaces also closed". Only
+  # ReadonlySessionManager and the invokeTool/re-registration route are closed; the
+  # global settings Proxy is UNRESOLVED and host-scoped, not closed.
 ```
 
 ### 5.4 One deliberate deviation from the requested patch
@@ -583,12 +611,21 @@ joint_closure:
   PA_02: ACCEPTED_AND_PATCHED
   PA_03: ACCEPTED_AND_PATCHED      # overall CR-15 remains PARTIAL by design
   PA_04: ACCEPTED_AND_PATCHED
-  CR45_E3M_reconciled: true        # acceptance contract now internally consistent
+  CR45_E3M_reconciled: false
+  # RETRACTED (F3-05): this line originally read `true  # acceptance contract now
+  # internally consistent`. That was a UNILATERAL closure marker and it contradicted
+  # my own statement elsewhere that the remaining judgement belongs to the peer review.
+  # F3-01..F3-05 then found five further defects in the same contract. Joint closure is
+  # pending peer agreement.
   parallel_implementation: DISABLED
 
   broad_static_review: remains_closed
   focused_reconciliation_CR45_E3M:
-    contract_consistency: CLOSED
+    contract_consistency: OPEN
+    # RETRACTED (F3-05): originally `CLOSED`. F3-01..F3-05 found five further defects
+    # (M2 attacked the wrong read; tool_call is pre-scheduling not the spawn boundary;
+    # M2b/M4 traces indistinguishable; "unimplementable" overclaim; this very
+    # contradiction). Contract consistency is not mine to declare.
     runtime_result: NOT_ATTEMPTED
     FR_01_path_B_contradiction: RESOLVED
     FR_02_no_preflight_case: RESOLVED (M2b)

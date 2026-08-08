@@ -595,10 +595,76 @@ path_A_true_interceptor:
     a single model turn are NOT atomically coupled: each tool call is a separate async
     operation on the OMP JS runtime, and Settings.override() can execute between any
     two tool calls regardless of whether they are in the "same model turn". An OMP
-    extension hook (extensibility/extensions/wrapper.ts:200-232 — blocks on
-    { block: true }, fails closed on throw) that intercepts the TaskTool itself would
-    satisfy path A ONLY IF it can access the live parent Settings instance at intercept
-    time. That access has NOT been demonstrated — see blocking_source_gap below.
+    extension `tool_call` hook (extensibility/extensions/wrapper.ts:205-232 — blocks on
+    { block: true }, fails closed on throw) can BLOCK a task call, but blocking ability
+    alone does NOT satisfy path A. Two independent conditions must hold — live parent
+    Settings access (see blocking_source_gap) AND a guard read at the native spawn
+    boundary (see boundary_timing_gap). Neither is demonstrated. An earlier revision of
+    this field implied Settings access was the only missing condition; that was wrong,
+    and the ordinary loop `tool_call` event is in fact emitted pre-scheduling rather than
+    at the dispatch boundary.
+  pass_requires_ALL:   # F3-02 — identity and timing are SEPARATE conjunctions
+    - the same live parent Settings instance (identity)
+    - the guard read occurs AT the protected native boundary (timing)
+    - no await/interleavable mutation window between the safe read and worker spawn,
+      OR an equivalent fail-closed invariant spanning that entire interval
+    - case M2 (guard_read → spawn race) passes
+    - cases M2b and M4 block before spawn, with distinguishable traces
+  note_identity_is_not_sufficient: >
+    An earlier revision implied path-A feasibility rested entirely on resolving the
+    global-proxy identity question. That was incomplete: identity is ONE necessary
+    conjunction, atomic timing is another and is independently unresolved. Solving proxy
+    identity does not establish that any cited hook runs at the dispatch boundary.
+
+  boundary_timing_gap: >
+    Verified against pinned v17.2.10 (3a8591a). The ordinary loop `tool_call` event is a
+    PRE-SCHEDULING interception point, not the native spawn boundary. It can block a call,
+    but "can block somewhere before execution" is strictly weaker than "check and spawn
+    share one indivisible boundary". Source:
+      - session/agent-session.ts:3179-3187 — the loop emits `tool_call` for a
+        loop-dispatched call at ARG-PREP time, documented as "before concurrency
+        scheduling, `tool_execution_start`, and the wrapper's approval gate", and MARKS the
+        dispatch so ExtensionToolWrapper does not emit a second event.
+      - extensibility/extensions/wrapper.ts:183 — consumeToolCallEmitted(...) consumes that
+        marker unconditionally.
+      - extensibility/extensions/wrapper.ts:205 — `if (!loopEmittedToolCall && ...)`: the
+        wrapper emits `tool_call` ONLY for dispatches the loop never saw. So for an ordinary
+        loop-dispatched task call there is NO second event at execute time.
+      - extensibility/extensions/wrapper.ts:238+ — the approval gate runs AFTER the event
+        and may await UI/events; the wrapped tool.execute runs after that.
+    Untested interval that therefore exists between an extension guard read and worker
+    spawn: guard reads apply=false → handler returns → assistant message completes →
+    concurrency scheduling → approval (may await UI) → native TaskTool.execute begins →
+    async agent discovery awaits → native policy reads task.isolation.apply → worker
+    allocation/spawn. Settings.override() may run anywhere in that interval.
+
+  composed_candidate_re_registration_plus_proxy: >
+    The more plausible current candidate is the COMPOSITION of surface 3 and surface 4: a
+    re-registered `task` tool whose execute() reads the global proxy and then calls
+    ctx.invokeTool(params). Pinned source shows this is NOT automatically atomic either:
+      - extensibility/extensions/wrapper.ts:62-86 — the registered tool's execute delegates
+        via ctx.invokeTool bound to the same tool name.
+      - extensibility/extensions/runner.ts:445-462 — invokeNativeTool calls the UNWRAPPED
+        native execute directly.
+      - task/index.ts:664-689 — native TaskTool.execute then does `await Promise.all(...)`
+        over per-item preflight resolution before any execution path is chosen.
+      - task/structured-subagent.ts:245-255 — resolveEffectiveSubagentPolicy awaits
+        discoverAgents(request.session.cwd).
+      - task/structured-subagent.ts:315-317 — only AFTER those awaits does the native policy
+        read request.session.settings.get("task.isolation.apply").
+    So a wrapper-side proxy read is followed by at least two await points before the native
+    read. A bare "read false, then ctx.invokeTool" wrapper is NOT an atomic
+    check-and-dispatch primitive.
+  no_public_bound_value_escape: >
+    Binding the safe value into the call instead of re-reading it would close the interval,
+    but no public argument carries it. structured-subagent.ts:315-317 gives
+    `request.isolation?.apply` PRECEDENCE over the settings read — however task/types.ts
+    exposes only `isolated?: boolean` (:128, :147, :212, :244, :304) and no
+    `isolation.apply` parameter, and task/index.ts:643 and :1418 populate the request as
+    `isolation: { requested: params.isolated }` ONLY. `apply` is therefore always undefined
+    on the public task path, so the settings read at dispatch always wins. A future round
+    may revisit this if OMP exposes a bound-apply argument.
+
   blocking_source_gap: >
     Verified against pinned v17.2.10 (3a8591a): the blocking capability and the settings
     capability live on DIFFERENT public contexts, and no public surface joins them.
@@ -710,12 +776,48 @@ non_pass_behavioral_disclosure:
     `08-isolation-and-concurrency.md` previously listed "Path C: setting locked/forced for
     the duration of the guarded dispatch" as a third PASS-eligible option while this file
     used the same "path C" label for a non-PASS behavioral note — one identifier with two
-    incompatible meanings. The mechanical reading is withdrawn: Settings.override()
-    (config/settings.ts:518-528) applies overrides unconditionally with no lock, freeze, or
-    read-only guard on the mutation path, and the readOnly option only sets #persist
-    (settings.ts:384), which gates file writes rather than in-memory mutation. There is
-    therefore no lock/force primitive to verify. Any future lock/force implementation falls
-    under path A or path B by definition. Only paths A and B are PASS-eligible.
+    incompatible meanings. The label is withdrawn; the *behavioral* reading survives here as
+    a non-PASS disclosure, and any *mechanical* lock/invariant is handled by the
+    pass_equivalence_rule below rather than by a "path C" identifier.
+  source_finding_precise_scope: >
+    What the source supports (verified at 3a8591a): Settings.override()
+    (config/settings.ts:518-528) applies overrides unconditionally — no lock, freeze, or
+    read-only guard on the mutation path — and the readOnly option only sets #persist
+    (settings.ts:384), which gates file writes (:1958, :1980, :2070), not in-memory
+    mutation. Therefore: `built_in_public_lock_primitive_found: false`.
+    What the source does NOT support (F3-04 — earlier overclaim withdrawn): that "a
+    locked/forced setting cannot be implemented against the pinned runtime". Inspecting
+    Settings.override() cannot exclude every extension composition, host wrapper, patched
+    runtime, or equivalent invariant mechanism. Absence of a public primitive is not
+    universal impossibility, and an earlier revision promoted the former into the latter.
+```
+
+**PASS-equivalence rule (F3-04 — normative).** The known-candidate list at the pinned SHA is
+paths A and B; that is a statement about what has been *found*, not about what can *exist*.
+The static-closure contract's equivalence escape hatch is retained explicitly:
+
+```yaml
+known_pinned_candidates:
+  path_A: unresolved            # identity AND timing both unresolved
+  path_B: unresolved
+  built_in_lock_or_freeze_primitive: NOT_FOUND   # not "impossible"
+
+pass_equivalence_rule:
+  allowed: >
+    Another source-verified mechanism with equivalent atomic / fail-closed semantics is
+    PASS-eligible. It does not need to be reducible to path A or path B, and it does not
+    need a new identifier — it is admitted on its properties, not its label.
+  requirements:   # all four
+    - unsafe state cannot cross into worker spawn
+    - the invariant covers the COMPLETE guard-read → spawn interval (no interleavable window)
+    - direct bypass fails closed (case M2b)
+    - gating cases M1, M2, M2b, M4 all pass
+  note: >
+    An earlier revision asserted that any future lock/force implementation is "path A or
+    path B by definition". That was stronger than necessary and risked a migration trap: a
+    lock or invariant held from safety observation through spawn is conceptually equivalent
+    fail-closed enforcement without being identical to a boundary interceptor (A) or a
+    single read-and-dispatch primitive (B). Such a mechanism is admissible under this rule.
 ```
 
 **Test matrix (for path A or B — whichever is attempted):**
@@ -726,31 +828,72 @@ case_M1_no_mutation:
   setup:    project apply:false, no mutation during execution
   expected: dispatch proceeds normally; no false positive
 
-case_M2_mutation_between_t0_and_t3:
+case_M2_guard_read_to_spawn_race:
   gating:   true
-  setup:    project apply:false at preflight; Settings.override(apply, true) triggered
-            after preflight read returns but before task dispatch
+  supersedes: case_M2_mutation_between_t0_and_t3   # see M2-control below
+  setup:
+    - the candidate ENFORCEMENT GUARD itself observes live apply=false
+    - inject Settings.override("task.isolation.apply", true) AFTER that guard read
+    - place the injection before native worker allocation/spawn
   expected:
-    - the CURRENT live unsafe value is observed AT the protected dispatch boundary
-    - the task is blocked BEFORE any worker spawn
+    - either the mechanism makes the guard-read→spawn interval non-interleavable,
+      or it detects the mutation at/after the native boundary
+    - NO worker is spawned
+  required_timestamps_or_events:   # the artifact must record all four, ordered
+    - guard_read
+    - mutation_attempt
+    - native_task_execute_enter
+    - worker_allocation_or_spawn
   forbidden_as_pass:
+    - mutation placed only between the E3-L observational preflight and the guard read
+    - the guard seeing `true` because the mutation happened BEFORE the guard ran
     - worker-side detection of the mismatch
     - worker refusal after spawn
     - "parent tree unchanged" as the only evidence
   rationale: >
-    The protected event is the dispatch/spawn itself, not the eventual patch application.
-    "Parent tree unchanged" is not a substitute for "no worker spawned": an isolated worker
-    that was spawned and then declined to act still consumed the dispatch, and its refusal
-    is a model-directed action it can skip. Any expected result that a worker-side
-    fingerprint could satisfy would contradict the non-PASS list below.
+    This is the load-bearing case and it must attack the candidate's OWN read, not an
+    earlier diagnostic observation. An earlier revision mutated after the observational
+    preflight (t0), which a mechanism can pass merely by having a later handler correct a
+    stale preflight: t0 preflight reads false → t1 mutate to true → t2 handler reads true
+    and blocks. That trace proves a later read can supersede an earlier one; it proves
+    nothing about whether the handler's read is coupled to the spawn. The protected event
+    is the dispatch/spawn itself, not eventual patch application — "parent tree unchanged"
+    is not a substitute for "no worker spawned", since an isolated worker that spawned and
+    then declined still consumed the dispatch, and its refusal is a model-directed action
+    it can skip.
+  if_injection_is_impossible: >
+    If the candidate primitive is genuinely atomic, the harness may be UNABLE to place the
+    mutation between guard_read and worker_allocation. That inability is a valid PASS
+    result, but it must be DEMONSTRATED with source and runtime timing evidence (the four
+    recorded events above plus the source path showing no await/yield in the interval) —
+    never assumed, and never inferred from a finite sample in which the race did not
+    happen to occur.
+
+case_M2_control_stale_preflight_corrected:
+  gating:   false
+  authority: control_only
+  e3_m_pass_power: none
+  setup:    project apply:false at the observational preflight; override to true after the
+            preflight read returns but before the guard runs
+  expected: the guard observes the CURRENT value (true) and blocks before any worker spawn
+  note: >
+    Retained as a useful control — it confirms the guard reads live state rather than a
+    cached preflight value. It is NOT the adversarial guard-to-spawn case and carries no
+    PASS power: passing it only shows a later read supersedes an earlier one.
 
 case_M2b_no_preflight_direct_bypass:
   gating:   true
   contract: option_A_live_unsafe_state
   setup:
     - NO preflight read occurs at any point — the guard is never invoked cooperatively
+    - preflight_invocation_count == 0 (must be recorded and asserted zero)
     - live effective task.isolation.apply = TRUE at the moment of dispatch (unsafe)
+    - the protected task is attempted DIRECTLY, bypassing the cooperative path entirely
   expected: the task boundary itself blocks dispatch before any worker spawn
+  required_evidence:   # distinguishes M2b from M4 — see trace_distinction below
+    - preflight_invocation_count: 0
+    - no preflight observation record exists in the transcript
+    - the block originates at the boundary, with no prior cooperative refusal
   premise_note: >
     The unsafe state is explicit and is the live value, not the absence of a preflight.
     This matters: under both eligible mechanisms (path A reads live at the boundary; path B
@@ -785,11 +928,44 @@ case_M3_mutation_reverted:
     on record, but it has no independent PASS power. Do not read a documented miss here as
     evidence for or against E3-M.
 
-case_M4_apply_true_before_call:
+case_M4_preexisting_unsafe_after_cooperative_observation:
   gating:   true
-  setup:    apply=true in effect before any task call (no mid-execution mutation needed)
-  expected: task blocked before any isolated worker spawn; this is the baseline case —
-            a mechanism that fails M4 provides no protection at all
+  former_id: case_M4_apply_true_before_call
+  setup:
+    - apply=true in effect BEFORE the preflight runs (no mid-execution mutation needed)
+    - the preflight DOES execute and observes true — preflight_invocation_count == 1
+    - the cooperative path therefore refuses; the harness then DELIBERATELY attempts the
+      protected task anyway, despite that refusal
+  expected: the boundary INDEPENDENTLY blocks before any isolated worker spawn — this is
+            the baseline case; a mechanism that fails M4 provides no protection at all
+  required_evidence:
+    - preflight_invocation_count: 1
+    - the preflight observation record exists and shows `true`
+    - a cooperative refusal was issued AND was deliberately overridden by the harness
+    - the boundary block is attributable to the boundary, not to the cooperative refusal
+```
+
+**M2b vs M4 — required trace distinction (F3-03).** Distinct labels do not create distinct
+evidence. Both cases end in "blocked before spawn", so the artifact MUST prove they
+exercised different execution paths rather than recording the same trace under two IDs:
+
+```yaml
+trace_distinction:
+  M2b:
+    preflight_invocation_count: 0        # cooperative path never entered
+    cooperative_refusal_present: false
+    tests: does the boundary have authority when nothing invoked it?
+  M4:
+    preflight_invocation_count: 1        # cooperative path entered AND refused
+    cooperative_refusal_present: true
+    cooperative_refusal_overridden: true
+    tests: does the boundary block independently of the cooperative refusal?
+  artifact_requirement: >
+    Both traces must be recorded with their preflight_invocation_count and refusal state.
+    If the two recorded traces are indistinguishable, BOTH cases are unproven — a runner
+    that executes M4 with no preflight produces the M2b trace and silently collapses two
+    independent failure modes into one. Equivalent separations are acceptable provided the
+    artifact demonstrates observably different execution paths.
 ```
 
 **Canonical acceptance-class mapping (normative — IDs are stable, classes are the contract).**
@@ -799,17 +975,26 @@ renumbering MUST preserve this class mapping:
 
 ```yaml
 canonical_acceptance_class_mapping:
-  safe_stable_dispatch:            M1     # gating — must NOT false-positive
-  unsafe_mutation_before_dispatch: M2     # gating — must block pre-spawn
-  no_preflight_direct_bypass:      M2b    # gating — must block pre-spawn, no cooperation
-  preexisting_unsafe_state:        M4     # gating — baseline; failing it means no protection
+  safe_stable_dispatch:                        M1    # gating — must NOT false-positive
+  guard_read_to_spawn_race:                    M2    # gating — the load-bearing case (F3-01)
+  no_preflight_direct_bypass:                  M2b   # gating — no cooperation; preflight count 0
+  preexisting_unsafe_after_cooperative_refusal: M4   # gating — baseline; preflight count 1
 
 diagnostic_only:
-  mutation_reverted:               M3     # characterization; e3_m_pass_power: none
+  mutation_reverted:                           M3    # characterization; e3_m_pass_power: none
+  stale_preflight_corrected:                   M2-control  # control; e3_m_pass_power: none
 
 gating_set:     [M1, M2, M2b, M4]         # all four must pass for E3-M PASS
-diagnostic_set: [M3]                      # must be recorded; cannot pass or fail the gate
-artifact_set:   [M1, M2, M2b, M3, M4]     # everything the artifact must contain
+diagnostic_set: [M3, M2-control]          # must be recorded; cannot pass or fail the gate
+artifact_set:   [M1, M2, M2b, M3, M4]     # minimum the artifact must contain (M2-control optional)
+
+class_renames_F3:   # IDs are stable; these classes were sharpened, not renumbered
+  M2:  was "unsafe_mutation_before_dispatch" — mutation after the OBSERVATIONAL preflight.
+       Now "guard_read_to_spawn_race" — mutation after the CANDIDATE GUARD's own read.
+       The old class is retained as the non-gating M2-control.
+  M4:  was "preexisting_unsafe_state" — silent on whether a preflight ran.
+       Now requires preflight_invocation_count == 1 plus a deliberately overridden
+       cooperative refusal, so M4 cannot produce the M2b trace.
 ```
 
 **E3-M non-PASS mechanisms (explicit — must not be accepted as PASS):**
@@ -835,16 +1020,34 @@ artifact_set:   [M1, M2, M2b, M3, M4]     # everything the artifact must contain
   candidate and is NOT excluded by this list
 - documenting a residual unsafe window as though disclosure converted a post-dispatch
   detector into a pre-spawn guard
+- passing only the M2-control (stale preflight corrected by a later read) and presenting it
+  as the guard-read→spawn race — it proves a later read supersedes an earlier one, nothing
+  about coupling to spawn (F3-01)
+- an ordinary loop `tool_call` handler presented as "the dispatch boundary" — it is emitted
+  at arg-prep time, before concurrency scheduling and the approval gate
+  (agent-session.ts:3179-3187), and is not re-emitted at execute time for loop-dispatched
+  calls (wrapper.ts:183, :205). Blocking ability ≠ atomic coupling (F3-02)
+- a wrapper that reads settings and then calls ctx.invokeTool, without evidence that no
+  await/yield intervenes before the native policy read — task/index.ts:664-689
+  (await Promise.all over per-item preflight) and structured-subagent.ts:245-255
+  (await discoverAgents) both sit in that interval (F3-02)
+- M2b and M4 recorded with indistinguishable traces — if preflight_invocation_count and
+  cooperative-refusal state do not differ between them, BOTH are unproven (F3-03)
 ```
 
 **E3-M PASS consequence:**
 
 ```yaml
 parallel_mode: ENABLED
-guarded_dispatch: confirmed — path A (interceptor at the actual dispatch boundary,
-                  reading the SAME live parent Settings instance, blocking before any
-                  worker spawn) or path B (atomic read-and-dispatch primitive).
-                  Post-dispatch detection is NOT a PASS mechanism under either path.
+guarded_dispatch: confirmed via ONE of —
+                  path A (interceptor at the actual native dispatch boundary, reading the
+                    SAME live parent Settings instance, blocking before any worker spawn);
+                  path B (atomic read-and-dispatch primitive);
+                  or any mechanism admitted by pass_equivalence_rule (equivalent
+                    atomic / fail-closed semantics, source-verified).
+                  Post-dispatch detection is NOT a PASS mechanism under any of them.
+timing_conjunction_satisfied: true   # F3-02 — separate from settings identity
+settings_identity_demonstrated: true
 e3_l_prerequisite: satisfied
 required_gating_cases: [M1, M2, M2b, M4]   # ALL four must pass — M2b is mandatory
 required_diagnostic_cases: [M3]            # must be recorded; no PASS power (characterization)
@@ -861,13 +1064,26 @@ note: >
   E3-M is optional for v0 — parallel remains disabled if E3-M is deferred.
 ```
 
-**Artifact:** Mechanism design note + test transcript for the chosen path (A or B only).
-Must record ALL FIVE cases — gating `[M1, M2, M2b, M4]` (all four must pass; M2b, the
-no-preflight direct bypass, is mandatory and not optional) plus diagnostic `[M3]` (recorded
-for characterization; no PASS power). Must also record: the declared supported host modes,
-the instance-identity evidence for whichever `Settings` object the mechanism reads (see
-`global_proxy_candidate.required_determination`), and the determination of whether a
-mechanical — not merely behavioral — guard is achievable with current OMP primitives.
+**Artifact:** Mechanism design note + test transcript for the chosen mechanism (path A,
+path B, or one admitted by `pass_equivalence_rule`). Must record:
+
+- **All five cases** — gating `[M1, M2, M2b, M4]` (all four must pass; M2b, the no-preflight
+  direct bypass, is mandatory and not optional) plus diagnostic `[M3]` (recorded for
+  characterization; no PASS power). The M2-control case may also be recorded.
+- **M2's four ordered events** — `guard_read`, `mutation_attempt`,
+  `native_task_execute_enter`, `worker_allocation_or_spawn`. If the mutation could not be
+  injected into the interval, the artifact must show WHY from source (no await/yield between
+  the guard read and spawn), not merely that the race did not occur in a finite sample.
+- **M2b vs M4 trace distinction** — `preflight_invocation_count` and cooperative-refusal
+  state for each, proving the two cases exercised different execution paths.
+- **The settings-identity conjunction** — declared supported host modes plus instance-identity
+  evidence for whichever `Settings` object the mechanism reads (see
+  `global_proxy_candidate.required_determination`).
+- **The boundary-timing conjunction** — evidence that the guard read executes at the native
+  spawn boundary, not merely somewhere before execution (see `boundary_timing_gap`). Identity
+  and timing are independent; both must be shown.
+- **The overall determination** — whether a mechanical, not merely behavioral, guard is
+  achievable with current OMP primitives.
 
 **Blocks (if E3-M is attempted):** phase-02 parallel fan-out. Without a passing E3-M, parallel
 mode remains DISABLED regardless of E3-L result.

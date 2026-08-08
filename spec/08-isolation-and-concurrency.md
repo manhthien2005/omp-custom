@@ -599,31 +599,66 @@ with a real boundary."
    ```
 
    **Parallel mode enablement requires an atomic guarded dispatch mechanism** (E3-M — see
-   phase-00), NOT merely E3-L. There are exactly **two** pass-eligible mechanism classes:
-   - **Path A**: interceptor at the actual task dispatch boundary that reads the **same live
-     parent `Settings` instance** and blocks before any worker spawn
+   phase-00), NOT merely E3-L. Two **known** candidate classes at the pinned SHA:
+   - **Path A**: interceptor at the actual native task dispatch boundary that reads the
+     **same live parent `Settings` instance** and blocks before any worker spawn
    - **Path B**: single primitive that reads settings AND dispatches the batch atomically
 
-   Until path A or path B is source-verified AND Phase-00 confirms it against the gating
-   cases (`phases/phase-00-foundation.md` — M1, M2, M2b, M4), parallel mode stays DISABLED.
+   Plus an open **equivalence class**: any other source-verified mechanism with equivalent
+   atomic / fail-closed semantics is PASS-eligible on its properties, without needing a new
+   identifier or being reducible to A or B (`phase-00` → `pass_equivalence_rule`). A/B is
+   what has been *found*, not an exhaustive account of what can exist.
 
-   **There is no path C.** An earlier revision of this section listed "Path C: setting
-   locked/forced for the duration of the guarded dispatch" as a third pass-eligible option,
-   while `phases/phase-00-foundation.md` used the same label for a *behavioral disclosure*
-   that is explicitly non-PASS. One label cannot mean both a candidate mechanical guard and
-   a non-guard, so the mechanical reading is withdrawn — on two grounds:
+   **PASS requires two independent conjunctions, not one.** Settings-instance identity and
+   boundary timing are separate and separately unresolved:
+   - *identity* — the guard must read the same live parent `Settings` the dispatch reads
+   - *timing* — the guard read must occur at the native spawn boundary, with no
+     interleavable mutation window before worker allocation (or an invariant spanning it)
 
-   1. **No source-supported lock primitive exists.** `Settings.override()`
+   Until one mechanism is source-verified on **both** conjunctions AND Phase-00 confirms it
+   against the gating cases (`phases/phase-00-foundation.md` — M1, M2, M2b, M4, with M2
+   attacking the guard-read→spawn interval), parallel mode stays DISABLED.
+
+   **The ordinary `tool_call` hook is pre-scheduling, not the spawn boundary.** Verified at
+   `3a8591a`: for a loop-dispatched call the event is emitted at arg-prep time — documented
+   "before concurrency scheduling, `tool_execution_start`, and the wrapper's approval gate"
+   (`session/agent-session.ts:3179-3187`) — and the dispatch is marked so the wrapper does
+   **not** re-emit at execute time (`extensions/wrapper.ts:183` consumes the marker;
+   `:205` emits only when the loop did not). Blocking ability is therefore weaker than
+   atomic coupling: between such a guard's read and worker spawn lie message completion,
+   scheduling, an approval gate that may await UI, `TaskTool.execute`'s `await Promise.all`
+   over per-item preflight (`task/index.ts:664-689`), and `await discoverAgents(...)`
+   (`task/structured-subagent.ts:245-255`) — only after which the native policy reads
+   `task.isolation.apply` (`:315-317`). `Settings.override()` can run in that interval.
+   A re-registered `task` tool that reads settings and then calls `ctx.invokeTool` inherits
+   the same gap. Binding the safe value into the call would close it, but no public argument
+   carries it: `task/types.ts` exposes only `isolated?: boolean` and `task/index.ts:643`/`:1418`
+   populate `isolation: { requested: params.isolated }` only, leaving `apply` undefined so the
+   settings read always wins.
+
+   **The "path C" label is withdrawn.** An earlier revision of this section listed "Path C:
+   setting locked/forced for the duration of the guarded dispatch" as a third pass-eligible
+   option, while `phases/phase-00-foundation.md` used the same label for a *behavioral
+   disclosure* that is explicitly non-PASS. One label cannot mean both a candidate mechanical
+   guard and a non-guard. The label is therefore retired — but note precisely what that does
+   and does not assert:
+
+   1. **No built-in public lock primitive was FOUND at the pinned SHA.** `Settings.override()`
       (`config/settings.ts:518-528`) applies the override and calls `#rebuildMerged()`
-      unconditionally — there is no lock, freeze, or read-only check on the mutation path.
-      The `readOnly` option sets `#persist` (`settings.ts:384`), which gates only *file
-      writes* (`settings.ts:1958`, `:1980`, `:2070`), never in-memory mutation. So a
-      "locked/forced setting" cannot be implemented against the pinned runtime.
-   2. **Any real lock/force implementation is already covered.** If a future OMP version
-      adds one, it qualifies under the generic source-verified fail-closed equivalence rule
-      — it must still read live state at the dispatch boundary and fail closed before any
-      worker spawn, which is path A (or path B if read and dispatch are one primitive). It
-      needs no separate identifier.
+      unconditionally — no lock, freeze, or read-only check on the mutation path. The
+      `readOnly` option sets `#persist` (`settings.ts:384`), which gates only *file writes*
+      (`settings.ts:1958`, `:1980`, `:2070`), never in-memory mutation.
+      `built_in_public_lock_primitive_found: false`.
+   2. **That is NOT a claim of universal unimplementability.** An earlier revision said a
+      locked/forced setting "cannot be implemented against the pinned runtime" and that any
+      future lock is "path A or path B by definition". Both were stronger than the evidence:
+      inspecting `Settings.override()` cannot exclude every extension composition, host
+      wrapper, patched runtime, or equivalent invariant. A lock or invariant held from safety
+      observation through spawn is conceptually equivalent fail-closed enforcement without
+      being identical to a boundary interceptor (A) or a single read-and-dispatch primitive
+      (B). Such a mechanism is **admissible** under the equivalence class above, judged on
+      its properties. Retiring the label removes a naming collision; it does not close the
+      mechanism space.
 
    Behavioral disclosure ("assume no Settings mutation during execution") is retained
    **only** on the explicit non-PASS list in `phases/phase-00-foundation.md`.
