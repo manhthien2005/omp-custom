@@ -127,20 +127,23 @@ summary does NOT begin with "Isolation:" (indicating apply=true path), fail the 
 do not fan out — and verify the parent tree is unchanged. If the isolated dispatch itself
 errors, parallel mode is unavailable. This exercises the same session, the same `task` tool,
 the same `session.settings`, and the same isolation path — so it attests behavior instead of
-reconstructing config. **CR-44 fail-closed:** the behavioral canary does NOT authorize parallel
-fan-out — it is a diagnostic/characterization tool only. The mechanical authority is E3-L:
-a project custom preflight tool reads `ctx.settings.get("task.isolation.apply")` from the
-live parent-session Settings instance (`session-tools.ts:1303` — source-verified at v17.2.10),
-which sees CLI `--config` overlays and in-session overrides that `omp config get` misses.
-Until E3-L passes, parallel mode is **DISABLED**; sequential non-isolated is the fallback.
-Full contract and CR-44/E3-L analysis in `08-isolation-and-concurrency.md §E-9.2`.
+reconstructing config. **CR-44/CR-45 fail-closed:** the behavioral canary does NOT authorize parallel fan-out — it
+is a diagnostic/characterization tool only. E3-L source-verifies that a project custom tool
+can read `ctx.settings.get("task.isolation.apply")` from the live parent-session Settings
+instance (`session-tools.ts:1303`), which sees CLI `--config` overlays and in-session
+overrides that `omp config get` misses. However, E3-L PASS confirms observation capability
+only — it is NOT the parallel authority gate. CR-45 TOCTOU: the read at t0 is a snapshot;
+`Settings.override()` (`settings.ts:518-525`) can mutate the value before dispatch at t3.
+**E3-M (guarded dispatch) is the gate**: until E3-M passes, parallel mode is DISABLED.
+Until E3-M (guarded dispatch) passes, parallel mode is **DISABLED**; sequential non-isolated is the fallback. E3-L confirms live-read capability (prerequisite for E3-M) but does NOT itself enable parallel — CR-45 TOCTOU: `Settings.override()` (`settings.ts:518-525`) can mutate the value between the preflight read (t0) and actual dispatch (t3).
+Full contract and CR-44/CR-45/E3-L/E3-M analysis in `08-isolation-and-concurrency.md §E-9.2`.
 
 The canary requires T-02.1b: it must be synchronous from the coordinator's perspective.
 `blocking: true` on the canary agent is required (§C-1.3).
 
 **CR-32 — Any nested git repo or submodule disables parallel isolated implementation for the whole repository.** On the successful `apply=false` path, OMP v17.2.10 never materializes nested-repo patches to disk (`persistNestedPatches()` is reachable only from the failure/recovery path), and the `apply=false` summary reports only the root patch when the root also changed — so a nested-repo change is silently lost with no signal. Post-integration `git status` on the nested repo **cannot distinguish compliance from silent loss** (the parent tree looks identical in both cases), so scope-exclusion instructions and post-hoc detection are not accepted as enforcement (§08 §D-1.1). The safe v0 policy is **Option A1**: the orchestrator enumerates nested repos before fan-out (`git submodule status --recursive`, `find . -mindepth 2 -name .git -not -path './node_modules/*'`), and **any non-empty result disables parallel isolated implementation for that run**, routing to sequential non-isolated implementation instead. Full source trace and enforcement analysis in `08-isolation-and-concurrency.md §D-1`.
 
-**Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `/orchestrated` runs the settings diagnostics **and** the mechanical live-session authority check (E3-L: `ctx.settings.get("task.isolation.apply")`), treating the mechanical check as the gate (behavioral canary is diagnostic-only per CR-44); the nested-repo preflight runs **before** fan-out and a non-empty result **disables parallel isolated implementation for the whole run**, routing to sequential non-isolated implementation with the nested paths disclosed (T-00.E3-G, CR-32 Option A1). Scope exclusion is explicitly NOT an accepted outcome here — an acceptance criterion reading "excluded from parallel scope" would restate the rule §08 §D-1.1 withdrew. **Until E3-L passes, parallel mode is DISABLED; sequential non-isolated is the fallback.**
+**Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `/orchestrated` runs the settings diagnostics and the E3-L live-settings read (`ctx.settings.get("task.isolation.apply")`), using it as a diagnostic input (behavioral canary is diagnostic-only per CR-44); the nested-repo preflight runs **before** fan-out and a non-empty result **disables parallel isolated implementation for the whole run**, routing to sequential non-isolated implementation with the nested paths disclosed (T-00.E3-G, CR-32 Option A1). Scope exclusion is explicitly NOT an accepted outcome here — an acceptance criterion reading "excluded from parallel scope" would restate the rule §08 §D-1.1 withdrew. **Until E3-M (guarded dispatch) passes, parallel mode is DISABLED; sequential non-isolated is the fallback. E3-L is a prerequisite for E3-M but does not itself enable parallel (CR-45 TOCTOU).**
 
 ### T-02.3 — Add the non-git-repo fallback
 
@@ -293,7 +296,7 @@ Execute each workflow against a real task in a scratch repository:
 - [ ] Implementers isolated in parallel; observation-phase agents (Explorer, Verifier, Reviewer) not isolated
 - [ ] `task.isolation.apply: false` confirmed at session/project settings (T-00.E3); parallel Implementers return captured artifacts without auto-apply
 - [ ] **CR-31** — `/orchestrated` performs the effective-settings preflight (`mode != none`, `apply == false`) and never fans out in parallel when it fails; the fallback or refusal is disclosed in the report
-- [ ] **CR-38/CR-42/CR-44** — `omp config get` is used as a diagnostic only; **parallel mode is DISABLED until E3-L passes** (live custom-tool settings read is the mechanical authority). Behavioral canary (§E-9.2) runs as characterization/diagnostic (E3-I) only — its PASS does NOT authorize parallel fan-out. After E3-L PASS: preflight reads `ctx.settings.get("task.isolation.apply")` mechanically; a false value blocks fan-out; a true value (hazard) blocks fan-out. `omp config get` explains the diagnosis to the user; `ctx.settings` decides the gate.
+- [ ] **CR-38/CR-42/CR-44/CR-45** — `omp config get` is used as a diagnostic only; **parallel mode is DISABLED until E3-M (guarded dispatch) passes**. E3-L (live custom-tool settings read) confirms `ctx.settings.get("task.isolation.apply")` sees live values including overlays — it is a prerequisite for E3-M — but E3-L PASS alone does NOT enable parallel: CR-45 TOCTOU means the preflight read at t0 is a snapshot; `Settings.override()` (`settings.ts:518-525`) can mutate the value between t0 and actual dispatch. Behavioral canary (§E-9.2) runs as characterization/diagnostic (E3-I) only — its PASS does NOT authorize parallel fan-out. After E3-M PASS: preflight uses the guarded-dispatch mechanism; `ctx.settings` reads inform the gate; `omp config get` explains the diagnosis to the user.
 - [ ] **CR-39** — all four worker agents carry `blocking: true`; L0 checks the files, L1 checks discovery; `async.enabled` untouched; `task.batch == true` verified in preflight with a disclosed fallback
 - [ ] **CR-40/CR-41** — project install owns `task.enableLsp: true`; an existing `false` reports CONFLICT and is not overwritten; a run without LSP discloses reduced-capability mode naming which of the **four conditions** failed (`lsp.enabled` is the fourth, distinct from `task.enableLsp`)
 - [ ] **CR-32** — orchestrator performs nested-repo preflight (Option A1); any non-empty nested-repo result disables parallel isolated implementation for that run and routes to sequential non-isolated; withdrawn enforcement: scope exclusion and post-integration `git status`

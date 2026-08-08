@@ -414,8 +414,11 @@ timing/ordering record.
 
 **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation.**
 E3-J additionally blocks *every* workflow size, not just Orchestrated — Standard's stage arrows
-depend on the same barrier. E3-L is the mechanical authority gate for parallel mode: without a
-passing E3-L, the canary (E3-I) is characterization-only and parallel fan-out is disabled.
+depend on the same barrier. E3-L confirms live-settings read capability (prerequisite for E3-M)
+but does NOT itself enable parallel — CR-45 TOCTOU: the preflight read at t0 is a snapshot;
+`Settings.override()` (`settings.ts:518-525`) can mutate the value before dispatch.
+**E3-M (guarded dispatch) is the gate that enables parallel mode**: without a passing E3-M,
+the canary (E3-I) is characterization-only and parallel fan-out remains disabled.
 
 #### E3-L — Live-session settings authority via custom-tool ctx (CR-44 — Branch A gate)
 
@@ -472,10 +475,18 @@ the mechanical authority path is confirmed.
 preflight_mechanism:
   type: custom-tool live-settings read
   call: ctx.settings.get("task.isolation.apply")
-  authority: mechanical (not behavioral)
+  authority: observation (not atomic dispatch guard)
+  note: >
+    CR-45 TOCTOU: ctx.settings.get() at t0 (preflight) is a snapshot.
+    Settings.override() (settings.ts:518-525) mutates the in-memory value
+    synchronously — between the preflight read (t0) and actual task dispatch (t3),
+    a Settings.set() or external override can change the effective value.
+    Observation ≠ atomic enforcement.
 behavioral_canary_E3_I:
   role: regression / characterization test only
-parallel_mode: ENABLED with mechanical authority
+live_settings_read_verified: true   # ctx.settings.get sees live value including overlays
+parallel_mode: DISABLED             # CR-45 TOCTOU: read at t0 ≠ atomic guard at t3
+parallel_mode_requires: guarded_dispatch (E3-M or equivalent)
 ```
 
 **E3-L FAIL consequence:**
@@ -489,6 +500,90 @@ required_action: identify alternative (Option A restrictToolNames path or other)
 **Artifact:** Three-case transcript with `ctx.settings` read values vs `omp config get` values
 vs actual `applyChanges` observed; confirmation that the custom tool executes in parent-session
 context (not subagent context).
+
+#### E3-M — Guarded dispatch (optional — CR-45 resolution gate)
+
+Design and empirically test an atomic check-and-dispatch mechanism that closes the CR-45 TOCTOU
+gap. E3-L proves the live-read capability; E3-M turns it into an enforceable gate.
+
+**Problem:** `ctx.settings.get("task.isolation.apply")` at preflight time (t0) is a snapshot.
+`Settings.override()` (`settings.ts:518-525`) is synchronously mutable — a value change
+between t0 and the actual task dispatch (t3) is undetectable by any preflight read alone.
+
+**Candidate mechanisms (choose one to test):**
+
+```yaml
+path_A_interceptor:
+  approach: >
+    Custom preflight tool reads ctx.settings immediately before returning the go/no-go
+    decision; the task dispatch call is structurally adjacent (same tool execution turn);
+    any mutation between the tool return and the TaskTool invocation falls outside the
+    OMP execution model's synchronous window.
+  feasibility: >
+    Verify whether OMP's single-threaded JS event loop guarantees no Settings mutation
+    can interleave between a custom-tool return and the subsequent TaskTool call within
+    the same model turn. If yes, path A is mechanically atomic within a turn.
+
+path_B_worker_side_fingerprint:
+  approach: >
+    Capture a settings fingerprint (hash of relevant keys) at preflight; the worker's
+    first action reads ctx.settings and verifies the fingerprint; abort if mismatch.
+  limitation: >
+    Detects the race post-dispatch, not pre-dispatch. Still a TOCTOU at the worker
+    boundary, but reduces the exploitable window to the task launch latency.
+
+path_C_behavioral_only:
+  approach: >
+    Document that /orchestrated assumes no Settings mutations during execution; add a
+    precondition note. Not a mechanical guard.
+  limitation: >
+    Same class as the behavioral canary — insufficient for enabling parallel mode
+    mechanically. Acceptable only as disclosure, not as a gate.
+```
+
+**Test matrix (for path A or B — whichever is attempted):**
+
+```yaml
+case_M1_no_mutation:
+  setup:    project apply:false, no mutation during execution
+  expected: dispatch proceeds normally; no false positive
+
+case_M2_mutation_between_t0_and_t3:
+  setup:    project apply:false at preflight; Settings.override(apply, true) triggered
+            after preflight read returns but before task dispatch
+  expected: interceptor or worker-side check detects mismatch; dispatch aborted or
+            worker refuses; parent tree unchanged
+
+case_M3_mutation_reverted:
+  setup:    project apply:false; override to true; revert to false before dispatch
+  expected: document whether the chosen mechanism catches the revert or misses it;
+            a known gap of the mechanism, not a failure if documented
+```
+
+**E3-M PASS consequence:**
+
+```yaml
+parallel_mode: ENABLED
+guarded_dispatch: confirmed (path A atomic-per-turn, or path B post-dispatch-detect)
+e3_l_prerequisite: satisfied
+```
+
+**E3-M FAIL or not attempted consequence:**
+
+```yaml
+parallel_mode: DISABLED
+fallback: sequential non-isolated + disclosure
+note: >
+  E3-L satisfies live_settings_read_verified but does not enable parallel.
+  E3-M is optional for v0 — parallel remains disabled if E3-M is deferred.
+```
+
+**Artifact:** Mechanism design note + test transcript for chosen path; result for cases M1–M3;
+determination of whether a mechanical (not purely behavioral) guard is achievable with current
+OMP primitives.
+
+**Blocks (if E3-M is attempted):** phase-02 parallel fan-out. Without a passing E3-M, parallel
+mode remains DISABLED regardless of E3-L result.
 
 ### T-00.E4 — Rule sentinel propagation
 
@@ -652,7 +747,7 @@ Manual checks:
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-K** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**). **E3-A, E3-G, E3-H, E3-I and E3-J are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier.
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record M1–M3; if not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
 - [ ] **T-00.E5 artifacts present for cases E5-A … E5-F** (LSP capability as a four-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, `lsp.enabled` gate (CR-41), language-server availability), each recording the tool-list contents and verbatim error so the five distinct remediations are distinguishable (CR-40/CR-41)
 

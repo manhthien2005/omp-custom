@@ -575,15 +575,36 @@ with a real boundary."
    tool calling `ctx.settings.get("task.isolation.apply")` reads the true effective value.
 
    Phase-00 E3-L must confirm empirically that the end-to-end path works as expected (value
-   correct under project config, `--config` overlay, and in-session override). After E3-L
-   PASS, the preflight replaces the behavioral canary with a custom-tool settings read:
+   correct under project config, `--config` overlay, and in-session override).
+
+   **CR-45 — live read ≠ atomic dispatch guard (TOCTOU).** `Settings` is live-mutable:
+   `settings.ts:518-525` shows `override(path, value)` calls `#rebuildMerged()` synchronously
+   at any time. Between the preflight custom-tool call (t0) and the actual `task` dispatch (t3),
+   `Settings` can be mutated by user `/settings` changes, runtime extensions, or future workflow
+   code. At t3, `structured-subagent.ts:315-317` reads the live setting again independently.
+   A truthful read at t0 does NOT prevent an unsafe value at t3.
+
+   Additionally, `/orchestrated` as a slash command expands to model instructions:
+   "call preflight before task" is a workflow instruction, not a mechanical constraint — the
+   model can issue `task(...)` without the preflight call.
+
+   **E3-L PASS consequence (CR-45 corrected):**
 
    ```yaml
    e3_l_pass_consequence:
-     preflight_mechanism: ctx.settings.get("task.isolation.apply")  # mechanical
+     live_read_primitive_verified: true   # ctx.settings.get sees live value including overlays
      behavioral_canary: demoted to diagnostic/regression test
-     parallel_mode: ENABLED with mechanical authority
+     parallel_mode: DISABLED              # TOCTOU gap — observation ≠ atomic enforcement
+     parallel_mode_requires: guarded_dispatch (E3-M or equivalent)
    ```
+
+   **Parallel mode enablement requires an atomic guarded dispatch mechanism** (E3-M — see
+   phase-00), NOT merely E3-L. Options:
+   - Path A: task-call interceptor that checks `task.isolation.apply` immediately before execution
+   - Path B: single primitive that reads settings AND dispatches the batch atomically
+   - Path C: setting locked/forced for the duration of the guarded dispatch
+
+   Until one of A/B/C is source-verified and Phase-00 confirmed, parallel mode stays DISABLED.
 
    **Agent taxonomy note.** `isolation-canary` is an **internal preflight support agent**, not a
    workflow worker role. The four-worker constraint (CR-33: explorer, implementer, verifier,
@@ -601,23 +622,20 @@ with a real boundary."
    that gate is structural. The canary's PASS does NOT authorize parallel fan-out in v0 (see
    fail-closed contract above).
 
-   Full preflight sequence (v0 — before E3-L mechanical authority):
+   Full preflight sequence (v0 — parallel disabled; E3-L proves live-read; E3-M gates enable):
 
    ```
    1. nested-repo scan             (§D-1.2)   structural   → any hit disables parallel
    2. effective task.batch         (§C-1.4)   diagnostic   → false disables parallel
    3. omp config get × 2           (§E-9)     diagnostic   → produces the actionable message
-   4. mechanical live-session      (E3-L)     AUTHORITY    → gates parallel fan-out
-      authority available?
-       └─ NO  → parallel DISABLED → sequential non-isolated + disclosure
-       └─ YES → verify apply=false via ctx.settings
-                → fan out
-   5. [diagnostic] behavioral canary (§E-9.2) → characterization only, does NOT gate
+   4. parallel mode:               DISABLED until E3-M (guarded dispatch) passes
+       └─ fallback: sequential non-isolated + disclosure
+   5. [experiment] E3-L            ctx.settings read → live_read_primitive_verified
+   6. [diagnostic] behavioral canary (§E-9.2) → characterization only, does NOT gate
    ```
 
-   Steps 3 and 5 are retained as diagnostics: step 3 explains *why* to the user when the
-   setting is wrong; step 5 (E3-I) characterizes the canary mechanism for future use. Neither
-   gates the production decision in v0.
+   Steps 3, 5, 6 are retained as diagnostics and experiments. None gates the production
+   parallel decision in v0. Step 4 is the fail-closed v0 state.
 
 10. **CR-29 — Integration order is normative: original orchestrator task-list index.** "Deterministic order" is not a specification — alphabetical name, worker finish order, batch input order, and file-path order all satisfy the English word while producing different conflict and recovery behavior. The rule is fixed:
 
