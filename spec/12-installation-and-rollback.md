@@ -165,7 +165,7 @@ optional_model_roles:           # CR-34 — convenience alias, NOT installer-own
 owned_required_settings:        # PROJECT target only — see C-2
   task.isolation.apply: false   # correctness precondition for parallel capture-first
   task.isolation.mode: auto     # backend selector; must not be "none"
-  task.enableLsp: true          # CR-40 — default is FALSE; three worker roles need it
+  task.enableLsp: true          # CR-40/CR-41 — default is FALSE; three worker roles need it (four conditions required — see §07 §A-1)
 
 opt_in_only_settings:           # CR-40 — user/global target requires an explicit flag
   task.enableLsp:

@@ -73,20 +73,27 @@ not installer-owned and has no mandatory runtime consumer after CR-06 and CR-33
 `tech-lead` is optional and its absence is **not** a failure. Asserting five would
 re-require the key CR-34 removed and would contradict the four-agent count above.
 
-**CR-39/CR-40 — L1 also asserts the execution-mode and capability settings**, because both are
-defaults that work *against* this template and both fail silently:
+**CR-39/CR-40/CR-41/CR-43 — L1 also asserts the execution-mode and capability settings**, because all are
+defaults that work *against* this template and all fail silently:
 
 - `effectiveAgent.blocking === true` for all four discovered workers. Check the **parsed**
   value, not the file text: `task/index.ts:707` tests exact `=== true`, so a truthy-but-not-`true`
   frontmatter value passes a text grep and still becomes a background job.
 - effective `task.batch == true` — else the Orchestrated wire has no `tasks[]` and no stable index.
-- effective `task.enableLsp == true` in the project target — the settings half of the LSP
-  conjunction (§07 §A-1).
+- effective `task.enableLsp == true` in the project target — the `task.enableLsp` half of the LSP
+  conjunction (§07 §A-1). Note: `lsp.enabled` (CR-41 fourth gate) defaults `true` and is
+  unlikely to be false in a fresh install, but a contradiction (`task.enableLsp: true` and
+  `lsp.enabled: false` both in project config) must be flagged as a FAIL.
+- **CR-43 — effective Verifier bash tool presence.** Assert the effective (post-settings) tool
+  set for the Verifier includes `bash`. `bash.enabled` defaults `true` but can be disabled. A
+  Verifier without effective `bash` cannot satisfy its fresh-execution contract (§10 §B-2); L1
+  MUST detect this before any workflow run.
 
 **Acceptance**: L1 confirms **four** agents (no `tech-lead`), three commands, three skills,
 **four** required resolvable worker model roles (`explorer`, `implementer`, `verifier`,
 `reviewer`; `tech-lead` optional), the effective isolation settings above, `blocking === true`
-on every worker, `task.batch == true`, and `task.enableLsp == true`.
+on every worker, `task.batch == true`, `task.enableLsp == true`, and effective `bash` present
+in the Verifier's tool set.
 
 ### T-06.3 — Add L2 (contract) + L3 (behavioral) workflow fixtures
 

@@ -81,6 +81,15 @@ the merge now covers two classes, not just `modelRoles`:
   `task.batch` is verified as a runtime precondition with a documented fallback. The installer
   must not write either key.
 
+  **`lsp.enabled` and `bash.enabled` are NOT owned by the installer (CR-41/CR-43).** Both
+  default to `true` and govern whether built-in tools are registered at all. A user who sets
+  either to `false` has made a deliberate capability decision — disabling shell execution
+  (`bash.enabled`) or the LSP tool (`lsp.enabled`) globally. The installer MUST NOT silently
+  override these. Instead, the post-install preflight (T-05.4 / L1) detects the contradiction
+  and reports it: `bash.enabled=false` is reported as a verification capability gap (§10 §B-2);
+  `lsp.enabled=false` with `task.enableLsp=true` is reported as an LSP reduced-capability
+  condition naming the specific cause (§07 §A-1, CR-41 fourth gate).
+
 The manifest `installer_delta` must record `before: null` for a key that was absent, so
 rollback removes it rather than writing OMP's default back explicitly (§D).
 

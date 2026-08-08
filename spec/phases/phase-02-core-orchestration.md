@@ -119,9 +119,20 @@ On failure: **do not launch parallel isolated Implementers.** Fall back to seque
 
 So a parent launched with `--config` setting `apply: true` over a project config of `false` yields a subprocess read of `false` (preflight PASS) and an actual `applyChanges == true` — restoring the CR-27 concurrent-auto-apply hazard through the check meant to prevent it.
 
-Add a **same-session capture canary** after the nested-repo and `task.batch` checks pass: dispatch one minimal isolated **blocking** worker that creates a single sentinel file (`.omp/.capture-first-canary-<nonce>`) and yields. Then assert the task completed, the sentinel is **absent** from the parent tree, and the result summary reports a retained artifact (`captured at <path>`) rather than `Applied patches: yes`. If the sentinel exists: delete it, fail the preflight, do not fan out. If the isolated dispatch itself errors, parallel mode is unavailable. This exercises the same session, the same `task` tool, the same `session.settings`, and the same isolation path — so it attests behavior instead of reconstructing config. Full contract in `08-isolation-and-concurrency.md §E-9.2`.
+Add a **same-session capture canary** after the nested-repo and `task.batch` checks pass:
+dispatch one minimal isolated **blocking** read-only agent (tools: `[read]`) that makes NO
+changes to its worktree and yields immediately. Assert the task completed, and that the
+result merge-summary begins with `"Isolation: ..."` (the apply=false discriminator). If the
+summary does NOT begin with "Isolation:" (indicating apply=true path), fail the preflight and
+do not fan out — and verify the parent tree is unchanged. If the isolated dispatch itself
+errors, parallel mode is unavailable. This exercises the same session, the same `task` tool,
+the same `session.settings`, and the same isolation path — so it attests behavior instead of
+reconstructing config. The read-only tool surface ensures the canary cannot mutate the parent
+regardless of the effective apply setting (CR-42). Full contract in
+`08-isolation-and-concurrency.md §E-9.2`.
 
-The canary requires T-02.1b: it must be synchronous from the coordinator's perspective, and a canary that returns before the worker writes proves nothing.
+The canary requires T-02.1b: it must be synchronous from the coordinator's perspective.
+`blocking: true` on the canary agent is required (§C-1.3).
 
 **CR-32 — Any nested git repo or submodule disables parallel isolated implementation for the whole repository.** On the successful `apply=false` path, OMP v17.2.10 never materializes nested-repo patches to disk (`persistNestedPatches()` is reachable only from the failure/recovery path), and the `apply=false` summary reports only the root patch when the root also changed — so a nested-repo change is silently lost with no signal. Post-integration `git status` on the nested repo **cannot distinguish compliance from silent loss** (the parent tree looks identical in both cases), so scope-exclusion instructions and post-hoc detection are not accepted as enforcement (§08 §D-1.1). The safe v0 policy is **Option A1**: the orchestrator enumerates nested repos before fan-out (`git submodule status --recursive`, `find . -mindepth 2 -name .git -not -path './node_modules/*'`), and **any non-empty result disables parallel isolated implementation for that run**, routing to sequential non-isolated implementation instead. Full source trace and enforcement analysis in `08-isolation-and-concurrency.md §D-1`.
 
@@ -278,9 +289,9 @@ Execute each workflow against a real task in a scratch repository:
 - [ ] Implementers isolated in parallel; observation-phase agents (Explorer, Verifier, Reviewer) not isolated
 - [ ] `task.isolation.apply: false` confirmed at session/project settings (T-00.E3); parallel Implementers return captured artifacts without auto-apply
 - [ ] **CR-31** — `/orchestrated` performs the effective-settings preflight (`mode != none`, `apply == false`) and never fans out in parallel when it fails; the fallback or refusal is disclosed in the report
-- [ ] **CR-38** — `omp config get` is used as a diagnostic only; the **same-session capture canary** is the gate. Canary asserts task completion, sentinel absent from the parent tree, and a retained-artifact summary; a present sentinel deletes the file, fails the preflight, and blocks fan-out
+- [ ] **CR-38/CR-42** — `omp config get` is used as a diagnostic only; the **same-session read-only capture canary** is the gate. Canary uses tools: `[read]`, creates NO files, asserts merge-summary begins `"Isolation: ..."` (apply=false discriminator); a summary NOT beginning "Isolation:" fails the preflight and blocks fan-out. Parent tree must be unchanged after the canary regardless of outcome (CR-42 non-mutating requirement).
 - [ ] **CR-39** — all four worker agents carry `blocking: true`; L0 checks the files, L1 checks discovery; `async.enabled` untouched; `task.batch == true` verified in preflight with a disclosed fallback
-- [ ] **CR-40** — project install owns `task.enableLsp: true`; an existing `false` reports CONFLICT and is not overwritten; a run without LSP discloses reduced-capability mode naming which of the three conditions failed
+- [ ] **CR-40/CR-41** — project install owns `task.enableLsp: true`; an existing `false` reports CONFLICT and is not overwritten; a run without LSP discloses reduced-capability mode naming which of the **four conditions** failed (`lsp.enabled` is the fourth, distinct from `task.enableLsp`)
 - [ ] **CR-32** — orchestrator performs nested-repo preflight (Option A1); any non-empty nested-repo result disables parallel isolated implementation for that run and routes to sequential non-isolated; withdrawn enforcement: scope exclusion and post-integration `git status`
 - [ ] **CR-29** — integration order is original task-list index order, normatively stated in `orchestrated.md` and independent of worker completion order
 - [ ] **CR-29** — conflict on artifact *i* stops integration of *i+1…n*; all unapplied artifacts remain readable and are reported by path

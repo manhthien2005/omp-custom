@@ -448,37 +448,76 @@ with a real boundary."
 
    Verify capture-first behavior through **the same parent session, the same `task` tool, the same `session.settings`, the same isolation code path** — rather than trying to reconstruct the session's config externally. This is a behavioral test, and behavior is what the gate actually cares about.
 
+   **CR-42 — the canary MUST NOT be able to mutate the parent.** The Round-7 sentinel design
+   had the canary create a file and then check whether the file was absent from the parent tree.
+   That detection logic is correct in principle, but it is wrong in safety direction: it discovers
+   `apply=true` *by letting the apply happen*. When `apply=true`, `runStructuredSubagent()` calls
+   `mergeIsolatedChanges({ repoRoot: isolationContext.repoRoot })` unconditionally on a successful
+   exit (`task/structured-subagent.ts:600-605`), using the parent's repo root. So the sentinel
+   file written by the canary lands in the parent before the preflight can read it. The failure
+   detection IS the parent mutation — that is the wrong polarity for a safety gate.
+
+   The fix is to remove write capability from the canary entirely. A read-only agent produces no
+   changes; the discrimination then relies entirely on the merge summary text, which is already
+   textually distinct on the two paths (source-verified):
+
+   ```text
+   apply=false, no changes → "Isolation: no changes captured."
+                              (structured-subagent.ts else-branch: !branchName, !patchPath, !nestedPatches)
+   apply=true,  no changes → "No changes to apply."
+                              (isolation-runner.ts: !result.branchName or no-change branch path)
+   ```
+
    ```yaml
    canary:
      when: after the §D-1.2 nested-repo scan and §C-1.4 batch check pass
-     dispatch: ONE isolated worker, blocking (§C-1.3), minimal prompt
-     worker_action: create exactly one sentinel file, then yield immediately
-     sentinel: .omp/.capture-first-canary-<nonce>     # nonce per run; never reused
+     agent:
+       name: isolation-canary       # support agent — NOT a workflow worker role (see note below)
+       tools: [read]                # NO write, edit, bash, lsp — mechanically cannot mutate worktree
+       blocking: true               # required: synchronous from coordinator's perspective (§C-1.3)
+       isolated: true
+     prompt: "Report the current working directory. Make no changes. Yield immediately."
      assert_all:
        - task completed (exit 0)
-       - sentinel does NOT exist in the parent working tree
-       - result summary reports a RETAINED artifact, not an applied change
-     on_sentinel_present:
-       - delete the sentinel immediately (it is template scratch, not user work)
-       - preflight FAILED — effective apply is true regardless of any file
+       - parent git status unchanged  — same HEAD, same working tree as before canary
+       - merge-summary contains "Isolation:"  (apply=false path discriminator)
+     on_apply_true_detected:
+       - merge-summary does NOT contain "Isolation:" — indicates apply=true path
+       - preflight FAILED — effective apply is true regardless of any persistent config
        - do NOT launch parallel workers
+       - report: "Isolation preflight failed: effective apply=true detected.
+                  Run `omp config get task.isolation.apply --json` to diagnose.
+                  Falling back to sequential non-isolated implementation."
      on_dispatch_error:
        - parallel mode unavailable (covers non-git, backend failure, mode: none)
-     cost: one minimal spawn per Orchestrated run
+     cost: one minimal read-only spawn per Orchestrated run
    ```
 
-   **Why the assertions are discriminating** — the two paths produce different, model-visible summaries and different parent-tree states:
+   **Why the assertions are discriminating** — the two paths produce different, model-visible
+   summaries with zero parent-tree change in both cases:
 
    | Effective setting | Parent tree | `<merge-summary>` text |
    |---|---|---|
-   | `apply == false` (required) | sentinel **absent** | ``Isolation: changes captured at `<path>` (apply=false). Not applied.`` |
-   | `apply == true` (hazard) | sentinel **present** | `Applied patches: yes` |
+   | `apply == false` (required) | **unchanged** | starts with `"Isolation: ..."` |
+   | `apply == true` (hazard) | **unchanged** (no write capability) | `"No changes to apply."` |
 
-   Both signals are checkable: the sentinel via the parent's own `read`/`glob`, and the summary because `mergeSummary` is rendered into the model-facing task result (`prompts/tools/task-summary.md` — `<merge-summary>`), not buried in `details`. Asserting on **both** matters: the filesystem check is the ground truth, and the summary check catches the case where isolation silently did not engage at all.
+   The summary is rendered into the model-facing task result (`prompts/tools/task-summary.md` —
+   `<merge-summary>`), not buried in `details`. The parent-tree invariant (unchanged regardless
+   of outcome) is the CR-42 requirement: the preflight must not damage the state it is protecting.
 
-   **The canary depends on CR-39.** It must be synchronous from the coordinator's perspective — a canary that returns before the worker writes anything proves nothing. That requires `blocking: true` on the worker (§C-1.3). CR-38 and CR-39 are therefore a single fix, not two independent ones.
+   **Agent taxonomy note.** `isolation-canary` is an **internal preflight support agent**, not a
+   workflow worker role. The four-worker constraint (CR-33: explorer, implementer, verifier,
+   reviewer) counts *workflow reasoning roles*, not support/preflight agents. Validation MUST NOT
+   collapse "number of discovered agent files" into "number of workflow worker roles" — the
+   canary agent file, if present, must be excluded from that count.
 
-   **What the canary does not prove.** It attests `apply` and that isolation engaged, at canary time, for a single spawn. It does not prove the setting cannot change mid-run, and it is not a substitute for the nested-repo gate (§D-1.2) — a nested repo is undetectable by *any* behavioral probe, which is exactly why that gate is structural.
+   **The canary depends on CR-39.** It must be synchronous from the coordinator's perspective.
+   `blocking: true` on the canary is required (§C-1.3). CR-38 and CR-39 remain a single fix.
+
+   **What the canary does not prove.** It attests `apply` and that isolation engaged, at canary
+   time, for a single spawn. It does not prove the setting cannot change mid-run, and it is not a
+   substitute for the nested-repo gate (§D-1.2) — a nested repo is undetectable by *any*
+   behavioral probe, which is exactly why that gate is structural.
 
    Full preflight sequence:
 
@@ -490,7 +529,9 @@ with a real boundary."
    5. fan out
    ```
 
-   Steps 3 and 4 are not redundant: 3 explains *why* to the user, 4 decides *whether*. A run where 3 passes and 4 fails is precisely the CR-38 overlay case, and the report must say so rather than reporting a generic refusal.
+   Steps 3 and 4 are not redundant: 3 explains *why* to the user, 4 decides *whether*. A run
+   where 3 passes and 4 fails is precisely the CR-38 overlay case, and the report must say so
+   rather than reporting a generic refusal.
 
 10. **CR-29 — Integration order is normative: original orchestrator task-list index.** "Deterministic order" is not a specification — alphabetical name, worker finish order, batch input order, and file-path order all satisfy the English word while producing different conflict and recovery behavior. The rule is fixed:
 

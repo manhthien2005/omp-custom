@@ -59,14 +59,17 @@ machine the template ships four agents whose LSP access is granted at the allowl
 withheld at the settings gate. That is the CR-31 defect class exactly: **the spec assumes a
 required runtime setting the installer never establishes.**
 
-LSP availability in a subagent is a **conjunction of three conditions**, all verified:
+LSP availability in a subagent is a **conjunction of four independent conditions**, all verified:
 
 ```ts
-// task/structured-subagent.ts:318-320
+// task/structured-subagent.ts:318-320  — child session enableLsp resolution
 enableLsp:
   !planMode &&
   (request.enableLsp ??
     ((request.session.enableLsp ?? true) && request.session.settings.get("task.enableLsp"))),
+
+// tools/index.ts:593  — child session built-in tool registration (CR-41)
+if (name === "lsp") return enableLsp && session.settings.get("lsp.enabled");
 ```
 
 | # | Condition | Default | Who establishes it |
@@ -74,10 +77,18 @@ enableLsp:
 | 1 | `lsp` in the agent's `tools:` allowlist | absent | **Template** (this section's resolution) |
 | 2 | `task.enableLsp == true` | **`false`** | **Template** — project-target install (see below) |
 | 3 | parent `session.enableLsp` not disabled, and not plan mode | enabled | **User's session** — template cannot control |
+| 4 | `lsp.enabled == true` | **`true`** | **User/session** — independent built-in tool registration gate (CR-41) |
 
 Condition 1 alone was the round-1 finding. Condition 2 is CR-40. Condition 3 is why T-00.E5
 remains a genuine runtime gate rather than a formality: a parent session with LSP disabled
 disables it for every child regardless of what the project config says.
+
+**Condition 4 is independent of condition 3.** `lsp.enabled` is a separate settings key that
+gates built-in tool registration at `tools/index.ts:593` — the child session can have
+`enableLsp == true` (conditions 2+3 met) and still have the `lsp` tool absent from its effective
+tool list if `lsp.enabled` is set `false`. Default is `true`, so this failure is uncommon, but
+it is a distinct cause with a distinct fix: enable the `lsp.enabled` setting in the project
+config or session settings, not in the agent allowlist or `task.enableLsp`.
 
 There is **no per-call escape hatch.** `request.enableLsp` is not exposed on the model-facing
 task wire (`docs/tools/task.md` lists `{name?, agent?, task, effort?, outputSchema?,
@@ -101,22 +112,25 @@ user_global_target:
     every repository — the same blast-radius argument as task.isolation.apply
 ```
 
-**Reduced-capability mode, stated honestly.** If condition 2 or 3 is unmet, LSP is
+**Reduced-capability mode, stated honestly.** If any of conditions 2, 3, or 4 is unmet, LSP is
 unavailable and the workflow does not silently pretend otherwise:
 
 - Explorer, Implementer, and Reviewer fall back to `grep` + ranged `read` for symbol
   questions. This is a **real degradation**, not an equivalent path: `grep` answers "what
   text exists", not "who calls this" (§C). Blast-radius review in particular gets weaker.
-- The degradation MUST be disclosed in the final report, naming which of the three conditions
-  failed — they have different fixes (edit the agent file / merge the project setting /
-  relaunch the session with LSP enabled).
+- The degradation MUST be disclosed in the final report, naming **which of the four conditions
+  failed** — they have different fixes:
+  - condition 1 (allowlist absent): edit the agent file
+  - condition 2 (`task.enableLsp` unset): merge the project setting via installer
+  - condition 3 (parent session disabled): relaunch the session with LSP enabled
+  - condition 4 (`lsp.enabled` false): enable the `lsp.enabled` setting
 - DR-7 is therefore refined: LSP is **required for full-quality retrieval and blast-radius
   review**, and its absence is a disclosed capability limit — not a silent substitution. A
   run without LSP is a valid run with a stated weakness; calling it equivalent would be the
   overclaiming pattern CR-35 corrected elsewhere.
 
-T-00.E5 must separate the three conditions as distinct failure causes, because they are
-diagnosed and fixed differently. See `phases/phase-00-foundation.md` T-00.E5.
+T-00.E5 must separate the four conditions as distinct failure causes, because they are
+diagnosed and fixed differently. See `spec/phases/phase-00-foundation.md` T-00.E5.
 
 ### CR-17 — Authoritative LSP Allowlist (DR-7 decision record)
 

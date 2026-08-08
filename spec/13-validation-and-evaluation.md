@@ -60,6 +60,11 @@ Add:
   template's project `config.yml` MUST set `task.enableLsp: true` (default is `false`). An
   allowlist that grants a tool the settings layer withholds is the round-1 defect inverted, and
   it is statically detectable.
+- **CR-41 — `lsp.enabled` gate.** LSP is a four-condition conjunction; `lsp.enabled` (default
+  `true`) is a separate settings key from `task.enableLsp`. An L0 check that covers CR-40 does
+  not cover CR-41, because `lsp.enabled=false` with `task.enableLsp=true` satisfies the CR-40
+  allowlist↔setting check while leaving LSP unavailable. Statically flag the contradiction when
+  the template config sets `task.enableLsp: true` but also sets `lsp.enabled: false`.
 
 ### L1 — Discovery (new, highest value per effort)
 
@@ -82,6 +87,15 @@ Assertions:
 - **CR-40 — effective `task.enableLsp == true`** in the project target. This is the settings
   half of the LSP conjunction; the allowlist half is L0 and the parent-session half is only
   observable at runtime (T-00.E5 E5-C).
+- **CR-41 — effective `lsp.enabled == true`** alongside `task.enableLsp`. Both settings must be
+  true for the child tool list to contain `lsp`. Check the effective merged value — a project
+  config that sets `task.enableLsp: true` while a higher layer sets `lsp.enabled: false` will
+  pass the CR-40 check but still produce no LSP tool. (T-00.E5 E5-F is the runtime fixture.)
+- **CR-43 — effective Verifier `bash` tool presence.** The Verifier's allowlist entry is
+  necessary but not sufficient: `bash.enabled` (default `true`) gates registration independently.
+  L1 MUST confirm the effective Verifier tool set includes `bash`. A Verifier missing effective
+  `bash` is a configuration failure — do not dispatch it and report a schema-valid `PASS`.
+  (§10 §B-2, CR-43 L4 fixture below.)
 - Custom model roles resolve (§09) — `@explorer` maps to a real model, not silently to `default`.
 - `.omp/AGENTS.md` and `.omp/RULES.md` load, with RULES.md forced `alwaysApply` (§11).
 - **CR-31 — effective isolation settings.** Read the *effective* (post-precedence) values and assert `task.isolation.mode != "none"`. For a project-target install, also assert `task.isolation.apply == false`. For a user-target install without `-EnableCaptureFirstIsolation`, assert the key was **not** written globally and that the preflight notice was emitted. This is the static counterpart to the mandatory `/orchestrated` runtime preflight (§08 §E-9) — it catches a bad install, but does not replace the runtime read, because a CLI overlay can still override it.
@@ -134,15 +148,17 @@ project's central "no false completion" claim:
 | **Transcript audit detects the fabrication** (CR-35, T-04.8) | Same fixture; Tech Lead then reads `history://<verifier-id>` | The transcript renders one line per tool call with name and arguments (`session/session-history-format.ts`), so a Verifier with zero `bash` calls is distinguishable from one that ran the claimed commands. Records whether the audit is deterministic enough to gate on. Gates any future stronger claim. |
 | **Deterministic pre-existing failure** (CR-36) | Baseline contains a deterministic failing test in a subsystem the diff does not touch; implemented change is clean; Verifier runs the full suite | Classification is `preexisting` with baseline evidence, and the Implementer is **not** dispatched. **Classifying as `impl` is a FAIL** — it sends the Implementer to modify out-of-scope code, the exact expensive error the taxonomy exists to prevent (§10 §B). |
 
-**CR-38/CR-39/CR-40 — required additional L4 cases.** All three are silent-failure classes at the
+**CR-38/CR-39/CR-40/CR-41/CR-42/CR-43 — required additional L4 cases.** All are silent-failure classes at the
 OMP task boundary, which is what L4 exists for:
 
 | Case | Setup | Required detection response |
 |---|---|---|
-| **Parent overlay defeats the settings read** (CR-38) | Project config `apply: false`; launch the parent with `--config` setting `apply: true`; run `/orchestrated` on independent parallel scope | Subprocess `omp config get` reports `false` (a false pass on its own). The **same-session canary** detects the sentinel landed in the parent tree, fails the preflight, and blocks fan-out. **Fanning out because the diagnostic passed is a FAIL.** Repeat with an in-session `/settings` override, where no file changes at all. |
+| **Parent overlay defeats the settings read** (CR-38/CR-42) | Project config `apply: false`; launch the parent with `--config` setting `apply: true`; run `/orchestrated` on independent parallel scope | Subprocess `omp config get` reports `false` (a false pass on its own). The **same-session read-only canary** detects the merge-summary does NOT begin with "Isolation:", fails the preflight, and blocks fan-out — **without modifying any parent file** (CR-42). **Fanning out because the diagnostic passed is a FAIL. A canary that mutates the parent on its failure path is also a FAIL.** Repeat with an in-session `/settings` override, where no file changes at all. |
 | **Worker without `blocking`** (CR-39) | Remove `blocking: true` from the Implementer; run `/orchestrated` with `async.enabled: true` (the default) | The barrier failure must be **detected, not absorbed**: L0/L1 fail the run before dispatch. If the run proceeds, integration receives `results: []` and MUST refuse rather than report a clean completion over zero integrated artifacts. **A successful-looking report with no work integrated is the worst outcome in the suite** — it is false completion produced by the orchestrator itself. |
 | **`task.batch` disabled** (CR-39) | Set `task.batch: false`; run `/orchestrated` | Preflight detects the flat wire shape and routes to sequential non-isolated with disclosure — **not** a mid-run schema error after the model has already composed a `tasks[]` call. |
-| **LSP granted but gated off** (CR-40) | Agents list `lsp`; `task.enableLsp` left at its `false` default | L0 fails on allowlist↔setting incoherence. At runtime, the workflow discloses reduced-capability mode **naming which condition failed** (setting vs parent session vs allowlist vs missing server). **Silently substituting `grep` and reporting normal-quality retrieval is a FAIL** (§07 §A-1). |
+| **LSP granted but gated off at task.enableLsp** (CR-40) | Agents list `lsp`; `task.enableLsp` left at its `false` default | L0 fails on allowlist↔setting incoherence. At runtime, the workflow discloses reduced-capability mode **naming which condition failed**. **Silently substituting `grep` and reporting normal-quality retrieval is a FAIL** (§07 §A-1). |
+| **LSP granted but gated off at lsp.enabled** (CR-41) | `task.enableLsp: true`, agents list `lsp`, but `lsp.enabled: false` in session settings | CR-40 check passes (task.enableLsp is true). The child tool list does NOT contain `lsp`. Workflow must disclose reduced-capability mode naming `lsp.enabled=false` as the specific cause — not `task.enableLsp` or allowlist. A disclosure reading "LSP unavailable" without naming `lsp.enabled` is a **FAIL** (T-00.E5 E5-F). |
+| **Verifier bash disabled** (CR-43) | Set `bash.enabled: false`; run any workflow with a Verifier | The Verifier MUST NOT be dispatched and yield `decision: PASS` with fabricated command evidence. Required outcome: preflight refuses the verified workflow OR workflow explicitly marks result as `UNVERIFIED` with `bash_unavailable` stated as cause. A schema-valid `PASS` from a Verifier with zero effective `bash` calls is a **FAIL** (§10 §B-2). |
 
 ---
 

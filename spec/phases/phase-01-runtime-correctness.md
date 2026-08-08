@@ -69,14 +69,15 @@ Fix (all three parts required):
 - state the reduced-capability behavior when LSP is unavailable, naming which of the three
   conditions failed
 
-**CR-40 — documenting the setting is not deploying it.** This task previously said "document
-`task.enableLsp: true` as a required setting". Documentation does not change effective settings,
-and the default is `false` (`config/settings-schema.ts:4615-4617`), so on a default machine the
-allowlist fix alone leaves `lsp` granted at the agent and withheld at the gate. The setting
-becomes an installer-owned project key (`spec/12 §C-1`, `phase-05` T-05.3); the user/global
-target requires `-EnableSubagentLsp`. LSP availability is a three-condition conjunction —
-allowlist ∧ `task.enableLsp` ∧ parent-session LSP — detailed in `spec/07 §A-1`, with T-00.E5
-cases A–E distinguishing the four remediations.
+**CR-40/CR-41 — documenting the setting is not deploying it, and three conditions are not all
+conditions.** This task previously said "document `task.enableLsp: true` as a required setting".
+Documentation does not change effective settings, and the default is `false`
+(`config/settings-schema.ts:4615-4617`), so on a default machine the allowlist fix alone leaves
+`lsp` granted at the agent and withheld at the gate. The setting becomes an installer-owned
+project key (`spec/12 §C-1`, `phase-05` T-05.3); the user/global target requires
+`-EnableSubagentLsp`. LSP availability is a **four-condition conjunction** —
+allowlist ∧ `task.enableLsp` ∧ parent-session LSP ∧ `lsp.enabled` — detailed in
+`spec/07 §A-1`, with T-00.E5 cases A–F distinguishing the five remediations.
 
 ### T-01.3b — Add `blocking: true` to every worker agent file (CR-39)
 

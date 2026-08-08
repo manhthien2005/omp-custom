@@ -162,6 +162,46 @@ It must not be. Tighten to:
 
 > `decision: PASS` requires every criterion to be `PASS`. Any `SKIP` forces `PARTIAL` at best, and the reason MUST appear in `coverage_gaps`.
 
+### B-2. Effective Tool Availability is a Precondition for the Verification Contract (CR-43)
+
+The Verifier's core contract — run every command fresh, read full output, count failures — depends
+on the `bash` tool being **effectively available**, not merely listed in the agent's `tools:`
+allowlist.
+
+OMP's built-in tool registration (`tools/index.ts:594`) gates `bash` independently:
+
+```ts
+if (name === "bash") return session.settings.get("bash.enabled");
+```
+
+`bash.enabled` defaults to `true` (`config/settings-schema.ts`), but a user who intentionally
+disabled shell execution sets it `false`. When that happens, the Verifier's allowlist entry is
+irrelevant — the tool is withheld regardless.
+
+**This is not a reduced-capability mode like LSP unavailability.** Without effective `bash`, the
+Verifier cannot execute a single command. It cannot run tests, builds, lint, or typecheck. The
+entire fresh-execution contract collapses. A Verifier without bash can still yield a
+schema-valid `PASS` — CR-35 already established that `buildOutputValidator()` has no tool-event
+correlation — which would be undetected false completion from the workflow's most trusted gate.
+
+**Required behavior when bash is unavailable:**
+
+```yaml
+bash_unavailable_policy:
+  detection: preflight checks effective Verifier tool set before dispatch
+  permitted_outcomes:
+    - REFUSE the verified workflow — do not dispatch Verifier; report bash unavailable
+    - UNVERIFIED result — mark result explicitly as unverified due to bash unavailability
+  prohibited_outcome:
+    - yield decision: PASS with prose substituting for command output
+    - silently downgrade to read-only "verification" without disclosing the incapacity
+  scope: Verifier ONLY as hard_required; Implementer bash absence is role_required (disclosed but not a hard refusal)
+```
+
+**L1/runtime check**: the preflight that reads effective isolation settings (§08 §E-9) MUST also
+read the effective Verifier tool set and assert `bash` is present. A Verifier missing effective
+`bash` is reported as a configuration failure, not dispatched. See `13-validation-and-evaluation.md §B` L1 and the CR-43 L4 fixture.
+
 ---
 
 ## C. The Reviewer Contract

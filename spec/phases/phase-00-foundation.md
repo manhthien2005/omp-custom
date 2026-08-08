@@ -296,10 +296,10 @@ has no evidence and MUST refuse the parallel path. Record the exact observed fai
 the command can distinguish "read succeeded, value is wrong" from "read failed" — they get
 the same refusal but different user-facing messages.
 
-#### E3-I — Parent-overlay attestation gap (CR-38 — decisive)
+#### E3-I — Parent-overlay attestation gap (CR-38/CR-42 — decisive)
 
-The case that proves why a subprocess read is not attestation. Construct the divergence
-deliberately:
+The case that proves why a subprocess read is not attestation, AND that the canary must be
+non-mutating. Construct the divergence deliberately:
 
 ```yaml
 project_config:            task.isolation.apply: false     # <repo>/.omp/config.yml
@@ -307,12 +307,26 @@ parent_launch:            omp --config /tmp/override.yml   # containing apply: t
 child_config_get_expect:  {"value": false}                 # subprocess sees files only
 parent_actual_expect:     applyChanges == true             # session.settings governs
 canary_expect:            detects apply=true → refuses parallel
+canary_parent_tree:       unchanged before and after canary (CR-42 — no mutations)
 ```
 
-Assert all four rows. The third and fourth **must disagree** — that disagreement is the
+Assert all five rows. The third and fourth **must disagree** — that disagreement is the
 finding. If they agree, record it: either the overlay did not take effect as documented, or a
 subprocess inherits more context than `docs/settings.md:21` implies, and CR-38's premise needs
 revision.
+
+**CR-42 canary contract.** The canary is a read-only agent (tools: `[read]`). It creates NO
+files. The discrimination is via merge summary text:
+
+```text
+apply=false → merge-summary begins "Isolation: ..."   (§E-9.2 apply=false path)
+apply=true  → merge-summary is "No changes to apply." (§E-9.2 apply=true, no-change path)
+```
+
+Assert that after the canary runs: `parent HEAD == before`, `parent git status == before`,
+`no files created or modified in parent`. On the apply=true path the canary must still produce
+zero parent mutations. If the canary creates any file in the parent even on the failure path,
+that is a CR-42 violation and §08 §E-9.2 must be revised before phase-02.
 
 Run the same shape a second time with an **in-session** override instead of a CLI overlay
 (change the setting via `/settings` mid-session, then dispatch). `Settings.set()` writes the
@@ -320,11 +334,13 @@ in-memory `#overrides` layer (`config/settings.ts:524`), so no file changes at a
 the harder variant and the one no external read can ever catch.
 
 Also record the canary's own cost and reliability: wall time, tokens, and whether the
-sentinel-absent assertion is stable across repeated runs (a flaky gate is worse than none).
+summary-discrimination assertion is stable across repeated runs (a flaky gate is worse than
+none).
 
 **Records**: whether `omp config get` can be trusted as a gate (expected: no, diagnostic only),
-and whether the canary reliably discriminates. If the canary proves unreliable, the parallel
-path needs a different authority and §08 §E-9.2 must be revised before phase-02.
+whether the read-only canary reliably discriminates apply=false vs apply=true, and whether it
+leaves zero parent mutations in both cases. If the canary proves unreliable, the parallel path
+needs a different authority and §08 §E-9.2 must be revised before phase-02.
 
 #### E3-J — Async barrier and ordering (CR-39 — decisive)
 
@@ -417,18 +433,22 @@ Procedure:
 - Success with `lsp` in allowlist → phase-01 T-01.3 proceeds safely
 - Rejection despite allowlist → investigate `task.enableLsp` propagation or allowlist gating logic
 
-**CR-40 — this is a three-condition conjunction, not a single allowlist check.** The procedure
-above tests only "allowlist present vs absent" against an assumed `task.enableLsp = true`
+**CR-40/CR-41 — this is a four-condition conjunction, not a single allowlist check.** The
+procedure above tests only "allowlist present vs absent" against an assumed `task.enableLsp = true`
 baseline. That assumed the spec author's environment: the setting defaults to **`false`**
 (`config/settings-schema.ts:4615-4617`), so the interesting failures are ones the original
-procedure could not distinguish. Verified policy:
+procedure could not distinguish. Additionally, CR-41 adds a fourth independent gate: `lsp.enabled`
+at the built-in tool registration layer (`tools/index.ts:593`). Verified policy:
 
 ```ts
-// task/structured-subagent.ts:318-320
+// task/structured-subagent.ts:318-320 — child session enableLsp resolution
 enableLsp:
   !planMode &&
   (request.enableLsp ??
     ((request.session.enableLsp ?? true) && request.session.settings.get("task.enableLsp"))),
+
+// tools/index.ts:593 — child session built-in tool registration (CR-41)
+if (name === "lsp") return enableLsp && session.settings.get("lsp.enabled");
 ```
 
 There is no per-call override — `request.enableLsp` is not on the model-facing task wire
@@ -445,6 +465,7 @@ E5-A:
 E5-B:
   task_enableLsp: true
   parent_session_lsp: enabled
+  lsp_enabled: true
   agent_allowlist: includes lsp
   expected:
     explorer:    lsp callable
@@ -469,15 +490,27 @@ E5-E:
   all_conditions_met: true
   language_server: unavailable / not installed
   expected: distinguish "tool callable but no server" from "tool unavailable"
+
+E5-F:
+  task_enableLsp: true             # CR-40 satisfied
+  parent_session_lsp: enabled      # condition 3 satisfied
+  agent_allowlist: includes lsp    # condition 1 satisfied
+  lsp_enabled: false               # CR-41 gate — independent setting, default: true
+  expected: worker lsp UNAVAILABLE
+  fix_if_hit: enable lsp.enabled in project config or session settings
+  note: >
+    This case is distinct from E5-A: `task.enableLsp` is true, the L0/CR-40 check passes,
+    but `lsp.enabled=false` at tools/index.ts:593 means the child tool list does not contain
+    lsp. The disclosure MUST name lsp.enabled as the failed condition, not task.enableLsp.
 ```
 
-**The discriminator that matters is the error shape.** E5-A, E5-C, E5-D, and E5-E all present to
-the agent as "LSP did not work", but they require four different remediations (merge a project
-setting / relaunch the session / edit an agent file / install a language server). Record the
-exact observed failure — is `lsp` absent from the tool list, or present and erroring? — because
-the reduced-capability disclosure required by `07-retrieval-and-code-understanding.md §A-1` must
-name the actual cause. A disclosure reading "LSP unavailable" without the cause sends the user
-to the wrong fix.
+**The discriminator that matters is the error shape.** E5-A, E5-C, E5-D, E5-E, and E5-F all
+present to the agent as "LSP did not work", but they require five different remediations (merge
+a project setting / relaunch the session / edit an agent file / install a language server /
+enable the lsp.enabled setting). Record the exact observed failure — is `lsp` absent from the
+tool list, or present and erroring? — because the reduced-capability disclosure required by
+`07-retrieval-and-code-understanding.md §A-1` must name the actual cause. A disclosure reading
+"LSP unavailable" without the cause sends the user to the wrong fix.
 
 **Artifact (extended)**: LSP capability transcript per case A–E, each recording the tool-list
 contents and the verbatim error or success.
@@ -525,9 +558,9 @@ Manual checks:
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-K** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap (E3-I)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**). **E3-A, E3-G, E3-H, E3-I and E3-J are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier.
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-K** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**). **E3-A, E3-G, E3-H, E3-I and E3-J are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
-- [ ] **T-00.E5 artifacts present for cases E5-A … E5-E** (LSP capability as a three-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, language-server availability), each recording the tool-list contents and verbatim error so the four distinct remediations are distinguishable (CR-40)
+- [ ] **T-00.E5 artifacts present for cases E5-A … E5-F** (LSP capability as a four-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, `lsp.enabled` gate (CR-41), language-server availability), each recording the tool-list contents and verbatim error so the five distinct remediations are distinguishable (CR-40/CR-41)
 
 ---
 
