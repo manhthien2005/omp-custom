@@ -22,10 +22,21 @@ This document reports the audit result.
 
 ## 2. Method
 
-1. Grepped `spec/` for `CR-N` tags across all 45 Round-1 CRs.
+1. Grepped `spec/` for `CR-N` tags across **CR-01…CR-45, i.e. the full review lineage**
+   (Round 1 contributed CR-01…CR-25; Rounds 2–11 added CR-26…CR-45).
 2. Found three with **zero traceability tags**: CR-05, CR-07, CR-15.
 3. Verified each substantively against current spec files.
-4. Patched all three gaps and fixed two bidirectional DAG defects discovered in the process.
+4. Patched all three gaps and fixed **three missing reverse-endpoint declarations**
+   across two header files (`P1 → P5`, `P3 → P6`, `P4 → P6`).
+
+**Authority of the tag scan (narrow, by design).** Tag presence proves *traceability
+only*: that a finding is referenced somewhere under `spec/`. It does **not** prove the
+accepted semantics were patched everywhere, that no later edit reintroduced a
+contradiction, that acceptance tests match the closure packet, or that runtime evidence
+exists. Substantive closure rests on the accepted review lineage, exact spec semantics,
+pinned source evidence, and required runtime artifacts — never on tag coverage. The CR-45
+finding in §6 below is a live example: the tag was present while the file still
+contradicted the accepted contract.
 
 ---
 
@@ -60,8 +71,14 @@ downstream tasks that cannot begin until the experiment has a recorded artifact:
 | T-00.E4 (rule sentinel propagation) | DR-4 final justification; phase-02 worker initialization |
 | T-00.E5 (LSP allowlist) | T-01.3 (LSP allowlist fix) |
 
-CR-05 is mechanically enforced: no gate can be bypassed without leaving the phase
-incomplete, and phase-01 depends on phase-00's exit criteria.
+CR-05 is **explicitly and normatively gated in the spec** — not mechanically enforced.
+The original sequencing defect is resolved at the specification level: experiment tasks
+exist, each names its downstream `**Blocks**`, and phase-00 exit criteria require retained
+artifacts before phase-01 may begin. But nothing at the repository/tool boundary enforces
+this. Verified absence: no file under `scripts/` contains phase, DAG, or experiment-gate
+logic, and there is no `.github/` directory, hence no CI. A human or model can ignore the
+gate and no tooling stops them. The earlier "mechanically enforced / no gate can be
+bypassed" wording was an overclaim and is withdrawn.
 
 ---
 
@@ -99,7 +116,8 @@ would misrepresent the trust boundary.
 **GPT's finding:** there was no single machine-readable DAG from which README, phase
 headers, and task gates derive. README and phase headers could drift apart.
 
-**Audit result: PARTIALLY RESOLVED before this audit; two defects found and patched.**
+**Audit result: PARTIAL — three missing reverse-endpoint declarations found and patched;
+mechanical derivation/validation still absent, so CR-15 does not close.**
 
 ### 5.1 Pre-existing prose resolution
 
@@ -108,16 +126,24 @@ had the prose critical paths with an explicit P5-independence note. This was the
 original Round-1 PARTIAL acceptance: prose addressed, machine-readable block not yet
 added.
 
-### 5.2 Defects found: two one-sided edges
+### 5.2 Defects found: three missing reverse-endpoint declarations
 
-Auditing the current phase headers against the README Mermaid graph revealed **two
-one-sided edges** — `**Blocks**`/`**Depends on**` pairs where one endpoint named the
-edge and the other did not:
+Auditing the current phase headers against the README Mermaid graph revealed **three
+one-sided edges** across two header files — `**Blocks**`/`**Depends on**` pairs where one
+endpoint named the edge and the other did not:
 
 | Edge | Before fix | Problem |
 |---|---|---|
 | P1 → P5 | `phase-05:5` said `Depends on: phase-01` ✓; `phase-01:6` said `Blocks: phase-02` only ✗ | P1 missing P5 in Blocks |
-| P5 → P6 | `phase-03:6` and `phase-04:6` both said `Blocks: phase-06` ✓; `phase-06:5` said `Depends on: phase-05` only ✗ | P6 missing P3 and P4 in Depends on |
+| P3 → P6 | `phase-03:6` said `Blocks: phase-06` ✓; `phase-06:5` said `Depends on: phase-05` only ✗ | P6 missing P3 in Depends on |
+| P4 → P6 | `phase-04:6` said `Blocks: phase-06` ✓; `phase-06:5` said `Depends on: phase-05` only ✗ | P6 missing P4 in Depends on |
+
+**Correction to the earlier record.** A previous version of this section counted these as
+"two one-sided edges" and labelled the second row `P5 → P6`. That label was wrong on both
+counts: `P5 → P6` was never broken (`phase-05` and `phase-06` both already named it), and
+the two genuinely missing incoming declarations at `phase-06` are `P3 → P6` and `P4 → P6`
+— distinct edges, not one. The patch applied was correct; the narrative describing it was
+not. Accurate count: **three** missing reverse endpoints across **two** files.
 
 Both fixed:
 
@@ -135,14 +161,23 @@ Both fixed:
 
 `spec/README.md §7` now contains an explicit resolution block that:
 
-1. Names the `§6` Mermaid graph as the **canonical** source
-2. States that phase headers are *derived views* and MUST NOT contradict it
+1. Names the `§6` Mermaid graph as the **canonical** declared authority
+2. States that phase headers are **manually maintained projections** — NOT generated, and
+   not checked by any validator
 3. Lists all 9 directed edges in a table with both endpoint columns
 4. States: "Any edit to the graph must update both endpoints in the same commit. A
    one-sided edge is a spec defect, not a stylistic choice."
+5. Records the mechanical status honestly: `current_projection_method: manual`,
+   `automatic_validation: pending`, `CI_check: none`,
+   `task_gate_derivation_from_phase_graph: not_implemented`
 
-This satisfies GPT's stated requirement: "README, phase headers, task gates and CI
-derive from one graph."
+This **partially** satisfies GPT's stated requirement ("README, phase headers, task gates
+and CI derive from one graph"). The single authority is declared and the edges are
+consistent, but nothing *derives* mechanically — there is no generator, no validator, and
+no CI. An earlier version of this section called the headers "derived views," which
+overstated it: they are hand-maintained copies governed by a prose MUST. CR-15 is
+therefore **PARTIAL**, not resolved. The drift risk is demonstrated rather than
+theoretical — three reverse endpoints were missing until a manual audit found them.
 
 **Note on "machine-readable YAML" (original GPT ask):** a `phases: P0: {depends_on: []}`
 YAML block was not added. Rationale: the Mermaid graph in `§6` is already machine-parseable
@@ -160,11 +195,19 @@ All other Round-1 CRs (CR-01–CR-04, CR-06, CR-08–CR-14, CR-16–CR-25) were 
 partially accepted in the original response and have 1–8 traceability tags in `spec/`.
 Rounds 2–11 introduced CR-26…CR-45; all are tagged. Post-static-closure state:
 
-- **CR-01…CR-45**: tagged in spec
-- **CR-45 TOCTOU**: fully closed — `parallel_mode: DISABLED`, `parallel_mode_requires:
-  guarded_dispatch (E3-M)`, explicit 7-item non-PASS list in `phase-00-foundation.md`
+- **CR-01…CR-45**: tagged in spec (traceability only — see §2)
+- **CR-45 TOCTOU**: **E3-L observation contract and parallel-default-disable are CLOSED;
+  the E3-M acceptance contract was NOT closed** at commit `c6f433a`. The earlier "fully
+  closed" claim is withdrawn. Three internal contradictions existed while the `CR-45` tag
+  was present: (a) worker-side fingerprint was on the non-PASS list *and* admitted into
+  the PASS consequence as "path B"; (b) the mandatory no-preflight direct-bypass case was
+  absent from the test matrix; (c) the E3-M body said M1–M4 while the phase-00 exit
+  criterion said M1–M3. All three are fixed in the follow-up commit; see the companion
+  response `opus5-response-to-gpt56-PA01-PA04.md`.
 - **E3-A…E3-L**: pending empirical execution
-- **E3-M**: not attempted; parallel mode stays DISABLED
+- **E3-M**: not attempted. Additionally, no public path-A implementation is known to exist
+  on pinned v17.2.10 — the blocking capability and the live-settings capability sit on
+  different public contexts. Parallel mode stays DISABLED.
 
 ---
 

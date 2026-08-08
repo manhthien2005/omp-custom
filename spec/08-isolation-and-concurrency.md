@@ -600,11 +600,32 @@ with a real boundary."
 
    **Parallel mode enablement requires an atomic guarded dispatch mechanism** (E3-M — see
    phase-00), NOT merely E3-L. Options:
-   - Path A: task-call interceptor that checks `task.isolation.apply` immediately before execution
+   - Path A: interceptor at the actual task dispatch boundary that reads the **same live
+     parent `Settings` instance** and blocks before any worker spawn
    - Path B: single primitive that reads settings AND dispatches the batch atomically
    - Path C: setting locked/forced for the duration of the guarded dispatch
 
    Until one of A/B/C is source-verified and Phase-00 confirmed, parallel mode stays DISABLED.
+
+   **Post-dispatch detection is not an option.** A worker-side settings fingerprint checked
+   as the worker's first action is `defense_in_depth` only: the isolated worker has already
+   been spawned, and the check is a model-directed action the worker can skip. Documenting
+   the residual window does not convert it into a pre-spawn guard. It can never pass E3-M.
+
+   **Source-authority gap (verified at v17.2.10 `3a8591a`).** Path A has no known public
+   implementation: the blocking capability and the live-settings capability sit on
+   *different* public contexts, and four candidate surfaces are all closed —
+   `ExtensionContext` (`extensibility/extensions/types.ts:415-483`, no `settings` field);
+   `ReadonlySessionManager` (`session/session-manager.ts:327-350`, a 21-member `Pick` with
+   no settings accessor); a re-registered built-in via `invokeTool`
+   (`types.ts:479-482`, but `ToolDefinition.execute` at `types.ts:576-582` also receives
+   `ExtensionContext`); and the global `settings` Proxy (`config/settings.ts:2371`, not
+   identity-equal to the session instance — `cloneForCwd` at `settings.ts:603-620`
+   `structuredClone`s layers into a separate object). `CustomToolContext`
+   (`extensibility/custom-tools/types.ts:98-99`) *does* expose `settings?: Settings` but has
+   no task-dispatch member. Consequence: E3-M is expected to record **FAIL/DEFER** on the
+   pinned version, and parallel mode stays DISABLED — see `phases/phase-00-foundation.md`
+   E3-M `blocking_source_gap`.
 
    **Agent taxonomy note.** `isolation-canary` is an **internal preflight support agent**, not a
    workflow worker role. The four-worker constraint (CR-33: explorer, implementer, verifier,

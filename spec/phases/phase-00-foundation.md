@@ -111,6 +111,16 @@ naming the downstream tasks and spec sections it gates. Phase-00 does not merely
 *list* the open questions — it gates dependent implementation on their recorded
 answers. No dependent task may begin against an unresolved experiment.
 
+**Enforcement level (precise).** This gate is **normative, not mechanically validated**.
+It is a written contract consumed by humans and coding agents: nothing under `scripts/`
+parses experiment status, checks artifact presence, or fails a build when a blocked task
+is attempted, and there is no CI workflow in this repository. A reader who chooses to
+ignore the gate is not stopped by tooling. Stating this plainly is required by the same
+discipline the spec applies elsewhere — documentation requirement ≠ runtime enforcement,
+preflight instruction ≠ protected-operation boundary. Optional future hardening: a
+machine-readable experiment-status file plus a validator that rejects missing or invalid
+required artifacts.
+
 ### T-00.E1 — Schema precedence and provider enforcement
 
 Verify `resolveSchema` precedence and provider strict-mode behavior at the pinned SHA.
@@ -532,7 +542,33 @@ path_A_true_interceptor:
     two tool calls regardless of whether they are in the "same model turn". An OMP
     extension hook (extensibility/extensions/wrapper.ts:200-232 — blocks on
     { block: true }, fails closed on throw) that intercepts the TaskTool itself would
-    satisfy path A if it can access the live Settings instance at intercept time.
+    satisfy path A ONLY IF it can access the live parent Settings instance at intercept
+    time. That access has NOT been demonstrated — see blocking_source_gap below.
+  blocking_source_gap: >
+    Verified against pinned v17.2.10 (3a8591a): the blocking capability and the settings
+    capability live on DIFFERENT public contexts, and no public surface joins them.
+    Four candidate surfaces were checked and all four are closed:
+      1. ExtensionContext (extensibility/extensions/types.ts:415-483) — the context the
+         tool_call interceptor actually receives. Has NO settings field.
+      2. ReadonlySessionManager (session/session-manager.ts:327-350) — reachable from
+         ExtensionContext.sessionManager, but it is a 21-member Pick with no settings
+         accessor (getCwd, getSessionDir, getEntries, putBlob, ...).
+      3. ExtensionContext.invokeTool / re-registered built-in (types.ts:479-482, and
+         ToolDefinition.execute at types.ts:576-582) — a re-registered tool CAN sit at
+         the dispatch boundary, but its execute() also receives ctx: ExtensionContext,
+         so it inherits the same missing-settings gap.
+      4. The global settings Proxy (config/settings.ts:2371) — importable in-process, but
+         NOT identity-equal to the session instance: cloneForCwd (settings.ts:603-620)
+         structuredClones each layer into a separate Settings object, and
+         liveSettingsInstances (settings.ts:2331) is a set of multiple live instances.
+         Reading the global therefore does not prove anything about the value the
+         dispatch will actually use.
+    By contrast CustomToolContext (extensibility/custom-tools/types.ts:98-99) DOES expose
+    settings?: Settings ("Prefer over the global singleton") — but exposes no task
+    dispatch member, so a custom tool cannot be the dispatch boundary.
+    Consequence: on pinned v17.2.10 there is no known public path-A implementation.
+    E3-M must record this as FAIL/DEFER unless an unexamined surface is found and
+    demonstrated. Parallel mode stays DISABLED.
   explicit_non_pass: >
     "Same JS event loop" or "same model turn" reasoning alone, without an actual
     interceptor running at the dispatch boundary, does NOT satisfy path A. Tool calls
@@ -540,13 +576,30 @@ path_A_true_interceptor:
     preflight custom-tool call followed by a later TaskTool invocation is not atomic
     and is explicitly on the E3-M non-PASS list.
 
-path_B_worker_side_fingerprint:
+path_B_atomic_dispatching_primitive:
+  approach: >
+    A single trusted primitive that reads the live setting AND performs the task
+    dispatch as one indivisible operation — no separate model-visible step between
+    the read and the spawn. If the read returns an unsafe value the primitive never
+    dispatches.
+  requirement: >
+    Read and dispatch must live inside the same primitive. Any design in which the
+    model performs the read and then separately requests the dispatch is path-A
+    territory at best and is non-PASS if no interceptor sits at the dispatch boundary.
+
+worker_side_fingerprint:
+  status: NOT a path to E3-M PASS
   approach: >
     Capture a settings fingerprint (hash of relevant keys) at preflight; the worker's
     first action reads ctx.settings and verifies the fingerprint; abort if mismatch.
+  authority: defense_in_depth_only
+  e3_m_pass_power: none
   limitation: >
-    Detects the race post-dispatch, not pre-dispatch. Still a TOCTOU at the worker
-    boundary, but reduces the exploitable window to the task launch latency.
+    Detects the race post-dispatch, not pre-dispatch — the isolated worker has already
+    been spawned, and the check is a model-directed action the worker can skip.
+    Documenting the residual window does not convert a post-dispatch detector into a
+    pre-spawn mechanical guard. May be adopted as an additional layer on top of a
+    passing path A or path B; never as the mechanism that passes E3-M.
 
 path_C_behavioral_only:
   approach: >
@@ -570,6 +623,18 @@ case_M2_mutation_between_t0_and_t3:
   expected: interceptor or worker-side check detects mismatch; dispatch aborted or
             worker refuses; parent tree unchanged
 
+case_M2b_no_preflight_direct_bypass:
+  setup:    a model/workflow attempts a protected parallel task with NO preceding
+            preflight read at all — the guard is never invoked cooperatively
+  expected: the task boundary itself blocks dispatch before any worker spawn
+  rationale: >
+    This is the direct-bypass failure mode and it is distinct from M2. M2 tests whether
+    a mutation between t0 and t3 is caught; M2b tests whether the mechanism has any
+    authority when no preflight happened. A mechanism that only works when politely
+    called first is cooperative, not mechanical — it fails exactly where an
+    uncooperative or forgetful caller matters most. M2 cannot substitute for M2b:
+    passing M2 only proves the guard works on a path that already invoked it.
+
 case_M3_mutation_reverted:
   setup:    project apply:false; override to true; revert to false before dispatch
   expected: document whether the chosen mechanism catches the revert or misses it;
@@ -591,15 +656,25 @@ case_M4_apply_true_before_call:
 - a worker prompt instructing it to abort before edits (behavioral, not mechanical)
 - the behavioral isolation canary
 - a finite sample in which hub happened not to execute
+- a mechanism that only blocks when a preflight was cooperatively invoked first
+  (i.e. fails case M2b — cooperative, not mechanical)
+- reading the global `settings` Proxy (config/settings.ts:2371) in place of the live
+  parent Settings instance — cloneForCwd (settings.ts:603-620) structuredClones layers
+  into a separate object, so the global is not provably the instance dispatch will read
+- documenting a residual unsafe window as though disclosure converted a post-dispatch
+  detector into a pre-spawn guard
 ```
 
 **E3-M PASS consequence:**
 
 ```yaml
 parallel_mode: ENABLED
-guarded_dispatch: confirmed (path A: true interceptor at dispatch boundary;
-                              or path B: post-dispatch-detect with documented residual window)
+guarded_dispatch: confirmed — path A (interceptor at the actual dispatch boundary,
+                  reading the SAME live parent Settings instance, blocking before any
+                  worker spawn) or path B (atomic read-and-dispatch primitive).
+                  Post-dispatch detection is NOT a PASS mechanism under either path.
 e3_l_prerequisite: satisfied
+required_cases: M1, M2, M3, M4 all recorded with expected results
 ```
 
 **E3-M FAIL or not attempted consequence:**
@@ -612,7 +687,8 @@ note: >
   E3-M is optional for v0 — parallel remains disabled if E3-M is deferred.
 ```
 
-**Artifact:** Mechanism design note + test transcript for chosen path; result for cases M1–M4;
+**Artifact:** Mechanism design note + test transcript for chosen path; result for ALL cases
+M1, M2, M2b, M3, M4 (M2b — the no-preflight direct bypass — is mandatory, not optional);
 determination of whether a mechanical (not purely behavioral) guard is achievable with current
 OMP primitives.
 
@@ -781,7 +857,7 @@ Manual checks:
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record M1–M3; if not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record ALL of M1, M2, M2b, M3, M4; if not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
 - [ ] **T-00.E5 artifacts present for cases E5-A … E5-F** (LSP capability as a four-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, `lsp.enabled` gate (CR-41), language-server availability), each recording the tool-list contents and verbatim error so the five distinct remediations are distinguishable (CR-40/CR-41)
 

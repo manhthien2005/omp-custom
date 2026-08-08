@@ -215,10 +215,12 @@ Phase-00 is non-negotiably first: it converts remaining assumptions into observe
 
 Note: P5 (installation hardening) depends only on P1, not P2. Stating all three of P3/P4/P5 as "after P2" would unnecessarily constrain P5 and contradict its independence.
 
-**CR-15 resolution — single source of truth.** The `§6` Mermaid graph above is the
+**CR-15 resolution — single declared authority.** The `§6` Mermaid graph above is the
 **canonical** phase DAG. The prose paths in this section and the `**Depends on**` /
-`**Blocks**` headers in every `phases/phase-NN-*.md` file are *derived views* of it
-and MUST NOT contradict it. Both directions of every edge are stated: if `§6` has
+`**Blocks**` headers in every `phases/phase-NN-*.md` file are **manually maintained
+projections** of it — they are NOT generated, and no validator checks them. They MUST
+NOT contradict the graph, but that "must" is a prose obligation, not a mechanism.
+Both directions of every edge are stated: if `§6` has
 `Px --> Py`, then `phase-Px` names `phase-Py` in `**Blocks**` **and** `phase-Py`
 names `phase-Px` in `**Depends on**`. The nine canonical edges are:
 
@@ -236,6 +238,25 @@ names `phase-Px` in `**Depends on**`. The nine canonical edges are:
 
 Any edit to the graph must update both endpoints in the same commit. A one-sided
 edge is a spec defect, not a stylistic choice.
+
+**Current mechanical status (do not overstate this):**
+
+```yaml
+canonical_phase_dag: Mermaid §6
+current_projection_method: manual
+current_consistency: verified_by_hand_at_commit_c6f433a
+automatic_validation: pending
+CI_check: none                        # no .github/ in this repository
+task_gate_derivation_from_phase_graph: not_implemented
+```
+
+The drift risk is demonstrated, not hypothetical: three reverse-endpoint declarations
+(`P1 → P5`, `P3 → P6`, `P4 → P6`) were missing until a manual audit found them. Until a
+deterministic validator exists — one that extracts the `§6` edges and diffs them against
+every phase header in both directions, failing on one-sided or unknown edges — this
+section is a convention, not a guarantee. Task-level gates (`**Blocks**` lines inside
+phase files, e.g. T-00.E1…E5) are **outside** the phase-DAG authority and are not modeled
+by this graph.
 
 ---
 
