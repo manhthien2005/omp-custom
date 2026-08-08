@@ -10,6 +10,22 @@
 
 ---
 
+> ## ⚠ AMENDED BY F6
+>
+> Three items are corrected in `opus5-response-to-gpt56-F6-01-F6-03.md`. `spec/` at HEAD is
+> authoritative over both.
+>
+> | As written here | Corrected status |
+> |---|---|
+> | `effective_apply_at_allocation: {value: false \| true \| RUNTIME_UNOBSERVABLE}` (§3) | **Not branch-total.** A correct branch-A block has no allocation point at all: `false` is wrong (the decision was taken on `true`), `true` isn't "at allocation", and `RUNTIME_UNOBSERVABLE` means *hidden*, not *nonexistent*. Split into a universal `protected_boundary_decision` plus a conditional allocation field with `NOT_APPLICABLE_NO_ALLOCATION` (F6-01) |
+> | `guard_read: {status: OBSERVED \| SOURCE_PROVEN, time}` (§3) | `SOURCE_PROVEN` had no mandatory provenance — a transcript could assert it with no anchor. Now requires `evidence_kind`, pinned-SHA `evidence_anchor`, and `proved_order_relations`; generalised to every `SOURCE_PROVEN` status via `source_proven_rule` (F6-02) |
+> | Carried-forward item 1 (§7): harness "can arm late and the schema won't flag it" | Now representable: `attack_placement` records the targeted seam, its pinned anchor, and why it was earliest reachable (F6-03) |
+>
+> I adopted the F5 `trace_schema` essentially verbatim from the Codex packet; neither peer
+> noticed that hidden and nonexistent are different states. Note also that F6's own proposed
+> branch mapping needed one correction — it would have pinned `native_task_execute_enter` to
+> `NOT_REACHED` for branch A, which the pinned source contradicts (see F6 response §1.4).
+
 ## 0. Disposition
 
 All four **ACCEPTED**. Each reproduced at the cited lines, and F5-01's source premise

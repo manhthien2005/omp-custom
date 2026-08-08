@@ -907,9 +907,20 @@ case_M2_guard_read_to_spawn_race:
     guard_read:
       status: OBSERVED | SOURCE_PROVEN
       time: timestamp | null
+      evidence_kind: RUNTIME | SOURCE_CALL_GRAPH        # F6-02 — mandatory
+      evidence_anchor: source_or_artifact_reference | null
+      proved_order_relations: [guard_read_before_override_call_enter]
     mutation_trigger:                 # F5-04 event 1 of 3 — arming/scheduling
       status: ARMED | REQUESTED
       time: timestamp
+    attack_placement:                 # F6-03 — provenance for common_setup's "earliest seam"
+      target_seam: symbol_or_event_identifier
+      source_anchor: pinned_SHA_file_and_line_or_symbol_range
+      relation_to_guard_read: AFTER
+      earliest_reachable: true
+      proof: source_or_harness_argument
+      trigger_armed_time: timestamp
+      actual_override_call_enter_time_or_status: timestamp | DEFERRED_UNTIL_AFTER_INTERVAL | NOT_REACHED
     override_call_enter:              # F5-04 event 2 of 3 — the call actually begins
       status: OBSERVED | DEFERRED_UNTIL_AFTER_INTERVAL | NOT_REACHED
       time: timestamp | null
@@ -919,14 +930,21 @@ case_M2_guard_read_to_spawn_race:
     native_task_execute_enter:
       status: OBSERVED | NOT_REACHED | NOT_APPLICABLE
       time: timestamp | null
+    protected_boundary_decision:   # F6-01 — UNIVERSAL: exists in every branch
+      outcome: ALLOW | BLOCK
+      effective_apply:             # the value the decision was actually taken on
+        value: false | true | RUNTIME_UNOBSERVABLE
+        evidence_kind: RUNTIME | SOURCE_CALL_GRAPH | SPANNING_INVARIANT
+        evidence_anchor: source_or_artifact_reference
     worker_allocation_attempt:
       status: OBSERVED | NOT_REACHED
       time: timestamp | null
     worker_spawn_count: integer
-    effective_apply_at_allocation:
-      value: false | true | RUNTIME_UNOBSERVABLE
-      evidence_kind: RUNTIME | SOURCE_CALL_GRAPH | SPANNING_INVARIANT
-      evidence_anchor: source_or_artifact_reference
+    effective_apply_at_allocation:   # F6-01 — CONDITIONAL on allocation existing
+      status: OBSERVED | SOURCE_PROVEN | RUNTIME_UNOBSERVABLE | NOT_APPLICABLE_NO_ALLOCATION
+      value: false | true | null
+      evidence_kind: RUNTIME | SOURCE_CALL_GRAPH | SPANNING_INVARIANT | NOT_APPLICABLE
+      evidence_anchor: source_or_artifact_reference | null
     observer_non_interference:
       required: true
       proof: >
@@ -944,6 +962,85 @@ case_M2_guard_read_to_spawn_race:
     observation point that a genuinely atomic mechanism may not expose — and instrumenting
     one there can itself introduce the seam that invalidates the option_1 proof. Hence
     RUNTIME_UNOBSERVABLE with a declared `evidence_kind`.
+  normative_branch_mapping:   # F6-01 — what each branch MUST record
+    branch_A:
+      protected_boundary_decision.outcome: BLOCK
+      protected_boundary_decision.effective_apply.value: true
+      native_task_execute_enter.status: OBSERVED | NOT_REACHED   # BOTH are legal — see note
+      worker_allocation_attempt.status: NOT_REACHED
+      worker_spawn_count: 0
+      effective_apply_at_allocation.status: NOT_APPLICABLE_NO_ALLOCATION
+      effective_apply_at_allocation.value: null
+      effective_apply_at_allocation.evidence_kind: NOT_APPLICABLE
+    branch_B:
+      protected_boundary_decision.outcome: ALLOW
+      worker_allocation_attempt.status: OBSERVED
+      effective_apply_at_allocation.status: OBSERVED | SOURCE_PROVEN | RUNTIME_UNOBSERVABLE
+      effective_apply_at_allocation.value: false | null   # null iff RUNTIME_UNOBSERVABLE
+  attack_placement_rule: >
+    F6-03: `common_setup` normatively requires the harness to target the EARLIEST REACHABLE
+    seam after guard_read, but the schema previously recorded only `mutation_trigger.time` —
+    a timestamp proves WHEN the harness armed something, not THAT it attacked the earliest
+    reachable interleaving point. A weak harness could arm late, satisfy common_setup
+    literally, and land in branch B for the wrong reason. `attack_placement` closes that gap:
+    the artifact must name the targeted seam, anchor it at the pinned SHA, and argue why it is
+    earliest. For option_1 the enumerated call graph may supply this proof; for option_2 the
+    invariant-coverage proof may make attack timing safety-independent, but the placement must
+    STILL be recorded — a normative common_setup clause may not sit outside the evidence model.
+    This is P2 rather than P1 because the complete atomicity/invariant proof, not the attack
+    timing, is what ultimately decides branch-B safety.
+  source_proven_rule:   # F6-02 — applies to EVERY field that can be SOURCE_PROVEN
+    applies_to_every_status: SOURCE_PROVEN
+    requires:
+      - evidence_kind: SOURCE_CALL_GRAPH
+      - evidence_anchor: pinned_SHA_file_and_line_or_symbol_range
+      - proved_order_relations recorded explicitly, not implied by field order
+    forbidden:
+      - SOURCE_PROVEN with no anchor
+      - source-derived facts recorded as runtime timestamps
+    rationale: >
+      Without this, a transcript could record `guard_read: {status: SOURCE_PROVEN, time: null}`
+      and nothing more — naming no source path, no pinned-SHA range, and no order relation.
+      That is an assertion, not evidence. It matters most in branch A, whose setup requires
+      the chain guard_read < override_call_enter < mutation_effect < blocked allocation: if
+      guard_read is not directly OBSERVED, source anchors must establish both its existence
+      AND its order relative to the injection seam. The same rule governs
+      effective_apply_at_allocation.status: SOURCE_PROVEN in branch B.
+  hidden_is_not_nonexistent: >
+    F6-01: `RUNTIME_UNOBSERVABLE` means the observation point EXISTS but cannot be read
+    without perturbing the interval. `NOT_APPLICABLE_NO_ALLOCATION` means the indexed event
+    NEVER OCCURRED, so no value can be indexed to it. These are different states and
+    RUNTIME_UNOBSERVABLE must never be used to mean the second. An earlier revision offered
+    only `value: false | true | RUNTIME_UNOBSERVABLE` for effective_apply_at_allocation, which
+    left a correct branch-A block with no truthful value: `false` is wrong (the decision was
+    taken on `true`), `true` is not "at allocation" (allocation never happened), and
+    RUNTIME_UNOBSERVABLE is wrong (the point is nonexistent, not hidden) — and it is
+    additionally gated by runtime_unobservable_is_not_a_waiver, which a branch-A
+    boundary-recheck mechanism need not and should not satisfy: it passes by OBSERVING the
+    unsafe value and preventing allocation, not by proving atomicity. This repeated the F4
+    defect one level down — the EVENT got NOT_REACHED, the VALUE indexed to that nonexistent
+    event did not. Hence the universal `protected_boundary_decision` (which always exists)
+    is now separate from the conditional allocation observation.
+  branch_A_native_entry_note: >
+    OPUS CORRECTION to the F6 proposed mapping. The F6 packet's §1.1 trace asserts "native
+    execute never entered" for branch A, and its mapping pins only
+    worker_allocation_attempt: NOT_REACHED while leaving native_task_execute_enter unstated.
+    Verified against the pinned SHA, that is too narrow: the most plausible real branch-A
+    mechanism blocks INSIDE native execute, after entry. task/index.ts:670-675 enters
+    execute() and runs repairTaskParams/validate; :681-688 then does
+    `await Promise.all(... this.#resolveSpawnPreflight(spawn) ...)`, and that preflight is
+    where task.isolation.apply is read (structured-subagent.ts:315-317 via
+    resolveEffectiveSubagentPolicy). A StructuredSubagentError thrown there is caught per
+    item and returned as createTaskModeError at :692-705 — which is BEFORE the depthCapacity /
+    asyncItems allocation decisions at :713-719 and before any executor or job manager
+    observes the batch (see the source comment at :679-680: "No executor or job manager may
+    observe a batch unless every effective policy is valid"). So a valid branch-A run may
+    legitimately record native_task_execute_enter: OBSERVED together with
+    worker_allocation_attempt: NOT_REACHED. Pinning native entry to NOT_REACHED would
+    misrecord exactly the mechanism most likely to be built, and would reintroduce the
+    "required event a correct run prevents" defect in mirror image — an event a correct run
+    is ALLOWED to reach, forbidden by the schema. The protected event remains the SPAWN, per
+    invariant_under_test; native-execute entry is not itself a violation.
   runtime_unobservable_is_not_a_waiver: >
     `effective_apply_at_allocation.value: RUNTIME_UNOBSERVABLE` is accepted ONLY when
     accompanied by a COMPLETE atomicity_proof (option_1 or option_2) and an
@@ -1209,12 +1306,18 @@ optional_control_cases: [M2-control]       # MAY be recorded; no PASS power (F4-
 artifact_must_record: [M1, M2, M2b, M3, M4]
 m2_oracle: branch-sensitive (F4-01/F5-01) — common_setup is branch-NEUTRAL (arm a trigger;
            do not require an effect). Branch A (effect landed before allocation) requires
+           protected_boundary_decision.outcome BLOCK on effective_apply true, plus
            worker_spawn_count == 0. Branch B (effect could not land) permits spawn when
            effective_apply_at_allocation was false, or RUNTIME_UNOBSERVABLE with a declared
            evidence_kind + anchor and a COMPLETE atomicity_proof (F5-03).
-m2_trace: per trace_schema — typed statuses, NOT_REACHED legal, observer_non_interference
-          proven, and mutation_trigger / override_call_enter / mutation_effect kept
-          distinct (F5-04)
+m2_trace: per trace_schema + normative_branch_mapping — typed statuses; NOT_REACHED legal;
+          protected_boundary_decision is UNIVERSAL while effective_apply_at_allocation is
+          CONDITIONAL (NOT_APPLICABLE_NO_ALLOCATION in branch A — hidden != nonexistent,
+          F6-01); native_task_execute_enter may be OBSERVED or NOT_REACHED in branch A;
+          every SOURCE_PROVEN carries a pinned anchor + proved_order_relations (F6-02);
+          attack_placement records the targeted earliest seam (F6-03);
+          observer_non_interference proven; and mutation_trigger / override_call_enter /
+          mutation_effect kept distinct (F5-04)
 ```
 
 **E3-M FAIL or not attempted consequence:**
@@ -1241,10 +1344,22 @@ path B, or one admitted by `pass_equivalence_rule`). Must record:
   prevented them. The three mutation events stay **distinct** — `mutation_trigger` (armed),
   `override_call_enter` (call began), `mutation_effect` (value changed / rejected / deferred
   / inert); one timestamp may never stand for more than one of them. Record which branch was
-  exercised: **branch A** (effect landed before allocation) requires `worker_spawn_count == 0`;
-  **branch B** (the effect could not land) permits spawn provided
-  `effective_apply_at_allocation` was false — or `RUNTIME_UNOBSERVABLE` with a declared
-  `evidence_kind` and anchor. Recording a trigger or call-entry without the effect
+  exercised, per `normative_branch_mapping`: **branch A** records
+  `protected_boundary_decision: {outcome: BLOCK, effective_apply.value: true}`,
+  `worker_allocation_attempt: NOT_REACHED`, `worker_spawn_count == 0`, and
+  `effective_apply_at_allocation.status: NOT_APPLICABLE_NO_ALLOCATION` with `value: null` —
+  **not** a fabricated allocation value, and **not** `RUNTIME_UNOBSERVABLE`, since the
+  allocation point is nonexistent rather than hidden (F6-01). `native_task_execute_enter` may
+  legally be `OBSERVED` **or** `NOT_REACHED` in branch A: a mechanism that blocks inside
+  native execute's per-item preflight (`task/index.ts:681-705`) enters execute but never
+  reaches allocation. **Branch B** records `outcome: ALLOW`,
+  `worker_allocation_attempt: OBSERVED`, and `effective_apply_at_allocation` as `OBSERVED`,
+  `SOURCE_PROVEN`, or `RUNTIME_UNOBSERVABLE` with a declared `evidence_kind` + anchor.
+  Every `SOURCE_PROVEN` status — on any field — requires `evidence_kind: SOURCE_CALL_GRAPH`,
+  a pinned-SHA `evidence_anchor`, and explicit `proved_order_relations` (F6-02); a
+  source-derived fact may never be recorded as a runtime timestamp. `attack_placement` must
+  name the targeted seam, anchor it, and argue why it was the earliest reachable seam after
+  `guard_read` (F6-03). Recording a trigger or call-entry without the effect
   disposition is non-PASS. `observer_non_interference` must be proven: instrumentation that
   introduces a seam invalidates both the measurement and any option_1 proof.
 - **Atomicity proof for branch B** (F4-02/F5-02) — satisfy **either** option, and do not
