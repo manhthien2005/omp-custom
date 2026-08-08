@@ -857,49 +857,99 @@ case_M1_no_mutation:
 case_M2_guard_read_to_spawn_race:
   gating:   true
   supersedes: case_M2_mutation_between_t0_and_t3   # see M2-control below
-  setup:
-    - the candidate ENFORCEMENT GUARD itself observes live apply=false
-    - inject Settings.override("task.isolation.apply", true) AFTER that guard read
-    - place the injection before native worker allocation/spawn
+  common_setup:   # F5-01 — branch-NEUTRAL: shared state and adversarial intent only
+    - the candidate ENFORCEMENT GUARD itself observes effective apply=false
+    - the harness ARMS an adversarial mutation trigger targeted at the earliest reachable
+      seam after guard_read (arming is always possible; landing an effect is not)
+    - record trigger/request, actual override-call entry, effect/disposition, and allocation
+  common_setup_note: >
+    F5-01: an earlier revision put "inject Settings.override(..., true) AFTER that guard read"
+    and "place the injection before native worker allocation/spawn" at CASE level, above
+    branch selection. That wording is branch-A-only and made branch B unsatisfiable. At the
+    pinned SHA Settings.override() is fully synchronous — it returns void and applies the
+    value via setByPath + #rebuildMerged + #fireEffectiveSettingChanged
+    (config/settings.ts:518-528), with no deferred result in the built-in method. So for a
+    same-stack atomic primitive the override CALL cannot execute inside the interval at all,
+    and for a spanning invariant the call may enter but its effect is rejected/deferred —
+    meaning "inject true before spawn" was never achieved in either valid branch-B shape.
+    Effect-timing requirements therefore belong ONLY inside the branches. The harness can
+    always ARM a trigger; whether the call enters and whether its effect lands are exactly
+    what the branches distinguish.
   invariant_under_test: unsafe state cannot cross into worker spawn
   # F4-01: the oracle is BRANCH-SENSITIVE. An earlier revision required both
   # "the interval is non-interleavable" AND unconditionally "NO worker is spawned" — those
   # cannot both be normative. If atomicity holds, effective apply stays FALSE through
   # allocation, and spawning is CORRECT (it agrees with M1). Demanding a block there would
   # require a false positive. What matters is `mutation_effect`, not `mutation_attempt`.
-  branch_A_mutation_becomes_effective_before_spawn:
-    setup:
-      - guard_read observes apply=false
-      - mutation_attempt occurs after guard_read
-      - mutation_effect makes effective apply=true BEFORE worker allocation/spawn
+  branch_A_effect_lands_before_allocation:
+    setup:   # the ONLY branch that may require an effective mutation before allocation
+      - the override CALL enters after guard_read
+      - mutation_effect makes effective apply=true BEFORE worker allocation
     pass_requires:
       - a boundary recheck or spanning invariant detects the effective unsafe state
       - worker_spawn_count == 0
-  branch_B_atomic_or_spanning_invariant_prevents_effect_in_interval:
+  branch_B_effect_cannot_land_in_interval:
     setup:
-      - guard_read observes apply=false
-      - the harness attempts the mutation adversarially
-      - source/runtime proof shows mutation_effect CANNOT occur inside the protected
-        interval, or the mutation is rejected/deferred by the spanning invariant
+      - the harness trigger is armed / adversarially scheduled (per common_setup)
+      - EITHER the actual override call cannot enter until after allocation,
+        OR it enters but is rejected / deferred / observationally inert under a
+        spanning invariant
     pass_requires:
-      - effective apply remains FALSE through worker allocation/spawn
-      - spawn MAY proceed — this is NOT a false-positive failure
+      - effective apply remains FALSE at allocation
+      - safe spawn MAY proceed — this is NOT a false-positive failure
       - the trace proves mutation_effect occurred only AFTER the protected interval,
-        or was rejected/deferred
-  required_trace_fields:   # fields, not mandatory occurrences — see note below
-    - guard_read_time
-    - mutation_attempt_time
-    - mutation_effect_time_or_disposition   # effective | rejected | deferred
-    - native_task_execute_enter_time
-    - worker_allocation_attempt_time
-    - worker_spawn_count
-    - effective_apply_at_allocation
-  why_fields_not_events: >
-    An earlier revision required `worker_allocation_or_spawn` as a mandatory recorded EVENT
-    while another clause required zero workers — a passing branch-A run must PREVENT that
-    event, so it could never satisfy both. A count/attempt sentinel
-    (worker_allocation_attempt_time + worker_spawn_count) expresses both branches without
-    requiring an occurrence that must not happen.
+        or was rejected / deferred / inert
+      - the corresponding atomicity_proof option is satisfied (option_1 or option_2)
+  trace_schema:   # F5-03/F5-04 — branch-TOTAL and observer-aware; every field has a
+                  # legal value for a correct run in EITHER branch. A bare `_time` name is
+                  # not enough: it still implies a timestamp for an event that correct
+                  # enforcement may prevent.
+    guard_read:
+      status: OBSERVED | SOURCE_PROVEN
+      time: timestamp | null
+    mutation_trigger:                 # F5-04 event 1 of 3 — arming/scheduling
+      status: ARMED | REQUESTED
+      time: timestamp
+    override_call_enter:              # F5-04 event 2 of 3 — the call actually begins
+      status: OBSERVED | DEFERRED_UNTIL_AFTER_INTERVAL | NOT_REACHED
+      time: timestamp | null
+    mutation_effect:                  # F5-04 event 3 of 3 — the value actually changes
+      status: EFFECTIVE | REJECTED | DEFERRED | INERT
+      time: timestamp | null
+    native_task_execute_enter:
+      status: OBSERVED | NOT_REACHED | NOT_APPLICABLE
+      time: timestamp | null
+    worker_allocation_attempt:
+      status: OBSERVED | NOT_REACHED
+      time: timestamp | null
+    worker_spawn_count: integer
+    effective_apply_at_allocation:
+      value: false | true | RUNTIME_UNOBSERVABLE
+      evidence_kind: RUNTIME | SOURCE_CALL_GRAPH | SPANNING_INVARIANT
+      evidence_anchor: source_or_artifact_reference
+    observer_non_interference:
+      required: true
+      proof: >
+        Instrumentation adds no await, synchronous callback, getter/proxy trap, event
+        emission, or other seam that changes the candidate's atomicity/re-entrancy
+        properties. An observer that creates the interleaving it measures invalidates both
+        the measurement and any option_1 proof that depends on the interval being seam-free.
+  why_typed_statuses_not_bare_times: >
+    F4 replaced four mandatory EVENTS with seven field names, which fixed the
+    "required event that must not happen" contradiction but not the underlying grammar: a
+    required `native_task_execute_enter_time` still presumes a timestamp for an event that a
+    correct Path-A block prevents (guard reads false → effect lands → boundary recheck
+    blocks → native execute never entered → allocation never attempted). NOT_REACHED is now
+    an explicit legal value. Likewise `effective_apply_at_allocation` presumed a runtime
+    observation point that a genuinely atomic mechanism may not expose — and instrumenting
+    one there can itself introduce the seam that invalidates the option_1 proof. Hence
+    RUNTIME_UNOBSERVABLE with a declared `evidence_kind`.
+  runtime_unobservable_is_not_a_waiver: >
+    `effective_apply_at_allocation.value: RUNTIME_UNOBSERVABLE` is accepted ONLY when
+    accompanied by a COMPLETE atomicity_proof (option_1 or option_2) and an
+    `evidence_kind` of SOURCE_CALL_GRAPH or SPANNING_INVARIANT with a concrete
+    `evidence_anchor`. It is never a licence to omit evidence, and a source/invariant
+    argument must never be recorded as though it were a runtime observation.
   forbidden_as_pass:
     - mutation placed only between the E3-L observational preflight and the guard read
     - the guard seeing `true` because the mutation happened BEFORE the guard ran
@@ -927,25 +977,40 @@ case_M2_guard_read_to_spawn_race:
     is a valid PASS result, but it must be DEMONSTRATED — never assumed, and never inferred
     from a finite sample in which the race did not happen to occur. See atomicity_proof
     below for what counts.
-  atomicity_proof:   # F4-02 — "no await" is NECESSARY but NOT SUFFICIENT
-    rule: >
-      "grep found no await" is NOT a complete atomicity proof. JavaScript can synchronously
-      re-enter user or extension code — through callbacks, synchronous event emission, proxy
-      traps, getters, or any other hookable call — with no await, no promise boundary, and no
-      event-loop yield. A guard that reads a safe value, synchronously emits an event, and
-      then spawns can observe a mutated value at spawn time despite containing no await.
-      Satisfy option_1 OR option_2.
-    option_1_source_path:
-      - no await or async yield anywhere in the COMPLETE guard-read → allocation interval
-      - no attacker-controlled or extension-controlled SYNCHRONOUS callback in the interval
-      - no synchronous event emission, getter, proxy trap, hook, or re-entrant call in the
-        interval capable of reaching Settings.override or any equivalent mutation path
-      - the entire call graph for the interval is ENUMERATED at the pinned SHA (not sampled)
+  atomicity_proof:   # F5-02 — no-await belongs to option_1 ONLY, not to the gate as a whole
+    universal_rule: >
+      No-await alone is neither a complete proof NOR a universal prerequisite. It is one
+      requirement of option_1 only. Option_2 is judged by invariant coverage across ALL
+      interleavings, INCLUDING awaits. Satisfy option_1 OR option_2 — they are alternatives,
+      and no requirement of one may be imposed on the other.
+    why_not_universal: >
+      An earlier revision annotated this block and the Artifact rule with '"no await" is
+      NECESSARY but NOT SUFFICIENT'. The "not sufficient" half is right (synchronous
+      re-entrancy needs no await — see option_1's callback clause). The "necessary" half is
+      WRONG for option_2 and silently re-narrowed the equivalence mechanism class that the
+      pass_equivalence_rule restores: a lock, freeze, capability, or other spanning
+      fail-closed invariant may deliberately remain held ACROSS one or more awaits. The await
+      creates an interleaving opportunity; the invariant makes the mutation's effect
+      unobservable until after the protected interval. Demanding no-await there would reject
+      a mechanism that is safe by construction.
+    option_1_non_interleavable_source_path:
+      requires:
+        - no await or async yield anywhere in the COMPLETE guard-read → allocation interval
+        - no attacker-controlled or extension-controlled SYNCHRONOUS callback in the interval
+        - no synchronous event emission, getter, proxy trap, hook, or re-entrant call in the
+          interval capable of reaching Settings.override or any equivalent mutation path
+        - the entire call graph for the interval is ENUMERATED at the pinned SHA (not sampled)
     option_2_spanning_invariant:
-      - mutation attempts MAY re-enter, but are rejected, deferred, or made observationally
-        inert for the duration of the protected interval
-      - effective unsafe state cannot become visible to worker allocation
-      - branch-sensitive M2 evidence records attempt, effect/disposition, and spawn state
+      await_allowed: true            # explicitly — awaits do not disqualify this option
+      requires:
+        - the invariant remains held/effective across EVERY yield and EVERY synchronous
+          re-entry within the protected interval
+        - the mutation effect is rejected, deferred, or observationally inert until the
+          protected interval ends
+        - effective unsafe state cannot become visible to worker allocation
+        - invariant RELEASE and any deferred-effect ordering are recorded in the trace
+        - branch-sensitive M2 evidence records trigger, override-call entry,
+          effect/disposition, and spawn state (see trace_schema)
 
 case_M2_control_stale_preflight_corrected:
   gating:   false
@@ -1112,10 +1177,14 @@ class_renames_F3:   # IDs are stable; these classes were sharpened, not renumber
   at arg-prep time, before concurrency scheduling and the approval gate
   (agent-session.ts:3179-3187), and is not re-emitted at execute time for loop-dispatched
   calls (wrapper.ts:183, :205). Blocking ability ≠ atomic coupling (F3-02)
-- a wrapper that reads settings and then calls ctx.invokeTool, without evidence that no
-  await/yield intervenes before the native policy read — task/index.ts:664-689
-  (await Promise.all over per-item preflight) and structured-subagent.ts:245-255
-  (await discoverAgents) both sit in that interval (F3-02)
+- a wrapper that reads settings and then calls ctx.invokeTool, without a COMPLETE
+  atomicity_proof — task/index.ts:664-689 (await Promise.all over per-item preflight) and
+  structured-subagent.ts:245-255 (await discoverAgents) both sit in that interval (F3-02).
+  F5-02: showing "no await/yield intervenes" is NOT on its own enough to admit this
+  composition — that phrasing could be misread as an accept condition. It must satisfy the
+  FULL option_1 (no await AND no synchronous re-entrant mutation path AND an enumerated
+  pinned-SHA call graph for the interval) OR present a spanning option_2 invariant. Absence
+  of await is one requirement of option_1, never a standalone pass
 - M2b and M4 recorded with indistinguishable traces — if preflight_invocation_count and
   cooperative-refusal state do not differ between them, BOTH are unproven (F3-03)
 ```
@@ -1138,8 +1207,14 @@ required_gating_cases: [M1, M2, M2b, M4]   # ALL four must pass — M2b is manda
 required_diagnostic_cases: [M3]            # must be recorded; no PASS power (characterization)
 optional_control_cases: [M2-control]       # MAY be recorded; no PASS power (F4-05)
 artifact_must_record: [M1, M2, M2b, M3, M4]
-m2_oracle: branch-sensitive — branch A requires worker_spawn_count == 0;
-           branch B permits spawn when effective apply stayed false (F4-01)
+m2_oracle: branch-sensitive (F4-01/F5-01) — common_setup is branch-NEUTRAL (arm a trigger;
+           do not require an effect). Branch A (effect landed before allocation) requires
+           worker_spawn_count == 0. Branch B (effect could not land) permits spawn when
+           effective_apply_at_allocation was false, or RUNTIME_UNOBSERVABLE with a declared
+           evidence_kind + anchor and a COMPLETE atomicity_proof (F5-03).
+m2_trace: per trace_schema — typed statuses, NOT_REACHED legal, observer_non_interference
+          proven, and mutation_trigger / override_call_enter / mutation_effect kept
+          distinct (F5-04)
 ```
 
 **E3-M FAIL or not attempted consequence:**
@@ -1159,23 +1234,29 @@ path B, or one admitted by `pass_equivalence_rule`). Must record:
   no-preflight direct bypass, is mandatory and not optional) plus required diagnostic `[M3]`
   (recorded for characterization; no PASS power). `M2-control` is in
   `optional_control_set` — it MAY be recorded and is not part of the five (F4-05).
-- **M2's seven trace FIELDS** (not mandatory events — F4-01) — `guard_read_time`,
-  `mutation_attempt_time`, `mutation_effect_time_or_disposition`,
-  `native_task_execute_enter_time`, `worker_allocation_attempt_time`, `worker_spawn_count`,
-  `effective_apply_at_allocation`. Record which branch was exercised: **branch A** (mutation
-  became effective before allocation) requires `worker_spawn_count == 0`; **branch B**
-  (atomicity or a spanning invariant prevented the effect) permits spawn provided
-  `effective_apply_at_allocation` stayed false. Recording `mutation_attempt` without its
-  effect/rejection/defer disposition is non-PASS — attempt alone cannot distinguish the
-  branches.
-- **Atomicity proof for branch B** (F4-02) — "no await/yield in the interval" is **necessary
-  but not sufficient**: JS can synchronously re-enter user code via callbacks, event
-  emission, getters, or proxy traps with no await at all. Satisfy either
-  `atomicity_proof.option_1_source_path` (no await AND no attacker- or extension-controlled
-  synchronous callback, event emission, getter, proxy trap, hook, or re-entrant path
-  reaching a mutation path, with the interval's call graph **enumerated** at the pinned SHA)
-  or `atomicity_proof.option_2_spanning_invariant` (re-entrant attempts are rejected,
-  deferred, or observationally inert for the protected interval).
+- **M2's `trace_schema`** (typed statuses, not bare timestamps — F4-01/F5-03/F5-04) — every
+  field per `case_M2_guard_read_to_spawn_race.trace_schema`, with its `status`/`value`
+  recorded even when the event did not occur. `NOT_REACHED` is a legal, expected value for
+  `native_task_execute_enter` and `worker_allocation_attempt` when a correct boundary block
+  prevented them. The three mutation events stay **distinct** — `mutation_trigger` (armed),
+  `override_call_enter` (call began), `mutation_effect` (value changed / rejected / deferred
+  / inert); one timestamp may never stand for more than one of them. Record which branch was
+  exercised: **branch A** (effect landed before allocation) requires `worker_spawn_count == 0`;
+  **branch B** (the effect could not land) permits spawn provided
+  `effective_apply_at_allocation` was false — or `RUNTIME_UNOBSERVABLE` with a declared
+  `evidence_kind` and anchor. Recording a trigger or call-entry without the effect
+  disposition is non-PASS. `observer_non_interference` must be proven: instrumentation that
+  introduces a seam invalidates both the measurement and any option_1 proof.
+- **Atomicity proof for branch B** (F4-02/F5-02) — satisfy **either** option, and do not
+  impose one option's requirements on the other. `option_1_non_interleavable_source_path`
+  requires no await AND no attacker- or extension-controlled synchronous callback, event
+  emission, getter, proxy trap, hook, or re-entrant path reaching a mutation path, with the
+  interval's call graph **enumerated** at the pinned SHA. `option_2_spanning_invariant`
+  **explicitly permits awaits** (`await_allowed: true`): the invariant must hold across every
+  yield and synchronous re-entry, the effect must be rejected/deferred/inert until the
+  interval ends, and invariant release plus deferred-effect ordering must be recorded.
+  No-await is **not** a universal prerequisite — it belongs to option_1 only; treating it as
+  universally necessary would re-narrow the `pass_equivalence_rule` mechanism class.
 - **M2b vs M4 trace distinction** — `preflight_invocation_count` and cooperative-refusal
   state for each, proving the two cases exercised different execution paths.
 - **The settings-identity conjunction** — declared supported host modes plus instance-identity

@@ -9,6 +9,22 @@
 
 ---
 
+> ## ⚠ AMENDED BY F5
+>
+> Four items in this document were subsequently found defective and are corrected in
+> `opus5-response-to-gpt56-F5-01-F5-04.md`. `spec/` at HEAD is authoritative over both.
+>
+> | As written here | Corrected status |
+> |---|---|
+> | M2 case-level `setup` ("inject override AFTER guard read", "before allocation") left above the branches | **Branch-A-only wording; made branch B unsatisfiable.** `Settings.override()` is fully synchronous (`config/settings.ts:518-528`), so a valid branch-B run can never "inject true before spawn". `common_setup` is now branch-neutral: arm a trigger, don't require an effect (F5-01) |
+> | `"no await" is NECESSARY but NOT SUFFICIENT` (§2, and the Artifact rule) | The "not sufficient" half is right; **"necessary" is wrong for option_2** and silently re-narrowed the equivalence class F4-04 restored. A spanning invariant may be held *across* awaits. No-await is an option_1 requirement only (F5-02) |
+> | `required_trace_fields` — 7 bare `_time` names (§1) | **Not branch-total.** `native_task_execute_enter_time` / `worker_allocation_attempt_time` still implied timestamps for events a correct block prevents, and `effective_apply_at_allocation` implied a runtime observation point an atomic mechanism may not expose. Replaced by a typed `trace_schema` with `NOT_REACHED`, `RUNTIME_UNOBSERVABLE`, and `observer_non_interference` (F5-03) |
+> | `mutation_attempt_time` as one field (§1) | Conflated three distinct events. Split into `mutation_trigger` / `override_call_enter` / `mutation_effect` (F5-04) |
+>
+> Note on §1 and §8.2 of this document: I identified the
+> `effective_apply_at_allocation` observability problem myself and left it unresolved in the
+> normative spec. F5-03 supplies the fix I should have applied when I named it.
+
 ## 0. Disposition
 
 All five **ACCEPTED**. Each reproduced at the cited lines when I checked the committed spec.
