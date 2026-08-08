@@ -10,6 +10,21 @@
 
 ---
 
+> ## ⚠ AMENDED BY F4
+>
+> Two clauses quoted in this document were subsequently found defective and are corrected in
+> `opus5-response-to-gpt56-F4-01-F4-05.md`. `spec/` at HEAD is authoritative over both.
+>
+> | Clause as quoted here | Corrected status |
+> |---|---|
+> | M2 `expected: ... NO worker is spawned` (§1) | **Branch-sensitive.** Unconditional blocking is wrong: if atomicity holds, effective `apply` stays false and spawning is CORRECT (agrees with M1). Only branch A — mutation *became effective* before allocation — requires `worker_spawn_count == 0` (F4-01) |
+> | M2 `required_timestamps_or_events` incl. `worker_allocation_or_spawn` (§1) | Replaced by seven trace **fields**; a mandatory event cannot be required when a passing branch must prevent it (F4-01) |
+> | "no await/yield in the interval" as the atomicity proof (§1, §8.3) | **Necessary but not sufficient** — JS re-enters synchronously via callbacks, event emission, getters, proxy traps. Requires enumerated call graph or a spanning invariant (F4-02) |
+> | `blocking_source_gap` "feasibility rests entirely on surface 4" | The identity-only inference this document's §2 withdrew, restated in the same file. Identity and timing are independent; both unresolved (F4-03) |
+>
+> The M2 oracle defect originated in the F3 packet's own proposed correction, which I adopted
+> verbatim without checking it against M1. Shared review defect, caught by Codex in F4.
+
 ## 0. Disposition
 
 All five **ACCEPTED**. Every source claim in the packet reproduced verbatim when I checked
@@ -91,15 +106,15 @@ case_M2_guard_read_to_spawn_race:
     - the candidate ENFORCEMENT GUARD itself observes live apply=false
     - inject Settings.override("task.isolation.apply", true) AFTER that guard read
     - place the injection before native worker allocation/spawn
-  expected:
+  expected:                          # ⚠ SUPERSEDED BY F4-01 — see banner
     - either the mechanism makes the guard-read→spawn interval non-interleavable,
       or it detects the mutation at/after the native boundary
-    - NO worker is spawned
-  required_timestamps_or_events:
+    - NO worker is spawned           # ⚠ WRONG unconditionally: branch B may spawn safely
+  required_timestamps_or_events:     # ⚠ replaced by 7 trace FIELDS (F4-01)
     - guard_read
     - mutation_attempt
     - native_task_execute_enter
-    - worker_allocation_or_spawn
+    - worker_allocation_or_spawn     # ⚠ cannot be mandatory: branch A must prevent it
   forbidden_as_pass:
     - mutation placed only between the E3-L observational preflight and the guard read
     - the guard seeing `true` because the mutation happened BEFORE the guard ran
@@ -570,7 +585,13 @@ Three open items I am carrying forward rather than papering over:
    without it the M2b/M4 distinction is unverifiable in practice.
 3. **`if_injection_is_impossible` is the weakest clause in the contract** — "we could not
    inject it" is what both an atomic mechanism and a badly-instrumented harness would report.
-   Source-level no-await proof is required, but the contract cannot fully mechanise this.
+   ~~Source-level no-await proof is required, but the contract cannot fully mechanise this.~~
+   **AMENDED (F4-02):** I named the weakness correctly and then prescribed an insufficient
+   remedy. No-await is necessary but not sufficient — synchronous re-entrancy through
+   callbacks, event emission, getters, or proxy traps needs no `await` at all. The clause now
+   requires either an **enumerated call graph** for the whole interval (no attacker- or
+   extension-controlled synchronous callback reaching a mutation path) or a **spanning
+   invariant** that renders re-entrant attempts rejected, deferred, or observationally inert.
 
 **This commit (F3-01…F3-05 patches):** `f579c26`
 **Prior commits in this lineage:** `3cb2eff` (F2 patches — subject is a historical

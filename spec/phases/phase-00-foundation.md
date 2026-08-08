@@ -675,18 +675,28 @@ path_A_true_interceptor:
          ExtensionContext.sessionManager, but it is a 21-member Pick with no settings
          accessor (getCwd, getSessionDir, getEntries, putBlob, ...).
       3. ExtensionContext.invokeTool / re-registered built-in (types.ts:479-482, and
-         ToolDefinition.execute at types.ts:576-582) — a re-registered tool CAN sit at
-         the dispatch boundary, but its execute() also receives ctx: ExtensionContext,
-         so it inherits the same missing-settings gap.
+         ToolDefinition.execute at types.ts:576-582) — a re-registered tool RECEIVES
+         execute() for the call, but that is NOT the same as sitting at the protected
+         native boundary: see composed_candidate_re_registration_plus_proxy below, which
+         shows a read-then-invokeTool composition still has awaits before the native
+         policy read and is therefore not automatically atomic. It also inherits the same
+         missing-settings gap, since its execute() receives ctx: ExtensionContext.
+         "Can receive execute" must never be abbreviated to "sits at the native boundary".
       4. The global settings Proxy (config/settings.ts:2371) — **UNRESOLVED, NOT closed.
          Host-scoped.** See global_proxy_candidate below; an earlier revision wrongly
          recorded this surface as closed.
     By contrast CustomToolContext (extensibility/custom-tools/types.ts:98-99) DOES expose
     settings?: Settings ("Prefer over the global singleton") — but exposes no task
     dispatch member, so a custom tool cannot be the dispatch boundary.
-    Consequence: surfaces 1-3 are closed. Path A feasibility therefore rests entirely on
-    surface 4, which is unresolved and host-dependent. E3-M remains NOT_ATTEMPTED and
-    parallel mode stays DISABLED — but this is NOT the same as "no candidate exists".
+    Consequence (F4-03 — corrected): surfaces 1-3 are closed FOR LIVE-SETTINGS ACCESS, i.e.
+    for the IDENTITY conjunction only. An earlier revision concluded "Path A feasibility
+    therefore rests entirely on surface 4" — that is the identity-only inference F3-02
+    withdrew, restated. It does not follow. Even if surface 4 proves same-instance identity,
+    the TIMING conjunction (boundary_timing_gap) remains independently unresolved, and a
+    candidate must satisfy BOTH. E3-M remains NOT_ATTEMPTED and parallel mode stays
+    DISABLED — but this is NOT the same as "no candidate exists".
+    rule: proxy identity success is NECESSARY for that candidate, never SUFFICIENT for a
+    Path-A PASS.
 
 global_proxy_candidate:
   status: UNRESOLVED_AND_HOST_SCOPED   # must be settled empirically, not by inference
@@ -731,6 +741,20 @@ global_proxy_candidate:
     the reason: the candidate is untested and host-scoped, not non-existent. If v0 must
     support ACP or arbitrary SDK hosts, this candidate is insufficient unless the
     implementation detects unsupported hosts and fails closed.
+  consolidated_status:   # F4-03 — the single current-authority statement of path-A status
+    identity_surface:
+      surfaces_1_to_3: closed_for_live_Settings_access
+      global_proxy: UNRESOLVED_AND_HOST_SCOPED
+    timing_surface:
+      ordinary_loop_tool_call: PRE_SCHEDULING_NON_ATOMIC
+      read_then_invokeTool: NON_ATOMIC_UNTIL_STRONGER_INVARIANT_PROVEN
+      other_public_native_boundary_surface: UNRESOLVED
+    overall: UNRESOLVED
+    rule: >
+      Proxy identity success is NECESSARY for that candidate and never SUFFICIENT for a
+      Path-A PASS. No statement of the form "feasibility rests entirely on proxy identity"
+      belongs in current authority — identity and timing are independent conjunctions and
+      both are unresolved.
   explicit_non_pass: >
     "Same JS event loop" or "same model turn" reasoning alone, without an actual
     interceptor running at the dispatch boundary, does NOT satisfy path A. Tool calls
@@ -761,7 +785,8 @@ worker_side_fingerprint:
     been spawned, and the check is a model-directed action the worker can skip.
     Documenting the residual window does not convert a post-dispatch detector into a
     pre-spawn mechanical guard. May be adopted as an additional layer on top of a
-    passing path A or path B; never as the mechanism that passes E3-M.
+    passing mechanism (path A, path B, or one admitted by pass_equivalence_rule); never as
+    the mechanism that passes E3-M.
 
 non_pass_behavioral_disclosure:
   former_label: path_C_behavioral_only   # renamed — "path C" no longer denotes a mechanism
@@ -820,7 +845,8 @@ pass_equivalence_rule:
     single read-and-dispatch primitive (B). Such a mechanism is admissible under this rule.
 ```
 
-**Test matrix (for path A or B — whichever is attempted):**
+**Test matrix (for the chosen mechanism — path A, path B, or one admitted by
+`pass_equivalence_rule`):**
 
 ```yaml
 case_M1_no_mutation:
@@ -835,21 +861,55 @@ case_M2_guard_read_to_spawn_race:
     - the candidate ENFORCEMENT GUARD itself observes live apply=false
     - inject Settings.override("task.isolation.apply", true) AFTER that guard read
     - place the injection before native worker allocation/spawn
-  expected:
-    - either the mechanism makes the guard-read→spawn interval non-interleavable,
-      or it detects the mutation at/after the native boundary
-    - NO worker is spawned
-  required_timestamps_or_events:   # the artifact must record all four, ordered
-    - guard_read
-    - mutation_attempt
-    - native_task_execute_enter
-    - worker_allocation_or_spawn
+  invariant_under_test: unsafe state cannot cross into worker spawn
+  # F4-01: the oracle is BRANCH-SENSITIVE. An earlier revision required both
+  # "the interval is non-interleavable" AND unconditionally "NO worker is spawned" — those
+  # cannot both be normative. If atomicity holds, effective apply stays FALSE through
+  # allocation, and spawning is CORRECT (it agrees with M1). Demanding a block there would
+  # require a false positive. What matters is `mutation_effect`, not `mutation_attempt`.
+  branch_A_mutation_becomes_effective_before_spawn:
+    setup:
+      - guard_read observes apply=false
+      - mutation_attempt occurs after guard_read
+      - mutation_effect makes effective apply=true BEFORE worker allocation/spawn
+    pass_requires:
+      - a boundary recheck or spanning invariant detects the effective unsafe state
+      - worker_spawn_count == 0
+  branch_B_atomic_or_spanning_invariant_prevents_effect_in_interval:
+    setup:
+      - guard_read observes apply=false
+      - the harness attempts the mutation adversarially
+      - source/runtime proof shows mutation_effect CANNOT occur inside the protected
+        interval, or the mutation is rejected/deferred by the spanning invariant
+    pass_requires:
+      - effective apply remains FALSE through worker allocation/spawn
+      - spawn MAY proceed — this is NOT a false-positive failure
+      - the trace proves mutation_effect occurred only AFTER the protected interval,
+        or was rejected/deferred
+  required_trace_fields:   # fields, not mandatory occurrences — see note below
+    - guard_read_time
+    - mutation_attempt_time
+    - mutation_effect_time_or_disposition   # effective | rejected | deferred
+    - native_task_execute_enter_time
+    - worker_allocation_attempt_time
+    - worker_spawn_count
+    - effective_apply_at_allocation
+  why_fields_not_events: >
+    An earlier revision required `worker_allocation_or_spawn` as a mandatory recorded EVENT
+    while another clause required zero workers — a passing branch-A run must PREVENT that
+    event, so it could never satisfy both. A count/attempt sentinel
+    (worker_allocation_attempt_time + worker_spawn_count) expresses both branches without
+    requiring an occurrence that must not happen.
   forbidden_as_pass:
     - mutation placed only between the E3-L observational preflight and the guard read
     - the guard seeing `true` because the mutation happened BEFORE the guard ran
     - worker-side detection of the mismatch
     - worker refusal after spawn
     - "parent tree unchanged" as the only evidence
+    - an effective apply=true crossing into worker spawn (the invariant itself)
+    - recording mutation_attempt WITHOUT recording mutation_effect / rejection / defer state
+      — attempt alone cannot distinguish branch A from branch B
+    - a finite sample in which the harness simply missed an actually interleavable interval
   rationale: >
     This is the load-bearing case and it must attack the candidate's OWN read, not an
     earlier diagnostic observation. An earlier revision mutated after the observational
@@ -862,12 +922,30 @@ case_M2_guard_read_to_spawn_race:
     then declined still consumed the dispatch, and its refusal is a model-directed action
     it can skip.
   if_injection_is_impossible: >
-    If the candidate primitive is genuinely atomic, the harness may be UNABLE to place the
-    mutation between guard_read and worker_allocation. That inability is a valid PASS
-    result, but it must be DEMONSTRATED with source and runtime timing evidence (the four
-    recorded events above plus the source path showing no await/yield in the interval) —
-    never assumed, and never inferred from a finite sample in which the race did not
-    happen to occur.
+    If the candidate primitive is genuinely atomic, the harness may be UNABLE to make the
+    mutation EFFECTIVE between guard_read and worker_allocation (branch B). That inability
+    is a valid PASS result, but it must be DEMONSTRATED — never assumed, and never inferred
+    from a finite sample in which the race did not happen to occur. See atomicity_proof
+    below for what counts.
+  atomicity_proof:   # F4-02 — "no await" is NECESSARY but NOT SUFFICIENT
+    rule: >
+      "grep found no await" is NOT a complete atomicity proof. JavaScript can synchronously
+      re-enter user or extension code — through callbacks, synchronous event emission, proxy
+      traps, getters, or any other hookable call — with no await, no promise boundary, and no
+      event-loop yield. A guard that reads a safe value, synchronously emits an event, and
+      then spawns can observe a mutated value at spawn time despite containing no await.
+      Satisfy option_1 OR option_2.
+    option_1_source_path:
+      - no await or async yield anywhere in the COMPLETE guard-read → allocation interval
+      - no attacker-controlled or extension-controlled SYNCHRONOUS callback in the interval
+      - no synchronous event emission, getter, proxy trap, hook, or re-entrant call in the
+        interval capable of reaching Settings.override or any equivalent mutation path
+      - the entire call graph for the interval is ENUMERATED at the pinned SHA (not sampled)
+    option_2_spanning_invariant:
+      - mutation attempts MAY re-enter, but are rejected, deferred, or made observationally
+        inert for the duration of the protected interval
+      - effective unsafe state cannot become visible to worker allocation
+      - branch-sensitive M2 evidence records attempt, effect/disposition, and spawn state
 
 case_M2_control_stale_preflight_corrected:
   gating:   false
@@ -896,8 +974,9 @@ case_M2b_no_preflight_direct_bypass:
     - the block originates at the boundary, with no prior cooperative refusal
   premise_note: >
     The unsafe state is explicit and is the live value, not the absence of a preflight.
-    This matters: under both eligible mechanisms (path A reads live at the boundary; path B
-    reads live and dispatches atomically) a missing observational preflight does NOT by
+    This matters: under EVERY eligible mechanism (path A reads live at the boundary; path B
+    reads live and dispatches atomically; an equivalence-rule mechanism holds a spanning
+    fail-closed invariant) a missing observational preflight does NOT by
     itself make a dispatch unsafe — if the live value were apply:false the dispatch would
     be legitimately safe, which is what M1 already covers. Without naming the live value,
     two correct implementations could produce opposite results for this same written case.
@@ -984,9 +1063,15 @@ diagnostic_only:
   mutation_reverted:                           M3    # characterization; e3_m_pass_power: none
   stale_preflight_corrected:                   M2-control  # control; e3_m_pass_power: none
 
-gating_set:     [M1, M2, M2b, M4]         # all four must pass for E3-M PASS
-diagnostic_set: [M3, M2-control]          # must be recorded; cannot pass or fail the gate
-artifact_set:   [M1, M2, M2b, M3, M4]     # minimum the artifact must contain (M2-control optional)
+gating_set:              [M1, M2, M2b, M4]      # all four must PASS for E3-M PASS
+required_diagnostic_set: [M3]                   # MUST be recorded; cannot pass or fail the gate
+optional_control_set:    [M2-control]           # MAY be recorded; no PASS power
+artifact_set:            [M1, M2, M2b, M3, M4]  # exactly what the artifact MUST contain
+
+# F4-05: M2-control is OPTIONAL, in every list, without exception. An earlier revision put
+# it in a `diagnostic_set` annotated "must be recorded" while the artifact_set comment and
+# the Artifact section both called it optional — two incompatible answers. It is a control
+# that confirms the guard reads live state; it is not required evidence for the gate.
 
 class_renames_F3:   # IDs are stable; these classes were sharpened, not renumbered
   M2:  was "unsafe_mutation_before_dispatch" — mutation after the OBSERVATIONAL preflight.
@@ -1051,7 +1136,10 @@ settings_identity_demonstrated: true
 e3_l_prerequisite: satisfied
 required_gating_cases: [M1, M2, M2b, M4]   # ALL four must pass — M2b is mandatory
 required_diagnostic_cases: [M3]            # must be recorded; no PASS power (characterization)
+optional_control_cases: [M2-control]       # MAY be recorded; no PASS power (F4-05)
 artifact_must_record: [M1, M2, M2b, M3, M4]
+m2_oracle: branch-sensitive — branch A requires worker_spawn_count == 0;
+           branch B permits spawn when effective apply stayed false (F4-01)
 ```
 
 **E3-M FAIL or not attempted consequence:**
@@ -1067,13 +1155,27 @@ note: >
 **Artifact:** Mechanism design note + test transcript for the chosen mechanism (path A,
 path B, or one admitted by `pass_equivalence_rule`). Must record:
 
-- **All five cases** — gating `[M1, M2, M2b, M4]` (all four must pass; M2b, the no-preflight
-  direct bypass, is mandatory and not optional) plus diagnostic `[M3]` (recorded for
-  characterization; no PASS power). The M2-control case may also be recorded.
-- **M2's four ordered events** — `guard_read`, `mutation_attempt`,
-  `native_task_execute_enter`, `worker_allocation_or_spawn`. If the mutation could not be
-  injected into the interval, the artifact must show WHY from source (no await/yield between
-  the guard read and spawn), not merely that the race did not occur in a finite sample.
+- **The five artifact cases** — gating `[M1, M2, M2b, M4]` (all four must pass; M2b, the
+  no-preflight direct bypass, is mandatory and not optional) plus required diagnostic `[M3]`
+  (recorded for characterization; no PASS power). `M2-control` is in
+  `optional_control_set` — it MAY be recorded and is not part of the five (F4-05).
+- **M2's seven trace FIELDS** (not mandatory events — F4-01) — `guard_read_time`,
+  `mutation_attempt_time`, `mutation_effect_time_or_disposition`,
+  `native_task_execute_enter_time`, `worker_allocation_attempt_time`, `worker_spawn_count`,
+  `effective_apply_at_allocation`. Record which branch was exercised: **branch A** (mutation
+  became effective before allocation) requires `worker_spawn_count == 0`; **branch B**
+  (atomicity or a spanning invariant prevented the effect) permits spawn provided
+  `effective_apply_at_allocation` stayed false. Recording `mutation_attempt` without its
+  effect/rejection/defer disposition is non-PASS — attempt alone cannot distinguish the
+  branches.
+- **Atomicity proof for branch B** (F4-02) — "no await/yield in the interval" is **necessary
+  but not sufficient**: JS can synchronously re-enter user code via callbacks, event
+  emission, getters, or proxy traps with no await at all. Satisfy either
+  `atomicity_proof.option_1_source_path` (no await AND no attacker- or extension-controlled
+  synchronous callback, event emission, getter, proxy trap, hook, or re-entrant path
+  reaching a mutation path, with the interval's call graph **enumerated** at the pinned SHA)
+  or `atomicity_proof.option_2_spanning_invariant` (re-entrant attempts are rejected,
+  deferred, or observationally inert for the protected interval).
 - **M2b vs M4 trace distinction** — `preflight_invocation_count` and cooperative-refusal
   state for each, proving the two cases exercised different execution paths.
 - **The settings-identity conjunction** — declared supported host modes plus instance-identity
@@ -1253,7 +1355,7 @@ Manual checks:
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record ALL FIVE cases: gating `[M1, M2, M2b, M4]` (all four must PASS — M2b, the no-preflight direct bypass, is mandatory) plus diagnostic `[M3]` (recorded for characterization only, no PASS power). Only path A or path B is PASS-eligible; there is no path C. If not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record ALL FIVE cases: gating `[M1, M2, M2b, M4]` (all four must PASS — M2b, the no-preflight direct bypass, is mandatory) plus diagnostic `[M3]` (recorded for characterization only, no PASS power). PASS-eligible mechanisms are path A, path B, **or any mechanism admitted by `pass_equivalence_rule`** (source-verified, equivalent atomic / fail-closed semantics — it need not reduce to A or B). The retired `path C` label denotes no mechanism; label retirement does NOT narrow the mechanism space. If not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
 - [ ] **T-00.E5 artifacts present for cases E5-A … E5-F** (LSP capability as a four-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, `lsp.enabled` gate (CR-41), language-server availability), each recording the tool-list contents and verbatim error so the five distinct remediations are distinguishable (CR-40/CR-41)
 
