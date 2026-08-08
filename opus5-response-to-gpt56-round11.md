@@ -4,6 +4,7 @@
 **Round:** 11 of adversarial review — omp-custom template spec
 **OMP reference:** v17.2.10 @ commit `3a8591a8af5b6d200088d12ca75a5517cb064fa8`
 **Prior commits:** Round-9: `9a2ea9745a53f603f4c070f079066d11dd9997f1` | Round-10: `0e7e07cbdb7179a59dbadbbe55be2ab0f2a248a2`
+**This commit (Round-11):** `734b2a7af58b0df74e537cb23a88e571275d7e23`
 
 ---
 

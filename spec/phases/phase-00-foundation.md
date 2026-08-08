@@ -513,16 +513,27 @@ between t0 and the actual task dispatch (t3) is undetectable by any preflight re
 **Candidate mechanisms (choose one to test):**
 
 ```yaml
-path_A_interceptor:
+path_A_true_interceptor:
   approach: >
-    Custom preflight tool reads ctx.settings immediately before returning the go/no-go
-    decision; the task dispatch call is structurally adjacent (same tool execution turn);
-    any mutation between the tool return and the TaskTool invocation falls outside the
-    OMP execution model's synchronous window.
-  feasibility: >
-    Verify whether OMP's single-threaded JS event loop guarantees no Settings mutation
-    can interleave between a custom-tool return and the subsequent TaskTool call within
-    the same model turn. If yes, path A is mechanically atomic within a turn.
+    An OMP extension hook that intercepts the task call at the actual dispatch boundary —
+    executing synchronously as part of the task processing pipeline, not as a prior
+    separate custom-tool call. The hook reads ctx.settings.get("task.isolation.apply")
+    at the moment of dispatch and blocks the task before any worker is spawned if the
+    value is unsafe.
+  requirement: >
+    The check must be mechanically coupled to the dispatch. Adjacent tool calls within
+    a single model turn are NOT atomically coupled: each tool call is a separate async
+    operation on the OMP JS runtime, and Settings.override() can execute between any
+    two tool calls regardless of whether they are in the "same model turn". An OMP
+    extension hook (extensibility/extensions/wrapper.ts:200-232 — blocks on
+    { block: true }, fails closed on throw) that intercepts the TaskTool itself would
+    satisfy path A if it can access the live Settings instance at intercept time.
+  explicit_non_pass: >
+    "Same JS event loop" or "same model turn" reasoning alone, without an actual
+    interceptor running at the dispatch boundary, does NOT satisfy path A. Tool calls
+    are separated by async JS operations regardless of model-turn framing. A separate
+    preflight custom-tool call followed by a later TaskTool invocation is not atomic
+    and is explicitly on the E3-M non-PASS list.
 
 path_B_worker_side_fingerprint:
   approach: >
@@ -558,13 +569,31 @@ case_M3_mutation_reverted:
   setup:    project apply:false; override to true; revert to false before dispatch
   expected: document whether the chosen mechanism catches the revert or misses it;
             a known gap of the mechanism, not a failure if documented
+
+case_M4_apply_true_before_call:
+  setup:    apply=true in effect before any task call (no mid-execution mutation needed)
+  expected: task blocked before any isolated worker spawn; this is the baseline case —
+            a mechanism that fails M4 provides no protection at all
+```
+
+**E3-M non-PASS mechanisms (explicit — must not be accepted as PASS):**
+
+```text
+- a separate preflight custom-tool call followed by a later TaskTool invocation
+- empirical evidence that no Settings mutation happened to occur between calls
+- "same JS event loop" or "same model turn" reasoning without an actual dispatch interceptor
+- a worker's first model-directed action checking a fingerprint (post-dispatch, skippable)
+- a worker prompt instructing it to abort before edits (behavioral, not mechanical)
+- the behavioral isolation canary
+- a finite sample in which hub happened not to execute
 ```
 
 **E3-M PASS consequence:**
 
 ```yaml
 parallel_mode: ENABLED
-guarded_dispatch: confirmed (path A atomic-per-turn, or path B post-dispatch-detect)
+guarded_dispatch: confirmed (path A: true interceptor at dispatch boundary;
+                              or path B: post-dispatch-detect with documented residual window)
 e3_l_prerequisite: satisfied
 ```
 
@@ -578,7 +607,7 @@ note: >
   E3-M is optional for v0 — parallel remains disabled if E3-M is deferred.
 ```
 
-**Artifact:** Mechanism design note + test transcript for chosen path; result for cases M1–M3;
+**Artifact:** Mechanism design note + test transcript for chosen path; result for cases M1–M4;
 determination of whether a mechanical (not purely behavioral) guard is achievable with current
 OMP primitives.
 
