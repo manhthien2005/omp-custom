@@ -131,7 +131,7 @@ Git path-scoped inspection.
   `omniroute/ds/deepseek-v4-flash:xhigh` and
   `omniroute/ds/deepseek-v4-pro:xhigh`.
 
-- [ ] **Step 1: Record the non-secret environment baseline**
+- [x] **Step 1: Record the non-secret environment baseline**
 
 Run:
 
@@ -148,7 +148,7 @@ Expected baseline on 2026-08-12: OMP `17.2.12`, OmniRoute image
 `diegosouzapw/omniroute:3.8.49`; the exact `ds/deepseek-v4-flash` and
 `ds/deepseek-v4-pro` routes are not yet advertised. Do not print API-key values.
 
-- [ ] **Step 2: Write the failing pure validator tests**
+- [x] **Step 2: Write the failing pure validator tests**
 
 The test script must assert these exact cases against in-memory arrays/objects:
 
@@ -176,7 +176,7 @@ pwsh -NoProfile -File scripts/tests/topic03-deepseek-routing.Tests.ps1
 
 Expected: FAIL because `scripts/lib/topic03-deepseek-routing.ps1` does not exist.
 
-- [ ] **Step 3: Implement the minimal pure helper**
+- [x] **Step 3: Implement the minimal pure helper**
 
 Use `{ Status, Code, Message }` records. `Test-Topic03DeepSeekCatalog` takes explicit
 `-GatewayModelIds` and `-OmpModels` inputs so tests never call a provider. Model checks require:
@@ -196,7 +196,7 @@ status enum.
 
 Run the tests again. Expected: all assertions pass with zero provider calls.
 
-- [ ] **Step 4: Back up the two external state owners before mutation**
+- [x] **Step 4: Back up the two external state owners before mutation**
 
 Run:
 
@@ -210,7 +210,7 @@ docker exec omniroute sh -lc "cp /app/data/storage.sqlite /app/data/db_backups/t
 Expected: both backup paths exist. If either backup fails, stop external mutation but continue
 Tasks 2–7; record Task 1 as `ENVIRONMENT_BLOCKED`.
 
-- [ ] **Step 5: Configure the two OmniRoute gateway model IDs**
+- [x] **Step 5: Configure the two OmniRoute gateway model IDs**
 
 Use the authenticated local OmniRoute UI/API. Reuse an existing DeepSeek provider credential if
 one is already configured. Add only these gateway-visible IDs:
@@ -226,7 +226,7 @@ gates.
 
 Re-run `GET /v1/models`. Expected: both exact IDs are present before OMP configuration changes.
 
-- [ ] **Step 6: Add scoped OMP catalog entries without replacing user configuration**
+- [x] **Step 6: Add scoped OMP catalog entries without replacing user configuration**
 
 Patch only the `providers.omniroute.models` list in
 `C:/Users/MrThien/.omp/agent/models.yml`. Preserve the existing Codex entry and add:
@@ -276,7 +276,7 @@ Expected: both selectors resolve under provider `omniroute`. If OMP rejects a co
 restore the timestamped backup, record the exact parser error, and mark the environment step
 `FAIL`; do not guess an alternative schema.
 
-- [ ] **Step 7: Implement and run the explicit smoke runner**
+- [x] **Step 7: Implement and run the explicit smoke runner**
 
 `scripts/run-topic03-deepseek-smoke.ps1` accepts `-Model Flash|Pro`, runs an ephemeral OMP session
 with `--thinking xhigh --tools read --mode json --no-session`, asks the model to read the first H1
@@ -295,7 +295,7 @@ pwsh -NoProfile -File scripts/tests/topic03-deepseek-routing.Tests.ps1
 Expected: both runs exit 0, include a real read-tool event, and record the expected full selector.
 If either route is unavailable, record `ENVIRONMENT_BLOCKED` or `FAIL` accurately and continue.
 
-- [ ] **Step 8: Commit only new repository-owned Task 1 artifacts**
+- [x] **Step 8: Commit only new repository-owned Task 1 artifacts**
 
 ```powershell
 git add -- scripts/lib/topic03-deepseek-routing.ps1 `
@@ -326,7 +326,7 @@ Do not stage the user-level `models.yml` backup or any pre-existing dirty path.
   `Test-Topic03InstallContract`, and `Test-Topic03TopologyRoutingContract`.
 - Result type remains `{ Status, Code, Message }`, compatible with existing validators.
 
-- [ ] **Step 1: Build a complete good fixture and mutation matrix**
+- [x] **Step 1: Build a complete good fixture and mutation matrix**
 
 The good fixture contains the design, minimal spec/decision/phase projections, exactly three agent
 files, main-session instructions, commands, config, installer, and current-product manifest.
@@ -352,7 +352,7 @@ T03-INSTALL-STALE-AGENT         omit exact stale-agent retirement
 T03-EVIDENCE-SUPERSESSION       remove Phase 00 supersession identity
 ```
 
-- [ ] **Step 2: Run the tests before the helper exists**
+- [x] **Step 2: Run the tests before the helper exists**
 
 ```powershell
 pwsh -NoProfile -File scripts/tests/topic03-topology-routing.Tests.ps1
@@ -360,7 +360,7 @@ pwsh -NoProfile -File scripts/tests/topic03-topology-routing.Tests.ps1
 
 Expected: exit 1 with `[T03-TEST-HELPER]`.
 
-- [ ] **Step 3: Implement the minimal validator and focused runner**
+- [x] **Step 3: Implement the minimal validator and focused runner**
 
 Use literal/regex checks only for closed, load-bearing semantics. Normalize CRLF/LF and collapse
 wrapped Markdown whitespace before matching. Enumerate `template/.omp/agents/*.md` and compare the
@@ -368,7 +368,7 @@ case-sensitive stem set against `cheap-scout,reviewer,worker`; do not merely sea
 
 The focused runner prints every result and exits 1 only when one or more results are `FAIL`.
 
-- [ ] **Step 4: Prove the mutation suite is red/green**
+- [x] **Step 4: Prove the mutation suite is red/green**
 
 ```powershell
 pwsh -NoProfile -File scripts/tests/topic03-topology-routing.Tests.ps1
@@ -378,7 +378,7 @@ pwsh -NoProfile -File scripts/validate-topic03-topology-routing.ps1
 Expected now: mutation self-test passes; focused real-repository validation fails on the old
 five-agent/runtime/spec state. Record the failure codes as the implementation checklist.
 
-- [ ] **Step 5: Commit only the three new validator files**
+- [x] **Step 5: Commit only the three new validator files**
 
 ```powershell
 git add -- scripts/lib/topic03-topology-routing.ps1 `
