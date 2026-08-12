@@ -399,7 +399,7 @@ git commit -m "test: define topic 03 topology contract"
 - Produces: KD-027 and one selected manifest contract consumed by runtime, installer, and L0–L4
   validation.
 
-- [ ] **Step 1: Rewrite `spec/03-agent-topology.md` as the canonical topology authority**
+- [x] **Step 1: Rewrite `spec/03-agent-topology.md` as the canonical topology authority**
 
 The active section must state, without historical-role ambiguity:
 
@@ -415,7 +415,7 @@ parallel writers: conditional; sequential fallback
 Move verified frontmatter/source facts that remain useful into a clearly labeled evidence appendix.
 Fence the Explorer/Implementer/Verifier/five-role graph as superseded history.
 
-- [ ] **Step 2: Rewrite `spec/09-model-routing.md` around selected aliases**
+- [x] **Step 2: Rewrite `spec/09-model-routing.md` around selected aliases**
 
 Specify:
 
@@ -442,7 +442,7 @@ selector. Record the credential-fallback caveat and exact returned-identity chec
 Reviewer. Treat Scout quality insufficiency as Tech Lead judgment, not automatic provider
 fallback.
 
-- [ ] **Step 3: Append KD-027**
+- [x] **Step 3: Append KD-027**
 
 KD-027 must record alternatives rejected and the selected outcome:
 
@@ -455,7 +455,7 @@ KD-027 must record alternatives rejected and the selected outcome:
 
 It must name Topic 02 as lifecycle authority and Phase 02 as runtime migration owner.
 
-- [ ] **Step 4: Project the contract across active specs and phases**
+- [x] **Step 4: Project the contract across active specs and phases**
 
 For every listed projection file, remove active claims that require Explorer, Implementer,
 Verifier, a fixed count, unconditional review, or all-model fallback-off. Preserve source facts in
@@ -470,7 +470,7 @@ explicit historical/evidence fences. Add exact ownership for:
 - installer stale-agent retirement in Phase 05;
 - L0/L1/behavioral fixtures in Phase 06.
 
-- [ ] **Step 5: Run focused and Topic 02 regression validation**
+- [x] **Step 5: Run focused and Topic 02 regression validation**
 
 ```powershell
 pwsh -NoProfile -File scripts/validate-topic03-topology-routing.ps1
@@ -480,7 +480,7 @@ git diff --check -- spec docs/superpowers/specs
 
 Expected: Topic 03 spec checks pass while runtime/install checks remain red; Topic 02 stays green.
 
-- [ ] **Step 6: Checkpoint without staging pre-dirty spec files**
+- [x] **Step 6: Checkpoint without staging pre-dirty spec files**
 
 Record the paths and focused totals in the Topic 03 changelog draft. Do not commit these existing
 dirty files as Topic 03-only work.
