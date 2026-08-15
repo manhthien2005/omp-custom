@@ -20,3 +20,13 @@ Thumbs.db
 *.pem
 credentials.*
 secrets.*
+
+# Local evaluation campaign output can contain environment-specific telemetry.
+evals/results/
+
+# Local Claude Code scratch and linked worktrees
+/.claude/tmp/
+/.claude/worktrees/
+
+# Phase 00 experiment copies (disposable; authoritative evidence in docs/evidence/phase-00/)
+/.tmp-phase00-*/

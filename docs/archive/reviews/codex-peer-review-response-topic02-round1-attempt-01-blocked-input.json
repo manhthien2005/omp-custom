@@ -1,0 +1,113 @@
+{
+  "manifest_type": "EVIDENCE_MANIFEST",
+  "schema_version": "1.0",
+  "gate": "TOPIC_02_ROUND_1",
+  "reviewer": "zeus_gatekeeper",
+  "verdict": "BLOCKED",
+  "run_validity": {
+    "status": "BLOCKED",
+    "reason": "BLOCKED_INPUT"
+  },
+  "human_summary": "OBSERVED: No schema-valid Zeus context packet addressed to zeus_gatekeeper was supplied. The referenced project review packet identifies reviewer fresh-codex-peer and does not provide the required Zeus exact-diff/base/config hash contract. The acceptance audit is therefore invalid and was stopped without issuing ACCEPT_TOPIC_02, REOPEN_TOPIC_02, or INSUFFICIENT_EVIDENCE.",
+  "confirmed_findings": [],
+  "evidence_gaps": [
+    {
+      "id": "EG-001",
+      "label": "OBSERVED",
+      "description": "Required schema-valid Zeus context packet addressed to zeus_gatekeeper is absent.",
+      "evidence": [
+        "Dispatch payload is unstructured task prose.",
+        "codex-peer-review-packet-topic02-round1.md declares reviewer: fresh-codex-peer."
+      ],
+      "required_for_re_review": "Supply a schema-valid Zeus context packet addressed to zeus_gatekeeper containing the exact review diff or commit range, base revision, configuration identity, hashes, named invariants, required evidence, and acceptance gate."
+    }
+  ],
+  "unverified_risks": [
+    {
+      "id": "UR-001",
+      "label": "UNVERIFIED",
+      "description": "Snapshot freshness, exact diff scope, base identity, configuration identity, invariants, validators, OMP source claims, and all ten mandatory questions remain unverified because the run is blocked at input validation."
+    }
+  ],
+  "severity_counts": {
+    "critical": 0,
+    "important": 0,
+    "minor": 0
+  },
+  "files_reviewed": [
+    {
+      "path": "codex-peer-review-prompt-topic02-round1.md",
+      "label": "OBSERVED",
+      "purpose": "Input-format assessment only"
+    },
+    {
+      "path": "codex-peer-review-packet-topic02-round1.md",
+      "label": "OBSERVED",
+      "purpose": "Input-format assessment only"
+    }
+  ],
+  "files_not_reviewed": [
+    {
+      "scope": "All proposed Topic 02 files, neighboring code, validators, tests, Git state, and pinned OMP sources",
+      "label": "NOT_CHECKED",
+      "reason": "BLOCKED_INPUT"
+    }
+  ],
+  "checks": [
+    {
+      "check": "Zeus context-packet schema and addressee validation",
+      "label": "OBSERVED",
+      "result": "FAILED",
+      "evidence": "No Zeus packet addressed to zeus_gatekeeper was supplied."
+    },
+    {
+      "check": "Diff/base/config freshness",
+      "label": "NOT_CHECKED",
+      "result": "BLOCKED",
+      "evidence": "Required Zeus identities were absent."
+    },
+    {
+      "check": "Mandated hashes, validators, contradiction searches, Git checks, and pinned OMP checks",
+      "label": "NOT_CHECKED",
+      "result": "BLOCKED",
+      "evidence": "Review cannot proceed after BLOCKED_INPUT."
+    }
+  ],
+  "mandatory_questions": [
+    { "question": 1, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 2, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 3, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 4, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 5, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 6, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 7, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 8, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 9, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" },
+    { "question": 10, "label": "NOT_CHECKED", "decision": "BLOCKED_INPUT" }
+  ],
+  "failed_checks_or_attempts": [],
+  "deviations": [
+    {
+      "label": "OBSERVED",
+      "description": "The two referenced review documents were read solely to determine whether they constituted a valid Zeus input. No substantive audit proceeded."
+    }
+  ],
+  "assumptions": [],
+  "contradictions": [
+    {
+      "label": "OBSERVED",
+      "description": "The requested project verdict vocabulary conflicts with the mandatory Zeus invalid-input disposition; BLOCKED takes precedence."
+    }
+  ],
+  "limitations": [
+    {
+      "label": "OBSERVED",
+      "description": "No substantive correctness, test, runtime, or source claim can be made from this invalid run."
+    }
+  ],
+  "runtime_probe_required": {
+    "label": "NOT_CHECKED",
+    "value": false,
+    "reason": "Input validation failed before runtime claims could be registered."
+  }
+}
