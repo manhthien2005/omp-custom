@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_current_product_manifest",
+  "generated_at_utc": "2026-08-14T07:40:59.0000000Z",
+  "status": "PASS",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "files": [
+    {
+      "path": "quality.json",
+      "sha256": "945067857b9206e466c1f646013279a47f1d7963aaf571c5cc2e01ce3679d6c2",
+      "record_type": "round0912_quality_evidence"
+    },
+    {
+      "path": "security.json",
+      "sha256": "0a8103b191ab69105ca412b4afd6e1602e5ddbe8da104cf4762efaeb846b09ff",
+      "record_type": "round0912_security_evidence"
+    },
+    {
+      "path": "evaluation.json",
+      "sha256": "c84d8ee833d362e70b3261357e1b96abce86d548a092c2250ca9c9dd07f1a500",
+      "record_type": "round0912_evaluation_evidence"
+    },
+    {
+      "path": "release-readiness.json",
+      "sha256": "2935a843fdd5770bf7a3b7cf018b3c3a62be19e9a2d299d01e50f7a131f79e76",
+      "record_type": "round0912_release_readiness"
+    }
+  ],
+  "governed_files": [
+    {
+      "path": ".gitignore",
+      "sha256": "c759c76dde723577bde805a6e320d15a2a819ebf96e01938bc2141b4a5e1f15c"
+    },
+    {
+      "path": "codex-round09-12-closure-evaluation-release-readiness-changelog.md",
+      "sha256": "6e167d2809c69b78b4b5c8ebac1786f76f022a3aa4cd0b32c3c23353a88e2216"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "f523338cfebf7f5ee7b25a0f6131044763067d839bda4c465cad9b7d78956eff"
+    },
+    {
+      "path": "docs/final-report.md",
+      "sha256": "a15766d648cf48fe496a408511d85ee4b99eac2d9db428bc33298e223d4f2e43"
+    },
+    {
+      "path": "docs/installation.md",
+      "sha256": "2ed3b29c2f31e55565bee955c402fc935de2fdb2e1878661f91ce8fd603d6d5d"
+    },
+    {
+      "path": "docs/rollback.md",
+      "sha256": "e68fd486be5ad7bcc131a131caa8ee7902a753969a960ba80aeb252c1b0ef6a6"
+    },
+    {
+      "path": "docs/security.md",
+      "sha256": "3f47da18d17d8948b826072e9fe164e35c6bf57c0363f83902ec01a680ab2195"
+    },
+    {
+      "path": "docs/workflow-v0.md",
+      "sha256": "4c7b025f426256c9cc5a7c4ff3ef02ef0a73d7642dfe6a0e39ca60222bf98b30"
+    },
+    {
+      "path": "evals/round09-12/cases/package.json",
+      "sha256": "0ddbcc4cb285731308db932aa08f27831e377fad96f5860e583c29d7aa334456"
+    },
+    {
+      "path": "evals/round09-12/cases/promotion.json",
+      "sha256": "c1937cbc6bad7a03b8ac877237a011d1702bcf29e05a8311f29060104b49ca1d"
+    },
+    {
+      "path": "evals/round09-12/cases/quality-security.json",
+      "sha256": "9603c11f6c4abe88a73a4238c6ca321c62d3732947755eed4c0a497bddc59517"
+    },
+    {
+      "path": "evals/round09-12/manifest.json",
+      "sha256": "1b2961dbda2de87901677d736080e63e24d81f37a79de405cb5f7eabb8dea65c"
+    },
+    {
+      "path": "README.md",
+      "sha256": "15e6e9bf2f4f42b74b97ad34ae964417421a7cce59765961cd1ddcddc225f25f"
+    },
+    {
+      "path": "scripts/benchmark.ps1",
+      "sha256": "5f8faf1f29b9bd39bc132c67e1aed1a741cc95b8defb5877758105e4a864251c"
+    },
+    {
+      "path": "scripts/capture-round09-12-evidence.ps1",
+      "sha256": "2c4b6c58e3e18675cccb8ecc9058becc3274d53921b60330b4a775fdf934309d"
+    },
+    {
+      "path": "scripts/lib/round09-12-evaluation-core.mjs",
+      "sha256": "2eb8b66663db2ddc4b0c67fa585c2726e9ee1441d6899ecc7a2208515920a028"
+    },
+    {
+      "path": "scripts/lib/round09-12-release-readiness.ps1",
+      "sha256": "8618133935a76be8d37f3bb2b250e35e6410d53cdb9b692c190a3367835ef866"
+    },
+    {
+      "path": "scripts/run-round09-12-evaluation.ps1",
+      "sha256": "5b9d0dec1b7f44ce55b76412ad7e2a5a11d338471601995a41e2db56476a8d77"
+    },
+    {
+      "path": "scripts/tests/fixtures/round09-12-fake-omp.mjs",
+      "sha256": "6d812785459b5f413ccf5a63d1cb2ee9da457351b01b803c08df03666faad9f1"
+    },
+    {
+      "path": "scripts/tests/round09-12-evaluation-core.Tests.mjs",
+      "sha256": "5495f457cb253038915194a3c9d490c3150f3c3d66245ff0b0ebee1e99c47b8d"
+    },
+    {
+      "path": "scripts/tests/round09-12-installer.Tests.ps1",
+      "sha256": "de13e891cb1486ba13791479fc78329d96b6dad58714d6eac47610d0ecb82359"
+    },
+    {
+      "path": "scripts/tests/round09-12-review-security.Tests.mjs",
+      "sha256": "a888caef0c8397a241445ffb67663b5a69af12cb029eea741369bcb912283333"
+    },
+    {
+      "path": "scripts/tests/round09-12-validator-mutations.Tests.ps1",
+      "sha256": "5357c6b8b73e104e02a2cb8f223c0c08f8d71675fafbbba6f1f0f3ca6860e0a7"
+    },
+    {
+      "path": "scripts/validate-round09-12-release-readiness.ps1",
+      "sha256": "f87dea35bb5640de46314576d0178fa4eb1f22fb420435698b3cde58239fe8d3"
+    },
+    {
+      "path": "scripts/validate-template.ps1",
+      "sha256": "b0d2c9d9f88c5e6883619591883df70420d4772e50168006d6fbc8ec80c644ed"
+    },
+    {
+      "path": "spec/10-verification-and-review.md",
+      "sha256": "2e3103531be0444c811e3c35e1e2863393690da1339b6c911344e42fe6b3039e"
+    },
+    {
+      "path": "spec/12-installation-and-rollback.md",
+      "sha256": "c7cfe77f1cb603b9a972ddc06222d5fee1f87469b40defeb102ef5d3465c5309"
+    },
+    {
+      "path": "spec/13-validation-and-evaluation.md",
+      "sha256": "f6c1cf944729200ea7cf1ef8a373b7b165f291a770125268f3e5b8da4be7a378"
+    },
+    {
+      "path": "spec/15-security-and-failure-recovery.md",
+      "sha256": "269a6b2663f1441bcda22370fa5b24d214d1707a2010bb3105544219fa23f7ba"
+    },
+    {
+      "path": "spec/16-migration-plan.md",
+      "sha256": "5cc1e71e42da2648b3d330fb7d16569368a8bef63846c83ee504ab2ed1dfdce1"
+    },
+    {
+      "path": "spec/key/04-decision-log.md",
+      "sha256": "c2b69a6a02c72cc0213b23e0b864371a58262341b765b7de7c60fda2c0f5687d"
+    },
+    {
+      "path": "spec/phases/phase-04-quality-system.md",
+      "sha256": "5215338c3c04069f84d7ec4b6719a37f93bd842883757614fa77fe77bcb21bc2"
+    },
+    {
+      "path": "spec/phases/phase-05-installation-hardening.md",
+      "sha256": "57a3cdf4658128ca0f57393dace3165b6b183e0eb00887a2c287eeffe5016f2c"
+    },
+    {
+      "path": "spec/phases/phase-06-evaluation.md",
+      "sha256": "411d54ef694816f71cc2f462012594ba7e22f8e7ddc5541f0ecc4ad5104d654d"
+    },
+    {
+      "path": "spec/phases/phase-07-stabilization.md",
+      "sha256": "c1bbeadc869744e394e6b2e9276e8125f13136e5c60c00d81bdab9adf4012d74"
+    }
+  ]
+}

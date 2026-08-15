@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "record_type": "topic07_context_continuity_evidence",
+  "status": "IMPLEMENTED_NOT_PROMOTED",
+  "captured_at_utc": "2026-08-15T10:15:37.2912136Z",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "source_attachment_count": 15,
+  "repository": {
+    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "working_tree_clean": false,
+    "dirty_paths_sha256": "87fd4efb511f662f5581f7cd986b52f984a189e2e4cef88b0b13e507433297d6",
+    "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
+  },
+  "environment": {
+    "os": "Microsoft Windows 10.0.26100",
+    "architecture": "X64",
+    "pwsh_version": "7.6.5",
+    "node_version": "v24.16.0",
+    "git_version": "git version 2.54.0.windows.1",
+    "installed_omp_version": "omp/17.2.12"
+  },
+  "pinned_omp": {
+    "commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+    "clean": true,
+    "source_status": "PASS"
+  },
+  "runtime_matrix": {
+    "status": "IMPLEMENTED_NOT_PROMOTED",
+    "code": "OPEN-T07-RUNTIME-02",
+    "rows": [
+      {
+        "version": "17.2.12",
+        "available": true,
+        "source": "installed"
+      },
+      {
+        "version": "17.2.10",
+        "available": false,
+        "source": "not-found"
+      }
+    ]
+  },
+  "cases": {
+    "portable_core_and_adapter": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free closed-schema, continuity-core, adapter, transaction, and pressure checks.",
+      "stdout_sha256": "c00b98027771fe19e95d7fb167186fb3b58ba96bf856c14b7f7d925a9a1557d9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "durable_state_contract": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free durable state contract.",
+      "stdout_sha256": "2a81b7f231ea3f2d2862c6bd5b37ca89d421b6813013808d90010daf4ecf8ce3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "durable_state_projection": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free durable state projection.",
+      "stdout_sha256": "f16705e29c04d9edfdc8c3c2051419a87267fd1396189edae9f3b1812cbbe9f7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "managed_runtime_profile": {
+      "status": "FAIL",
+      "exit_code": 1,
+      "scope": "Model-free managed runtime profile.",
+      "stdout_sha256": "24a9b476c06364b28a4df7ef2f2deb0911aae583f3d0f481442512769f936fa4",
+      "stderr_sha256": "3e70c23868599734765b13df78cf5daf670247b1d75cb2644de7437b770998d3",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "local_pressure_canary": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free local pressure canary.",
+      "stdout_sha256": "bfa59c77667b2116e8cb5e1fa91727cd194d1181a4cc90f3ffc2dc298862678d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "validator_mutations": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free validator mutations.",
+      "stdout_sha256": "bc328b420b1f1c6a939d2e0dcd849167c7f001380fe5ae1191887680d75c824d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "focused_contract_bootstrap": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Focused Topic 07 validation with only its not-yet-final evidence pair skipped (20 records).",
+      "stdout_sha256": "a4e21c06ad97a1be8d77987dd7614b4dcb0b5080e1ae01a1971a68791a6cd844",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "full_validator_bootstrap": {
+      "status": "FAIL",
+      "exit_code": 1,
+      "scope": "Full repository validator with only the Topic 07 evidence self-check skipped during capture.",
+      "stdout_sha256": "b296fa895dc307ece16fcc983222854e802243a0c25f9c854b39c8f4d9cec654",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    }
+  },
+  "limitations": {
+    "promotion": "BLOCKED_UNTIL_BOTH_SUPPORTED_RUNTIME_CANARIES_PASS",
+    "open_blocker": "OPEN-T07-RUNTIME-02",
+    "provider_smoke": "NOT_RUN_MODEL_FREE_CAMPAIGN",
+    "operational_state": "LOCAL_OUTSIDE_GIT"
+  }
+}

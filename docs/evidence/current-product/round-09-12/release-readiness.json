@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_release_readiness",
+  "generated_at_utc": "2026-08-14T07:40:59.0000000Z",
+  "status": "IMPLEMENTED_NOT_PROMOTED",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "live_install_performed": false,
+  "scratch_package": {
+    "status": "PASS",
+    "omp_version": "17.2.12",
+    "assertions": 30,
+    "live_target_modified": false
+  },
+  "adapters": {
+    "omp": {
+      "status": "IMPLEMENTED_NOT_PROMOTED",
+      "installable": true
+    },
+    "claude": {
+      "status": "DESIGNED_NOT_VERIFIED",
+      "installable": false
+    }
+  },
+  "campaign": {
+    "environment_status": "NOT_RUN",
+    "promotion_verdict": "DEFER_INCONCLUSIVE"
+  },
+  "limitations": [
+    "OMP_17_2_10_NOT_AVAILABLE",
+    "CLAUDE_RUNTIME_NOT_VERIFIED",
+    "MODEL_ASSISTED_ARMS_NOT_RUN",
+    "SCRATCH_PROOF_NOT_LIVE_INSTALL"
+  ],
+  "commands": [
+    {
+      "name": "round0912-installer-proof",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/tests/round09-12-installer.Tests.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "ec70ed81f55d8300a4ddc69b5c577e4404c2c594a1e3860b03c2e16257c78722",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "round0912-validator-mutations",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/tests/round09-12-validator-mutations.Tests.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "45778567a96339f297ebf766cc79e90de09881b25eba9c441f5c21a5c2395152",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "round0912-focused-no-evidence",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-round09-12-release-readiness.ps1 -RepositoryRoot . -SkipEvidence",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "f26e24889036c6c20f2efc00579850d2aa5decf60884dfb61cce10487266b13e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "topic03-focused",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic03-topology-routing.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "172521de837fcd08e8f4f494fae26d5b261343e7794cefa51d17a644237c2c0f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "topic04-focused",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic04-durable-state.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "bf350b4e2106d762f540dfb15ec4cd612c5b2deda58d1ddb47666b751607db1a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "topic05-focused",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic05-progressive-retrieval.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "b36bf9afceb2aaf6ed61a7077ea708af2e256da9403909d13bbbc27d307cbb04",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "topic06-focused",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic06-agent-boundary.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "3a6f1fcfc1c2ffca7fbfe73d6f51389de2a6c5d345097e83497b5ce95d71559e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "topic07-focused",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic07-context-continuity.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "c6b8f17ba21820511e090a25f7ad5e308aa38aa4856199307a0be5c6a34cb1a2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "topic08-focused",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic08-behavior-core.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "006ac16ade89e6e1cef83a898c892df1287108a3363bcd489490a49ef67557ff",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_evaluation_evidence",
+  "generated_at_utc": "2026-08-14T07:40:59.0000000Z",
+  "status": "PASS",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "deterministic": {
+    "status": "PASS",
+    "environment_status": "PASS",
+    "cases_passed": 14,
+    "verdicts": [
+      "PROMOTE_EFFICIENCY",
+      "PROMOTE_QUALITY",
+      "REJECT",
+      "DEFER_INCONCLUSIVE"
+    ]
+  },
+  "campaign": {
+    "environment_status": "NOT_RUN",
+    "promotion_verdict": "DEFER_INCONCLUSIVE",
+    "reasons": [
+      "model_assisted_campaign_not_authorized"
+    ]
+  },
+  "commands": [
+    {
+      "name": "round0912-core-tests",
+      "command": "node --test --test-reporter=dot scripts/tests/round09-12-evaluation-core.Tests.mjs",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "f44599e69d732ed8dee0e717f36e0ee98cd5c0c2ea518926a89974e68da39217",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "round0912-review-security-tests",
+      "command": "node --test --test-reporter=dot scripts/tests/round09-12-review-security.Tests.mjs",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "3778c5c90f5276339c6de23117314f593efa65b62332a11fb9ba1c55404fb3ad",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "round0912-deterministic-runner",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/run-round09-12-evaluation.ps1 -Mode Deterministic -OutputDirectory <system-temp>/omp-round0912-evidence-run-*",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "f9f6a82941814ac8e4bbe40f104458ee856e88740a35cb4941d20c2622c7f9f6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "round0912-focused-no-evidence",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-round09-12-release-readiness.ps1 -RepositoryRoot . -SkipEvidence",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "f26e24889036c6c20f2efc00579850d2aa5decf60884dfb61cce10487266b13e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

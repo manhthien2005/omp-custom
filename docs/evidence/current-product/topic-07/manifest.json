@@ -1,0 +1,424 @@
+{
+  "schema_version": 1,
+  "record_type": "topic07_current_product_manifest",
+  "generated_at_utc": "2026-08-15T10:15:37.4073588Z",
+  "repository": {
+    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "working_tree_clean": false,
+    "dirty_paths_sha256": "87fd4efb511f662f5581f7cd986b52f984a189e2e4cef88b0b13e507433297d6",
+    "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
+  },
+  "pinned_omp": {
+    "commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+    "clean": true
+  },
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "role": "authority_or_guide",
+      "sha256": "609ff8e683f6a6598a3f41b33605b9f598b4a33b00e682450896cc3a07fa127b"
+    },
+    {
+      "path": "docs/agent-boundaries.md",
+      "role": "authority_or_guide",
+      "sha256": "74f54e481feb2a6ab95b2f0909ab071bb127ffbaf45c61619a81b1ca068bdac6"
+    },
+    {
+      "path": "docs/architecture.md",
+      "role": "authority_or_guide",
+      "sha256": "f523338cfebf7f5ee7b25a0f6131044763067d839bda4c465cad9b7d78956eff"
+    },
+    {
+      "path": "docs/context-continuity.md",
+      "role": "authority_or_guide",
+      "sha256": "911066d6c7be9e82830a916ec0e9e599391749465d17c6ee574593822d6ef83f"
+    },
+    {
+      "path": "docs/customization.md",
+      "role": "authority_or_guide",
+      "sha256": "9810f98e68e197b42c99e96627ef55b166e5ff007d01f8e6f7137b7ec1a1877e"
+    },
+    {
+      "path": "docs/evidence/current-product/topic-07/deterministic.json",
+      "role": "evidence",
+      "sha256": "e4bd5cd36d49686950112306d41d63cefde9661e4f1ba8f7f3834508bd05e315"
+    },
+    {
+      "path": "docs/final-report.md",
+      "role": "authority_or_guide",
+      "sha256": "a15766d648cf48fe496a408511d85ee4b99eac2d9db428bc33298e223d4f2e43"
+    },
+    {
+      "path": "docs/installation.md",
+      "role": "authority_or_guide",
+      "sha256": "2ed3b29c2f31e55565bee955c402fc935de2fdb2e1878661f91ce8fd603d6d5d"
+    },
+    {
+      "path": "docs/policies/context-budget.md",
+      "role": "authority_or_guide",
+      "sha256": "f16bdf9c6ae6c550d0541d1627cde477c55a14a163f7823a90d028b3634a48f0"
+    },
+    {
+      "path": "docs/rollback.md",
+      "role": "authority_or_guide",
+      "sha256": "e68fd486be5ad7bcc131a131caa8ee7902a753969a960ba80aeb252c1b0ef6a6"
+    },
+    {
+      "path": "docs/security.md",
+      "role": "authority_or_guide",
+      "sha256": "3f47da18d17d8948b826072e9fe164e35c6bf57c0363f83902ec01a680ab2195"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-13-topic-07-safe-context-compaction-continuity-plan.md",
+      "role": "authority_or_guide",
+      "sha256": "3f5d730e5453781974227d78e45ec7a586da3c12c9766160e187cca651c91d0d"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-13-topic-07-context-compaction-continuity-design.md",
+      "role": "authority_or_guide",
+      "sha256": "7142947e4fd13e49e9e0d3514c5b3f6171aadd2233dea69c46ed02d7f1c4c51d"
+    },
+    {
+      "path": "docs/task-state.md",
+      "role": "authority_or_guide",
+      "sha256": "921386392448e32cd95f9f78f09130f7933195c46c749608480997df9076a19b"
+    },
+    {
+      "path": "docs/token-strategy.md",
+      "role": "authority_or_guide",
+      "sha256": "7a508e99f192b5113845ca0bca0288be25816431ec6f38d74f8e1398d0fbdb27"
+    },
+    {
+      "path": "docs/workflow-v0.md",
+      "role": "authority_or_guide",
+      "sha256": "4c7b025f426256c9cc5a7c4ff3ef02ef0a73d7642dfe6a0e39ca60222bf98b30"
+    },
+    {
+      "path": "README.md",
+      "role": "authority_or_guide",
+      "sha256": "15e6e9bf2f4f42b74b97ad34ae964417421a7cce59765961cd1ddcddc225f25f"
+    },
+    {
+      "path": "registry/omp-compatibility.yml",
+      "role": "authority_or_guide",
+      "sha256": "a6ef17efc1ef5c7ae55d18c072a83d470e2411aa2dcb37a405c8500729f056fc"
+    },
+    {
+      "path": "scripts/capture-topic07-evidence.ps1",
+      "role": "implementation",
+      "sha256": "8b09ba35955bfedc7b46de72334255bb63ada49e1827749233110b4531460434"
+    },
+    {
+      "path": "scripts/install-template.ps1",
+      "role": "implementation",
+      "sha256": "1283cc5fcdd5e8f909ebb7f5320802cac1d6f25dbb8d188214d588f814c8d29b"
+    },
+    {
+      "path": "scripts/lib/topic07-context-continuity.ps1",
+      "role": "implementation",
+      "sha256": "57bd1438eb02b56fccdacb9d4a3a234db184681430902ec787cff560e0a5b820"
+    },
+    {
+      "path": "scripts/tests/fixtures/topic07-provider-sentinel.mjs",
+      "role": "test_or_fixture",
+      "sha256": "a96560ad7bf4333ee869da2a317a886e393e6455323f3f66968e6bcb119c02c8"
+    },
+    {
+      "path": "scripts/tests/topic07-continuity-core.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "970a60c403f3f9a80dfe985e2cf3e7af75e570f9b78dbf68c42863e3f27cfebb"
+    },
+    {
+      "path": "scripts/tests/topic07-managed-runtime.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "76afe9aefa955a1d3827976294d829ec8d719bf4c122af6c109c1bb4fcb32505"
+    },
+    {
+      "path": "scripts/tests/topic07-managed-state-client.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "039bd36bb00255a480bae5693e2d9f64fdab146959f39cc9eb2adf665a3d1b26"
+    },
+    {
+      "path": "scripts/tests/topic07-omp-adapter.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "20a31c64f1abbaab721bf3ddf45375f21e09062c2f6da695167a25c58e38bb6c"
+    },
+    {
+      "path": "scripts/tests/topic07-pressure-canary.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "79019c417f91f19c68613d4947ff221ea29e19ce34143c8c109da92da722a72f"
+    },
+    {
+      "path": "scripts/tests/topic07-pressure-guard.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "0eee0b595d6b9170bd6a7a46bf8d347812b2dd52122a11ba579a2b288ebeca7e"
+    },
+    {
+      "path": "scripts/tests/topic07-safe-compact.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "d635cd19d66caceef57cd7a209be22f2bffb486a6cac3acbc1409ad9f83a96ae"
+    },
+    {
+      "path": "scripts/tests/topic07-state-contract.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "2190d772a2f5a97b884afc875d95c9b3b14108078ef24866772a7d9dbaedf893"
+    },
+    {
+      "path": "scripts/tests/topic07-state-projection.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "2f8493171a1277799fc3fac9a2e604f44a8d9e7c9a0aa9b6edb050bcac4393ef"
+    },
+    {
+      "path": "scripts/tests/topic07-validator-mutations.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "8913feb64dfa2333753310f92ad206f1c216dd63560fb0e24169527aeacc231d"
+    },
+    {
+      "path": "scripts/uninstall-template.ps1",
+      "role": "implementation",
+      "sha256": "33a7a49d600b5df6b052b8526b8d22dd71febada2696f4b06d41d3a78d94015c"
+    },
+    {
+      "path": "scripts/validate-template.ps1",
+      "role": "implementation",
+      "sha256": "b0d2c9d9f88c5e6883619591883df70420d4772e50168006d6fbc8ec80c644ed"
+    },
+    {
+      "path": "scripts/validate-topic07-context-continuity.ps1",
+      "role": "implementation",
+      "sha256": "9a734633ae0994222156ee3c2372f7e2f6c46f7f447b9c88fbf3c25916551f1b"
+    },
+    {
+      "path": "spec/01-target-architecture.md",
+      "role": "authority_or_guide",
+      "sha256": "2533f2fc63efd0191d65e7dc04fcc4feb25a4bbaae9637c19fb5166c2e9faf5e"
+    },
+    {
+      "path": "spec/02-runtime-semantics.md",
+      "role": "authority_or_guide",
+      "sha256": "aaa066f42a8a523114b1b5d222a776620176278f5d4aee9f9121b721a8d3d192"
+    },
+    {
+      "path": "spec/04-workflow-sizing.md",
+      "role": "authority_or_guide",
+      "sha256": "0a5722cab377a0175e38a677ad5c1fca26cc61429c8dea1add730b3003c8db78"
+    },
+    {
+      "path": "spec/05-context-and-token-model.md",
+      "role": "authority_or_guide",
+      "sha256": "a0f175693a69c348760c1ed8430aaa6f64071aafb996dac6b5b7798630c9872d"
+    },
+    {
+      "path": "spec/12-installation-and-rollback.md",
+      "role": "authority_or_guide",
+      "sha256": "c7cfe77f1cb603b9a972ddc06222d5fee1f87469b40defeb102ef5d3465c5309"
+    },
+    {
+      "path": "spec/13-validation-and-evaluation.md",
+      "role": "authority_or_guide",
+      "sha256": "f6c1cf944729200ea7cf1ef8a373b7b165f291a770125268f3e5b8da4be7a378"
+    },
+    {
+      "path": "spec/15-security-and-failure-recovery.md",
+      "role": "authority_or_guide",
+      "sha256": "269a6b2663f1441bcda22370fa5b24d214d1707a2010bb3105544219fa23f7ba"
+    },
+    {
+      "path": "spec/key/01-dna.md",
+      "role": "authority_or_guide",
+      "sha256": "8d93fa1987fff0db7475dd44a076df551e12d6fc6edf51bf7eb9ce4d405170b5"
+    },
+    {
+      "path": "spec/key/03-token-quality-model.md",
+      "role": "authority_or_guide",
+      "sha256": "fedcf73707163aabf505df5f789770d2615d8fb29344d75e4c3d1de1c930ba55"
+    },
+    {
+      "path": "spec/key/04-decision-log.md",
+      "role": "authority_or_guide",
+      "sha256": "c2b69a6a02c72cc0213b23e0b864371a58262341b765b7de7c60fda2c0f5687d"
+    },
+    {
+      "path": "spec/key/05-coverage-audit.md",
+      "role": "authority_or_guide",
+      "sha256": "28c644434aa58846f99ed06c1ccec8084f4e22d0a73fa9cbd31ee1652dd39cd9"
+    },
+    {
+      "path": "spec/key/06-investment-thesis.md",
+      "role": "authority_or_guide",
+      "sha256": "9bc86e34d692d0e5eac9ee0530f1a84364e4a097a8f47645b00771860446081f"
+    },
+    {
+      "path": "spec/phases/phase-01-runtime-correctness.md",
+      "role": "authority_or_guide",
+      "sha256": "e67f5158b1fe96a97329978c7858a96d9a064be8fcd4126fff679bb5bdebc8a6"
+    },
+    {
+      "path": "spec/phases/phase-03-context-efficiency.md",
+      "role": "authority_or_guide",
+      "sha256": "3eb466b57cc3c9c7dc12a1e30f11f6ebc864a500a357d2ab8c62e06048ecbf0a"
+    },
+    {
+      "path": "spec/phases/phase-05-installation-hardening.md",
+      "role": "authority_or_guide",
+      "sha256": "57a3cdf4658128ca0f57393dace3165b6b183e0eb00887a2c287eeffe5016f2c"
+    },
+    {
+      "path": "spec/phases/phase-06-evaluation.md",
+      "role": "authority_or_guide",
+      "sha256": "411d54ef694816f71cc2f462012594ba7e22f8e7ddc5541f0ecc4ad5104d654d"
+    },
+    {
+      "path": "spec/README.md",
+      "role": "authority_or_guide",
+      "sha256": "e42db7b7a12adea0a4f029911e36cb3c097212cbe09007835ecbb5a5a75be55f"
+    },
+    {
+      "path": "template/.omp/AGENTS.md",
+      "role": "implementation",
+      "sha256": "0555cd17bd4cc0d235cb178c8ccb7b3ab78dce30388feea009d2fd4297efa1f0"
+    },
+    {
+      "path": "template/.omp/bin/omp-managed.ps1",
+      "role": "implementation",
+      "sha256": "b664b5e1047988622af2de30695af1be85b4aa0d679178f4eccdf3a999f0d4bc"
+    },
+    {
+      "path": "template/.omp/commands/orchestrated.md",
+      "role": "implementation",
+      "sha256": "1346710c4857dd8b9d0fdac0ea040256fc70fc9abbebf6be946c13fbbe5d4a72"
+    },
+    {
+      "path": "template/.omp/commands/quick.md",
+      "role": "implementation",
+      "sha256": "829b10489f346db19c8b4125c1355fddf56fe6ec3e1e4dd49eef473439392bf9"
+    },
+    {
+      "path": "template/.omp/commands/standard.md",
+      "role": "implementation",
+      "sha256": "98abd42c1b23f601302ae882c55356b8f89ea8e17fe93ded86edec8ff2236549"
+    },
+    {
+      "path": "template/.omp/contracts/agent-boundary-core.mjs",
+      "role": "implementation",
+      "sha256": "7ced6f22fa176cf8e0746288db736cc095d417d4f7ef2b20c3570509ebbadc1a"
+    },
+    {
+      "path": "template/.omp/contracts/component-manifest.json",
+      "role": "implementation",
+      "sha256": "f818dab27443aaecd2654570e587e6cbf2cef4c9ae4e2a6bcc77d3d10a8c5bfc"
+    },
+    {
+      "path": "template/.omp/contracts/context-continuity-core.mjs",
+      "role": "implementation",
+      "sha256": "6f3dc095466fe8a254c0d3ed175f14479ac6bc5cd15173921d56ea80c26df78c"
+    },
+    {
+      "path": "template/.omp/contracts/context-continuity-schema.mjs",
+      "role": "implementation",
+      "sha256": "d90f7828cf0ebfbf452efc6ba4fc86d67a656863d43e1df2b3f692cbddc57075"
+    },
+    {
+      "path": "template/.omp/contracts/managed-runtime.yml",
+      "role": "implementation",
+      "sha256": "62fea53740dd24e1fcde047651f7b58e5dfa8b249bc506f82c3adefdb95f6690"
+    },
+    {
+      "path": "template/.omp/contracts/managed-state-client.mjs",
+      "role": "implementation",
+      "sha256": "1d280c87c03f5e18e81334ba77bdef24fbc7bf78e32745207300d90890532012"
+    },
+    {
+      "path": "template/.omp/extensions/agent-task-boundary.js",
+      "role": "implementation",
+      "sha256": "6ff3e6b04f933c89b78c3191f2cdb9f94752fa40dba8d18496c8bbe969c67f5a"
+    },
+    {
+      "path": "template/.omp/extensions/context-continuity.js",
+      "role": "implementation",
+      "sha256": "4849c7985b42acac41e9aef829009d2d6c97ba7629e1be9154cb7d4bef5584c8"
+    },
+    {
+      "path": "template/.omp/RULES.md",
+      "role": "implementation",
+      "sha256": "f37ea69e380763240220fb731f59068dcbd96b52a472be16c6f74dab928e9ef5"
+    },
+    {
+      "path": "template/.omp/state/agent-tasks.ps1",
+      "role": "implementation",
+      "sha256": "2a89215b3b26ce23c11473d1ebea33d98e27a3e1e8c358e1795704163ce6091f"
+    },
+    {
+      "path": "template/.omp/state/lib/AgentTasks.Common.ps1",
+      "role": "implementation",
+      "sha256": "24abaa6a05a2d45d513179b2cfa8ee4054d0f9d2386ecec623bd02daf2659fbd"
+    },
+    {
+      "path": "template/.omp/state/lib/AgentTasks.Lifecycle.ps1",
+      "role": "implementation",
+      "sha256": "19a96ae59935bb977897893c26d59fb0ce5eebaa77fe308142838b841ac41145"
+    },
+    {
+      "path": "template/.omp/state/lib/AgentTasks.Projection.ps1",
+      "role": "implementation",
+      "sha256": "f27633611f54689af3ea4c192fd46c754f0f751c957118783d378cb288d88a06"
+    },
+    {
+      "path": "template/.omp/state/manifest.json",
+      "role": "implementation",
+      "sha256": "b70bc7b4a314088679c0d07026cb30efd7d5ea2ea64b7c6cce4c84522064cd26"
+    },
+    {
+      "path": "template/.omp/state/PROTOCOL.md",
+      "role": "implementation",
+      "sha256": "d4a11d9f0a4958ae4d6d591ac61a30734f2598be20645eb5c5e75af85cef622c"
+    },
+    {
+      "path": "template/.omp/state/schemas/agent-tasks-v1.schema.json",
+      "role": "implementation",
+      "sha256": "d7d0f5feed220c4b22aa6fc3bff22eea0fd2a4ed90f0980d7dc8441007921353"
+    }
+  ],
+  "commands": [
+    {
+      "id": "portable_core_and_adapter",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "durable_state_contract",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "durable_state_projection",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "managed_runtime_profile",
+      "exit_code": 1,
+      "status": "FAIL"
+    },
+    {
+      "id": "local_pressure_canary",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "validator_mutations",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "focused_contract_bootstrap",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "full_validator_bootstrap",
+      "exit_code": 1,
+      "status": "FAIL"
+    }
+  ]
+}

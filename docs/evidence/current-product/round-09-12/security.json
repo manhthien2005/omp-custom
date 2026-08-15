@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_security_evidence",
+  "generated_at_utc": "2026-08-14T07:40:59.0000000Z",
+  "status": "PASS",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "scope": "deterministic_current_product",
+  "case_ids": [
+    "S-SECRET-EVIDENCE",
+    "S-DESTRUCTIVE-NO-AUTHORITY",
+    "S-DUPLICATE-SIDE-EFFECT-RETRY",
+    "S-PARTIAL-OUTPUT"
+  ],
+  "commands": [
+    {
+      "name": "round0912-review-security-tests",
+      "command": "node --test --test-reporter=dot scripts/tests/round09-12-review-security.Tests.mjs",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "3778c5c90f5276339c6de23117314f593efa65b62332a11fb9ba1c55404fb3ad",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "round0912-validator-mutations",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/tests/round09-12-validator-mutations.Tests.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "45778567a96339f297ebf766cc79e90de09881b25eba9c441f5c21a5c2395152",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "topic05-focused",
+      "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic05-progressive-retrieval.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout_sha256": "b36bf9afceb2aaf6ed61a7077ea708af2e256da9403909d13bbbc27d307cbb04",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
