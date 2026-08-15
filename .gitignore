@@ -27,7 +27,6 @@ evals/results/
 # Local Claude Code scratch and linked worktrees
 /.claude/tmp/
 /.claude/worktrees/
-/.worktrees/
 
 # Phase 00 experiment copies (disposable; authoritative evidence in docs/evidence/phase-00/)
 /.tmp-phase00-*/
