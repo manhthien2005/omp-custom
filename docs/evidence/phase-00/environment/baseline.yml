@@ -1,0 +1,25 @@
+schema_version: 1
+phase: "00"
+captured_at: "2026-08-08T22:21:38+07:00"
+repository:
+  root: D:/Dev/Projects/omp-template
+  branch: main
+  head: 62fecf277dc9d5e47d06319387eac747462214c1
+  status_artifact: docs/evidence/phase-00/environment/repository-status-before.txt
+platform:
+  os: Microsoft Windows 10.0.26100
+  architecture: X64
+  powershell: 7.6.4
+omp:
+  executable: C:/Users/MrThien/AppData/Local/omp/omp.exe
+  version: 17.2.10
+  pinned_source_clone: _research/upstreams/oh-my-pi
+  pinned_source_head: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  pinned_source_dirty_entries: 0
+protected_live_home:
+  path: C:/Users/MrThien/.omp/agent
+  write_authorized: false
+  content_captured: false
+  rationale: Secrets and private runtime state are outside experiment artifacts.
+runtime_experiments_executed: []
+

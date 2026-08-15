@@ -1,0 +1,16 @@
+plan:
+  defaultOnStartup: false
+async:
+  enabled: false
+task:
+  batch: false
+  enableEffort: false
+  maxConcurrency: 3
+  maxRecursionDepth: 2
+  maxRuntimeMs: 180000
+  isolation:
+    mode: rcopy
+    apply: false
+    merge: branch
+modelRoles:
+  implementer: omniroute/oc/mimo-v2.5-free

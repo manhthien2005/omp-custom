@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_fixture_manifest",
+  "fixture_version": "1.0.0",
+  "baseline_kinds": [
+    "stable_product_baseline",
+    "pinned_plain_omp_runtime_baseline"
+  ],
+  "campaign_policy": {
+    "default_mode": "deterministic",
+    "provider_calls_require_explicit_authority": true,
+    "pilot_min_pairs_per_arm": 3,
+    "pilot_can_promote": false,
+    "max_joint_false_promotion_probability": 0.05
+  },
+  "case_files": [
+    "cases/quality-security.json",
+    "cases/promotion.json",
+    "cases/package.json"
+  ]
+}

@@ -1,5 +1,12 @@
 # Dossier — Skills Cluster (superpowers, anthropics/skills, addyosmani/agent-skills, Agent-Skills-for-Context-Engineering, karpathy-skills)
 
+> Authority boundary: This dossier is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > commits (read from each `.git`, `_research/upstreams/`):
 > - `superpowers` — `44c9b2d6e889982ac18c27d05a19fefe335194e1` (2026-07-28) — LICENSE present (MIT, Jesse Vincent)
 > - `skills` (anthropics) — `b29e7cf65e5cb78a5ac33d582270551bc74a14eb` (2026-07-24) — no root LICENSE; 16 per-skill `LICENSE.txt`

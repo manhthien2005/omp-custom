@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-D",
+  "status": "PASS",
+  "command": [
+    "<PINNED_RUNTIME>/omp.exe",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSIONS>",
+    "--model",
+    "omniroute/oc/mimo-v2.5-free",
+    "--tools",
+    "task",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "150",
+    "<SYNTHETIC_PROMPT>"
+  ],
+  "started_at": "2026-08-11T10:50:31.6584780+07:00",
+  "completed_at": "2026-08-11T10:50:54.5411633+07:00",
+  "duration_ms": 22881,
+  "process_exit_code": 0,
+  "timed_out": false,
+  "fixture_head": "8964c6d408654e3ab2a33483b9561a107d613ba3",
+  "parent_head_unchanged": true,
+  "parent_status_unchanged": true,
+  "poll_count": 56,
+  "poll_violation_count": 0,
+  "task_is_error": false,
+  "results": [
+    {
+      "index": 0,
+      "id": "e3d-0",
+      "agent": "phase00-write-probe-0",
+      "exit_code": 0,
+      "output": "{\n  \"sentinel\": \"E3_D_0_OK\"\n}",
+      "duration_ms": 7341,
+      "resolved_model": "omniroute/oc/mimo-v2.5-free",
+      "patch_path": "<DURABLE_ARTIFACT>/e3d-0.patch",
+      "nested_patches": [],
+      "extracted_tool_data": {
+        "yield": [
+          {
+            "data": {
+              "sentinel": "E3_D_0_OK"
+            },
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "id": "e3d-1",
+      "agent": "phase00-write-probe-1",
+      "exit_code": 0,
+      "output": "{\n  \"sentinel\": \"E3_D_1_OK\"\n}",
+      "duration_ms": 7633,
+      "resolved_model": "omniroute/oc/mimo-v2.5-free",
+      "patch_path": "<DURABLE_ARTIFACT>/e3d-1.patch",
+      "nested_patches": [],
+      "extracted_tool_data": {
+        "yield": [
+          {
+            "data": {
+              "sentinel": "E3_D_1_OK"
+            },
+            "status": "success"
+          }
+        ]
+      }
+    }
+  ],
+  "intervals_overlap": true,
+  "patches_apply_cleanly": true,
+  "private_content_projection": "System prompts, reasoning, signatures, and private context omitted.",
+  "runtime_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+  "omp_version": "17.2.10",
+  "omp_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+}

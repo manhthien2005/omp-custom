@@ -1,5 +1,15 @@
 # Conflict Matrix
+
+> Authority boundary: This research file is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
 <!-- Generated: 2026-08-07 — Phase 2 -->
+
+> Historical Phase 2 conflict-resolution snapshot only; no current design, execution, topology, review, routing, or capability authority.
+> Current authority lives in the accepted design, key decisions, active specs, phase plans, and Topic 03-selected manifest.
 
 ## Purpose
 

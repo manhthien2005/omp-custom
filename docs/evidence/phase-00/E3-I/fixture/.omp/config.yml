@@ -1,0 +1,4 @@
+task:
+  isolation:
+    mode: rcopy
+    apply: false

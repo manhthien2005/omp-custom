@@ -1,4 +1,11 @@
 # Dossier — External Agentic TUIs (Amp, Harness, jcode)
+
+> Authority boundary: This dossier is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
 > Web research, 2026-08-07. Confidence marked per claim.
 > Method: primary sources only (vendor manuals, vendor blog, upstream repo docs read via `gh api`). Web search returned empty for every query this pass; all findings come from direct URL fetch or GitHub API. Anything I did not read is tagged **NOT READ THIS PASS** rather than omitted.
 

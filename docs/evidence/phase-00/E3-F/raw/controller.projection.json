@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "projection_of": "controller JSONL",
+  "task_calls": 1,
+  "task_is_error": false,
+  "result_indices": [0, 1, 2],
+  "result_exit_codes": [0, 0, 0],
+  "terminal_text": "E3_F_PARENT_DONE",
+  "omitted": ["system_prompt", "reasoning", "thinking_signature", "private_context"]
+}

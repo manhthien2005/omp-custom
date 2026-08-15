@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "case": "A1",
+  "attempt": 1,
+  "experiment": "E3-A",
+  "omp_version": "omp/17.2.10",
+  "model": null,
+  "provider_call": false,
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+    "PATH": "INHERITED"
+  },
+  "fixture_commit": null,
+  "command": "absolute omp 17.2.10 config-get operations; see stdout operation records",
+  "cleanup_succeeded": true,
+  "cleanup_error": null,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "after_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "changed_count": 0,
+    "changed_paths": [],
+    "boundary_result": "PASS_LIVE_HOME_READ_ONLY"
+  },
+  "sentinel_observed": null,
+  "analysis": {
+    "Status": "PASS",
+    "Reasons": [
+      "A1_EFFECTIVE_PROJECT_VALUES"
+    ],
+    "Mode": "rcopy",
+    "Apply": false,
+    "DiagnosticDecision": "DIAGNOSTIC_OK_NOT_AUTHORIZATION"
+  }
+}

@@ -1,0 +1,39 @@
+{
+    "schema_version":  1,
+    "experiment":  "E5-E",
+    "role":  "allowlisted",
+    "attempt":  1,
+    "status":  "PASS",
+    "reasons":  [
+                    "E5_CONDITION_DISCRIMINATED"
+                ],
+    "tools":  [
+                  "lsp",
+                  "yield",
+                  "hub"
+              ],
+    "lsp_present":  true,
+    "lsp_call_count":  1,
+    "lsp_result_count":  1,
+    "lsp_result_success":  false,
+    "lsp_result_text":  "No language server found for this action",
+    "lsp_server_name":  null,
+    "yield_call_count":  1,
+    "marker":  "E5_E_TOOL_PRESENT_NO_SERVER",
+    "marker_count":  1,
+    "cause":  "LANGUAGE_SERVER_UNAVAILABLE",
+    "remediation":  "INSTALL_OR_CONFIGURE_LANGUAGE_SERVER",
+    "first_turn_prompt_tokens":  7292,
+    "final_total_tokens":  7536,
+    "fixture":  {
+                    "task_enable_lsp":  true,
+                    "parent_session_lsp":  true,
+                    "lsp_enabled":  true,
+                    "agent_allowlist_includes_lsp":  true,
+                    "language_server_configured":  false
+                },
+    "child_transcript":  {
+                             "path":  "docs/evidence/phase-00/E5/raw/e5-e-attempt-001.child.jsonl",
+                             "sha256":  "49DCF6B95ED4ECAA82A59FB122A03D79B3C7D7A9A29E853986C211BBAD060E57"
+                         }
+}

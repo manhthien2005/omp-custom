@@ -422,8 +422,8 @@ Specify:
 ```yaml
 modelRoles:
   cheap-scout: omniroute/ds/deepseek-v4-flash:xhigh
-  worker: omniroute/codex/gpt-5.6-sol
-  reviewer: omniroute/codex/gpt-5.6-sol
+  worker: omniroute/codex/gpt-5.6-sol:high
+  reviewer: omniroute/codex/gpt-5.6-sol:xhigh
 retry:
   modelFallback: true
   usageAwareFallback: false
@@ -503,7 +503,7 @@ dirty files as Topic 03-only work.
 - Produces: exactly three discoverable OMP agents and a current-product evidence boundary that
   leaves Phase 00 conclusions byte-unchanged.
 
-- [ ] **Step 1: Add failing Phase 00 supersession tests**
+- [x] **Step 1: Add failing Phase 00 supersession tests**
 
 Extend `phase00-t003.Tests.ps1` with a fixture where the old four agent destination paths are
 absent, a Topic 03 current-product manifest binds their historical Phase 00 identities, and the
@@ -519,7 +519,7 @@ FAIL P00-T003-CONSUMERS: retired agent remains discoverable
 
 Run only the focused Pester test. Expected: new tests fail before helper changes.
 
-- [ ] **Step 2: Implement the later-product supersession contract**
+- [x] **Step 2: Implement the later-product supersession contract**
 
 Extend the validator helper; do not edit `docs/evidence/phase-00/T-00.3/conclusion.yml`. The new
 manifest has this closed shape:
@@ -551,7 +551,7 @@ deepseek_environment: PASS | FAIL | ENVIRONMENT_BLOCKED
 At implementation time replace `<computed exact SHA256>` and populate `current_files` with actual
 path/SHA rows; those are generated values, not hand-written placeholders in the finished artifact.
 
-- [ ] **Step 3: Create the three agent contracts**
+- [x] **Step 3: Create the three agent contracts**
 
 Frontmatter requirements:
 
@@ -588,7 +588,7 @@ ranked evidence/uncertainty; Worker returns changed files and verification; Revi
 decision/findings/false-positive checks. The coordinator accepts only
 `structuredOutput.status == valid` and no override.
 
-- [ ] **Step 4: Rehome Tech Lead behavior and retire old agents**
+- [x] **Step 4: Rehome Tech Lead behavior and retire old agents**
 
 Move useful main-session behavior into `template/.omp/AGENTS.md` and human explanation into
 `docs/roles/tech-lead.md`. Delete only these exact runtime files:
@@ -602,7 +602,7 @@ template/.omp/agents/verifier.md
 
 Do not delete the agents directory or use a wildcard.
 
-- [ ] **Step 5: Rewrite command adapters around benefit gates**
+- [x] **Step 5: Rewrite command adapters around benefit gates**
 
 - Quick remains inline unless a bounded Scout query creates clear value.
 - Standard remains one integrated lane; Scout, Worker, and Reviewer are optional/risk-gated.
@@ -613,7 +613,7 @@ Do not delete the agents directory or use a wildcard.
 - Tech Lead runs fresh verification after integration.
 - No command names a concrete model ID.
 
-- [ ] **Step 6: Populate and verify the current-product manifest**
+- [x] **Step 6: Populate and verify the current-product manifest**
 
 Calculate hashes after runtime files settle, write them into `current_files`, and run:
 
@@ -641,7 +641,7 @@ runtime-manifest checks pass.
 - Produces: project installation that copies commands correctly, retires only exact stale agents,
   preserves protected model/credential files, and restores through the existing backup path.
 
-- [ ] **Step 1: Write failing installer tests in disposable directories**
+- [x] **Step 1: Write failing installer tests in disposable directories**
 
 Tests must create paths beneath `[IO.Path]::GetTempPath()` with prefix
 `omp-topic03-installer-`, validate the resolved absolute cleanup target before deletion, and cover:
@@ -661,15 +661,15 @@ user target does not enable global effort without explicit opt-in
 Run: `pwsh -NoProfile -File scripts/tests/topic03-installer.Tests.ps1`.
 Expected: fail against the current copy-only installer.
 
-- [ ] **Step 2: Replace the template role map and settings**
+- [x] **Step 2: Replace the template role map and settings**
 
 Use this project-level contract:
 
 ```yaml
 modelRoles:
   cheap-scout: omniroute/ds/deepseek-v4-flash:xhigh
-  worker: omniroute/codex/gpt-5.6-sol
-  reviewer: omniroute/codex/gpt-5.6-sol
+  worker: omniroute/codex/gpt-5.6-sol:high
+  reviewer: omniroute/codex/gpt-5.6-sol:xhigh
 retry:
   modelFallback: true
   usageAwareFallback: false
@@ -686,7 +686,7 @@ task:
 
 No `tech-lead`, `explorer`, `implementer`, or `verifier` alias remains required.
 
-- [ ] **Step 3: Fix component mapping and exact stale-agent retirement**
+- [x] **Step 3: Fix component mapping and exact stale-agent retirement**
 
 Use `$component_map[$comp]` so `workflows` copies `commands`. Add a closed retirement list:
 
@@ -701,13 +701,13 @@ and whose leaf is in the closed list. Never build a recursive delete target from
 For `-Target user`, require explicit `-EnablePerSpawnEffort` before applying
 `task.enableEffort/maxEffort`; project target uses the selected project config normally.
 
-- [ ] **Step 4: Integrate focused Topic 03 validation into the full validator**
+- [x] **Step 4: Integrate focused Topic 03 validation into the full validator**
 
 Update required files/token budgets/agent scans to the selected three-agent set. Dot-source
 `scripts/lib/topic03-topology-routing.ps1`, invoke its aggregate contract, and translate results
 through existing `Write-Pass/Write-Warn/Write-Fail` helpers.
 
-- [ ] **Step 5: Run installation and full static validation**
+- [x] **Step 5: Run installation and full static validation**
 
 ```powershell
 pwsh -NoProfile -File scripts/tests/topic03-installer.Tests.ps1
@@ -731,7 +731,7 @@ Expected: all focused tests pass; full validator has zero failures. The known ap
 - Produces: user-facing setup/behavior text with no false claim that DeepSeek, Opus, review, or
   parallel execution is universally available or mandatory.
 
-- [ ] **Step 1: Update concise product docs**
+- [x] **Step 1: Update concise product docs**
 
 Every current-product description must say:
 
@@ -747,14 +747,14 @@ Every current-product description must say:
 Installation docs must distinguish OmniRoute gateway IDs (`ds/...`) from OMP selectors
 (`omniroute/ds/...`) and point to the external `models.yml` prerequisite without embedding a key.
 
-- [ ] **Step 2: Reconcile policy references and historical research**
+- [x] **Step 2: Reconcile policy references and historical research**
 
 Make `docs/policies/model-routing.md` the concise human routing reference. Update quality-gate
 text so risk selects review but workflow class does not. In research/registry files, either update
 current adoption rows or fence the old fixed roster as historical; do not silently delete research
 evidence.
 
-- [ ] **Step 3: Add the Topic 03 changelog**
+- [x] **Step 3: Add the Topic 03 changelog**
 
 Record:
 
@@ -766,7 +766,7 @@ Record:
 - pre-existing dirty paths not claimed as Topic 03 work;
 - remaining environment or independent-review limitations.
 
-- [ ] **Step 4: Run contradiction scans**
+- [x] **Step 4: Run contradiction scans**
 
 ```powershell
 rg -n -i 'always.*Explorer|always.*Implementer|always.*Verifier|all four workers|five agents|Opus.*required|must wait for Opus' `
@@ -791,7 +791,7 @@ instructions contain no concrete model IDs.
 - Produces: evidence-backed status `IMPLEMENTED`, `IMPLEMENTED_WITH_ENVIRONMENT_BLOCK`, or
   `REWORK_REQUIRED`.
 
-- [ ] **Step 1: Install into a disposable project and verify discovery**
+- [x] **Step 1: Install into a disposable project and verify discovery**
 
 Create a temp project under the validated prefix `omp-topic03-e2e-`, run installer dry-run then
 apply, and assert the installed `agents` set is exactly:
@@ -805,7 +805,7 @@ worker.md
 Run OMP discovery against that project and confirm no `tech-lead`, `explorer`, `implementer`, or
 `verifier` definition appears.
 
-- [ ] **Step 2: Run the minimum behavioral matrix**
+- [x] **Step 2: Run the minimum behavioral matrix**
 
 Use ephemeral sessions and retain redacted JSON evidence for:
 
@@ -824,7 +824,7 @@ selected Worker/Reviewer identity.
 If DeepSeek remains environment-blocked, case 2 must instead prove the Tech Lead fallback and
 record the missing capability; do not fabricate a DeepSeek PASS.
 
-- [ ] **Step 3: Run the final lean verification set**
+- [x] **Step 3: Run the final lean verification set**
 
 ```powershell
 pwsh -NoProfile -File scripts/tests/topic03-deepseek-routing.Tests.ps1
@@ -839,14 +839,14 @@ git diff --check
 
 Expected: zero failures. Report exact totals and the known warning separately.
 
-- [ ] **Step 4: Self-review only the Topic 03 diff**
+- [x] **Step 4: Self-review only the Topic 03 diff**
 
 Check for secrets, stale agents, accidental hardcoded models in workflow prose, broad deletes,
 unowned user-level settings, missing fallback disclosure, and claims unsupported by smoke evidence.
 Do not launch repeated general-purpose peer audits. Note a difficult unresolved item for a future
 strong-model review only when it cannot be resolved from source/tests.
 
-- [ ] **Step 5: Set the final status and stop at the integration boundary**
+- [x] **Step 5: Set the final status and stop at the integration boundary**
 
 - `IMPLEMENTED`: all repository gates plus DeepSeek environment smoke pass.
 - `IMPLEMENTED_WITH_ENVIRONMENT_BLOCK`: repository gates pass, but a named credential/gateway

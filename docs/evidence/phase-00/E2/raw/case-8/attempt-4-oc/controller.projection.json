@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "session_id": "019feee3-6cdf-7000-91c3-e9efb6c7e50c",
+  "model_change": {
+    "model": "e2control/oc/mimo-v2.5-free",
+    "resolved_model_is_fallback": false
+  },
+  "assistant_messages": [
+    {
+      "provider": "e2control",
+      "model": "oc/mimo-v2.5-free",
+      "stop_reason": "toolUse",
+      "tool_calls": [
+        {
+          "name": "task",
+          "arguments": {
+            "name": "E2CustomRole",
+            "agent": "phase00-e2-worker",
+            "task": "Terminal-yield result.data exactly {\"sentinel\":\"E2_CUSTOM_ROLE_OK\"}.",
+            "i": "E2 custom-role preflight probe"
+          }
+        }
+      ],
+      "text": []
+    },
+    {
+      "provider": "e2control",
+      "model": "oc/mimo-v2.5-free",
+      "stop_reason": "stop",
+      "tool_calls": [],
+      "text": [
+        "E2_CONTROLLER_DONE"
+      ]
+    }
+  ],
+  "task": {
+    "tool_call_id": "call_72afb0db10d246ec9a90ca91|fc_call_72afb0db10d246ec9a90ca91",
+    "arguments": {
+      "name": "E2CustomRole",
+      "agent": "phase00-e2-worker",
+      "task": "Terminal-yield result.data exactly {\"sentinel\":\"E2_CUSTOM_ROLE_OK\"}."
+    },
+    "is_error": false,
+    "result": {
+      "agent": "phase00-e2-worker",
+      "agent_source": "project",
+      "exit_code": 0,
+      "output": "{\n  \"sentinel\": \"E2_CUSTOM_ROLE_OK\"\n}",
+      "duration_ms": 8806,
+      "model_override": [
+        "e2project/oc/mimo-v2.5-free"
+      ],
+      "model_role": "implementer",
+      "resolved_model": "e2project/oc/mimo-v2.5-free",
+      "aborted": false,
+      "extracted_tool_data": {
+        "yield": [
+          {
+            "data": {
+              "sentinel": "E2_CUSTOM_ROLE_OK"
+            },
+            "status": "success"
+          }
+        ]
+      }
+    }
+  }
+}

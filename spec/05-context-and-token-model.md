@@ -1,22 +1,61 @@
 # 05 — Context and Token Model
 
+<!-- topic05-projection:context -->
+## Topic 05 compact retrieval overlay (KD-029)
+
+Choose the most source-fit accessible level within a bounded retrieval budget. Optional CodeGraph
+is useful for relationship/blast-radius hypotheses, while native retrieval remains the baseline
+and the required corroboration for absence. Carry the compact cited overlay across boundaries;
+do not duplicate raw graph output plus an equivalent summary. Cheap Scout token volume is
+reported separately from premium/core workflow context and is never estimated.
+
+## Durable checkpoints and offload tiers (KD-028)
+
+Compact checkpoints preserve next action, blockers, risks, lineage, and worktree binding before
+compaction, handoff, stop, or user wait. `.task/<task-id>` and runtime artifacts are transient raw
+offload, not lifecycle authority or acceptance evidence. Only bounded sanitized artifacts are
+content-addressed and promoted. Prompts receive compact projections/IDs, never raw authority or a
+second compactor's state.
+
 > OPUS PROPOSED SPEC v1 | What loads when, what each budget is, and where the current template overspends.
+>
+> **Topic 02 supersession boundary:** role names below are frozen-baseline examples, not
+> topology authority. Token controls attach to responsibilities selected by Topic 03.
+>
+> **KD-027 projection:** Cheap Scout may spend abundant cheap retrieval tokens but remains
+> read-only/advisory. Core-token accounting covers Tech Lead, Worker, and Reviewer; benefit-gated
+> spawn prevents delegation overhead when inline work is cheaper. Worker defaults `high`, hard
+> Worker and Reviewer use `xhigh`.
 
 ---
 
 ## A. The Metric
 
-The optimization target is **tokens per accepted outcome**, not tokens.
+The decision order is **quality gates → validated accepted-outcome rate → core workflow
+tokens per validated accepted outcome → latency tie-breaker**. No weighted score can trade a
+failure in an earlier term for a gain in a later one (`spec/key/03 §A`, KD-024).
 
-This distinction decides every trade-off below. A run that spends 40k tokens and
-produces a change the user accepts beats a run that spends 15k and produces one
-they reject — the second run's real cost includes the retry. Any change that
-saves tokens by weakening verification is therefore not a saving; it moves cost
-from the measured column to the unmeasured one.
+“Accepted” means the objective is complete, every mandatory criterion has PASS evidence,
+required verification/review is clear, no blocking authority or scope issue remains, and the
+Tech Lead records acceptance against an immutable candidate. `cancelled` and
+`terminally_blocked` are the other terminal task outcomes. Waived results remain outside the
+validated denominator; `partial`, recoverable `blocked`, `waiting_for_user`, and rework are
+nonterminal observations.
+
+The accounting boundary is the whole task cycle, beginning when the task contract is accepted
+and ending at one of its three terminal outcomes. It includes failures, rejected candidates,
+retrieval, retries, rework, handoff/compaction, and Scout fallback. The primary ledger is
+`core_workflow_tokens`; `cheap_scout_tokens` and `raw_total_tokens` are unweighted telemetry.
+A zero accepted-outcome denominator is infinite cost. Exact fields, frozen dual baselines, and
+promotion thresholds are canonical in `13-validation-and-evaluation.md §C`.
+
+This distinction decides every trade-off below. Any change that saves core tokens by
+weakening verification is not a saving; it moves cost from the measured column to the
+unmeasured one. Latency is recorded for reliability and used only as a final tie-breaker.
 
 Concretely, the following are never acceptable token reductions:
 
-- Skipping the Verifier because the Implementer reported success.
+- Skipping required independent verification because the candidate author reported success.
 - Dropping the failing-test-first step on a bug fix.
 - Reducing thinking level on a high-risk task.
 - Trimming acceptance criteria to fewer than the change needs.
@@ -72,6 +111,13 @@ descriptions, skill bodies, or — because they are runtime artifacts — packet
 results. Packets and results are enforced by contract in the agent prompts, not
 statically.
 
+The request ceiling is a separate runtime boundary. `task.softRequestBudget` defaults to
+200 requests; after the wrap-up notice, 1.5× the budget forces a stop and returns a partial
+yield (`config/settings-schema.ts:4676-4692`, `task/executor.ts:1568-1596,1821-1826`). Task
+packets must be scoped to finish inside that boundary. A forced softRequestBudget partial yield
+is nonterminal and requires recovery or redispatch. It cannot supply completion evidence even
+when its prose looks complete.
+
 ---
 
 ## D. The Two Prohibitions
@@ -96,7 +142,7 @@ policy file no agent reads.
 
 ## E. Where the Current Template Overspends
 
-### E-1. `read-summarize: false` on Explorer — P1 defect
+### E-1. `read-summarize: false` on the former Explorer adapter — P1 defect
 
 The global baseline sets `read.summarize.enabled = true`. Explorer's frontmatter
 sets `read-summarize: false`, which `parseAgentFields` reads
@@ -111,7 +157,7 @@ Explorer's job is ranked evidence — file paths, line references, symbol names,
 brief context. Summarized reads are *better* input for that than full contents.
 Recommend removing the override.
 
-### E-2. `read-summarize: false` on Verifier — P1, weaker case
+### E-2. `read-summarize: false` on the former Verifier adapter — P1, weaker case
 
 More defensible: verification needs exact output, and a summarizer that elides
 the one line showing which assertion failed has destroyed the evidence.
@@ -120,9 +166,9 @@ But the Verifier gets its evidence from `bash` command output, which
 `read.summarize` does not touch. The override only affects files it reads with
 `read` — mostly test files and source, where summaries are adequate.
 
-Recommend removing it, with a documented exception: if a fixture shows the
-Verifier missing failure detail because of summarization, restore it for the
-Verifier only, and record why.
+Recommend removing it. A selected exact-output verification responsibility may disable read
+summarization only when a fixture shows that summaries lose required file evidence, and the
+selected contract records why. Command output from `bash` is unaffected by this setting.
 
 ### E-3. Reviewer scope creep — P1
 
@@ -159,6 +205,15 @@ Adopted from `context-budget.yml` as **guidance** (CR-20: not rigid gates — au
 
 **Guidance, not exhaustion gates**: prefer project executable truth for "what this repo currently does"; prefer version-matched official docs for external API/runtime semantics. If the current level cannot answer the question within a reasonable retrieval budget, escalate rather than continuing to search. Most retrieval failures are jumps from level 1 to level 5 — a web search for something the type definition next to the callsite already answered. But "exhaust level N before descending" is not the rule — the rule is: use the most authoritative source for the specific question type, within a bounded retrieval budget.
 
+Every skipped level uses a named reason and is disclosed in the retrieval result. The reason
+context7_unavailable is the disclosed named skip when level 4 is unavailable; it authorizes
+the next fitting accessible source under the same bounded-escalation rule, never a silent
+fallback or backtrack.
+
+web_unavailable is disclosed when level 5 is unavailable; a freshness contract remains
+unresolved and cannot be accepted without authoritative evidence. There is no implicit level 6
+and no permission to substitute model memory for a current-source requirement.
+
 Levels 4 and 5 are not wired in v0. Context7 is available as an MCP tool in this
 environment but is not part of the template; `web_search` is in the Tech Lead's
 allowlist only.
@@ -179,9 +234,9 @@ validated.
 
 | Artifact | Threshold (provisional) | Destination | Isolation-safe? |
 |---|---|---|---|
-| Exploration evidence | >2,000 tokens | `.task/<id>/exploration.md` | Standard workflow only |
-| Verification output | >500 tokens | quote key lines only; full output to `.task/<id>/verify.log` | Standard workflow only |
-| Review findings | >1,000 tokens | `.task/<id>/review.md` | Standard workflow only |
+| Exploration evidence | >2,000 tokens | `.task/<id>/exploration.md` | Non-isolated retained workspace only |
+| Verification output | >500 tokens | quote key lines only; full output to `.task/<id>/verify.log` | Non-isolated retained workspace only |
+| Review findings | >1,000 tokens | `.task/<id>/review.md` | Non-isolated retained workspace only |
 
 This is how a worker returns a large finding without putting it in the parent's
 context: the result carries `artifacts: [".task/impl-001/review.md"]` and the
@@ -196,24 +251,35 @@ lifecycle completes. A gitignored `.task/<id>/...` file inside the isolated work
 does not propagate through git branch/patch merge, and is destroyed when the worktree
 is cleaned up. The path reference passed in the result is invalid in the parent.
 
-For Orchestrated (isolated) Implementers: use the OMP native artifact manager
+For every selected isolated worker: use the OMP native artifact manager
 (executor options for parent artifact manager adoption, available in `sdk.ts`).
 The child session adopts the parent artifact manager, and artifacts are stored in
 the parent artifact domain — remaining valid after isolation teardown.
 
-The `.task/<id>/...` pattern is safe **only** for non-isolated (Standard) workers
-where the working tree persists through the full Tech Lead lifecycle.
+The `.task/<id>/...` pattern is safe **only** for a non-isolated worker whose working tree
+persists through the full Tech Lead lifecycle. That may be Standard or sequential,
+non-isolated Orchestrated execution. Offload safety follows effective isolation and
+artifact-retention responsibility, independent of workflow name.
 
 ---
 
 ## H. Compaction
 
-The frozen baseline configures `shake`:
+The frozen baseline's `shake` setting is historical evidence only. KD-031 selects this managed
+profile:
 
 ```
-compaction.enabled          = true
-compaction.strategy         = shake
+contextPromotion.enabled    = false
+compaction.enabled          = false
+compaction.strategy         = off
+compaction.midTurnEnabled   = false
+compaction.thresholdPercent = -1
+compaction.thresholdTokens  = -1
 compaction.keepRecentTokens = 20000
+compaction.autoContinue     = false
+compaction.idleEnabled      = false
+compaction.remoteEnabled    = false
+compaction.remoteStreamingV2Enabled = false
 compaction.supersedeReads   = true
 compaction.dropUseless      = true
 ```
@@ -222,13 +288,52 @@ compaction.dropUseless      = true
 the earlier read is dropped. This makes the "re-read after edit" pattern cheap
 and removes the incentive to cache file contents in the conversation.
 
-The template must not attempt its own compaction. OMP owns this
-(`01-target-architecture.md`, principle 1). No summarize-the-conversation step
-in any command.
+The template implements no summarizer. After exact Topic 04 task arming, `/safe-compact` accepts
+no arguments and authorizes one native `ctx.compact({ mode: "soft" })` context-full transaction.
+It writes and verifies a local recovery artifact first, schedules no continuation or retry, and
+rejects built-in `/compact`, `shake`, `snapcompact`, automatic handoff, and remote compaction as
+managed fallbacks.
 
 ---
 
-## I. Verification
+## I. Lifecycle Boundary for Compaction and Handoff
+
+Safe compaction preserves the current task, candidate lineage, session identity, workflow,
+ownership, and acceptance state. It rescues context for the same work; neither the compacted
+summary, recovery artifact, injected continuity kernel, nor conversation history becomes
+lifecycle authority. The next normal prompt receives one fresh Topic 04-derived kernel exactly
+once; no hidden continuation is scheduled.
+
+Handoff creates a successor session for the same open task and non-competing candidate
+lineage. The predecessor loses active ownership after an accepted handoff. Before mutation,
+the successor must reconcile the contract and workspace with the handoff; generated handoff
+text is a context carrier, not authoritative task state.
+
+Durable task/candidate/session storage, identifiers, and recovery leases remain Topic 04
+work. This section fixes conceptual identity only.
+
+At the managed pressure boundary, ordinary provider dispatch stops. The main session uses
+`/safe-compact` or explicit Topic 04 handoff. A bounded subagent aborts as failed/partial and is
+not automatically retried. If one safe compaction leaves pressure unresolved, stop and hand off
+or request user action rather than invoking rescue shake.
+
+---
+
+## I-1. Topic 06 projection boundary
+
+An agent packet is a deterministic, role-minimal view of one Topic 04 work unit. It excludes the
+parent transcript, hidden reasoning, credentials, unrelated task state, and Worker CLAIM when the
+consumer is Reviewer. A result is similarly compact: structured role output plus an
+`agent_boundary_receipt`, never a raw session transcript.
+
+The projection is assembled at dispatch time and discarded as authority after its provisional
+outcome is recorded. Topic 04 retains the canonical task/candidate/criterion/evidence state. The
+managed runtime sets `task.softRequestBudget: 200`; the 300-request forced partial remains
+nonterminal and must be narrowed or repartitioned, not reported as completion.
+
+---
+
+## J. Verification
 
 - `validate-template.ps1` checks budgets for `AGENTS.md`, `RULES.md`, and all
   five agent prompts (already implemented).
@@ -243,8 +348,8 @@ in any command.
 
 | # | Item | Position |
 |---|---|---|
-| C-1 | Remove `read-summarize: false` from Explorer | Yes — contradicts its own instructions |
-| C-2 | Remove `read-summarize: false` from Verifier | Yes, with a documented restore condition |
-| C-3 | Bound Reviewer's "diff context" | Diff first, enclosing symbol only on demand |
+| C-1 | Remove unjustified `read-summarize: false` from selected discovery roles | Yes — it contradicts compact-evidence responsibilities |
+| C-2 | Permit unsummarized reads for a selected exact-output responsibility | Only with a fixture-backed written condition |
+| C-3 | Bound selected review-path "diff context" | Diff first, enclosing symbol only on demand |
 | C-4 | Enforce packet/result budgets at runtime | Not possible statically; contract-only in v0 |
 | C-5 | Wire Context7 as level 4 | Deferred past v0 |

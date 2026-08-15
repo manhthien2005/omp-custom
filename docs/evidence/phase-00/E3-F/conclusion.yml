@@ -1,0 +1,7 @@
+schema_version: 1
+phase: "00"
+experiment: E3-F
+status: PASS
+decision: Integration stopped on task[1] conflict, retained task[0] only, skipped task[2], and preserved both unapplied artifacts.
+cases: {F1: PASS}
+artifacts: [docs/evidence/phase-00/E3-F/F1.yml]

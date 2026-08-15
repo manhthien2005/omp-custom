@@ -1,0 +1,28 @@
+schema_version: 1
+phase: "00"
+experiment: E3-A
+status: PASS
+decision: >-
+  A1-A4 prove the concrete project-root read shape, unknown-key refusal, cwd-only
+  project discovery, supported task-item wire exclusion of apply, and non-authority
+  of a forced raw per-item apply field on OMP 17.2.10.
+cases:
+  A1: PASS
+  A2: PASS
+  A3: PASS
+  A4: PASS
+gate_power: E3-A_COMPLETE_DEPENDENCY_HALF
+non_claims:
+  - A correct config-get result is diagnostic only and does not authorize parallel dispatch.
+  - The A4 eval bridge does not prove where ArkType deletion occurs in normal model validation.
+  - E3-A alone does not unlock E3-B, E3-C, E3-I, or E3-L; E3-H must also pass.
+artifacts:
+  - docs/evidence/phase-00/E3-A/A1.yml
+  - docs/evidence/phase-00/E3-A/A2.yml
+  - docs/evidence/phase-00/E3-A/A3.yml
+  - docs/evidence/phase-00/E3-A/A4.yml
+  - docs/evidence/phase-00/E3-A/raw/A1.run.json
+  - docs/evidence/phase-00/E3-A/raw/A2.run.json
+  - docs/evidence/phase-00/E3-A/raw/A3.run.json
+  - docs/evidence/phase-00/E3-A/raw/A4-attempt-004.run.json
+

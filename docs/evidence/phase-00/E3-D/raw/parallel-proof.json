@@ -1,0 +1,37 @@
+{
+  "poll_count": 56,
+  "poll_interval_ms": 350,
+  "poll_violation_count": 0,
+  "parent_head_before": "8964c6d408654e3ab2a33483b9561a107d613ba3",
+  "parent_head_after": "8964c6d408654e3ab2a33483b9561a107d613ba3",
+  "parent_status_before": [],
+  "parent_status_after": [],
+  "visible_target_count_during_run": 0,
+  "worker_intervals": [
+    {
+      "id": "e3d-0",
+      "started_at": "2026-08-11T03:50:42.661Z",
+      "ended_at": "2026-08-11T03:50:49.988Z"
+    },
+    {
+      "id": "e3d-1",
+      "started_at": "2026-08-11T03:50:42.661Z",
+      "ended_at": "2026-08-11T03:50:50.29Z"
+    }
+  ],
+  "intervals_overlap": true,
+  "patch_apply_checks": [
+    {
+      "patch": "e3d-0.patch",
+      "check_exit": 0,
+      "apply_exit": 0,
+      "content": "E3_D_0"
+    },
+    {
+      "patch": "e3d-1.patch",
+      "check_exit": 0,
+      "apply_exit": 0,
+      "content": "E3_D_1"
+    }
+  ]
+}

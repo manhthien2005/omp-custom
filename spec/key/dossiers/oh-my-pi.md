@@ -1,4 +1,11 @@
 # Dossier — oh-my-pi (OMP runtime)
+
+> Authority boundary: This dossier is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
 > Upstream commit: `3a8591a8af5b6d200088d12ca75a5517cb064fa8` (2026-08-06) | Verified by source reading at `_research/upstreams/oh-my-pi`
 > **All `file:line` citations below are relative to `packages/coding-agent/src/`** unless the path starts with `packages/`.
 > Claims carried over from `spec/02` that I did **not** re-read this pass are tagged `[spec-carried]`. Unverified items are in §11, not asserted here.
@@ -198,7 +205,7 @@ Prewalk: plan on the strong model, hand off to `smol` at the first edit/write (`
 
 Effort: `task.enableEffort` false by default (`4582`), ceiling `task.maxEffort` default `max` (`4706-4718`), per-spawn values `lo|med|hi` (`types.ts:112`). Thinking budgets: minimal 1024 → max 32768 (`settings-schema.ts:5574-5584`).
 
-LSP: `lsp.enabled` true (`3378`), `lsp.lazy` true (`3389`), `lsp.shared` true (`3401`), `diagnosticsOnWrite` true (`3424`), `diagnosticsOnEdit` **false** (`3435`), `diagnosticsDeduplicate` true (`3446`), `formatOnWrite` false (`3413`). Subagent gate `task.enableLsp` false (`4615-4625`).
+LSP: `lsp.enabled` true (`3378`), `lsp.lazy` true (`3389`), `lsp.shared` true (`3401`), `diagnosticsOnWrite` true (`3424`), `diagnosticsOnEdit` **false** (`3435`), `diagnosticsDeduplicate` true (`3446`), `formatOnWrite` false (`3413`). Subagent registration requires the selected allowlist, `task.enableLsp`, parent LSP enabled and not plan mode, and `lsp.enabled`; registration still does not prove an applicable server or successful required call (`lsp/index.ts:2145-2160`).
 
 Delegation pressure: `task.eager` `default|preferred|always` (`4553-4568`) injects delegation guidance into the system prompt.
 

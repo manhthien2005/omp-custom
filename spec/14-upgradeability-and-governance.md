@@ -1,6 +1,33 @@
 # 14 — Upgradeability and Governance
 
+<!-- topic05-projection:governance -->
+## Topic 05 pin and update governance (KD-029)
+
+CodeGraph is pinned by repository, release URL, version, tag, commit, license digest, checksum
+asset, and six platform artifact digests. Updating it requires a new isolated lock, license and
+host review, adapter/provisioning/installer/cleanup regression, deterministic four-arm evidence,
+and a recorded adoption decision. No upstream release, auto-update mechanism, or vendor benchmark
+silently changes the selected version or makes the component default-on.
+
+## State schema governance (KD-028)
+
+Every authority record carries a schema version and content hash; the installed component has its
+own hashed manifest. Unknown newer authority schemas are status-only and reject mutation. Migration
+is explicit, validates source/target manifests, leaves one canonical writable root, and records a
+read-only migrated backup marker. Root/profile changes require a decision and migration path, never
+silent fallback to a second store.
+
 > OPUS PROPOSED SPEC v1 | How the template survives OMP upgrades and upstream drift.
+>
+> **Topic 02 supersession boundary:** governance consumes the
+> Topic 03-selected topology manifest. Former worker names and counts are non-authoritative baseline examples. Watched
+> claims, removal procedures, and upgrade checks attach only to selected responsibilities and
+> capabilities.
+>
+> **KD-027 watched manifest:** `cheap-scout`, `worker`, `reviewer`; Tech Lead stays outside agent
+> discovery. Governance watches DeepSeek reasoning/effort mapping, the closed Scout-only fallback
+> chain, Worker/Reviewer returned identity, exact effort, stale-agent retirement, and the
+> current-product supersession record.
 
 ---
 
@@ -47,9 +74,10 @@ The template must treat these as **pinned, watched dependencies** — not assump
     - packages/coding-agent/src/task/discovery.ts           # agent discovery + precedence
     - packages/coding-agent/src/task/agents.ts              # parseAgent + bundled agents
     - packages/coding-agent/src/task/index.ts               # task schema, isolationEnabled
-    - packages/coding-agent/src/task/executor.ts            # autoloadSkills injection
-    - packages/coding-agent/src/task/structured-subagent.ts # autoload resolution
+    - packages/coding-agent/src/task/executor.ts            # selected allowlist + autoloadSkills injection
+    - packages/coding-agent/src/task/structured-subagent.ts # child LSP gates + autoload resolution
     - packages/coding-agent/src/task/isolation-runner.ts    # git-repo requirement
+    - packages/coding-agent/src/tools/index.ts              # built-in tool setting gates
     - packages/coding-agent/src/tools/yield.ts              # output schema enforcement
     - packages/coding-agent/src/config/model-resolver.ts    # custom role acceptance
     - packages/coding-agent/src/config/model-roles.ts        # built-in role list
@@ -72,17 +100,34 @@ may be false, and this part of the template may break."
 
 | Watched path | Claim it backs | Template component that breaks if it changes |
 |---|---|---|
-| `discovery/helpers.ts` | `parseAgentFields` accepts our frontmatter keys | All 5 agent files |
+| `discovery/helpers.ts` | `parseAgentFields` accepts our frontmatter keys | All selected worker definitions |
 | `utils/src/frontmatter.ts` | kebab-case keys normalize to camelCase | `thinking-level`, `read-summarize` |
 | `discovery/builtin.ts` | `.omp/commands`, `.omp/skills`, `.omp/RULES.md`, `.omp/config.yml` are discovered | Commands, skills, rules, config |
 | `task/discovery.ts` | project `.omp/agents` beats user and bundled | Agent name precedence (`reviewer` shadowing) |
-| `task/index.ts` | `isolated` param exists only when isolation enabled | Implementer isolation |
-| `task/executor.ts` | `autoloadSkills` injects skill bodies into subagents | evidence-before-completion guarantee |
-| `task/isolation-runner.ts` | isolation requires a git repo | Non-git-repo fallback path |
-| `tools/yield.ts` | `outputSchema` is validated with bounded retries | All structured results |
-| `config/model-resolver.ts` | custom roles resolve when configured | `@tech-lead`, `@explorer`, … |
-| `config/model-roles.ts` | built-in role list (name-collision risk) | Custom role naming |
+| `task/index.ts` | `isolated` param exists only when isolation enabled | Selected per-task isolation requests |
+| `task/executor.ts` | selected `tools:` is the worker allowlist; `autoloadSkills` injects skill bodies | Selected skill-autoload consumers and tool consumers |
+| `task/structured-subagent.ts` | plan mode, parent-session enablement, and `task.enableLsp` shape the child LSP gate | Selected LSP-consuming paths |
+| `task/isolation-runner.ts` | isolation requires a git repo | Selected isolation paths |
+| `tools/index.ts` | `lsp.enabled` independently gates built-in LSP registration | Selected LSP-consuming paths |
+| `lsp/index.ts` | applicable-server routing and `details.success` distinguish working LSP calls from ordinary failure content | Selected LSP-consuming paths |
+| `tools/yield.ts` | `outputSchema` is validated with bounded retries | Selected structured-result consumers |
+| `config/model-resolver.ts` | custom roles resolve when configured | Selected custom model aliases |
+| `config/model-roles.ts` | built-in role list (name-collision risk) | Selected alias naming and collision checks |
 | `config/settings-schema.ts` | setting names and defaults | `task.*`, `lsp.*`, `compaction.*` |
+
+The LSP four-gate conjunction is a watched governance claim: allowlist handling in
+`task/executor.ts`, parent/plan/`task.enableLsp` handling in `task/structured-subagent.ts`, and
+the independent `lsp.enabled` registration gate in `tools/index.ts` must be re-verified
+together after an upstream change.
+
+Applicable-language-server routing and LSP details.success are watched governance claims backed
+by lsp/index.ts. Re-verify both the no-matching-server and no-configured-server branches, because
+the four registration gates can remain unchanged while either branch still returns a failed
+ordinary tool result.
+
+The grep, glob, ast_grep, and web_search setting gates are watched governance claims backed by
+`tools/index.ts` and the matching `settings-schema.ts` entries. A default change or new filter
+requires re-running the selected-consumer L1 checks before adoption.
 
 ---
 
@@ -113,17 +158,17 @@ from the original plan (Definition of Done #18), and it constrains implementatio
 
 | Component | Removal effect | Independently removable? |
 |---|---|---|
-| A single agent file | That agent stops being spawnable; commands referencing it must degrade | Yes — if commands degrade gracefully |
-| A single skill | Its discipline stops being injected; `autoloadSkills` entry must be dropped too | Yes — coupled to agent frontmatter |
+| A selected worker file | That responsibility stops being spawnable; selected consumers must reconcile the manifest and contract before continuation | Yes — after manifest/consumer reconciliation and validation |
+| A selected skill | Its discipline stops being injected; every selected `autoloadSkills` consumer must remove or replace the reference and revalidate | Yes — coupled to selected worker frontmatter |
 | `RULES.md` | Sticky invariants stop being enforced | Yes |
 | `AGENTS.md` | Constitution stops loading | Yes |
-| A command | That workflow size becomes unavailable | Yes |
-| `config.yml` roles | Roles fall back to `default` per `resolveModelRoleValue` | Yes — graceful |
+| A selected command adapter | That compatibility entry becomes unavailable; plain entry remains normal, and selected consumers must be reconciled | Yes — after consumer reconciliation |
+| Selected `config.yml` aliases | Alias intent becomes unavailable; discovery must fail closed until every selected reference is reconciled | Yes — after selected references are removed or replaced |
 | Schema docs | Runtime unaffected (docs only); inline schemas in commands still work | Yes |
 | Policy docs | Runtime unaffected (docs only) | Yes |
 
-**Coupling to document explicitly**: removing a skill requires editing the
-`autoloadSkills` frontmatter of every agent that autoloads it. This is a real
+**Coupling to document explicitly**: removing a selected skill requires editing the
+`autoloadSkills` frontmatter of every selected worker that autoloads it. This is a real
 coupling the removal procedure must state, or removal leaves a dangling name.
 `resolveAutoloadSkills` filters unresolved names out (`.filter(skill => skill !== undefined)`),
 so a dangling entry fails **silently** — the discipline just stops being injected.
@@ -188,11 +233,13 @@ omp_verified_commit: <SHA>
 omp_minimum_version: 17.2.0
 verification_date: <ISO date>
 verified_claims:
-  - agent frontmatter keys accepted by parseAgentFields
+  - selected agent frontmatter keys accepted by parseAgentFields
   - kebab-case frontmatter normalization
-  - custom model role resolution
-  - autoloadSkills subagent injection
-  - isolation git-repo requirement
+  - selected custom model role resolution
+  - selected autoloadSkills subagent injection
+  - selected isolation git-repo requirement
+  - selected LSP four-gate conjunction
+  - selected LSP applicable-server routing and required-call details.success
   - task outputSchema enforcement
 ```
 

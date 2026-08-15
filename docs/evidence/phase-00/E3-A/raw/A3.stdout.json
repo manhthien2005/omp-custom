@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "case": "A3",
+  "attempt": 1,
+  "operations": [
+    {
+      "name": "root_mode",
+      "key": "task.isolation.mode",
+      "context": "ProjectRoot",
+      "overlay_position": "None",
+      "exit_code": 0,
+      "started_at": "2026-08-09T01:07:48.1441234+07:00",
+      "completed_at": "2026-08-09T01:07:49.2154815+07:00",
+      "stdout": "{\n  \"key\": \"task.isolation.mode\",\n  \"value\": \"rcopy\",\n  \"type\": \"enum\",\n  \"description\": \"Isolation backend for subagents. \\\"auto\\\" lets the native PAL pick the best available backend (CoW-aware filesystems, then overlayfs/ProjFS, then a git worktree / recursive-copy fallback).\"\n}\n",
+      "classification": {
+        "Status": "OBSERVED",
+        "Reasons": [
+          "CONFIG_READ_OK"
+        ],
+        "Observation": {
+          "Key": "task.isolation.mode",
+          "Value": "rcopy",
+          "Type": "enum",
+          "Description": "Isolation backend for subagents. \"auto\" lets the native PAL pick the best available backend (CoW-aware filesystems, then overlayfs/ProjFS, then a git worktree / recursive-copy fallback)."
+        },
+        "Fallback": null,
+        "Context": "ProjectRoot"
+      }
+    },
+    {
+      "name": "root_apply",
+      "key": "task.isolation.apply",
+      "context": "ProjectRoot",
+      "overlay_position": "None",
+      "exit_code": 0,
+      "started_at": "2026-08-09T01:07:49.2174023+07:00",
+      "completed_at": "2026-08-09T01:07:50.1881060+07:00",
+      "stdout": "{\n  \"key\": \"task.isolation.apply\",\n  \"value\": false,\n  \"type\": \"boolean\",\n  \"description\": \"Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts\"\n}\n",
+      "classification": {
+        "Status": "OBSERVED",
+        "Reasons": [
+          "CONFIG_READ_OK"
+        ],
+        "Observation": {
+          "Key": "task.isolation.apply",
+          "Value": false,
+          "Type": "boolean",
+          "Description": "Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts"
+        },
+        "Fallback": null,
+        "Context": "ProjectRoot"
+      }
+    },
+    {
+      "name": "nested_mode",
+      "key": "task.isolation.mode",
+      "context": "NestedCwd",
+      "overlay_position": "None",
+      "exit_code": 0,
+      "started_at": "2026-08-09T01:07:50.1899349+07:00",
+      "completed_at": "2026-08-09T01:07:51.1731538+07:00",
+      "stdout": "{\n  \"key\": \"task.isolation.mode\",\n  \"value\": \"none\",\n  \"type\": \"enum\",\n  \"description\": \"Isolation backend for subagents. \\\"auto\\\" lets the native PAL pick the best available backend (CoW-aware filesystems, then overlayfs/ProjFS, then a git worktree / recursive-copy fallback).\"\n}\n",
+      "classification": {
+        "Status": "OBSERVED",
+        "Reasons": [
+          "CONFIG_READ_OK"
+        ],
+        "Observation": {
+          "Key": "task.isolation.mode",
+          "Value": "none",
+          "Type": "enum",
+          "Description": "Isolation backend for subagents. \"auto\" lets the native PAL pick the best available backend (CoW-aware filesystems, then overlayfs/ProjFS, then a git worktree / recursive-copy fallback)."
+        },
+        "Fallback": null,
+        "Context": "NestedCwd"
+      }
+    },
+    {
+      "name": "nested_apply",
+      "key": "task.isolation.apply",
+      "context": "NestedCwd",
+      "overlay_position": "None",
+      "exit_code": 0,
+      "started_at": "2026-08-09T01:07:51.1757541+07:00",
+      "completed_at": "2026-08-09T01:07:52.1633867+07:00",
+      "stdout": "{\n  \"key\": \"task.isolation.apply\",\n  \"value\": true,\n  \"type\": \"boolean\",\n  \"description\": \"Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts\"\n}\n",
+      "classification": {
+        "Status": "OBSERVED",
+        "Reasons": [
+          "CONFIG_READ_OK"
+        ],
+        "Observation": {
+          "Key": "task.isolation.apply",
+          "Value": true,
+          "Type": "boolean",
+          "Description": "Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts"
+        },
+        "Fallback": null,
+        "Context": "NestedCwd"
+      }
+    }
+  ]
+}

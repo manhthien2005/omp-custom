@@ -1,0 +1,8 @@
+schema_version: 1
+record_type: topic08_skill_trigger_fixture
+skill: evidence-before-completion
+expectation: should_trigger
+cases:
+  - "Return completed after implementing the Worker packet."
+  - "Claim that the defect is fixed."
+  - "State that all required checks pass and the work is done."

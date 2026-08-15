@@ -1,5 +1,12 @@
 # Repo Report — andrej-karpathy-skills
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/andrej-karpathy-skills`
 > **SHA:** `2c606141936f1eeef17fa3043a72095b4765b9c2` (`git -C andrej-karpathy-skills rev-parse HEAD`)
 > **Remote:** `https://github.com/multica-ai/andrej-karpathy-skills.git`

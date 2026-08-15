@@ -1,0 +1,5 @@
+task:
+  batch: true
+  isolation:
+    mode: rcopy
+    apply: false

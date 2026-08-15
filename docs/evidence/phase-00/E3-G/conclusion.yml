@@ -1,0 +1,11 @@
+schema_version: 1
+phase: "00"
+experiment: E3-G
+status: PASS
+decision: Successful apply=false nested changes are not durable or model-addressable; preflight is a runtime superset, so Option A1 remains normative. A2 is technically reachable but diagnostic-only.
+cases: {G1: PASS, G2: PASS, G3: PASS_DIAGNOSTIC_ONLY}
+policy:
+  parallel_isolated_implementation_when_nested_repo_present: DISABLED
+  fallback: sequential_non_isolated
+  option_a2: NOT_ADOPTED_FOR_V0
+artifacts: [docs/evidence/phase-00/E3-G/G1.yml, docs/evidence/phase-00/E3-G/G2.yml, docs/evidence/phase-00/E3-G/G3.yml]

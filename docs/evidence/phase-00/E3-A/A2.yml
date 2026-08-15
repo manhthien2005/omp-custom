@@ -1,0 +1,33 @@
+schema_version: 1
+phase: "00"
+experiment: E3-A
+case: A2
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+
+execution:
+  selected_attempt: 1
+  provider_call: false
+  direct_process_count: 1
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-A/raw/A2.stdout.json, sha256: 31308AE4FD5D9A6DF8604FA8FC02BB195590E6BEA1414BFB07155B7A84F6955F}
+    - {path: docs/evidence/phase-00/E3-A/raw/A2.stderr.txt, sha256: 028E308DD189E84308C711687947BD8410FFE76BD3BC929C2EABC7B927F4BEFC}
+    - {path: docs/evidence/phase-00/E3-A/raw/A2.run.json, sha256: B29C1790EC71F116F313C843F07373A59230C2390A6009EB64923E788D228642}
+
+observation:
+  command_key: task.isolation.__phase00_unknown
+  exit_code: 1
+  accepted_observation: false
+  refusal_reason: CONFIG_KEY_UNKNOWN
+
+interpretation:
+  reason: A2_UNKNOWN_KEY_REFUSED
+  decision: Unknown schema keys fail non-zero and cannot satisfy a preflight read.
+  affected_requirements: [CR-31, E3-A]
+

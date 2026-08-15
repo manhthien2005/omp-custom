@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "root_patch_file": "e3g-nested.patch",
+  "root_patch_sha256": "027E935CC5263DFA690F8DC31CB424BB9967E92596A10041510B078E5809D357",
+  "root_patch_check_exit": 0,
+  "root_patch_apply_exit": 0,
+  "persisted_nested_patch_files": [],
+  "isolation_worktree_exists_after_teardown": false,
+  "parent_can_locate_nested_artifact_from_model_facing_result": false,
+  "harness_only_internal_metadata_contains_inline_diffs": true,
+  "parent_repositories_unchanged": true,
+  "interpretation": "Inline diagnostic metadata is not an addressable artifact exposed by task summary/history and disappears with the process; it does not satisfy durable integration."
+}

@@ -1,0 +1,893 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/omp/agent-tasks-v1.schema.json",
+  "title": "OMP agent-tasks authority schema bundle v1",
+  "oneOf": [
+    { "$ref": "#/$defs/operationEnvelope" },
+    { "$ref": "#/$defs/resultEnvelope" }
+  ],
+  "$defs": {
+    "safeInteger": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "lowerSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "utcTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "requestPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {
+        "not": {
+          "enum": [
+            "command_to_run",
+            "transcript",
+            "reasoning",
+            "api_key",
+            "token",
+            "secret",
+            "credential",
+            "env_contents",
+            "terminal_history"
+          ]
+        }
+      },
+      "properties": {
+        "display_name": {},
+        "phase_id": {},
+        "objective": {},
+        "authority": {},
+        "dependencies": {},
+        "exit_obligations": {},
+        "target_status": {},
+        "acceptance_criteria": {},
+        "obligations": {},
+        "execution_mode": {},
+        "write_scope": {},
+        "workflow_class": {},
+        "locked_decisions": {},
+        "authority_ref": {},
+        "owned_ignored_outputs": {},
+        "scope_override": {},
+        "task_id": {},
+        "worktree_root": {},
+        "expected_revision": {},
+        "expected_revision_sha256": {},
+        "expected_lease_generation": {},
+        "work_unit_id": {},
+        "inputs": {},
+        "outputs": {},
+        "ownership": {},
+        "completion_conditions": {},
+        "status": {},
+        "artifact_refs": {},
+        "observed_summary": {},
+        "kind": {},
+        "next_action": {},
+        "blockers": {},
+        "open_risks": {},
+        "acceptance_inputs": {},
+        "scope_dispositions": {},
+        "candidate_id": {},
+        "source_path": {},
+        "media_type": {},
+        "handoff_id": {},
+        "evidence_type": {},
+        "covered_ac_ids": {},
+        "observation": {},
+        "validity_triggers": {},
+        "artifact_hash": {},
+        "producer": {},
+        "producer_session_ref": {},
+        "acceptance_input_hashes": {},
+        "input_evidence_ids": {},
+        "authority_scope": {},
+        "contract_hash": {},
+        "environment_fingerprint": {},
+        "source_identity": {},
+        "successor_session_ref": {},
+        "successor_runtime": {},
+        "predecessor_revision": {},
+        "predecessor_revision_sha256": {},
+        "user_authorization": {},
+        "reconciliation": {},
+        "terminal_status": {},
+        "reason": {},
+        "target_type": {},
+        "target_id": {},
+        "remediation_task_id": {},
+        "mode": {},
+        "confirmation": {},
+        "lock_domain": {},
+        "lock_id": {},
+        "migration_kind": {},
+        "target_schema_version": {}
+      }
+    },
+    "operationEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "operation",
+        "working_directory",
+        "session_ref",
+        "runtime",
+        "request"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "operation": { "type": "string", "minLength": 1 },
+        "working_directory": { "type": "string", "minLength": 1 },
+        "session_ref": { "type": "string", "minLength": 1 },
+        "runtime": { "type": "string", "minLength": 1 },
+        "request": { "$ref": "#/$defs/requestPayload" }
+      }
+    },
+    "resultEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "code", "operation", "data"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "code": { "type": "string", "minLength": 1 },
+        "operation": { "type": "string", "minLength": 1 },
+        "data": {}
+      }
+    },
+    "projectIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "project_id",
+        "display_name",
+        "project_root",
+        "worktree_root",
+        "git_common_dir",
+        "is_git",
+        "created_at",
+        "record_hash"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "project_identity" },
+        "project_id": { "type": "string" },
+        "display_name": { "type": "string" },
+        "project_root": { "type": "string" },
+        "worktree_root": { "type": "string" },
+        "git_common_dir": { "type": ["string", "null"] },
+        "is_git": { "type": "boolean" },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "phaseContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "phase_contract" },
+        "phase_id": { "type": "string" },
+        "objective": { "type": "string" },
+        "authority": { "type": "array" },
+        "dependencies": { "type": "array" },
+        "exit_obligations": { "type": "array" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "phaseStateRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "phase_state_revision" },
+        "revision": { "$ref": "#/$defs/safeInteger" },
+        "revision_id": { "type": "string" },
+        "previous_revision": { "type": ["string", "null"] },
+        "previous_revision_sha256": { "type": ["string", "null"] },
+        "status": { "type": "string" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "taskContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "task_contract" },
+        "task_id": { "type": "string" },
+        "objective": { "type": "string" },
+        "authority": { "type": "array" },
+        "acceptance_criteria": { "type": "array" },
+        "obligations": { "type": "array" },
+        "execution_mode": { "type": "string" },
+        "write_scope": { "type": "array" },
+        "phase_id": { "type": ["string", "null"] },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "lockedDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision_id", "statement", "authority_ref"],
+      "properties": {
+        "decision_id": { "type": "string", "pattern": "^D-[A-Z0-9][A-Z0-9._-]{0,63}$" },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "authority_ref": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    },
+    "taskStateRevision": {
+      "oneOf": [
+        { "$ref": "#/$defs/taskStateRevisionLegacy" },
+        { "$ref": "#/$defs/taskStateRevisionCurrent" }
+      ]
+    },
+    "taskStateRevisionBase": {
+      "type": "object",
+      "required": [
+        "schema_version", "record_type", "task_id", "revision", "revision_id",
+        "previous_revision", "previous_revision_sha256", "status", "lease_generation",
+        "owner_session_ref", "owner_runtime", "lease_status", "authoritative_worktree",
+        "observation_worktree", "baseline_ref", "latest_checkpoint_id", "work_unit_ids",
+        "work_unit_outcome_ids", "supporting_refs", "handoff_ids", "active_handoff_id",
+        "invalidated_evidence_ids", "created_at", "record_hash"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "task_state_revision" },
+        "task_id": { "type": "string" },
+        "revision": { "$ref": "#/$defs/safeInteger" },
+        "revision_id": { "type": "string" },
+        "previous_revision": { "type": ["string", "null"] },
+        "previous_revision_sha256": { "type": ["string", "null"] },
+        "status": { "type": "string" },
+        "lease_generation": { "$ref": "#/$defs/safeInteger" },
+        "owner_session_ref": { "type": "string" },
+        "owner_runtime": { "type": "string" },
+        "lease_status": { "enum": ["active", "transferring", "released", "recovery_required"] },
+        "authoritative_worktree": { "type": ["string", "null"] },
+        "observation_worktree": { "type": "string" },
+        "baseline_ref": { "type": "string" },
+        "latest_checkpoint_id": { "type": ["string", "null"] },
+        "work_unit_ids": { "type": "array" },
+        "work_unit_outcome_ids": { "type": "array" },
+        "predecessor_session_ref": { "type": ["string", "null"] },
+        "active_handoff_id": { "type": ["string", "null"] },
+        "completed_handoff_id": { "type": ["string", "null"] },
+        "transfer_prior_status": { "type": ["string", "null"] },
+        "handoff_ids": { "type": "array" },
+        "invalidated_evidence_ids": { "type": "array" },
+        "dependency_task_ids": { "type": "array" },
+        "supporting_refs": { "type": "array" },
+        "last_claimed_at": { "$ref": "#/$defs/utcTimestamp" },
+        "candidate_ids": { "type": "array" },
+        "candidate_lineage": { "$ref": "#/$defs/safeInteger" },
+        "selected_candidate_id": { "type": ["string", "null"] },
+        "selected_candidate_hash": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "stale_candidate_ids": { "type": "array" },
+        "reconciliation_reason_code": { "type": ["string", "null"] },
+        "acceptance_evidence_ids": { "type": "array" },
+        "accepted_candidate_id": { "type": ["string", "null"] },
+        "accepted_candidate_hash": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "artifact_hashes": { "type": "array" },
+        "evidence_ids": { "type": "array" },
+        "historical_acceptance_validity": { "type": ["string", "null"] },
+        "invalidation_ids": { "type": "array" },
+        "remediation_task_id": { "type": ["string", "null"] },
+        "terminal_reason": { "type": ["string", "null"] },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "taskStateRevisionLegacy": {
+      "allOf": [{ "$ref": "#/$defs/taskStateRevisionBase" }],
+      "not": {
+        "anyOf": [
+          { "required": ["workflow_class"] },
+          { "required": ["locked_decisions"] }
+        ]
+      },
+      "unevaluatedProperties": false
+    },
+    "taskStateRevisionCurrent": {
+      "allOf": [
+        { "$ref": "#/$defs/taskStateRevisionBase" },
+        {
+          "type": "object",
+          "required": ["workflow_class", "locked_decisions"],
+          "properties": {
+            "workflow_class": { "enum": ["quick", "standard", "orchestrated"] },
+            "locked_decisions": {
+              "type": "array",
+              "maxItems": 64,
+              "items": { "$ref": "#/$defs/lockedDecision" }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "continuityContractRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id", "workflow_class", "locked_decisions", "authority_ref", "reason",
+        "expected_revision", "expected_revision_sha256", "expected_lease_generation"
+      ],
+      "properties": {
+        "task_id": { "type": "string" },
+        "workflow_class": { "enum": ["quick", "standard", "orchestrated"] },
+        "locked_decisions": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/lockedDecision" } },
+        "authority_ref": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "expected_revision": { "$ref": "#/$defs/safeInteger" },
+        "expected_revision_sha256": { "$ref": "#/$defs/sha256" },
+        "expected_lease_generation": { "$ref": "#/$defs/safeInteger" }
+      }
+    },
+    "continuityContractResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id", "workflow_class", "locked_decisions_sha256", "continuity_change_id",
+        "revision", "revision_sha256"
+      ],
+      "properties": {
+        "task_id": { "type": "string" },
+        "workflow_class": { "enum": ["quick", "standard", "orchestrated"] },
+        "locked_decisions_sha256": { "$ref": "#/$defs/sha256" },
+        "continuity_change_id": { "type": "string", "pattern": "^CC[0-9]{6}$" },
+        "revision": { "$ref": "#/$defs/safeInteger" },
+        "revision_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "continuityContractChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "record_type", "continuity_change_id", "task_id",
+        "prior_workflow_class", "new_workflow_class", "prior_locked_decisions_sha256",
+        "new_locked_decisions_sha256", "authority_ref", "reason", "created_at", "record_hash"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "continuity_contract_change" },
+        "continuity_change_id": { "type": "string", "pattern": "^CC[0-9]{6}$" },
+        "task_id": { "type": "string" },
+        "prior_workflow_class": { "type": ["string", "null"], "enum": ["quick", "standard", "orchestrated", null] },
+        "new_workflow_class": { "enum": ["quick", "standard", "orchestrated"] },
+        "prior_locked_decisions_sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "new_locked_decisions_sha256": { "$ref": "#/$defs/sha256" },
+        "authority_ref": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sessionIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "session_identity" },
+        "session_ref": { "type": "string" },
+        "runtime": { "type": "string" },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "checkpoint" },
+        "checkpoint_id": { "type": "string" },
+        "kind": { "type": "string" },
+        "next_action": { "type": "string" },
+        "blockers": { "type": "array" },
+        "open_risks": { "type": "array" },
+        "work_unit_id": { "type": ["string", "null"] },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "workUnitContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "work_unit_contract" },
+        "work_unit_id": { "type": "string" },
+        "inputs": { "type": "array" },
+        "outputs": { "type": "array" },
+        "ownership": { "type": "array" },
+        "dependencies": { "type": "array" },
+        "completion_conditions": { "type": "array" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "workUnitOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "work_unit_outcome" },
+        "work_unit_id": { "type": "string" },
+        "status": { "type": "string" },
+        "artifact_refs": { "type": "array" },
+        "observed_summary": { "type": "object" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "projectionTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "status",
+        "objective",
+        "authority",
+        "execution_mode",
+        "write_scope",
+        "acceptance_criteria",
+        "obligations",
+        "owned_ignored_outputs"
+      ],
+      "properties": {
+        "task_id": { "type": "string" },
+        "status": { "type": "string" },
+        "objective": { "type": "string" },
+        "authority": { "type": "array" },
+        "execution_mode": { "enum": ["read_only", "mutating"] },
+        "write_scope": { "type": "array" },
+        "acceptance_criteria": { "type": "array" },
+        "obligations": { "type": "array" },
+        "owned_ignored_outputs": { "type": "array" }
+      }
+    },
+    "projectionWorkUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_unit_id", "inputs", "outputs", "ownership", "dependencies", "completion_conditions"],
+      "properties": {
+        "work_unit_id": { "type": "string" },
+        "inputs": { "type": "array" },
+        "outputs": { "type": "array" },
+        "ownership": { "type": "array" },
+        "dependencies": { "type": "array" },
+        "completion_conditions": { "type": "array" }
+      }
+    },
+    "projectionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation_worktree",
+        "authoritative_worktree",
+        "candidate_id",
+        "candidate_sha256",
+        "diff_ref",
+        "artifact_refs"
+      ],
+      "properties": {
+        "observation_worktree": { "type": "string" },
+        "authoritative_worktree": { "type": ["string", "null"] },
+        "candidate_id": { "type": ["string", "null"] },
+        "candidate_sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "diff_ref": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "artifact_refs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "projectionCas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "revision_sha256", "lease_generation"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/safeInteger" },
+        "revision_sha256": { "$ref": "#/$defs/sha256" },
+        "lease_generation": { "$ref": "#/$defs/safeInteger" }
+      }
+    },
+    "workUnitProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "record_type", "task", "work_unit", "binding", "cas", "projection_sha256"],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "work_unit_projection" },
+        "task": { "$ref": "#/$defs/projectionTask" },
+        "work_unit": { "$ref": "#/$defs/projectionWorkUnit" },
+        "binding": { "$ref": "#/$defs/projectionBinding" },
+        "cas": { "$ref": "#/$defs/projectionCas" },
+        "projection_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "continuityProjectionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 0
+    },
+    "continuityTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id", "workflow_class", "objective", "authority", "execution_mode",
+        "write_scope", "acceptance_criteria", "obligations", "locked_decisions"
+      ],
+      "properties": {
+        "task_id": { "type": "string", "pattern": "^T[0-9]{6}$" },
+        "workflow_class": { "enum": ["quick", "standard", "orchestrated"] },
+        "objective": { "type": "string", "minLength": 1 },
+        "authority": { "type": "array", "maxItems": 128, "items": { "type": "string", "minLength": 1 } },
+        "execution_mode": { "enum": ["read_only", "mutating"] },
+        "write_scope": { "type": "array", "maxItems": 128 },
+        "acceptance_criteria": { "type": "array", "maxItems": 128 },
+        "obligations": { "type": "array", "maxItems": 128, "items": { "type": "string", "minLength": 1 } },
+        "locked_decisions": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/lockedDecision" } }
+      }
+    },
+    "continuityLifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status", "owner_session_ref", "owner_runtime", "revision", "revision_id",
+        "revision_sha256", "lease_generation"
+      ],
+      "properties": {
+        "status": { "enum": ["active", "candidate_frozen", "rework"] },
+        "owner_session_ref": { "type": "string", "minLength": 1 },
+        "owner_runtime": { "const": "omp" },
+        "revision": { "$ref": "#/$defs/safeInteger" },
+        "revision_id": { "type": "string", "pattern": "^R[0-9]{6}$" },
+        "revision_sha256": { "$ref": "#/$defs/lowerSha256" },
+        "lease_generation": { "$ref": "#/$defs/safeInteger" }
+      }
+    },
+    "continuityCheckpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkpoint_id", "checkpoint_sha256", "work_unit_id", "next_action", "blockers", "open_risks"],
+      "properties": {
+        "checkpoint_id": { "type": ["string", "null"], "pattern": "^CP[0-9]{6}$" },
+        "checkpoint_sha256": { "oneOf": [{ "$ref": "#/$defs/lowerSha256" }, { "type": "null" }] },
+        "work_unit_id": { "type": ["string", "null"], "pattern": "^WU-[A-Z0-9][A-Z0-9._-]{0,79}$" },
+        "next_action": { "type": ["string", "null"] },
+        "blockers": { "type": "array", "maxItems": 128, "items": { "type": "string", "minLength": 1 } },
+        "open_risks": { "type": "array", "maxItems": 128, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "continuityCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "candidate_hash", "candidate_sha256"],
+      "properties": {
+        "candidate_id": { "type": ["string", "null"], "pattern": "^C[A-Z0-9][A-Z0-9._-]{0,79}$" },
+        "candidate_hash": { "oneOf": [{ "$ref": "#/$defs/lowerSha256" }, { "type": "null" }] },
+        "candidate_sha256": { "oneOf": [{ "$ref": "#/$defs/lowerSha256" }, { "type": "null" }] }
+      }
+    },
+    "continuityEvidenceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "record_sha256"],
+      "properties": {
+        "evidence_id": { "type": "string", "pattern": "^E[0-9]{6}$" },
+        "record_sha256": { "$ref": "#/$defs/lowerSha256" }
+      }
+    },
+    "contextContinuityKernel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "record_type", "task", "lifecycle", "checkpoint", "candidate",
+        "evidence_bindings", "degraded_fields", "kernel_sha256"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "context_continuity_kernel" },
+        "task": { "$ref": "#/$defs/continuityTask" },
+        "lifecycle": { "$ref": "#/$defs/continuityLifecycle" },
+        "checkpoint": { "$ref": "#/$defs/continuityCheckpoint" },
+        "candidate": { "$ref": "#/$defs/continuityCandidate" },
+        "evidence_bindings": { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/continuityEvidenceBinding" } },
+        "degraded_fields": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": { "enum": ["blockers", "candidate", "checkpoint", "evidence_bindings", "next_action", "open_risks", "work_unit_id"] }
+        },
+        "kernel_sha256": { "$ref": "#/$defs/lowerSha256" }
+      }
+    },
+    "handoffProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "task_contract",
+        "candidate",
+        "lifecycle",
+        "successor",
+        "transfer",
+        "projection_sha256"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "handoff_projection" },
+        "task_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_id",
+            "objective",
+            "authority",
+            "acceptance_criteria",
+            "obligations",
+            "execution_mode",
+            "write_scope",
+            "owned_ignored_outputs",
+            "task_contract_sha256"
+          ],
+          "properties": {
+            "task_id": { "type": "string" },
+            "objective": { "type": "string" },
+            "authority": { "type": "array" },
+            "acceptance_criteria": { "type": "array" },
+            "obligations": { "type": "array" },
+            "execution_mode": { "enum": ["read_only", "mutating"] },
+            "write_scope": { "type": "array" },
+            "owned_ignored_outputs": { "type": "array" },
+            "task_contract_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "candidate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "candidate_id",
+            "candidate_sha256",
+            "diff_ref",
+            "artifact_refs",
+            "evidence_bindings",
+            "workspace_snapshot_sha256"
+          ],
+          "properties": {
+            "candidate_id": { "type": ["string", "null"] },
+            "candidate_sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+            "diff_ref": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+            "artifact_refs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+            "evidence_bindings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["evidence_id", "record_hash"],
+                "properties": {
+                  "evidence_id": { "type": "string" },
+                  "record_hash": { "$ref": "#/$defs/sha256" }
+                }
+              }
+            },
+            "workspace_snapshot_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "prior_status", "next_action", "blockers", "open_risks"],
+          "properties": {
+            "status": { "const": "transferring" },
+            "prior_status": { "type": "string" },
+            "next_action": { "type": "string" },
+            "blockers": { "type": "array" },
+            "open_risks": { "type": "array" }
+          }
+        },
+        "successor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["session_ref", "runtime"],
+          "properties": {
+            "session_ref": { "type": "string" },
+            "runtime": { "type": "string" }
+          }
+        },
+        "transfer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_id",
+            "handoff_id",
+            "handoff_sha256",
+            "predecessor_revision",
+            "predecessor_revision_sha256",
+            "revision",
+            "revision_sha256",
+            "lease_generation"
+          ],
+          "properties": {
+            "task_id": { "type": "string" },
+            "handoff_id": { "type": "string" },
+            "handoff_sha256": { "$ref": "#/$defs/sha256" },
+            "predecessor_revision": { "$ref": "#/$defs/safeInteger" },
+            "predecessor_revision_sha256": { "$ref": "#/$defs/sha256" },
+            "revision": { "$ref": "#/$defs/safeInteger" },
+            "revision_sha256": { "$ref": "#/$defs/sha256" },
+            "lease_generation": { "$ref": "#/$defs/safeInteger" }
+          }
+        },
+        "projection_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "candidate" },
+        "task_id": { "type": "string" },
+        "task_contract_hash": { "$ref": "#/$defs/sha256" },
+        "candidate_id": { "type": "string" },
+        "lineage": { "$ref": "#/$defs/safeInteger" },
+        "baseline": { "type": "object" },
+        "acceptance_inputs": { "type": "array" },
+        "entries": { "type": "array" },
+        "scope_dispositions": { "type": "array" },
+        "integration_provenance": { "type": "array" },
+        "frozen_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "evidence" },
+        "evidence_id": { "type": "string" },
+        "evidence_type": { "type": "string" },
+        "producer": { "type": "string" },
+        "producer_session_ref": { "type": ["string", "null"] },
+        "task_id": { "type": "string" },
+        "candidate_id": { "type": ["string", "null"] },
+        "candidate_hash": { "type": ["string", "null"] },
+        "task_contract_hash": { "$ref": "#/$defs/sha256" },
+        "covered_ac_ids": { "type": "array" },
+        "observation": { "type": "object" },
+        "validity_triggers": { "type": "array" },
+        "acceptance_input_hashes": { "type": "array" },
+        "input_evidence_ids": { "type": "array" },
+        "artifact_hash": { "type": ["string", "null"] },
+        "authority_scope": {},
+        "environment_fingerprint": {},
+        "source_identity": {},
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "handoff" },
+        "handoff_id": { "type": "string" },
+        "handoff_kind": { "enum": ["normal", "recovery"] },
+        "task_id": { "type": "string" },
+        "authority_root": { "type": "string" },
+        "task_contract_hash": { "$ref": "#/$defs/sha256" },
+        "predecessor_revision": { "$ref": "#/$defs/safeInteger" },
+        "predecessor_revision_sha256": { "$ref": "#/$defs/sha256" },
+        "predecessor_session_ref": { "type": "string" },
+        "predecessor_runtime": { "type": "string" },
+        "predecessor_status": { "type": "string" },
+        "lease_generation": { "$ref": "#/$defs/safeInteger" },
+        "authoritative_worktree": { "type": ["string", "null"] },
+        "observation_worktree": { "type": "string" },
+        "workspace_snapshot_sha256": { "$ref": "#/$defs/sha256" },
+        "candidate_id": { "type": ["string", "null"] },
+        "candidate_hash": { "type": ["string", "null"] },
+        "evidence_bindings": { "type": "array" },
+        "checkpoint_id": { "type": ["string", "null"] },
+        "checkpoint_hash": { "type": ["string", "null"] },
+        "successor_session_ref": { "type": "string" },
+        "successor_runtime": { "type": "string" },
+        "last_work_unit_id": { "type": ["string", "null"] },
+        "next_action": { "type": "string" },
+        "blockers": { "type": "array" },
+        "open_risks": { "type": "array" },
+        "invalidated_evidence_ids": { "type": "array" },
+        "user_authorization": { "type": ["object", "null"] },
+        "prior_handoff_id": { "type": ["string", "null"] },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "artifactMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "artifact_metadata" },
+        "artifact_id": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "file_name": { "type": "string" },
+        "media_type": { "type": "string" },
+        "byte_length": { "$ref": "#/$defs/safeInteger" },
+        "candidate_id": { "type": ["string", "null"] },
+        "handoff_id": { "type": ["string", "null"] },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "cleanupPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "task_id": { "type": "string" },
+        "mode": { "enum": ["dry-run", "apply"] },
+        "eligible": { "type": "boolean" },
+        "blockers": { "type": "array" },
+        "source_path": { "type": "string" },
+        "target_path": { "type": "string" },
+        "estimated_bytes": { "$ref": "#/$defs/safeInteger" }
+      }
+    },
+    "rootMigration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "root_migration" },
+        "migration_id": { "type": "string" },
+        "source_manifest_hash": { "$ref": "#/$defs/sha256" },
+        "backup_path": { "type": "string" },
+        "target_root": { "type": "string" },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "taskPurge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "task_purge" },
+        "purge_id": { "type": "string" },
+        "task_id": { "type": "string" },
+        "terminal_revision_hash": { "$ref": "#/$defs/sha256" },
+        "byte_length": { "$ref": "#/$defs/safeInteger" },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "lockOwner": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "record_type": { "const": "lock_owner" },
+        "created_at": { "$ref": "#/$defs/utcTimestamp" },
+        "host": { "type": "string" },
+        "process_id": { "$ref": "#/$defs/safeInteger" },
+        "process_start_time": { "type": "string" },
+        "record_hash": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

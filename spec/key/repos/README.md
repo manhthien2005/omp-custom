@@ -3,6 +3,11 @@
 > **What this folder is.** One report per upstream, all in the same shape (`_CONTRACT.md`),
 > so they can be compared, diffed, and rolled up mechanically.
 >
+> Every report repeats its own authority boundary. This folder summary cannot substitute for
+> that per-file statement: reports are source/research evidence, while current design and
+> execution authority lives in the accepted design, key decisions, active specs, phase plans,
+> and Topic 03-selected manifest.
+>
 > **Why it exists alongside `dossiers/`.** The `dossiers/` were organized by *cluster*
 > (retrieval, skills, spec-workflow). That was efficient to produce and turned out to be the
 > wrong axis: a cluster file cannot be diffed against another cluster file, coverage hides

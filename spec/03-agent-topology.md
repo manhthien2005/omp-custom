@@ -1,7 +1,103 @@
 # 03 — Agent Topology
 
-> OPUS PROPOSED SPEC v1 | Who exists, who spawns whom, what each may touch.
-> All frontmatter claims verified against `discovery/helpers.ts::parseAgentFields`.
+<!-- topic05-projection:topology -->
+## Topic 05 actor/capability boundary (KD-029)
+
+The Tech Lead selects actor and retrieval capability independently: Lead/native,
+Lead/CodeGraph, Scout/native then Lead, or Scout/CodeGraph then Lead. CodeGraph is optional and
+default-off. Cheap Scout remains read-only advisory evidence and cannot edit, verify, review,
+integrate, or accept. Reviewer independently selects native, CodeGraph, or mixed retrieval and
+corroborates load-bearing graph/Scout claims against current source; it never inherits them as
+proof.
+
+> **Topic 02 boundary:** Topic 02 owns workflow classification. Topology does not redefine
+> workflow classification, task/candidate/session identity, or the structural
+> Standard/Orchestrated boundary.
+>
+> **Status:** KD-027 selects the benefit-gated three-agent manifest below. The main-session
+> Tech Lead retains final ownership. Sections B–I preserve the pre-Topic-03 topology hypothesis
+> and verified runtime notes as superseded evidence only; they are not current execution
+> authority.
+> Topic 03 owns the worker graph, dispatch conditions, reviewer shape, and model routing.
+>
+> All frontmatter claims below were checked against
+> `discovery/helpers.ts::parseAgentFields`; verified runtime facts remain evidence even when a
+> topology proposal is reopened.
+
+---
+
+## 0. Canonical Selected Topology (KD-027)
+
+The main-session Tech Lead is the default writer and final owner. It classifies the workflow,
+accepts the task contract, decides whether delegation has a concrete benefit, validates returned
+evidence, performs or commissions fresh verification, integrates accepted work, and reports the
+final result. It is not a spawned agent and no `tech-lead.md` may remain under
+`template/.omp/agents/`.
+
+Default to no subagent spawn. Every spawn requires all of the following before dispatch:
+
+1. a concrete benefit over inline Tech Lead work;
+2. one bounded objective and ownership boundary;
+3. a named output contract and consumer;
+4. a stop condition and fallback;
+5. the effective model, effort, tools, and isolation needed by that contract.
+
+The selected spawnable manifest is exactly `cheap-scout`, `worker`, and `reviewer`:
+
+| Agent | Bounded responsibility | Writes? | Dispatch rule |
+|---|---|---:|---|
+| `cheap-scout` | Retrieval, repository mapping, and evidence gathering | No | Optional; only after the spawn-benefit gate passes |
+| `worker` | One bounded implementation work unit | Yes | Optional; only after the spawn-benefit gate passes |
+| `reviewer` | Independent review using a task-specific concern profile | No by contract | Risk-gated; mandatory only for the high-risk concerns below |
+
+Explorer is absorbed by Cheap Scout. Implementer is renamed Worker. The permanent Verifier is
+removed: verification is a task-contract obligation owned by the Tech Lead, not a permanent
+topology slot. Reviewer is one General Reviewer; security, authentication, durable-data,
+database-migration, concurrency, public-API, and destructive-change concerns are dynamic packet
+profiles rather than permanent specialist agents.
+
+### 0.1 Agent boundaries
+
+- **Cheap Scout** is read-only and advisory. It may search, map, retrieve, and summarize cited
+  evidence. It may not edit, run workspace-mutating commands, verify acceptance, review a
+  candidate, integrate work, or issue a verdict. Weak evidence returns to the Tech Lead; it does
+  not silently become a quality-triggered provider fallback.
+- **Worker** receives one explicitly owned write scope and verification commands. It defaults to
+  `high`; the Tech Lead selects exact `xhigh` for difficult, high-risk, cross-boundary,
+  concurrency-sensitive, migration-sensitive, or uncertain-root-cause work.
+- **Reviewer** runs at exact `xhigh`. Review is mandatory for security, authentication, durable
+  data, database migration, concurrency, public API, and destructive change concerns. Other
+  review is selected by the accepted task contract and actual risk, never solely by workflow
+  name. More than one Reviewer requires at least two independent high-risk concerns.
+
+Each selected agent declares a closed structured result contract in frontmatter. The Tech Lead
+accepts only a valid structured result, checks the returned model and effort when identity is
+acceptance-bearing, and reconciles any partial, blocked, or failed result before continuing.
+
+### 0.2 Writer ownership and concurrency
+
+The Tech Lead writes inline by default. One sequential Worker may write the retained workspace
+within its assigned scope while the Tech Lead refrains from competing writes. Parallel writing
+Workers are permitted only when their scopes are disjoint, isolation/capture is proven, and the
+Tech Lead integrates artifacts sequentially with cross-boundary verification. If any precondition
+is absent, use one sequential writer and disclose the fallback; the task is not blocked merely
+because parallelism was unavailable.
+
+### 0.3 Review independence and model availability
+
+Reviewer preference is a suitable different model family, then another suitable strong model,
+then the same model in a separate session with disclosure. Opus is a preference, not a gate.
+Unavailable Opus blocks work only when the accepted task contract explicitly requires it or an
+unresolved finding genuinely cannot be adjudicated with an available suitable model. Cheap Scout
+cannot substitute for Reviewer or Tech Lead verification.
+
+### 0.4 Supersession boundary
+
+Everything below this section that names Explorer, Implementer, Verifier, a fixed four-worker
+graph, or five role slots is frozen topology evidence from before KD-027. Source facts about OMP
+frontmatter, discovery, blocking, tool surfaces, and recursion remain useful where they do not
+select a roster. Current runtime, installer, routing, and validation must consume the three-agent
+manifest in this section.
 
 ---
 
@@ -33,11 +129,15 @@ A command spawns `agent: tech-lead`, which then spawns workers.
 - Costs a recursion level and makes the depth budget tight.
 - Adds a full agent context (~1.2k tokens) to every task.
 
-**Decision: Option A.** Recursion budget is the deciding evidence, not
-preference. `task.maxRecursionDepth = 2` in the frozen baseline does not leave
-room for a spawned coordinator that itself fans out.
+**Current ownership boundary:** Option A remains the Topic 02 premise for the
+main-session Tech Lead and final answer ownership. The old fixed worker graph and its
+spawn-count rationale are reopened for Topic 03; recursion depth is a constraint, not a
+reason to spawn workers that are otherwise unnecessary.
 
-**Consequence (CR-33 — resolved): `template/.omp/agents/tech-lead.md` is REMOVED from the agent directory.** Its role-contract content moves to `docs/roles/tech-lead.md`, and its orchestration procedure folds into the three commands and `AGENTS.md`.
+**Pending Topic 03 migration decision:** the prior CR-33 proposal removes
+`template/.omp/agents/tech-lead.md` from agent discovery and moves role-reference content
+outside the agent directory. Runtime discovery facts below still apply, but the exact
+migration target belongs to Topic 03 and Phase 02.
 
 There is no third option. **OMP agent discovery is mechanical and has no documentation-only category:** `loadAgentsFromDir()` filters on `entry.name.endsWith(".md")` and passes every match to `parseAgent()` (verified: `task/discovery.ts:42-45`, OMP v17.2.10). Discovery covers `~/.omp/agent/agents/*.md`, `<project>/.omp/agents/*.md`, and every extension package's `agents/` directory. Any `.md` file placed there **is** a live, discoverable, spawnable `AgentDefinition` regardless of what the spec calls it.
 
@@ -47,9 +147,12 @@ Option (b) from earlier drafts — "retain with a `description` saying it is nes
 
 ---
 
-## B. Worker Roster
+## B. Pre-Topic-03 Worker Roster Hypothesis
 
-Four workers, spawned from the main session via `task`.
+The prior hypothesis uses four workers spawned from the main session via `task`. Topic 03
+must re-evaluate whether each role is useful, whether work stays inline, and whether a
+specialist is optional or required before any runtime projection treats this roster as
+normative.
 
 | Agent | Tools | Writes? | Isolated? | Spawns |
 |---|---|---|---|---|
@@ -208,20 +311,19 @@ Implementer, whose contract includes root-cause fixes.
 
 ## F. Model Role Assignment
 
-Each worker declares `model: "@<rolename>"`. Per `getModelRoleAlias`
+Each selected agent declares `model: "@<rolename>"`. Per `getModelRoleAlias`
 (`model-resolver.ts:925`), a custom role resolves only when
 `settings.getModelRole(candidate)` returns a value — i.e. only when the role is
 defined under `modelRoles:` in a loaded config.
 
-The template's `config.yml` defines all five. So the current setup works **if
-and only if** that config is installed. If a user installs the agents without
-the config, `@explorer` fails to resolve as a role and falls through to being
-treated as a model pattern, which will not match. See `09-model-routing.md`
-for the failure mode and the mitigation.
+The selected manifest defines `cheap-scout`, `worker`, and `reviewer`. Agent-boundary installation
+therefore couples those agents to compatible config and refuses incomplete deployment. The Tech
+Lead is the main session and has no required discoverable agent alias. See `09-model-routing.md`
+for exact routing and failure behavior.
 
 ---
 
-## G. Spawn Graph
+## G. Historical Spawn Graph Hypothesis
 
 ```
 Main session (Tech Lead — no agent file)
@@ -247,7 +349,7 @@ currently unused — which is the desired headroom, not waste.
 
 ---
 
-## H. Non-Overlap Check
+## H. Historical Non-Overlap Check
 
 The Definition of Done requires the roles to have non-overlapping
 responsibilities. Under Option A there are four spawnable workers plus the main session (five
@@ -268,6 +370,22 @@ verification (its contract requires it) and the Verifier re-runs
 independently. That is redundancy by design, not role confusion — the
 Implementer's run catches its own errors early, the Verifier's run is the
 authoritative evidence.
+
+---
+
+## H-1. Current Topic 06 managed boundary (KD-030)
+
+The two sections above are historical hypotheses. Current managed dispatch has three selected
+responsibility contracts: optional read-only Cheap Scout, benefit-gated Worker, and risk-gated
+Reviewer. Stage names do not force a spawn, and fresh verification plus final acceptance remain
+with the main-session Tech Lead.
+
+The trusted same-name `task` wrapper accepts one complete Topic 04 work-unit projection per single
+or batch item. It is blocking, forbids nested spawns, and emits a provisional receipt/outcome only.
+Cheap Scout is Flash `xhigh` with disclosed Pro `xhigh` availability fallback; Worker is `high` or
+Tech-Lead-selected `xhigh`; Reviewer is `xhigh`. Reviewer receives ARTIFACT + CONTRACT and never
+the Worker's claim. If managed dispatch is unavailable, the Tech Lead works inline without
+fabricating an agent packet, independent review, or receipt.
 
 ---
 

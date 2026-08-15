@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "case": "H3",
+  "attempt": 1,
+  "operations": [
+    {
+      "name": "overlay_before",
+      "key": "task.isolation.apply",
+      "context": "CliOverlay",
+      "overlay_position": "Before",
+      "exit_code": 1,
+      "started_at": "2026-08-09T01:07:55.1267900+07:00",
+      "completed_at": "2026-08-09T01:07:56.1088891+07:00",
+      "stdout": "",
+      "classification": {
+        "Status": "REFUSE",
+        "Reasons": [
+          "CONFIG_CLI_OVERLAY_UNSUPPORTED",
+          "CLI_OVERLAY_UNOBSERVABLE"
+        ],
+        "Observation": null,
+        "Fallback": "SEQUENTIAL_NON_ISOLATED_DISCLOSED",
+        "Context": "CliOverlay"
+      }
+    },
+    {
+      "name": "overlay_after",
+      "key": "task.isolation.apply",
+      "context": "CliOverlay",
+      "overlay_position": "After",
+      "exit_code": 1,
+      "started_at": "2026-08-09T01:07:56.1106625+07:00",
+      "completed_at": "2026-08-09T01:07:57.1107377+07:00",
+      "stdout": "",
+      "classification": {
+        "Status": "REFUSE",
+        "Reasons": [
+          "CONFIG_CLI_OVERLAY_UNSUPPORTED",
+          "CLI_OVERLAY_UNOBSERVABLE"
+        ],
+        "Observation": null,
+        "Fallback": "SEQUENTIAL_NON_ISOLATED_DISCLOSED",
+        "Context": "CliOverlay"
+      }
+    }
+  ]
+}

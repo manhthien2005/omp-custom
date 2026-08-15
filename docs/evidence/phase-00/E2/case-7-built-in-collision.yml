@@ -1,0 +1,46 @@
+schema_version: 1
+phase: "00"
+experiment: E2
+case: 7
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  repository_status_before: docs/evidence/phase-00/E2/raw/repository-status-before.txt
+  repository_status_after: docs/evidence/phase-00/E2/raw/repository-status-after.txt
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+  provider_gateway: OmniRoute loopback 127.0.0.1:20128; credential value excluded
+
+setup:
+  working_directory: disposable E2 project root
+  fixture: docs/evidence/phase-00/E2/fixture
+  selector: "@default"
+  configured_value: e2project/ddgw/claude-haiku-4-5
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model @default --no-tools --no-skills --no-rules --max-time 5
+  exit_code: 0
+  started_at: "2026-08-11T10:29:38.2534259+07:00"
+  completed_at: "2026-08-11T10:29:40.3165645+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E2/raw/case-7/run.json, sha256: 175A7D1796B501B5894BD7281252C27021246F9A7968E29E26A1C90C7163566E}
+    - {path: docs/evidence/phase-00/E2/raw/case-7/stdout.jsonl, sha256: 2DE069FCD765984323E8AAEF0FEF414F494AE2163957E1115CD7C5942AD91871}
+    - {path: docs/evidence/phase-00/E2/raw/case-7/stderr.txt, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+    - {path: docs/evidence/phase-00/E2/raw/case-7/session-001.jsonl, sha256: 1DD43CA72031165D5F9C22CB61938786F42247DAB380B9A74A1BE84D606F498E}
+
+observation:
+  facts:
+    - The configured modelRoles.default value was selected.
+    - The built-in default-selection path did not shadow the configured role.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/config/model-resolver.ts::resolveDefaultModel
+  limitations: []
+
+interpretation:
+  decision: CONFIGURED_DEFAULT_ROLE_WINS_BUILT_IN_COLLISION
+  spec_effect: CHANGE
+  affected_requirements: [CR-24, E2-7]

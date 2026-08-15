@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-L",
+  "case": "L1",
+  "status": "PASS",
+  "attempt": 7,
+  "selected_transaction": {
+    "path": "docs/evidence/phase-00/E3-L/selected-transaction.json",
+    "sha256": "526156954A6710DC85EB7738D6D23EFA24F05F90C5696962622917B041158121"
+  },
+  "observation": {
+    "reader_value": false,
+    "child_value": false,
+    "task_branches": [
+      "APPLY_FALSE_CAPTURE_ONLY",
+      "APPLY_FALSE_CAPTURE_ONLY",
+      "APPLY_FALSE_CAPTURE_ONLY"
+    ]
+  },
+  "reason": "E3L_L1_EXACT"
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "session_id": "019feeeb-d1ac-7000-8ba9-be46794625a0",
+  "model_change": {
+    "model": "omniroute/oc/mimo-v2.5-free",
+    "resolved_model_is_fallback": false
+  },
+  "task": {
+    "tool_call_id": "call_c502a9799f06414593811e3a|fc_call_c502a9799f06414593811e3a",
+    "arguments": {
+      "agent": "phase00-write-probe",
+      "name": "e3b-root",
+      "task": "Terminal-yield result.data exactly {\"sentinel\":\"E3_B_ROOT_OK\"}.",
+      "isolated": true
+    },
+    "is_error": false,
+    "result": {
+      "agent": "phase00-write-probe",
+      "exit_code": 0,
+      "output": "{\n  \"sentinel\": \"E3_B_ROOT_OK\"\n}",
+      "duration_ms": 8103,
+      "model_role": "implementer",
+      "resolved_model": "omniroute/oc/mimo-v2.5-free",
+      "patch_path": "<DURABLE_ARTIFACT>/e3b-root.patch",
+      "nested_patches": [],
+      "extracted_tool_data": {
+        "yield": [
+          {
+            "data": {
+              "sentinel": "E3_B_ROOT_OK"
+            },
+            "status": "success"
+          }
+        ]
+      }
+    }
+  }
+}

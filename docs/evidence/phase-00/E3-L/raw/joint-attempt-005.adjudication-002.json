@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "experiment": "E3-I+E3-L",
+  "attempt": 5,
+  "selected": false,
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "correction_of": {
+    "path": "docs/evidence/phase-00/E3-L/raw/joint-attempt-005.adjudication.json",
+    "sha256": "C1D2307FDC3237477D50CA3C309A17E6A42EC9E2539A0D41D822180737BF0B5D"
+  },
+  "correction_reason": "E3IL_PARENT_TERMINAL_PRECEDENCE_AND_SELECTION_CORRECTION",
+  "runtime": {
+    "version": "omp/17.2.10",
+    "sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "executable": "<PINNED_OMP_EXECUTABLE>"
+  },
+  "source_identity": {
+    "path": "docs/evidence/phase-00/E3-L/source-identity.json",
+    "sha256": "CE7B3DF1446788C2996521172FD2BB7B124E1DBBDB854F2E0FBD990FF5EA32FD"
+  },
+  "sessions": {
+    "a": {
+      "invoked": true,
+      "run": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.run.json",
+        "sha256": "8A2EAFC45F771268FCB872F7ED0D6A278AD1F4217CDC625F0F431FF55CF3230B"
+      },
+      "parent_stdout": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.stdout.jsonl",
+        "sha256": "5F8DF445A52D54E6C48D11D35D75706E435D67B51D2CEB518B4C89F1804F44F0"
+      },
+      "parent_stderr": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.stderr.txt",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "canaries": [
+        {
+          "id": "e3i-project-1",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.canary.e3i-project-1.jsonl",
+          "sha256": "97B8B7C06A57159C9865A06D179C2CE77B7EBA01869C10E4ABD13B328C2B3325"
+        },
+        {
+          "id": "e3i-project-2",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.canary.e3i-project-2.jsonl",
+          "sha256": "6A96C0C1A6DCBE0CA37F4A7C6EEBDF0FFE2DC7E786D9BC1F2A1BAC56D2BCE65A"
+        },
+        {
+          "id": "e3i-project-3",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.canary.e3i-project-3.jsonl",
+          "sha256": "0CDCAC4964F479BDEC49179A9EB6BEE045208C08FDCD5D0194E22BB7D4E47D16"
+        },
+        {
+          "id": "e3i-runtime-1",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.canary.e3i-runtime-1.jsonl",
+          "sha256": "D80867A0744FF62B846170D9CD9E3A28B23F5A2C73BA1B719BE3311A575EE4A1"
+        },
+        {
+          "id": "e3i-runtime-2",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.canary.e3i-runtime-2.jsonl",
+          "sha256": "5940D7F9C9AF277439F5D3F9D213FC7F06115117BBFB32137DF08E5F2268AB21"
+        },
+        {
+          "id": "e3i-runtime-3",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-005.canary.e3i-runtime-3.jsonl",
+          "sha256": "76CD96E3D797C290A2B92358F8800605BF609024E7F6B89C6BF8A13C9D08432B"
+        }
+      ],
+      "transport_status": "INVALID_RUN",
+      "transport_reasons": [
+        "E3IL_NESTED_PROVIDER_RECOVERY"
+      ],
+      "e3_i_status": "INVALID_RUN",
+      "e3_l_status": "INVALID_RUN",
+      "provider_terminal": false,
+      "recovered_provider_retry": true,
+      "authoritative_parent_outcome": {
+        "source": "terminal-agent-end",
+        "event_line": 735,
+        "stop_reason": "stop",
+        "completion_text": "E3I_SESSION_A_DONE"
+      },
+      "parent_retry_recovery": {
+        "count": 8,
+        "start_event_lines": [
+          28,
+          238,
+          248,
+          491,
+          501,
+          511,
+          612,
+          717
+        ]
+      },
+      "nested_retry_recovery": {
+        "canary_id": "e3i-runtime-3",
+        "event_line": 7,
+        "kind": "auto-retry",
+        "status": "recovered",
+        "attempt": 1,
+        "superseding_event_line": 8
+      },
+      "boundary": {
+        "parent_content_unchanged": true,
+        "parent_head_unchanged": true,
+        "parent_status_unchanged": true,
+        "fixture_hashes_unchanged": true,
+        "live_home_unchanged": true,
+        "cleanup_succeeded": true
+      }
+    },
+    "b": {
+      "invoked": false,
+      "skip_reason": "A_INVALID_RUN"
+    }
+  },
+  "adjudication": {
+    "status": "INVALID_RUN",
+    "reason": "E3IL_NESTED_PROVIDER_RECOVERY",
+    "selection_eligible": false,
+    "precedence": "The recovered parent outcome removes the false terminal block; the explicit e3i-runtime-3 recovered retry then invalidates selection before either semantic oracle."
+  },
+  "automatic_retry": false,
+  "provider_auto_retry_observed": true,
+  "new_provider_call": false,
+  "e3_i_conclusion_consumed": false,
+  "e3_l_conclusion_consumed": false,
+  "parallel_authorized": false,
+  "non_claims": [
+    "Session B was not launched and no selected E3-I/E3-L transaction exists.",
+    "No L1-L3 or I1-I4 artifact is materialized from this attempt.",
+    "The local correction made no provider call and did not create Attempt 6.",
+    "E3-M remains deferred and parallel_mode remains DISABLED."
+  ]
+}

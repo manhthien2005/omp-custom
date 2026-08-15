@@ -1,0 +1,17 @@
+providers:
+  omniroute:
+    baseUrl: http://127.0.0.1:20128/v1
+    apiKey: OMNIROUTE_API_KEY
+    api: openai-responses
+    authHeader: true
+    models:
+      - id: codex/gpt-5.6-sol-high
+        name: Codex GPT-5.6 Sol High via OmniRoute
+        reasoning: true
+        input: [text]
+        contextWindow: 128000
+      - id: oc/mimo-v2.5-free
+        name: Mimo v2.5 Free via OmniRoute
+        reasoning: true
+        input: [text]
+        contextWindow: 128000

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "e3g-nested",
+  "started_at": "2026-08-11T04:14:51.181Z",
+  "completed_at": "2026-08-11T04:14:57.053Z",
+  "exit_code": 0,
+  "resolved_model": "omniroute/oc/mimo-v2.5-free",
+  "yield": {"status": "success", "data": {"sentinel": "E3_G_OK"}},
+  "root_patch_path": "<DURABLE_ARTIFACT>/e3g-nested.patch",
+  "nested_patch_metadata": [
+    {"relative_path": "deep/level/two", "length": 139, "sha256": "182D28138F04F19AFD74BCDA71EEC92F896FC97FE3D94A9E5940266C78121FD7", "git_apply_check_exit": 0},
+    {"relative_path": "nested-plain", "length": 149, "sha256": "D8E1C9CEB34B3268BE08DE3E4E03D00D982611C246F3A82D59BB39144CC43E0D", "git_apply_check_exit": 0}
+  ],
+  "omitted": ["system_prompt", "reasoning", "thinking_signature", "private_context", "inline_nested_patch_text"]
+}

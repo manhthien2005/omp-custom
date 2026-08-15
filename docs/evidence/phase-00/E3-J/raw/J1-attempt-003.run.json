@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "case": "J1",
+  "attempt": 3,
+  "experiment": "E3-J",
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>"
+  },
+  "model_catalog_sha256": "56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779",
+  "fixture_commit": "13e0a9650e9a9a89976708d11d8a2f79196fbddc",
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_ROOT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--config",
+    "<DISPOSABLE_ROOT>/config.yml",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "8m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:J1-blocking-batch.md>"
+  ],
+  "exit_code": 0,
+  "started_at": "2026-08-08T23:13:16.8688683+07:00",
+  "completed_at": "2026-08-08T23:13:57.4084447+07:00",
+  "duration_ms": 40540,
+  "cleanup_succeeded": true,
+  "cleanup_failure_count": 0,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "2903b21818511ed056940ae6c177ae1ea83103c83cee8e14abe9e757d909a1c2",
+    "after_sha256": "2903b21818511ed056940ae6c177ae1ea83103c83cee8e14abe9e757d909a1c2",
+    "changed_count": 0,
+    "boundary_result": "PASS_LIVE_HOME_READ_ONLY"
+  },
+  "analysis": {
+    "Status": "BLOCKED_ENVIRONMENT",
+    "Reasons": [
+      "P00-RUNTIME-PROVIDER-AUTH"
+    ],
+    "Provider": "omniroute",
+    "Model": "codex/gpt-5.6-sol-high",
+    "ErrorMessage": "404 No active credentials for provider: codex\nNo active credentials for provider: codex (type=invalid_request_error param=model_not_found)"
+  }
+}

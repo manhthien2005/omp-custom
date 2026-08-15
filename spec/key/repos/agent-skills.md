@@ -1,5 +1,12 @@
 # Repo Report — agent-skills (addyosmani)
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/agent-skills`
 > **SHA:** `d2478bf0c73a6357df39a3ed6aff16acaa218843`
 > **License:** MIT. `LICENSE:1-3` — "MIT License / Copyright (c) 2025 Addy Osmani". Root file

@@ -1,0 +1,118 @@
+schema_version: 1
+experiment: "E1"
+case_id: "SessionOnly"
+matrix_artifact: "case-4-session-only"
+status: "PASS"
+attempt: 1
+runtime:
+  pinned_source_commit: "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+  omp_sha256: "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+  omp_version: "omp/17.2.10"
+  model: "omniroute/codex/gpt-5.6-sol-high"
+inputs:
+  prompt_sha256: "D93A14C4AF93541DB049C3A7154593FADF5275CCC07D2D912EFCEB20EF8BE817"
+  agent: "phase00-e1-session-leaf"
+  caller_schema_state: "ABSENT"
+  agent_schema_state: "ABSENT"
+  agent_schema_dialect: "NONE"
+  session_schema_state: "PRESENT"
+observations:
+  selected_result:
+    agent: "phase00-e1-session-leaf"
+    is_async_acknowledgement: false
+    source: "session"
+    mode: "permissive"
+    structured_status: "valid"
+    data_property_names:
+      - "session_sentinel"
+    expected_sentinel_matches: true
+    forbidden_property_present: false
+  attributable_result_count: 1
+  selected_result_role: "nested_leaf"
+  child_initialization_source: "session"
+  schema_override_observable: false
+  schema_override_observed: false
+  blocking_executions:
+    -
+      Role: "carrier"
+      Agent: "phase00-e1-session-carrier"
+      DefinitionBlocking: true
+      SetupBlocking: true
+      ExecutionMode: "blocking"
+      AsyncAcknowledgement: false
+    -
+      Role: "leaf"
+      Agent: "phase00-e1-session-leaf"
+      DefinitionBlocking: true
+      SetupBlocking: true
+      ExecutionMode: "blocking"
+      AsyncAcknowledgement: false
+provider_ledger:
+  selected_session:
+    requests: 1
+    attributed_requests: 1
+    unattributed_requests: 0
+    response_ends: 1
+    recovered_retries: 0
+    retry_exhausted: false
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+    terminal_failure_found: false
+    terminal_failure_code: ""
+  process:
+    requests: 5
+    attributed_requests: 5
+    unattributed_requests: 0
+    response_ends: 5
+    recovered_retries: 0
+    retry_exhausted_count: 0
+    terminal_failure_count: 0
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+  controller_stdout_duplicates_excluded: true
+raw_artifacts:
+  -
+    kind: "stdout"
+    path: "docs/evidence/phase-00/E1/raw/session-only/attempt-001.stdout.jsonl"
+    sha256: "5A6B257F0F73BBE940D21D0B719E5559917519B14EA66BB5CF1EEB9A81263130"
+    lines: 153
+    source_capture_sha256: "4567BEE6829F0A496AB8E3CF969371D1D69F5266A940F8A14E6E956A2EB0EAC9"
+  -
+    kind: "stderr"
+    path: "docs/evidence/phase-00/E1/raw/session-only/attempt-001.stderr.jsonl"
+    sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    lines: 0
+    source_capture_sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/session-only/attempt-001.sessions/session-001.jsonl"
+    sha256: "FF9AF82B11C41A60E20CA59E3F11392F54427C9E7BA70C7E219D28592F5D21C4"
+    lines: 10
+    source_capture_sha256: "ED1D037AF5D2A1AEF82764FEDC97621B779B90B23C6C7CB18EE38D1725F4C610"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/session-only/attempt-001.sessions/session-002.jsonl"
+    sha256: "A0042A5AECE81DCA58FAF76B42601ECFB096E4C82E091366EE21F5113E38D424"
+    lines: 13
+    source_capture_sha256: "5AD853A18943C68948733AAA01C63CB6028EB902F309F5FE92E34B46D9980F08"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/session-only/attempt-001.sessions/session-003.jsonl"
+    sha256: "E19CBF6176EA958D26DF324C84E779148696A0D5DCA2F980635D394A86412C77"
+    lines: 10
+    source_capture_sha256: "C79A82FFD6FA3D43F4DDEF6B26967DDF36C82AA25861E5850A1C27B846E2C7BC"
+  -
+    kind: "run"
+    path: "docs/evidence/phase-00/E1/raw/session-only/attempt-001.run.json"
+    sha256: "745AA34BBDE7DFC4780ACE9CB64A83804FBE50228A6D7B022B475E3349480254"
+    lines: 361
+    source_capture_sha256: null
+protected_surface:
+  unchanged: true
+  cleanup_succeeded: true
+  remaining_child_pid_count: 0
+reason_codes:
+  - "E1_SESSION_ONLY_PASS"
+limitations:
+  - "Provider counts are attributed from persisted sessions; duplicated controller stdout events are excluded."
+  - "Sanitized raw artifacts omit private prompts, reasoning, credentials, and complete provider bodies."

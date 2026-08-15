@@ -1,5 +1,12 @@
 # Repo Report — skills (anthropics/skills)
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/skills`
 > **SHA:** `b29e7cf65e5cb78a5ac33d582270551bc74a14eb`
 > **License:** **Split, verified per-file.** No root LICENSE (`ls -a` shows only

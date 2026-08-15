@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "record_type": "topic05_current_product_manifest",
+  "generated_at_utc": "2026-08-13T09:41:00.8398136Z",
+  "repository": {
+    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "dirty_paths_sha256": "32fea2f2fbadb98750fbf11678b8f1254f080cebfaefb088cc5e3c5f937d1084",
+    "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
+  },
+  "pinned_omp": {
+    "commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+    "version": "17.2.10",
+    "clean": true
+  },
+  "environment": {
+    "pwsh_version": "7.6.4",
+    "node_version": "24.16.0",
+    "git_version": "2.54.0.windows.1",
+    "installed_omp_version": "17.2.12"
+  },
+  "files": [
+    {
+      "path": "docs/evidence/current-product/topic-05/deterministic.json",
+      "role": "evidence",
+      "sha256": "8d797db25dee16b9f1f376960684e95655eb8d4add4d0176c3359a97f6ba9083"
+    },
+    {
+      "path": "docs/evidence/current-product/topic-05/model-campaign.json",
+      "role": "evidence",
+      "sha256": "06467b6413b0859fbc1e23efccc2373dfccf4c70c4db73c7693451ab7707f566"
+    },
+    {
+      "path": "docs/retrieval.md",
+      "role": "authority_or_guide",
+      "sha256": "9a9e937b93dd415dca82a2bef6c7bca799ceee476256052d97e430ba25326e03"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-13-topic-05-progressive-retrieval-codegraph-cheap-scout-design.md",
+      "role": "authority_or_guide",
+      "sha256": "852d34ba1cf0093cfad864aeb2df8af8c67376f530fb3926bc407f082197b3ca"
+    },
+    {
+      "path": "evals/retrieval/topic05/README.md",
+      "role": "test_or_fixture",
+      "sha256": "f8a4db106e104572231b3a61fa01eae67e358296b123a9a356963e79be7286bd"
+    },
+    {
+      "path": "evals/retrieval/topic05/fixtures.json",
+      "role": "test_or_fixture",
+      "sha256": "74b8d42779eb0ce1732b14a7c6ca2f61e2cdafc8fcd5754b202a166e1c3537c3"
+    },
+    {
+      "path": "scripts/cleanup-codegraph.ps1",
+      "role": "implementation",
+      "sha256": "24f24ebc03a3ad19116542e88cb7ecc3c71e6accdb43395e0ec35a4eda442b47"
+    },
+    {
+      "path": "scripts/install-template.ps1",
+      "role": "implementation",
+      "sha256": "1283cc5fcdd5e8f909ebb7f5320802cac1d6f25dbb8d188214d588f814c8d29b"
+    },
+    {
+      "path": "scripts/lib/phase00-evidence.ps1",
+      "role": "implementation",
+      "sha256": "d960ff8807efffa18e44c9932601e439d314bc4381ac57384c02f811c3dbe670"
+    },
+    {
+      "path": "scripts/lib/topic05-benchmark.ps1",
+      "role": "implementation",
+      "sha256": "f9084639163b5a23e3605f6074f8541531eaa32abd2d90516432201671101256"
+    },
+    {
+      "path": "scripts/lib/topic05-codegraph.ps1",
+      "role": "implementation",
+      "sha256": "6e741d18f7ab3904e679a7ae8edb730ef2d221013df275a5e82d05c3af49a178"
+    },
+    {
+      "path": "scripts/lib/topic05-progressive-retrieval.ps1",
+      "role": "implementation",
+      "sha256": "71b012bc5448e39927d55d958bf921bc013af057dd1a1cfd2a44f0db6220bccf"
+    },
+    {
+      "path": "scripts/provision-codegraph.ps1",
+      "role": "implementation",
+      "sha256": "9280c995557170f2f71593135f05504353349b2083a64bacf6764955273cc18b"
+    },
+    {
+      "path": "scripts/run-topic05-retrieval-benchmark.ps1",
+      "role": "implementation",
+      "sha256": "a4715674cde65803e61560de8d3215344e2801cb0748460bddf17a35098f9882"
+    },
+    {
+      "path": "scripts/tests/fixtures/topic05/fake-codegraph.mjs",
+      "role": "test_or_fixture",
+      "sha256": "ccf6418889cd3065c659796794db2edb266819ec565a01643c241ec3d9b5ed52"
+    },
+    {
+      "path": "scripts/tests/topic05-adapter.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "725631ed45fea46bd00655804c86b261920f924b102ed134d6c647c1a88efe90"
+    },
+    {
+      "path": "scripts/tests/topic05-benchmark.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "ea46d23cd18902058ee523967c835339446778750d93aaa32eb491e64b809f09"
+    },
+    {
+      "path": "scripts/tests/topic05-installer.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "88ca4463f5bc1a43087f7a0019c31784458e7793630d6029b531ffe342fcaf38"
+    },
+    {
+      "path": "scripts/tests/topic05-progressive-retrieval.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "35abf5977ed55e08d87ef6c842b08713d3301924eae5b9e975c388b1d71895d9"
+    },
+    {
+      "path": "scripts/tests/topic05-provisioning.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "5fd1237297b197535cd99589b8fdf40811ec5b062a69dd074a2e8b53b7a72d3d"
+    },
+    {
+      "path": "scripts/tests/topic05-routing.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "9637f3fc8038b0cf27e2a3c1b650e22bdc682f8ef18970c2036c8e83e53234e5"
+    },
+    {
+      "path": "scripts/tests/topic05-tool.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "9c31e847479028d1cc319ec57f78c93931ac2ba80d4726209cc4714e9febd219"
+    },
+    {
+      "path": "scripts/uninstall-template.ps1",
+      "role": "implementation",
+      "sha256": "33a7a49d600b5df6b052b8526b8d22dd71febada2696f4b06d41d3a78d94015c"
+    },
+    {
+      "path": "scripts/validate-template.ps1",
+      "role": "implementation",
+      "sha256": "b0d2c9d9f88c5e6883619591883df70420d4772e50168006d6fbc8ec80c644ed"
+    },
+    {
+      "path": "scripts/validate-topic05-progressive-retrieval.ps1",
+      "role": "implementation",
+      "sha256": "769c950f26f11305c4e43d35adee37eeb31aca9a8e2c7f75d4ca91fb19800da8"
+    },
+    {
+      "path": "spec/key/04-decision-log.md",
+      "role": "authority_or_guide",
+      "sha256": "c2b69a6a02c72cc0213b23e0b864371a58262341b765b7de7c60fda2c0f5687d"
+    },
+    {
+      "path": "template/.omp/agents/cheap-scout.md",
+      "role": "implementation",
+      "sha256": "d2a75279c8c0b271e8c4dc2e581d314d018c9101bb0234d12f07db0a795a28e4"
+    },
+    {
+      "path": "template/.omp/agents/reviewer.md",
+      "role": "implementation",
+      "sha256": "08cbb0112202f9cd33c150762e502c7c4bdace2c7703cf5a372e9189b20bd537"
+    },
+    {
+      "path": "template/.omp/codegraph/CODEGRAPH-LICENSE.txt",
+      "role": "implementation",
+      "sha256": "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809"
+    },
+    {
+      "path": "template/.omp/codegraph/COMPONENT.md",
+      "role": "implementation",
+      "sha256": "1e0ad87be70913739a4c9a7a94290dd25690c02b764501686a855199e44a5f18"
+    },
+    {
+      "path": "template/.omp/codegraph/codegraph-process.ps1",
+      "role": "implementation",
+      "sha256": "08b908709c7d15e149e73c57732c90c05473911c228c25a28c02649cf7a154b7"
+    },
+    {
+      "path": "template/.omp/codegraph/component-manifest.json",
+      "role": "implementation",
+      "sha256": "c7ebb138a9008f73277ee2968e0d6489ff394fc08710072ee1a0e237ad31f5a1"
+    },
+    {
+      "path": "template/.omp/codegraph/safe-init.mjs",
+      "role": "implementation",
+      "sha256": "46334b96e0a192c4fa790db9189825bb0df930a54643f2a2bae73d2faacadc2c"
+    },
+    {
+      "path": "template/.omp/codegraph/upstream-lock.json",
+      "role": "implementation",
+      "sha256": "9d41e53b2545782c8c01d65897f185f1898ca8b3da28dc183cd773331c84d5b4"
+    },
+    {
+      "path": "template/.omp/config.yml",
+      "role": "implementation",
+      "sha256": "5450a5bf06bc22c1390c88fde388a8deba718fa4f629fff9c98a234023429a38"
+    },
+    {
+      "path": "template/.omp/tools/codegraph-retrieve.js",
+      "role": "implementation",
+      "sha256": "71a70f404b3b33a4f4491b82960bcc1cf561d8c66b65e30ee665a14bea1e9d37"
+    }
+  ],
+  "commands": [
+    { "id": "prerequisite_validation", "exit_code": 0, "status": "PASS" },
+    { "id": "official_artifact_provision", "exit_code": 0, "status": "PASS" },
+    { "id": "artifact_receipt_reconciliation", "exit_code": 0, "status": "PASS" },
+    { "id": "real_main_retrieval", "exit_code": 0, "status": "PASS" },
+    { "id": "real_linked_retrieval", "exit_code": 0, "status": "PASS" },
+    { "id": "shared_index_refusal", "exit_code": 0, "status": "PASS" },
+    { "id": "absence_graph_retrieval", "exit_code": 0, "status": "PASS" },
+    { "id": "absence_native_rg", "exit_code": 1, "status": "EXPECTED_NO_MATCH" },
+    { "id": "source_mutation_invalidation", "exit_code": 0, "status": "PASS" },
+    { "id": "candidate_index_missing", "exit_code": 0, "status": "PASS" },
+    { "id": "rpc_tool_discovery", "exit_code": 0, "status": "PASS" },
+    { "id": "restricted_child_source_contract", "exit_code": 0, "status": "PASS" },
+    { "id": "strict_uninstall_pre_fix", "exit_code": 1, "status": "EXPECTED_FAIL" },
+    { "id": "strict_uninstall_regression_red", "exit_code": 1, "status": "EXPECTED_FAIL" },
+    { "id": "topic05_installer_tests_post_fix", "exit_code": 0, "status": "PASS" },
+    { "id": "strict_uninstall_post_fix", "exit_code": 0, "status": "PASS" },
+    { "id": "final_host_check", "exit_code": 0, "status": "PASS" },
+    { "id": "deterministic_campaign", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_provisioning_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_adapter_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_tool_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_installer_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_routing_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_benchmark_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_mutation_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic05_focused_validator_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic02_mutation_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic02_validator_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic03_deepseek_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic03_topology_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic03_installer_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic03_validator_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic04_candidate_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic04_transfer_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic04_installer_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic04_e2e_final", "exit_code": 0, "status": "PASS" },
+    { "id": "topic04_validator_final", "exit_code": 0, "status": "PASS" },
+    { "id": "phase00_pester_aggregate", "exit_code": 1, "status": "PREDECESSOR_FAIL" },
+    { "id": "full_validator_final", "exit_code": 0, "status": "PASS" },
+    { "id": "javascript_syntax_final", "exit_code": 0, "status": "PASS" },
+    { "id": "git_diff_check_final", "exit_code": 0, "status": "PASS" },
+    { "id": "manifest_convergence", "exit_code": 0, "status": "PASS" }
+  ]
+}

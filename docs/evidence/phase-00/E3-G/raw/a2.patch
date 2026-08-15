@@ -1,0 +1,7 @@
+diff --git a/a2-hook-audit.txt b/a2-hook-audit.txt
+index b40cab7..8e1597c 100644
+--- a/a2-hook-audit.txt
++++ b/a2-hook-audit.txt
+@@ -1 +1 @@
+-NOT_TRIGGERED
++BLOCKED:nested-plain/a2-blocked.txt

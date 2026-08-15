@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "experiment": "E3-L",
+  "state": "PASS",
+  "attempt": 7,
+  "supported_host": "OMP-owned default main-CLI root-session construction class",
+  "runtime_version": "omp/17.2.10",
+  "source_identity": {
+    "path": "docs/evidence/phase-00/E3-L/source-identity.json",
+    "sha256": "CE7B3DF1446788C2996521172FD2BB7B124E1DBBDB854F2E0FBD990FF5EA32FD"
+  },
+  "selected_transaction": {
+    "path": "docs/evidence/phase-00/E3-L/selected-transaction.json",
+    "sha256": "526156954A6710DC85EB7738D6D23EFA24F05F90C5696962622917B041158121"
+  },
+  "cases": [
+    {
+      "name": "L1",
+      "path": "docs/evidence/phase-00/E3-L/L1.json",
+      "sha256": "04D0AA936689376ACEA18DB0A17F8F387A7B8F981C712E296FFA634055CDBE2A"
+    },
+    {
+      "name": "L2",
+      "path": "docs/evidence/phase-00/E3-L/L2.json",
+      "sha256": "7405C652043A65C58863598C25F010D460D2121707C165030307978883D67292"
+    },
+    {
+      "name": "L3",
+      "path": "docs/evidence/phase-00/E3-L/L3.json",
+      "sha256": "C1E10E5275DDB28A6B98A315E0C74CCAE1B584667607A7BDCD1DAB5A733F2CBD"
+    }
+  ],
+  "claim": "The approved proxy observes live effective task.isolation.apply for the OMP-owned default main-CLI root-session class on pinned 17.2.10.",
+  "authority": "host-scoped observation only",
+  "parallel_authorized": false,
+  "parallel_mode_after": "DISABLED",
+  "e3_m_replaced": false,
+  "non_claims": [
+    "This result is not a universal OMP host claim.",
+    "A live read is not an atomic guarded dispatch.",
+    "E3-L PASS does not authorize parallel fan-out or replace E3-M."
+  ],
+  "incomplete_markers": []
+}

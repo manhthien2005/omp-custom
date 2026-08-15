@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_fixture_cases",
+  "category": "promotion",
+  "cases": [
+    {
+      "id": "E-MISSING-TELEMETRY",
+      "kind": "promotion",
+      "input": {
+        "promotion": {
+          "campaign": {
+            "environment_status": "PASS",
+            "phase": "final",
+            "evidence_budget_exhausted": false,
+            "frozen_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "observed_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "frozen_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "observed_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "look_declared": true,
+            "inference_method": "anytime_valid",
+            "alpha_allocation_complete": true,
+            "joint_false_promotion_probability": 0.05,
+            "pilot_included_in_frozen_plan": false
+          },
+          "hard_gates": {
+            "operational_fixtures_pass": true,
+            "acceptance_criteria_coverage_complete": true,
+            "new_false_completions": 0,
+            "blocking_regressions": 0,
+            "acceptance_rate_not_lower": true,
+            "ledgers_coherent": true,
+            "baseline_identities_coherent": true
+          },
+          "summary": {
+            "observed_acceptance_rate_delta": 0.02,
+            "acceptance_rate_lower_bound": -0.03,
+            "token_improvement_fraction": 0.12,
+            "token_improvement_lower_bound": 0.01,
+            "token_ratio_upper_bound": 0.88
+          },
+          "sequential_evidence": {
+            "measured": false,
+            "promotion_bounds_valid": true
+          }
+        }
+      },
+      "expected": {
+        "verdict": "DEFER_INCONCLUSIVE",
+        "reasons": ["required_ledger_not_measured"],
+        "eligible": false
+      }
+    },
+    {
+      "id": "E-PILOT-CANNOT-PROMOTE",
+      "kind": "promotion",
+      "input": {
+        "promotion": {
+          "campaign": {
+            "environment_status": "PASS",
+            "phase": "pilot",
+            "evidence_budget_exhausted": false,
+            "frozen_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "observed_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "frozen_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "observed_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "look_declared": true,
+            "inference_method": "anytime_valid",
+            "alpha_allocation_complete": true,
+            "joint_false_promotion_probability": 0.05,
+            "pilot_included_in_frozen_plan": false
+          },
+          "hard_gates": {
+            "operational_fixtures_pass": true,
+            "acceptance_criteria_coverage_complete": true,
+            "new_false_completions": 0,
+            "blocking_regressions": 0,
+            "acceptance_rate_not_lower": true,
+            "ledgers_coherent": true,
+            "baseline_identities_coherent": true
+          },
+          "summary": {
+            "observed_acceptance_rate_delta": 0.02,
+            "acceptance_rate_lower_bound": -0.03,
+            "token_improvement_fraction": 0.12,
+            "token_improvement_lower_bound": 0.01,
+            "token_ratio_upper_bound": 0.88
+          },
+          "sequential_evidence": {
+            "measured": true,
+            "promotion_bounds_valid": true
+          }
+        }
+      },
+      "expected": {
+        "verdict": "DEFER_INCONCLUSIVE",
+        "reasons": ["pilot_cannot_promote"],
+        "eligible": false
+      }
+    },
+    {
+      "id": "E-EFFICIENCY-WIN",
+      "kind": "promotion",
+      "input": {
+        "promotion": {
+          "campaign": {
+            "environment_status": "PASS",
+            "phase": "final",
+            "evidence_budget_exhausted": false,
+            "frozen_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "observed_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "frozen_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "observed_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "look_declared": true,
+            "inference_method": "finite_alpha_spending",
+            "alpha_allocation_complete": true,
+            "joint_false_promotion_probability": 0.05,
+            "pilot_included_in_frozen_plan": false
+          },
+          "hard_gates": {
+            "operational_fixtures_pass": true,
+            "acceptance_criteria_coverage_complete": true,
+            "new_false_completions": 0,
+            "blocking_regressions": 0,
+            "acceptance_rate_not_lower": true,
+            "ledgers_coherent": true,
+            "baseline_identities_coherent": true
+          },
+          "summary": {
+            "observed_acceptance_rate_delta": 0.02,
+            "acceptance_rate_lower_bound": -0.03,
+            "token_improvement_fraction": 0.12,
+            "token_improvement_lower_bound": 0.01,
+            "token_ratio_upper_bound": 0.88
+          },
+          "sequential_evidence": {
+            "measured": true,
+            "promotion_bounds_valid": true
+          }
+        }
+      },
+      "expected": {
+        "verdict": "PROMOTE_EFFICIENCY",
+        "reasons": ["efficiency_path_clear"],
+        "eligible": true
+      }
+    },
+    {
+      "id": "E-QUALITY-WIN",
+      "kind": "promotion",
+      "input": {
+        "promotion": {
+          "campaign": {
+            "environment_status": "PASS",
+            "phase": "final",
+            "evidence_budget_exhausted": false,
+            "frozen_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "observed_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "frozen_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "observed_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "look_declared": true,
+            "inference_method": "equivalent_joint_sequential",
+            "alpha_allocation_complete": true,
+            "joint_false_promotion_probability": 0.04,
+            "pilot_included_in_frozen_plan": false
+          },
+          "hard_gates": {
+            "operational_fixtures_pass": true,
+            "acceptance_criteria_coverage_complete": true,
+            "new_false_completions": 0,
+            "blocking_regressions": 0,
+            "acceptance_rate_not_lower": true,
+            "ledgers_coherent": true,
+            "baseline_identities_coherent": true
+          },
+          "summary": {
+            "observed_acceptance_rate_delta": 0.08,
+            "acceptance_rate_lower_bound": 0.01,
+            "token_improvement_fraction": 0.02,
+            "token_improvement_lower_bound": -0.02,
+            "token_ratio_upper_bound": 1.08
+          },
+          "sequential_evidence": {
+            "measured": true,
+            "promotion_bounds_valid": true
+          }
+        }
+      },
+      "expected": {
+        "verdict": "PROMOTE_QUALITY",
+        "reasons": ["quality_path_clear"],
+        "eligible": true
+      }
+    },
+    {
+      "id": "E-POSTHOC-THRESHOLD",
+      "kind": "promotion",
+      "input": {
+        "promotion": {
+          "campaign": {
+            "environment_status": "PASS",
+            "phase": "final",
+            "evidence_budget_exhausted": false,
+            "frozen_threshold_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "observed_threshold_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "frozen_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "observed_plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "look_declared": true,
+            "inference_method": "anytime_valid",
+            "alpha_allocation_complete": true,
+            "joint_false_promotion_probability": 0.05,
+            "pilot_included_in_frozen_plan": false
+          },
+          "hard_gates": {
+            "operational_fixtures_pass": true,
+            "acceptance_criteria_coverage_complete": true,
+            "new_false_completions": 0,
+            "blocking_regressions": 0,
+            "acceptance_rate_not_lower": true,
+            "ledgers_coherent": true,
+            "baseline_identities_coherent": true
+          },
+          "summary": {
+            "observed_acceptance_rate_delta": 0.02,
+            "acceptance_rate_lower_bound": -0.03,
+            "token_improvement_fraction": 0.12,
+            "token_improvement_lower_bound": 0.01,
+            "token_ratio_upper_bound": 0.88
+          },
+          "sequential_evidence": {
+            "measured": true,
+            "promotion_bounds_valid": true
+          }
+        }
+      },
+      "expected": {
+        "verdict": "REJECT",
+        "reasons": ["threshold_identity_mismatch"],
+        "eligible": false
+      }
+    }
+  ]
+}

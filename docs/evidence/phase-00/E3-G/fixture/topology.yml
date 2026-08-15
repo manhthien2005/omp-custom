@@ -1,0 +1,15 @@
+schema_version: 1
+root_repository:
+  head_core_attempt: fba368a8aebd7ec0050125975123c019dae101cc
+  tracked_files: [root.txt, nested-presence.json]
+repositories:
+  - {path: tracked-submodule, kind: tracked_submodule, baseline_file: sub.txt, baseline_content: E3_G_SUBMODULE_BASE}
+  - {path: nested-plain, kind: plain_nested_repo, baseline_file: nested.txt, baseline_content: E3_G_PLAIN_BASE}
+  - {path: deep/level/two, kind: plain_nested_repo_two_levels_deep, baseline_file: deep.txt, baseline_content: E3_G_DEEP_BASE}
+  - {path: node_modules/pkg, kind: plain_nested_repo_under_node_modules, baseline_file: module.txt, baseline_content: E3_G_NODE_MODULES_BASE}
+construction:
+  - Initialize and commit each nested repository independently.
+  - Initialize and commit the root fixture.
+  - Add tracked-submodule with git submodule add using the local committed source.
+  - Keep the three non-submodule nested repositories ignored by the root.
+  - The selected core attempt clones all four repositories independently inside the isolation worktree before mutation because Windows rcopy does not materialize ignored nested repositories.

@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "record_type": "topic08_deterministic_evidence",
+  "generated_at_utc": "2026-08-14T05:04:39.0628313Z",
+  "status": "IMPLEMENTED_NOT_PROMOTED",
+  "component": "behavior-core",
+  "component_version": "1.0.0",
+  "omp_source_sha": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+  "source_attachment_count": 11,
+  "provider_calls": 0,
+  "adapters": {
+    "omp": {
+      "status": "IMPLEMENTED_NOT_PROMOTED",
+      "installable": true
+    },
+    "claude": {
+      "status": "DESIGNED_NOT_VERIFIED",
+      "installable": false
+    }
+  },
+  "runtime_matrix": [
+    {
+      "version": "17.2.12",
+      "available": true,
+      "path": "C:\\Users\\MrThien\\AppData\\Local\\omp\\omp.exe",
+      "canary": "PASS"
+    },
+    {
+      "version": "17.2.10",
+      "available": false,
+      "path": null,
+      "canary": "UNAVAILABLE_NO_DOWNLOAD"
+    }
+  ],
+  "checks": [
+    {
+      "name": "topic08-node",
+      "command": "node --test scripts/tests/topic08-behavior-core.Tests.mjs scripts/tests/topic08-skill-contracts.Tests.mjs scripts/tests/topic08-agent-tasks-tool.Tests.mjs scripts/tests/topic08-behavior-gates.Tests.mjs",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "ℹ duration_ms 100.1487"
+    },
+    {
+      "name": "topic08-installer",
+      "command": "pwsh -NoProfile -File scripts/tests/topic08-installer.Tests.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS: Topic 08 installer (19 assertions)."
+    },
+    {
+      "name": "topic08-validator-mutations",
+      "command": "pwsh -NoProfile -File scripts/tests/topic08-validator-mutations.Tests.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS: Topic 08 validator mutations (18 assertions)."
+    },
+    {
+      "name": "topic08-focused-no-evidence",
+      "command": "pwsh -NoProfile -File scripts/validate-topic08-behavior-core.ps1 -RepositoryRoot .",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "Topic 08 focused validation: 17 PASS, 0 WARN, 0 FAIL"
+    },
+    {
+      "name": "topic08-lock-check",
+      "command": "pwsh -NoProfile -File scripts/update-skill-lock.ps1 -RepositoryRoot . -Check",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "Behavior and component locks are current (3 active skills)."
+    },
+    {
+      "name": "omp-17.2.12-discovery-canary",
+      "command": "node --test scripts/tests/topic06-agent-contracts.Tests.mjs",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "ℹ duration_ms 1197.6551"
+    }
+  ],
+  "open_items": [
+    {
+      "code": "OPEN-T07-RUNTIME-02",
+      "owner": "Topic 07",
+      "disposition": "retained"
+    },
+    {
+      "code": "TOPIC11-SEMANTIC-PROMOTION",
+      "owner": "Topic 11",
+      "disposition": "not_promoted"
+    }
+  ]
+}

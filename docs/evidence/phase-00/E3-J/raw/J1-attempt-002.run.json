@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "case": "J1",
+  "attempt": 2,
+  "experiment": "E3-J",
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>"
+  },
+  "fixture_commit": "19327e6dc185076437ef421e5f32fd72b7acb6a8",
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_ROOT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--config",
+    "<DISPOSABLE_ROOT>/config.yml",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "8m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:J1-blocking-batch.md>"
+  ],
+  "exit_code": 1,
+  "started_at": "2026-08-08T23:10:15.8342698+07:00",
+  "completed_at": "2026-08-08T23:10:18.4462109+07:00",
+  "duration_ms": 2612,
+  "cleanup_succeeded": true,
+  "cleanup_failure_count": 0,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "2903b21818511ed056940ae6c177ae1ea83103c83cee8e14abe9e757d909a1c2",
+    "after_sha256": "2903b21818511ed056940ae6c177ae1ea83103c83cee8e14abe9e757d909a1c2",
+    "changed_count": 0,
+    "boundary_result": "PASS_LIVE_HOME_READ_ONLY"
+  },
+  "analysis": {
+    "Status": "BLOCKED_ENVIRONMENT",
+    "Reasons": [
+      "OMP_EXIT_1"
+    ]
+  }
+}

@@ -1,8 +1,38 @@
 # 02 — Runtime Semantics
 
+## Selected Topic 04 lifecycle reducer (KD-028)
+
+`state/agent-tasks.ps1` is the only reducer for immutable init/status, phase/task creation, worktree binding,
+checkpoint, work-unit outcome, freeze/check, artifact/evidence, handoff/takeover, terminal close,
+invalidation, cleanup/restore/purge, lock recovery, and migration. Every mutation uses a lock plus
+expected revision, revision hash, and lease generation; mismatch refuses without merging.
+There is no heartbeat TTL and no automatic takeover. Normal handoff is two-phase structured transfer;
+crash takeover needs explicit structured user authority. Topic 04 uses the manual shared core;
+automatic lifecycle attachment remains gated to Topic 08.
+
+## Selected Topic 07 runtime semantics (KD-031)
+
+The `agent-boundary` component v2 installs `context-continuity.js` last with an exact runtime-only
+profile: `contextPromotion.enabled=false`, `compaction.enabled=false`, `strategy=off`, automatic
+thresholds disabled, `autoContinue=false`, and remote/idle/mid-turn paths disabled. The extension
+registers argument-free `/safe-compact`; only a single-use nonce from that command may pass
+`session_before_compact`, and the command calls native `ctx.compact({ mode: "soft" })` once.
+`project-continuity` derives exactly one active task from the persisted OMP session identity.
+Before ordinary provider dispatch the adapter rechecks settings, authority, epoch/kernel binding,
+and context pressure. Failure aborts rather than silently continuing. Bounded subagents inherit
+the disabled profile, cannot compact, and settle pressure as failed/partial without auto-retry.
+
 > OPUS PROPOSED SPEC v1 | Every omp-custom component mapped to a real OMP primitive.
 > **All claims below are verified against OMP source at `_research/upstreams/oh-my-pi`.**
 > Citations are `file:line`. Nothing in this document is inference.
+>
+> Former worker names and counts below describe the frozen Phase 00 baseline only; they are
+> runtime observations, not topology authority. The Topic 03-selected manifest owns current
+> worker names and count; Phase 02 owns runtime projection.
+>
+> **Current manifest:** exactly `cheap-scout`, `worker`, and `reviewer`. `tech-lead`, `explorer`,
+> `implementer`, and `verifier` must be absent from agent discovery. Current-product evidence
+> supersedes the Phase 00 roster for runtime acceptance without rewriting historical bytes.
 
 ---
 
@@ -114,13 +144,13 @@ return undefined;
 `getKnownRoleIds` (`model-roles.ts:87`) explicitly folds in every key of
 `settings.getModelRoles()`, confirming custom roles are a designed feature.
 
-This makes `model: "@explorer"` correct **if and only if** `config.yml` ships a
-`modelRoles.explorer` entry. omp-custom's `config.yml` does define all five, so
-the pairing is coherent. The fragility is the coupling: installing `agents/`
-without `config.yml` (which the installer's `-Components` flag permits) leaves
-every `@role` unresolvable. When resolution fails the alias is not an error — it
-returns `undefined` and falls through to default-model inheritance, so the failure
-is **silent**: workers keep running on the wrong model with no diagnostic.
+This makes `model: "@explorer"` correct **if and only if** the effective settings ship a
+matching `modelRoles.explorer` entry. Phase-00 E2 supersedes the earlier fall-through
+hypothesis: missing or unknown aliases and unavailable models fail with no fallback; project
+configuration wins over the global value. Missing and unknown aliases hard-error before
+session creation, while an alias mapped to an unavailable model resolves first and then
+surfaces the downstream error. The installer and L1 therefore validate every alias referenced
+by the selected manifest before dispatch.
 
 ---
 
@@ -167,20 +197,30 @@ never passes `isolated`.
 
 ## F. LSP in Subagents
 
-`task.enableLsp` default is **`false`** (`settings-schema.ts:4617`), described as
-*"Allow subagents spawned via the task tool to use the lsp tool. Off by default to
-keep subagents cheap."* The spec author's development environment set it `true`; **that is not a
-property of OMP or of any install (CR-40)** — the project install must own the key. See
-`07-retrieval-and-code-understanding.md §A-1`.
+Source-verified LSP availability is a **four-condition conjunction**: per-agent allowlist,
+`task.enableLsp`, parent session not disabled and not plan mode, and `lsp.enabled`.
 
-Gate: `lsp/index.ts:1639` — `session.enableLsp === false ? null : new LspTool(session)`.
+- `task/structured-subagent.ts:318-320` combines plan mode, parent `enableLsp`, and
+  `task.enableLsp`; the latter defaults **`false`** (`settings-schema.ts:4617`).
+- `tools/index.ts:593` separately requires `lsp.enabled == true` before registering the
+  built-in tool.
+- `task/executor.ts:2675-2678` supplies the selected agent's `tools:` allowlist.
 
-But the tool must *also* be in the agent's `tools:` allowlist. **No omp-custom agent
-lists `lsp`.** Meanwhile `explorer.md`'s body instructs: *"Use LSP hover, references,
-and grep before reading full files."* The Explorer is told to use a tool it cannot
-call. It will fall back to `grep`/`read` — precisely the full-file reads the
-instruction exists to prevent, while `read-summarize: false` removes the safety net
-that would have bounded those reads.
+All four effective gates are source-verified independently. The spec author's development
+environment setting `task.enableLsp: true` is not a property of OMP or any install (CR-40).
+The project install owns that key only when the selected contract consumes LSP; parent/plan
+state and CR-41 remain effective-runtime checks. See `07-retrieval-and-code-understanding.md
+§A-1`.
+
+A registered LSP tool may still return details.success false when no language server applies;
+that result cannot satisfy a selected symbol-aware contract. In the pinned runtime, no matching
+or configured server returns ordinary content with `details.success: false`
+(`lsp/index.ts:2145-2160`) rather than preventing the worker from yielding a plausible result.
+The coordinator therefore validates required LSP call outcomes, not tool registration alone.
+
+No frozen-baseline omp-custom agent lists `lsp`, while `explorer.md` instructs LSP use. That
+instruction is unsatisfiable under its current allowlist; OMP cannot expose the tool through
+that worker definition.
 
 ---
 
@@ -231,13 +271,17 @@ verification must read `_research/upstreams/oh-my-pi` or raw.githubusercontent.c
 Genuinely unresolved after source reading — each needs a live experiment, not more
 code reading.
 
+OQ-3 is closed by pinned source: child depth 1 retains task, while child depth 2 reaches the
+default maxRecursionDepth and loses task. The executor computes `childDepth = parentDepth + 1`
+and strips `task` when `childDepth >= maxRecursionDepth` (`task/executor.ts:2655-2687`), so no
+live experiment is needed to establish the default depth boundary.
+
 | OQ | Question | Why source reading was insufficient | Experiment |
 |---|---|---|---|
 | OQ-1 | Does `alwaysApply: true` propagate a skill into *subagent* contexts, or only the main session? | Skill injection is assembled in the system-prompt builder; subagent prompt assembly is a separate path not traced. | Set `alwaysApply` on a marker skill, spawn a worker, inspect its rendered prompt. |
 | OQ-2 | With `isolation.mode=auto` on Windows/ProjFS, does `isolated: true` succeed or silently degrade? | Backend selection is native (`pi-iso`), not readable from TS. | Run two isolated writers on the target volume; confirm patch-merge isolation. |
-| OQ-3 | Is `task.maxRecursionDepth=2` counted from the main session or the first subagent? | Depth accounting lives in the executor across several call paths. | Nest `task` three levels; observe which level is refused. |
 | OQ-4 | Does a `tools:` allowlist hard-*block* an unlisted tool, or merely omit it from the schema? | Registry filtering is visible; enforcement on a fabricated call is not. | Have a worker emit a call for an unlisted tool; observe error vs silent drop. |
 
-Note OQ-1 through OQ-4 are deliberately narrower than the previous draft's OQ list:
+The remaining OQ-1, OQ-2, and OQ-4 are deliberately narrower than the previous draft's OQ list:
 the earlier OQ-1/OQ-2/OQ-5 (frontmatter fields, custom roles) are now **closed** by
 §B and §C above.

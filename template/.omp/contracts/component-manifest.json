@@ -1,0 +1,212 @@
+{
+  "schema_version": 2,
+  "record_type": "agent_boundary_component_manifest",
+  "component": "agent-boundary",
+  "component_version": "2.1.0",
+  "minimum_pwsh_version": "7.4.0",
+  "supported_omp_versions": [
+    "17.2.10",
+    "17.2.12"
+  ],
+  "role_policy": {
+    "soft_request_budget": 200,
+    "forced_partial_requests": 300,
+    "agents": {
+      "cheap-scout": {
+        "role": "cheap_scout",
+        "model_role": "cheap-scout",
+        "primary_model": "omniroute/ds/deepseek-v4-flash",
+        "fallback_model": "omniroute/ds/deepseek-v4-pro",
+        "effort": "xhigh",
+        "blocking": true,
+        "spawns": [],
+        "tools": [
+          "read",
+          "grep",
+          "glob",
+          "web_search"
+        ]
+      },
+      "worker": {
+        "role": "worker",
+        "model_role": "worker",
+        "primary_model": "omniroute/codex/gpt-5.6-sol",
+        "fallback_model": null,
+        "default_effort": "high",
+        "efforts": [
+          "high",
+          "xhigh"
+        ],
+        "blocking": true,
+        "spawns": [],
+        "tools": [
+          "read",
+          "grep",
+          "glob",
+          "edit",
+          "write",
+          "bash"
+        ]
+      },
+      "reviewer": {
+        "role": "reviewer",
+        "model_role": "reviewer",
+        "primary_model": "omniroute/codex/gpt-5.6-sol",
+        "fallback_model": null,
+        "effort": "xhigh",
+        "blocking": true,
+        "spawns": [],
+        "tools": [
+          "read",
+          "grep",
+          "glob",
+          "bash"
+        ]
+      }
+    }
+  },
+  "continuity_policy": {
+    "command": "safe-compact",
+    "automatic_semantic_compaction": false,
+    "context_promotion": false,
+    "keep_recent_tokens": 20000,
+    "nonce_ttl_ms": 120000,
+    "max_kernel_bytes": 16384,
+    "max_recovery_artifact_bytes": 262144,
+    "pressure_default_reserve_tokens": 16384
+  },
+  "dependencies": [
+    {
+      "component": "agents",
+      "paths": [
+        ".omp/agents/cheap-scout.md",
+        ".omp/agents/worker.md",
+        ".omp/agents/reviewer.md"
+      ]
+    },
+    {
+      "component": "skills",
+      "paths": [
+        ".omp/skills/task-triage/SKILL.md",
+        ".omp/skills/systematic-debugging/SKILL.md",
+        ".omp/skills/evidence-before-completion/SKILL.md"
+      ]
+    },
+    {
+      "component": "state",
+      "path": ".omp/state/manifest.json",
+      "schema_version": 1,
+      "record_type": "agent_tasks_component_manifest"
+    },
+    {
+      "component": "config",
+      "path": ".omp/config.yml"
+    }
+  ],
+  "files": [
+    {
+      "path": ".omp/contracts/agent-boundary-schema.mjs",
+      "sha256": "c97c6a9f2c2f42fa14a47da7721b03bd97bb7e322b5ec5a2bb0db34a2dbefa5a",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/agent-boundary-core.mjs",
+      "sha256": "7ced6f22fa176cf8e0746288db736cc095d417d4f7ef2b20c3570509ebbadc1a",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/agent-boundary-cli.mjs",
+      "sha256": "dcc5b6615c7295f47810874c5df462a584f7e848ce42547acfcf2d601a9e0bef",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/managed-state-client.mjs",
+      "sha256": "1d280c87c03f5e18e81334ba77bdef24fbc7bf78e32745207300d90890532012",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/behavior-core-schema.mjs",
+      "sha256": "b1ad4702663a8d858d2e6d4a2692000bb8fd3e5504116a70bfa8fa011a7f6360",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/behavior-core.mjs",
+      "sha256": "291134536c3f3826f39cd2e851d33e65f5c8bdf4bb1ca8a8a79e362875e48cc4",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/behavior-manifest.json",
+      "sha256": "ce440439a21d7219da2913929068fe513845c96b82b4d520e9338e0b13bbfd9d",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/context-continuity-schema.mjs",
+      "sha256": "d90f7828cf0ebfbf452efc6ba4fc86d67a656863d43e1df2b3f692cbddc57075",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/context-continuity-core.mjs",
+      "sha256": "6f3dc095466fe8a254c0d3ed175f14479ac6bc5cd15173921d56ea80c26df78c",
+      "owned": true
+    },
+    {
+      "path": ".omp/contracts/managed-runtime.yml",
+      "sha256": "62fea53740dd24e1fcde047651f7b58e5dfa8b249bc506f82c3adefdb95f6690",
+      "owned": true
+    },
+    {
+      "path": ".omp/extensions/agent-task-boundary.js",
+      "sha256": "6ff3e6b04f933c89b78c3191f2cdb9f94752fa40dba8d18496c8bbe969c67f5a",
+      "owned": true
+    },
+    {
+      "path": ".omp/extensions/context-continuity.js",
+      "sha256": "4849c7985b42acac41e9aef829009d2d6c97ba7629e1be9154cb7d4bef5584c8",
+      "owned": true
+    },
+    {
+      "path": ".omp/bin/omp-managed.ps1",
+      "sha256": "b664b5e1047988622af2de30695af1be85b4aa0d679178f4eccdf3a999f0d4bc",
+      "owned": true
+    },
+    {
+      "path": ".omp/agents/cheap-scout.md",
+      "sha256": "d2a75279c8c0b271e8c4dc2e581d314d018c9101bb0234d12f07db0a795a28e4",
+      "owned": false
+    },
+    {
+      "path": ".omp/agents/worker.md",
+      "sha256": "51ff4442c1e8f262cdcf6b2b423b72e06335292e3fd7799a14aee9c690c9895c",
+      "owned": false
+    },
+    {
+      "path": ".omp/agents/reviewer.md",
+      "sha256": "08cbb0112202f9cd33c150762e502c7c4bdace2c7703cf5a372e9189b20bd537",
+      "owned": false
+    },
+    {
+      "path": ".omp/skills/task-triage/SKILL.md",
+      "sha256": "2b8c38d24dcbecc8336dea0a16766387de9385cd952d28ea480da3c23a0092ea",
+      "owned": false
+    },
+    {
+      "path": ".omp/skills/systematic-debugging/SKILL.md",
+      "sha256": "2c501983a6b7c48781f8e414424fbc700d6d88c299ee0021e69ec0320d24f1ba",
+      "owned": false
+    },
+    {
+      "path": ".omp/skills/evidence-before-completion/SKILL.md",
+      "sha256": "fc89c5e73205f961d8bf383771c943c7afc9181d1cb91ca81ae639bc3c7b0613",
+      "owned": false
+    },
+    {
+      "path": ".omp/state/manifest.json",
+      "sha256": "b70bc7b4a314088679c0d07026cb30efd7d5ea2ea64b7c6cce4c84522064cd26",
+      "owned": false
+    }
+  ],
+  "generated_target_files": [
+    ".omp/contracts/runtime.json",
+    ".omp/contracts/install-record.json"
+  ]
+}

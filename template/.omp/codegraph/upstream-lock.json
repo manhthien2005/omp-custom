@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "upstream": "colbymchenry/codegraph",
+  "release_url": "https://github.com/colbymchenry/codegraph/releases/tag/v1.5.0",
+  "version": "1.5.0",
+  "tag": "v1.5.0",
+  "commit": "ea72e1b190921232aa7bd02e96bef5bbe4fe0ab6",
+  "license": "MIT",
+  "license_file": {
+    "repository_path": "LICENSE",
+    "sha256": "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809"
+  },
+  "download_origin": "https://github.com/colbymchenry/codegraph/releases/download/v1.5.0/",
+  "allowed_final_hosts": [
+    "github.com",
+    "release-assets.githubusercontent.com"
+  ],
+  "checksum_asset": {
+    "name": "SHA256SUMS",
+    "sha256": "434166207a163b5fe40f0052df5ea20be1e4ba56d7b4eaa00795cc75c8c0f3ed"
+  },
+  "artifacts": [
+    {
+      "platform": "darwin-arm64",
+      "name": "codegraph-darwin-arm64.tar.gz",
+      "size": 56627196,
+      "sha256": "cf5ee435a6e44d097b2f98f2b7b8b9422bb1094844404efed82519c5da1af2cf"
+    },
+    {
+      "platform": "darwin-x64",
+      "name": "codegraph-darwin-x64.tar.gz",
+      "size": 57729407,
+      "sha256": "0a0ccc29bf7da9d10be1458d89d7e15c55927ae24cd95e9fa3de4bdfea059dde"
+    },
+    {
+      "platform": "linux-arm64",
+      "name": "codegraph-linux-arm64.tar.gz",
+      "size": 61327175,
+      "sha256": "9f17750aedf45d51f68caae39ed21d6e2a7290b2326e5c53f95a165918ebd1d8"
+    },
+    {
+      "platform": "linux-x64",
+      "name": "codegraph-linux-x64.tar.gz",
+      "size": 61744667,
+      "sha256": "2ba65e87a1210b706bb1e67d5e48b5fc4a1935e43dbb3fb5f31c5597840d2e58"
+    },
+    {
+      "platform": "win32-arm64",
+      "name": "codegraph-win32-arm64.zip",
+      "size": 48389210,
+      "sha256": "de125e792b5eed7dee8def2ab9bd7e762f372012f75f595e59d3b0c8714b0d55"
+    },
+    {
+      "platform": "win32-x64",
+      "name": "codegraph-win32-x64.zip",
+      "size": 52398062,
+      "sha256": "d6798622b4f44ee6757c94335f437ee27a9ff7d3537b554cb6a2b3baf11bc4a1"
+    }
+  ]
+}

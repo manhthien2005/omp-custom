@@ -23,6 +23,10 @@
    a context), `persistent` (every turn), `lazy` (on invocation), `per-spawn`, `per-action`.
 6. **Do not edit any file outside your own report.** Not the spec, not the registry, not
    another repo's report. Propose; do not apply.
+7. **Every repository report repeats its own authority boundary; a folder-level notice is
+   insufficient.** The report is source/research evidence. Its former role names, counts,
+   verdicts, and adoption labels cannot select current topology, dispatch, review, or
+   capability behavior.
 
 ---
 

@@ -1,0 +1,5 @@
+{
+  "sentinel": "E3_G_A2_BLOCK_OBSERVED",
+  "blocked": true,
+  "details": "Phase00 nested-path guard blocked nested-plain/a2-blocked.txt"
+}

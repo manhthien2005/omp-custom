@@ -1,0 +1,179 @@
+schema_version: 1
+phase: "00"
+normative_spec: spec/phases/phase-00-foundation.md
+parallel_mode: DISABLED
+entries:
+  - id: T-00.1
+    kind: foundation
+    state: PASS
+    depends_on: []
+    artifacts: [registry/upstreams.yml]
+    decision: "OMP source authority pinned with thirteen watched paths"
+  - id: T-00.2
+    kind: foundation
+    state: PASS
+    depends_on: [T-00.1]
+    artifacts: [registry/omp-compatibility.yml]
+    decision: "Verified claims mapped to pinned source anchors"
+  - id: T-00.3
+    kind: foundation
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/T-00.3/conclusion.yml]
+    decision: "Five inert policy YAML sources removed from the installed surface; canonical content re-homed to real consumers and human references; chars/4 budget checks remain advisory, not exact token enforcement"
+  - id: T-00.4
+    kind: foundation
+    state: NOT_STARTED
+    depends_on: [E1]
+    artifacts: []
+    decision: null
+  - id: T-00.5
+    kind: foundation
+    state: NOT_STARTED
+    depends_on: [T-00.3, T-00.4]
+    artifacts: []
+    decision: null
+  - id: T-00.6
+    kind: foundation
+    state: NOT_STARTED
+    depends_on: [T-00.4]
+    artifacts: []
+    decision: null
+  - id: T-00.7
+    kind: foundation
+    state: NOT_STARTED
+    depends_on: [E1, E2, E3-A, E3-B, E3-C, E3-D, E3-E, E3-F, E3-G, E3-H, E3-I, E3-J, E3-K, E3-L, E4, E5-A, E5-B, E5-C, E5-D, E5-E, E5-F]
+    artifacts: []
+    decision: null
+  - id: E1
+    kind: experiment
+    state: READY
+    depends_on: []
+    artifacts: []
+    decision: null
+  - id: E2
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E2/case-1-built-in-role.yml, docs/evidence/phase-00/E2/case-2-custom-role.yml, docs/evidence/phase-00/E2/case-3-missing-custom-role.yml, docs/evidence/phase-00/E2/case-4-arbitrary-unknown-role.yml, docs/evidence/phase-00/E2/case-5-unavailable-model.yml, docs/evidence/phase-00/E2/case-6-user-project-precedence.yml, docs/evidence/phase-00/E2/case-7-built-in-collision.yml, docs/evidence/phase-00/E2/case-8-main-vs-worker.yml, docs/evidence/phase-00/E2/conclusion.yml]
+    decision: "All eight model-role cases PASS; missing aliases hard-fail, project overrides global, configured default wins collision, and main/worker paths resolve exact configured values without fallback"
+  - id: E3-A
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E3-A/A1.yml, docs/evidence/phase-00/E3-A/A2.yml, docs/evidence/phase-00/E3-A/A3.yml, docs/evidence/phase-00/E3-A/A4.yml, docs/evidence/phase-00/E3-A/conclusion.yml]
+    decision: "A1-A4 prove exact reads, cwd sensitivity, supported task wire, and per-item apply non-authority"
+  - id: E3-B
+    kind: experiment
+    state: PASS
+    depends_on: [E3-A, E3-H]
+    artifacts: [docs/evidence/phase-00/E3-B/B1.yml, docs/evidence/phase-00/E3-B/conclusion.yml]
+    decision: "Capture-only root patch remains readable after teardown, leaves parent unchanged, and applies cleanly to a fresh clone"
+  - id: E3-C
+    kind: experiment
+    state: PASS
+    depends_on: [E3-A, E3-H]
+    artifacts: [docs/evidence/phase-00/E3-C/C1.yml, docs/evidence/phase-00/E3-C/conclusion.yml]
+    decision: "Branch mode retains omp/task/e3c-branch with the isolated change and does not merge it into the parent"
+  - id: E3-D
+    kind: experiment
+    state: PASS
+    depends_on: [E3-B]
+    artifacts: [docs/evidence/phase-00/E3-D/D1.yml, docs/evidence/phase-00/E3-D/conclusion.yml]
+    decision: "Two overlapping isolated workers produced independent durable patches while 56 parent polls observed no change"
+  - id: E3-E
+    kind: experiment
+    state: PASS
+    depends_on: [E3-D, E3-J]
+    artifacts: [docs/evidence/phase-00/E3-E/E1.yml, docs/evidence/phase-00/E3-E/conclusion.yml]
+    decision: "Controlled completion order 2-0-1 produced durable artifacts that integrated successfully in original task-index order 0-1-2"
+  - id: E3-F
+    kind: experiment
+    state: PASS
+    depends_on: [E3-E]
+    artifacts: [docs/evidence/phase-00/E3-F/F1.yml, docs/evidence/phase-00/E3-F/conclusion.yml]
+    decision: "Stop-on-conflict preserved task[0], skipped task[2], and retained readable task[1]/task[2] artifacts"
+  - id: E3-G
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E3-G/G1.yml, docs/evidence/phase-00/E3-G/G2.yml, docs/evidence/phase-00/E3-G/G3.yml, docs/evidence/phase-00/E3-G/conclusion.yml]
+    decision: "Nested changes are not durable/model-addressable on successful apply=false; Option A1 remains normative, while A2 is diagnostic-only"
+  - id: E3-H
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E3-H/H1.yml, docs/evidence/phase-00/E3-H/H2.yml, docs/evidence/phase-00/E3-H/H3.yml, docs/evidence/phase-00/E3-H/H4.yml, docs/evidence/phase-00/E3-H/H5.yml, docs/evidence/phase-00/E3-H/H6.yml, docs/evidence/phase-00/E3-H/conclusion.yml]
+    decision: "H1-H6 prove precedence, cwd/tool diagnostics, and fail-closed refusal controls"
+  - id: E3-I
+    kind: experiment
+    state: PASS
+    depends_on: [E3-A, E3-H]
+    artifacts: [docs/evidence/phase-00/E3-I/I1.yml, docs/evidence/phase-00/E3-I/I2.yml, docs/evidence/phase-00/E3-I/I3.yml, docs/evidence/phase-00/E3-I/I4.yml, docs/evidence/phase-00/E3-I/conclusion.yml]
+    decision: "Attempt 7 independently passes I1-I4; characterization only, with parallel mode still disabled"
+  - id: E3-J
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E3-J/J1.yml, docs/evidence/phase-00/E3-J/J2.yml, docs/evidence/phase-00/E3-J/J3.yml, docs/evidence/phase-00/E3-J/conclusion.yml, docs/evidence/phase-00/E3-J/environment-resume-diagnostic.yml]
+    decision: "J1-J3 prove blocking barriers, concurrent stable merge, missing-blocking control, and stage ordering"
+  - id: E3-K
+    kind: experiment
+    state: PASS
+    depends_on: [E3-J]
+    artifacts: [docs/evidence/phase-00/E3-K/K1.yml, docs/evidence/phase-00/E3-K/conclusion.yml]
+    decision: "K1 proves the batch-disabled flat task wire and sequential fallback"
+  - id: E3-L
+    kind: experiment
+    state: PASS
+    depends_on: [E3-A, E3-H]
+    artifacts: [docs/evidence/phase-00/E3-L/source-identity.json, docs/evidence/phase-00/E3-L/selected-transaction.json, docs/evidence/phase-00/E3-L/L1.json, docs/evidence/phase-00/E3-L/L2.json, docs/evidence/phase-00/E3-L/L3.json, docs/evidence/phase-00/E3-L/conclusion.json]
+    decision: "Attempt 7 independently passes L1-L3 for the bounded default main-CLI host; observation only, parallel remains disabled"
+  - id: E3-M
+    kind: experiment
+    state: DEFERRED_PARALLEL_DISABLED
+    depends_on: [E3-L]
+    artifacts: []
+    decision: "parallel_mode: DISABLED; experiment not attempted"
+  - id: E4
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E4/selected-transaction.json, docs/evidence/phase-00/E4/conclusion.yml]
+    decision: "Outcome A: RULES.md is prompt-visible in the child; retain autoloadSkills for explicit scoped delivery, not because rules fail to propagate"
+  - id: E5-A
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E5-A/conclusion.yml, docs/evidence/phase-00/E5/source-identity.json, docs/evidence/phase-00/E5/selected-transaction.json, docs/evidence/phase-00/E5/conclusion.yml]
+    decision: "task.enableLsp=false removes lsp; merge task.enableLsp=true in project config"
+  - id: E5-B
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E5-B/conclusion.yml, docs/evidence/phase-00/E5/source-identity.json, docs/evidence/phase-00/E5/selected-transaction.json, docs/evidence/phase-00/E5/conclusion.yml]
+    decision: "explorer, implementer, and reviewer call lsp successfully when all gates pass; verifier control excludes lsp"
+  - id: E5-C
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E5-C/conclusion.yml, docs/evidence/phase-00/E5/source-identity.json, docs/evidence/phase-00/E5/selected-transaction.json, docs/evidence/phase-00/E5/conclusion.yml]
+    decision: "parent --no-lsp removes child lsp; relaunch the parent session with LSP enabled"
+  - id: E5-D
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E5-D/conclusion.yml, docs/evidence/phase-00/E5/source-identity.json, docs/evidence/phase-00/E5/selected-transaction.json, docs/evidence/phase-00/E5/conclusion.yml]
+    decision: "an agent allowlist without lsp removes the tool; edit the agent allowlist"
+  - id: E5-E
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E5-E/conclusion.yml, docs/evidence/phase-00/E5/source-identity.json, docs/evidence/phase-00/E5/selected-transaction.json, docs/evidence/phase-00/E5/conclusion.yml]
+    decision: "lsp can be callable while the query fails with No language server found for this action; install or configure a server"
+  - id: E5-F
+    kind: experiment
+    state: PASS
+    depends_on: []
+    artifacts: [docs/evidence/phase-00/E5-F/conclusion.yml, docs/evidence/phase-00/E5/source-identity.json, docs/evidence/phase-00/E5/selected-transaction.json, docs/evidence/phase-00/E5/conclusion.yml]
+    decision: "lsp.enabled=false independently removes lsp; enable lsp.enabled in project or session settings"

@@ -1,0 +1,23 @@
+schema_version: 1
+phase: "00"
+experiment: E3-H
+case: H1
+status: PASS
+
+execution:
+  shared_raw_case: A1
+  provider_call: false
+  global_fixture_apply: true
+  project_fixture_apply: false
+  selected_raw_run: docs/evidence/phase-00/E3-A/raw/A1.run.json
+  selected_raw_run_sha256: 26161599995467193F365D71DE0C5D445025285AEB9842C05A948208C0551B68
+
+observation:
+  effective_project_apply: false
+  diagnostic_decision: DIAGNOSTIC_OK_NOT_AUTHORIZATION
+
+interpretation:
+  reason: H1_PROJECT_OVERRIDES_GLOBAL
+  decision: The project layer overrides disposable global apply:true with apply:false.
+  non_claim: This read does not attest another parent process or authorize parallel work.
+

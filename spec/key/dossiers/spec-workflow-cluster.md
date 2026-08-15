@@ -1,5 +1,12 @@
 # Dossier — spec-workflow cluster (partial + coordinator addendum)
 
+> Authority boundary: This dossier is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > Status: **PARTIAL for the delegated pass**, supplemented by a coordinator pass (§5).
 > The delegated pass read spec-kit in depth, enumerated OpenSpec without reading file
 > contents, and did not open the other four repos. The coordinator then read a targeted

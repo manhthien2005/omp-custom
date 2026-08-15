@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "case": "case-8",
+  "attempt": 4,
+  "status": "PASS",
+  "route": "oc/mimo-v2.5-free",
+  "route_capabilities": {
+    "tool_calling": true,
+    "source": "OmniRoute /v1/models"
+  },
+  "command": [
+    "<PINNED_RUNTIME>/omp.exe",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSIONS>",
+    "--model",
+    "e2control/oc/mimo-v2.5-free",
+    "--tools",
+    "task",
+    "--approval-mode",
+    "yolo",
+    "--no-skills",
+    "--no-rules",
+    "--max-time",
+    "180",
+    "<SYNTHETIC_CONTROLLER_PROMPT>"
+  ],
+  "started_at": "2026-08-11T10:35:08.6675408+07:00",
+  "completed_at": "2026-08-11T10:35:31.0007534+07:00",
+  "duration_ms": 22330,
+  "exit_code": 0,
+  "controller_model": "e2control/oc/mimo-v2.5-free",
+  "controller_fallback": false,
+  "task_is_error": false,
+  "worker_model": "e2project/oc/mimo-v2.5-free",
+  "worker_role": "implementer",
+  "worker_exit_code": 0,
+  "worker_output": "{\n  \"sentinel\": \"E2_CUSTOM_ROLE_OK\"\n}",
+  "worker_yield": {
+    "data": {
+      "sentinel": "E2_CUSTOM_ROLE_OK"
+    },
+    "status": "success"
+  },
+  "private_content_projection": "System prompts, reasoning, signatures, and private context omitted; only resolver and task boundary fields retained.",
+  "runtime_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+  "omp_version": "17.2.10",
+  "omp_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+}

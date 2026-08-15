@@ -1,0 +1,57 @@
+schema_version: 1
+phase: "00"
+scope: E1-through-E5 experiment rounds
+status: CLOSED_WITH_ACCEPTED_EXCEPTIONS
+recorded_at: "2026-08-11T13:24:14.2155191+07:00"
+
+runtime_pin:
+  omp_version: omp/17.2.10
+  omp_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  omp_source_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  model: omniroute/oc/mimo-v2.5-free
+
+results:
+  E1:
+    status: PARTIAL_WITH_UNRESOLVED_EXCEPTION
+    passed_logical_cases: [1, 2, 3, 4]
+    unresolved: E1-B
+    exception_record: docs/evidence/phase-00/E1/e1-b-unresolved.yml
+    manifest_state: READY
+  E2:
+    status: PASS
+    passed_cases: 8
+    conclusion: docs/evidence/phase-00/E2/conclusion.yml
+  E3:
+    status: PASS_WITH_DEFERRED_PARALLEL_CASE
+    passed_cases: [E3-A, E3-B, E3-C, E3-D, E3-E, E3-F, E3-G, E3-H, E3-I, E3-J, E3-K, E3-L]
+    deferred_case: E3-M
+    deferred_reason: parallel_mode is DISABLED
+  E4:
+    status: PASS
+    conclusion: docs/evidence/phase-00/E4/conclusion.yml
+  E5:
+    status: PASS
+    passed_cases: [E5-A, E5-B, E5-C, E5-D, E5-E, E5-F]
+    selected_runtime_rows: 9
+    conclusion: docs/evidence/phase-00/E5/conclusion.yml
+
+accepted_exceptions:
+  - id: E1-B
+    status: UNRESOLVED
+    reason: strict-off control was not authoritatively exercised after three bounded attempts
+    follow_up: Opus 5 design review before any new provider attempt
+  - id: E3-M
+    status: DEFERRED_PARALLEL_DISABLED
+    reason: the repository-wide parallel gate remains disabled
+
+scope_boundary:
+  experiment_rounds_closed: true
+  full_phase_00_foundation_closed: false
+  foundation_states:
+    PASS: [T-00.1, T-00.2, T-00.3]
+    NOT_STARTED: [T-00.4, T-00.5, T-00.6, T-00.7]
+  phase_01_automatically_unblocked: false
+  rationale: >-
+    This record closes the requested experiment campaign with its accepted exceptions.
+    It does not convert E1-B into PASS, complete the remaining foundation tasks, or
+    override dependency gates in the Phase 00 manifest.

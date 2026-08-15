@@ -1,0 +1,45 @@
+schema_version: 1
+phase: "00"
+experiment: E2
+case: 4
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  repository_status_before: docs/evidence/phase-00/E2/raw/repository-status-before.txt
+  repository_status_after: docs/evidence/phase-00/E2/raw/repository-status-after.txt
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+  provider_gateway: not reached
+
+setup:
+  working_directory: disposable E2 project root
+  fixture: docs/evidence/phase-00/E2/fixture
+  selector: "@phase00-unknown-7f3"
+  role_present_in_config: false
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model @phase00-unknown-7f3 --no-tools --no-skills --no-rules --max-time 5
+  exit_code: 1
+  started_at: "2026-08-11T10:29:31.7553968+07:00"
+  completed_at: "2026-08-11T10:29:33.4129803+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E2/raw/case-4/run.json, sha256: 51E20D53DC48DB8B33ED1DF9AA29AF562B59E35909426C1889DA47D2C8CF0DCA}
+    - {path: docs/evidence/phase-00/E2/raw/case-4/stdout.jsonl, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+    - {path: docs/evidence/phase-00/E2/raw/case-4/stderr.txt, sha256: B50F7DF3845910F2181A185218C2031291F1F0A91A892DF73625E8D56A29C09F}
+
+observation:
+  facts:
+    - The arbitrary alias exited 1 with Model "@phase00-unknown-7f3" not found.
+    - No session was created and no silent fallback occurred.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/config/model-resolver.ts::resolveModelRoleValue
+  limitations: []
+
+interpretation:
+  decision: ARBITRARY_UNKNOWN_ALIAS_HARD_FAILS_WITHOUT_FALLBACK
+  spec_effect: CHANGE
+  affected_requirements: [CR-24, E2-4, D-6]

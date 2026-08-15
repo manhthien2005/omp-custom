@@ -1,0 +1,59 @@
+{
+    "schema_version":  1,
+    "experiment":  "E5-F",
+    "role":  "allowlisted",
+    "attempt":  1,
+    "selected":  true,
+    "status":  "PASS",
+    "model":  "omniroute/oc/mimo-v2.5-free",
+    "runtime":  {
+                    "version":  "omp/17.2.10",
+                    "sha256":  "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+                    "source_commit":  "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+                },
+    "node":  {
+                 "version":  "v24.16.0",
+                 "sha256":  "B3094D0B49F9AD602262A9921551737BB97637C05DD357A06AE98188D7290AA3",
+                 "used_as_language_server":  false
+             },
+    "started_at":  "2026-08-11T13:07:16.2380236+07:00",
+    "completed_at":  "2026-08-11T13:07:35.8618267+07:00",
+    "duration_ms":  19624,
+    "exit_code":  0,
+    "timed_out":  false,
+    "analysis":  {
+                     "Status":  "PASS",
+                     "Reasons":  [
+                                     "E5_CONDITION_DISCRIMINATED"
+                                 ],
+                     "FinalTotalTokens":  6536,
+                     "Marker":  "E5_F_LSP_ABSENT",
+                     "LspServerName":  null,
+                     "Cause":  "LSP_ENABLED_FALSE",
+                     "Tools":  [
+                                   "yield",
+                                   "hub"
+                               ],
+                     "LspResultSuccess":  null,
+                     "LspPresent":  false,
+                     "MarkerCount":  1,
+                     "LspResultCount":  0,
+                     "LspCallCount":  0,
+                     "YieldCallCount":  1,
+                     "CaseId":  "E5-F",
+                     "Role":  "allowlisted",
+                     "FirstTurnPromptTokens":  6469,
+                     "LspResultText":  null,
+                     "Remediation":  "ENABLE_PROJECT_LSP_ENABLED"
+                 },
+    "repository_unchanged":  true,
+    "live_home_changed_count":  0,
+    "cleanup_succeeded":  true,
+    "cleanup_error":  null,
+    "artifacts":  {
+                      "parent_stdout":  "B992E9DE6502B0C1C268035EADD1275B500CFD747FEEC2497A627EFD5765C34A",
+                      "parent_stderr":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                      "child":  "3E9B3F0F882DB9D631468FB01EE50F5ABB7E3C1A30D79662669017C1A98F253A",
+                      "projection":  "E40118CADBBFCD33E0BE9040F6A6C9DBE08CFF1E32630B2EC8CB272764A740D3"
+                  }
+}

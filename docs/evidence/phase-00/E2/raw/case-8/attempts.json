@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "case": "case-8",
+  "status": "PASS",
+  "attempts": [
+    {
+      "attempt": "attempt-1-codex",
+      "route": "codex/gpt-5.6-sol-high",
+      "classification": "QUOTA_BLOCK",
+      "duration_ms": 180000,
+      "session_count": 1,
+      "worker_session_count": 0,
+      "terminal_errors": [
+        "Unable to connect. Is the computer able to access the url?",
+        "Unable to connect. Is the computer able to access the url?",
+        "Unable to connect. Is the computer able to access the url?",
+        "Unable to connect. Is the computer able to access the url?",
+        "Unable to connect. Is the computer able to access the url?",
+        "Unable to connect. Is the computer able to access the url?",
+        "Unable to connect. Is the computer able to access the url?",
+        "Unable to connect. Is the computer able to access the url?",
+        "429 [codex/gpt-5.6-sol-high] All codex accounts reached configured quota threshold (reset after 121h 20m 33s) retry-after-ms=436833000"
+      ]
+    },
+    {
+      "attempt": "attempt-2-aug",
+      "route": "aug/gpt5.6-terra",
+      "classification": "STREAM_EARLY_EOF",
+      "duration_ms": 226400,
+      "session_count": 1,
+      "worker_session_count": 0,
+      "terminal_errors": [
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)",
+        "502 Stream ended before producing a non-ping SSE event\nStream ended before producing a non-ping SSE event (type=stream_early_eof param=STREAM_EARLY_EOF)"
+      ]
+    },
+    {
+      "attempt": "attempt-3-ddgw",
+      "route": "ddgw/claude-haiku-4-5",
+      "classification": "BAD_REQUEST_TOOL_PATH",
+      "duration_ms": 5600,
+      "session_count": 1,
+      "worker_session_count": 0,
+      "terminal_errors": [
+        "400 [400]: DuckDuckGo AI Chat error: ERR_BAD_REQUEST\n[400]: DuckDuckGo AI Chat error: ERR_BAD_REQUEST (type=invalid_request_error param=bad_request)\nraw-http-request=<USER_PROFILE>\\.omp\\logs\\http-400-requests\\1786418672865-364nl0d0mp20q.json"
+      ]
+    },
+    {
+      "attempt": "attempt-4-oc",
+      "route": "oc/mimo-v2.5-free",
+      "classification": "SUCCESS_TOOL_AND_WORKER_PATH",
+      "duration_ms": 22330,
+      "controller_session_count": 1,
+      "worker_session_count": 1,
+      "controller_model": "e2control/oc/mimo-v2.5-free",
+      "worker_model": "e2project/oc/mimo-v2.5-free",
+      "worker_role": "implementer",
+      "resolved_model_is_fallback": false,
+      "task_status": "completed",
+      "sentinel": "E2_CUSTOM_ROLE_OK"
+    }
+  ],
+  "retry_decision": "RESOLVED_BY_CAPABILITY_FILTERED_ROUTE",
+  "reason": "The fourth route was admitted only after the gateway catalog proved tool_calling=true; it reached worker creation and completed the sentinel transaction."
+}

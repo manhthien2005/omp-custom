@@ -1,0 +1,3 @@
+[no_project_mode]
+
+[no_project_apply]

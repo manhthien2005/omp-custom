@@ -1,0 +1,40 @@
+schema_version: 1
+phase: "00"
+experiment: E3-I
+case: I3
+status: PASS
+selected_attempt: 7
+reason: E3I_CLI_OVERLAY_DIVERGENCE_CONFIRMED
+
+runtime:
+  version: "omp/17.2.10"
+  executable_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  model: omniroute/oc/mimo-v2.5-free
+
+raw_inputs:
+  - {path: docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.run.json, sha256: 3C65E031030B2D6DBA10886744CDB12CEAF78C713E3610337E5F8E6456354978}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.stdout.jsonl, sha256: C87F1292ED6891096B7CB01CE30A4D6F50F6EA508E760F7433C5E5C12888F913}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.canary.e3i-cli-1.jsonl, sha256: B7A30D8AEFB749001E27581E65EF5C49239E549E630D1EA01E1BD0E63A76C1F2}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.canary.e3i-cli-2.jsonl, sha256: F07C64A36FE2BEDF790B754B88FD5769C3DD923E4B2B425ADB3F31E8852E72A7}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.canary.e3i-cli-3.jsonl, sha256: E62EB91CF93E334C6B7CBD15BF89C82B90616BA67848D8A791D685468AC7EE7C}
+
+observation:
+  project_config_apply: false
+  cli_overlay_apply: true
+  child_config_values: [false]
+  task_branches: [APPLY_TRUE_NO_DIFF, APPLY_TRUE_NO_DIFF, APPLY_TRUE_NO_DIFF]
+  effective_tool_surface: [read, yield, hub]
+  terminal_yield_count: 3
+  forbidden_tool_call_count: 0
+  stable_repetitions: 3
+  required_repetitions: 3
+  samples:
+    - {id: e3i-cli-1, duration_ms: 5482, tokens: 5361, requests: 1}
+    - {id: e3i-cli-2, duration_ms: 4679, tokens: 5403, requests: 1}
+    - {id: e3i-cli-3, duration_ms: 3440, tokens: 5497, requests: 1}
+
+interpretation:
+  decision: SUBPROCESS_DIAGNOSTIC_DIVERGES_FROM_PARENT_CLI_OVERLAY
+  authority: CHARACTERIZATION_ONLY
+  parallel_authorized: false
+

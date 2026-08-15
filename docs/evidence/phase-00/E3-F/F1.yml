@@ -1,0 +1,54 @@
+schema_version: 1
+phase: "00"
+experiment: E3-F
+case: F1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+
+setup:
+  working_directory: disposable committed git fixture
+  fixture: docs/evidence/phase-00/E3-F/fixture
+  effective_settings: {async.enabled: true, task.batch: true, task.isolation.mode: rcopy, task.isolation.apply: false, task.isolation.merge: patch}
+  conflict_design: task[0] and task[1] replace the same tracked baseline line differently; task[2] creates an independent file
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model omniroute/oc/mimo-v2.5-free --tools task --max-time 180 <SYNTHETIC_BATCH_PROMPT>
+  exit_code: 0
+  started_at: "2026-08-11T11:06:58.2011386+07:00"
+  completed_at: "2026-08-11T11:07:19.9508842+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-F/raw/run.json, sha256: D2483298431FD8D8A968B264057E2A25052914C8FABE2CBB7E838384FEC1A026}
+    - {path: docs/evidence/phase-00/E3-F/raw/controller.projection.json, sha256: ECECFE0E937257B2FAD918880F682DE2CD0CAA947D1DCEEEE9AE322854D4B3A4}
+    - {path: docs/evidence/phase-00/E3-F/raw/conflict-proof.json, sha256: 2B00D157EEFC3F183889D1EC3487088068C351DA4D58EC5D4C58805CA576B8A6}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-0.worker.projection.json, sha256: 72216BBADD78AD208D047AD11471C82333F31D29AEBA5A44BBD38EB39738D098}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-1.worker.projection.json, sha256: D1267C84B0329A7C4833752E41C7AF6379380BDBE838649B1E112107886E193B}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-2.worker.projection.json, sha256: E0A45BEEB1343D620F9DFFEEFAA9BB8850D26BC7A969220076BB616C7CD0BEA9}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-0.patch, sha256: C9BA2BA88F78F62D73E8C370D05A4E8A3CE6BD344B33F7C20E14A752A435807B}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-1.patch, sha256: EE5EEBACEEBDA35FB18D4236CC71AD1BB9A0462AB1340C26E8AC6E136F97F45D}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-2.patch, sha256: 824662991E98168B5CAA956ADFDDBEBF68D1B75A27005067D7812D277D3638DF}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-0.output.txt, sha256: 0048E61F3684F5E1CF852A8913175CA049FC2D9BA6EB02AAEB6087E2ADE69EDA}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-1.output.txt, sha256: ABE5171E929066E7D592E8B4508419FE325462EAB8ACC42D4BF226CEE9DB95DA}
+    - {path: docs/evidence/phase-00/E3-F/raw/e3f-2.output.txt, sha256: FC0875ADE337109DBE4B4E4CA9FE1D81F9C88C7DD2FDD6A22E0E580F0C972A20}
+
+observation:
+  facts:
+    - All three workers exited 0 and left three durable capture artifacts while 53 parent polls observed no mutation.
+    - Applying task[0] succeeded and changed only conflict.txt to E3_F_TASK_0.
+    - Applying task[1] returned exit 1 because its patch expected the original baseline.
+    - Integration stopped immediately; task[2] was not attempted and its target file remained absent.
+    - The parent retained task[0] only, while task[1] and task[2] artifact hashes remained unchanged and readable.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/executor.ts::executeTaskBatch
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/isolation-runner.ts::captureDeltaPatch
+
+interpretation:
+  decision: STOP_ON_FIRST_INTEGRATION_CONFLICT_AND_PRESERVE_UNAPPLIED_ARTIFACTS
+  spec_effect: RETAIN
+  affected_requirements: [E3-F, CR-29]

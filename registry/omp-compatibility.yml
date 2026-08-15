@@ -1,0 +1,238 @@
+schema_version: 1
+omp_verified_version: "17.2.10"
+omp_verified_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+omp_minimum_version: "17.2.0"
+verification_date: "2026-08-08"
+normative_source: spec/02-runtime-semantics.md
+continuity_selected_status: IMPLEMENTED_NOT_PROMOTED
+continuity_supported_versions: "17.2.10,17.2.12"
+continuity_runtime_canary_gate: "Topic 07 stop-before-provider canary must pass on both versions; OPEN-T07-RUNTIME-02 remains for unavailable local 17.2.10."
+verified_claims:
+  - id: DISC-001
+    statement: "Project commands/ is discovered as SlashCommand input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "commands directory join at line 345"
+    spec_anchor: "spec/02-runtime-semantics.md:15-17"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-002
+    statement: "Project rules/ is discovered as Rule input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "rules directory join at line 377"
+    spec_anchor: "spec/02-runtime-semantics.md:15-18"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-003
+    statement: "Project prompts/ is discovered as Prompt input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "prompts directory join at line 435"
+    spec_anchor: "spec/02-runtime-semantics.md:15-19"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-004
+    statement: "Project extensions/ is discovered as extension-module input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "extensions directory joins at lines 483 and 587"
+    spec_anchor: "spec/02-runtime-semantics.md:15-20"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-005
+    statement: "Project settings.json is discovered as settings input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "settings.json joins at lines 484, 505, and 863"
+    spec_anchor: "spec/02-runtime-semantics.md:15-21"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-006
+    statement: "Project instructions/ is discovered as Instruction input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "instructions directory join at line 642"
+    spec_anchor: "spec/02-runtime-semantics.md:15-22"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-007
+    statement: "Project hooks/<type>/ is discovered as Hook input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "hook type directory join at line 687"
+    spec_anchor: "spec/02-runtime-semantics.md:15-23"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-008
+    statement: "Project tools/ is discovered as Tool input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "tools directory joins at lines 736 and 750"
+    spec_anchor: "spec/02-runtime-semantics.md:15-24"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-009
+    statement: "Project config.yml is discovered as settings input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "config.yml join at line 879"
+    spec_anchor: "spec/02-runtime-semantics.md:15-25"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-010
+    statement: "Project and user skills/ directories are discovered as Skill input."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "project and user skills joins at lines 283-296"
+    spec_anchor: "spec/02-runtime-semantics.md:15-26"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-011
+    statement: "Project AGENTS.md is discovered as a context file."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "context-file provider and project AGENTS.md join at lines 905-942"
+    spec_anchor: "spec/02-runtime-semantics.md:15-27"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-012
+    statement: "Project RULES.md is discovered as a forced always-apply rule."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "RULES.md discovery and forced alwaysApply at lines 387-416"
+    spec_anchor: "spec/02-runtime-semantics.md:15-28"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-013
+    statement: "Project .omp/agents/*.md files are discovered as AgentDefinition input."
+    source_path: packages/coding-agent/src/task/discovery.ts
+    source_anchor: "loadAgentsFromDir and project directory precedence at lines 42-137"
+    spec_anchor: "spec/02-runtime-semantics.md:15-29"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-014
+    statement: "policies/ has no registered discovery path or runtime consumer."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "complete built-in provider registrations at lines 256-942; no policies path"
+    spec_anchor: "spec/02-runtime-semantics.md:31-34"
+    evidence_type: SOURCE_VERIFIED
+  - id: DISC-015
+    statement: "schemas/ has no registered discovery path or runtime consumer."
+    source_path: packages/coding-agent/src/discovery/builtin.ts
+    source_anchor: "complete built-in provider registrations at lines 256-942; no schemas path"
+    spec_anchor: "spec/02-runtime-semantics.md:31-34"
+    evidence_type: SOURCE_VERIFIED
+  - id: FM-001
+    statement: "parseAgentFields recognizes the agent frontmatter contract and appends yield to explicit tool lists."
+    source_path: packages/coding-agent/src/discovery/helpers.ts
+    source_anchor: "parseAgentFields at lines 253-323; yield append at lines 264-266"
+    spec_anchor: "spec/02-runtime-semantics.md:38-78"
+    evidence_type: SOURCE_VERIFIED
+  - id: FM-002
+    statement: "Frontmatter keys normalize recursively from kebab-case to camelCase."
+    source_path: packages/utils/src/frontmatter.ts
+    source_anchor: "key replacement and normalizeKeys at lines 11-38; parseFrontmatter at lines 106-173"
+    spec_anchor: "spec/02-runtime-semantics.md:43-52"
+    evidence_type: SOURCE_VERIFIED
+  - id: AGENT-001
+    statement: "Agent markdown is parsed into AgentDefinition and bundled definitions use the same parser."
+    source_path: packages/coding-agent/src/task/agents.ts
+    source_anchor: "parseAgent at lines 105-125; loadBundledAgents at lines 127-141"
+    spec_anchor: "spec/02-runtime-semantics.md:187-204"
+    evidence_type: SOURCE_VERIFIED
+  - id: TASK-001
+    statement: "task.batch controls model-facing shape and isolated is normalized per spawn."
+    source_path: packages/coding-agent/src/task/index.ts
+    source_anchor: "shape validation at lines 195-305; settings read and execute at lines 610-706"
+    spec_anchor: "spec/02-runtime-semantics.md:150-164"
+    evidence_type: SOURCE_VERIFIED
+  - id: SKILL-001
+    statement: "autoloadSkills bodies are injected into subagents via sendCustomMessage."
+    source_path: packages/coding-agent/src/task/executor.ts
+    source_anchor: "autoloadSkills injection at lines 3234-3245"
+    spec_anchor: "spec/14-upgradeability-and-governance.md:73-85"
+    evidence_type: SOURCE_VERIFIED
+  - id: SESSION-001
+    statement: "Subagent applyChanges and enableLsp are resolved from live session settings."
+    source_path: packages/coding-agent/src/task/structured-subagent.ts
+    source_anchor: "policy resolution at lines 315-320"
+    spec_anchor: "spec/phases/phase-00-foundation.md:498-515"
+    evidence_type: SOURCE_VERIFIED
+  - id: ISO-001
+    statement: "Isolation requires a Git repository context and persists patch or branch artifacts before teardown."
+    source_path: packages/coding-agent/src/task/isolation-runner.ts
+    source_anchor: "prepareIsolationContext at lines 64-70; run/capture/cleanup at lines 142-246"
+    spec_anchor: "spec/02-runtime-semantics.md:150-164"
+    evidence_type: SOURCE_VERIFIED
+  - id: OUTPUT-001
+    statement: "yield builds an output validator from session.outputSchema and returns bounded correction feedback on mismatch."
+    source_path: packages/coding-agent/src/tools/yield.ts
+    source_anchor: "validator construction at lines 234-249; validation feedback at lines 382-396"
+    spec_anchor: "spec/02-runtime-semantics.md:127-146"
+    evidence_type: SOURCE_VERIFIED
+  - id: ROLE-001
+    statement: "A custom model role alias is admitted only when settings define it."
+    source_path: packages/coding-agent/src/config/model-resolver.ts
+    source_anchor: "getModelRoleAlias at lines 919-925; configured role resolution at lines 1046-1057"
+    spec_anchor: "spec/02-runtime-semantics.md:99-123"
+    evidence_type: SOURCE_VERIFIED
+  - id: ROLE-002
+    statement: "Known role IDs include visible built-ins plus configured custom role IDs."
+    source_path: packages/coding-agent/src/config/model-roles.ts
+    source_anchor: "MODEL_ROLES at lines 42-68; getKnownRoleIds at lines 77-87"
+    spec_anchor: "spec/02-runtime-semantics.md:99-119"
+    evidence_type: SOURCE_VERIFIED
+  - id: SETTINGS-001
+    statement: "Pinned defaults are lsp.enabled true, task.isolation.mode none, task.isolation.apply true, task.batch true, and task.enableLsp false."
+    source_path: packages/coding-agent/src/config/settings-schema.ts
+    source_anchor: "defaults at lines 3378-3386, 4449-4505, 4570-4578, and 4615-4623"
+    spec_anchor: "spec/02-runtime-semantics.md:150-183"
+    evidence_type: SOURCE_VERIFIED
+  - id: BOUNDARY-001
+    statement: "A same-name extension tool can delegate to the unwrapped native built-in through ctx.invokeTool."
+    source_path: packages/coding-agent/src/sdk.ts
+    source_anchor: "native built-ins captured before extension replacement and exposed at lines 2620-2675"
+    spec_anchor: "spec/key/04-decision-log.md KD-030"
+    evidence_type: SOURCE_VERIFIED
+  - id: BOUNDARY-002
+    statement: "Same-name native delegation preserves ordinary tool context and has a recursion-depth guard."
+    source_path: packages/coding-agent/src/extensibility/extensions/runner.ts
+    source_anchor: "invokeNativeTool at lines 439-474"
+    spec_anchor: "spec/key/04-decision-log.md KD-030"
+    evidence_type: SOURCE_VERIFIED
+  - id: BOUNDARY-003
+    statement: "Plan-mode subagents are transformed to read-only tools and lose spawn/prewalk capabilities."
+    source_path: packages/coding-agent/src/task/structured-subagent.ts
+    source_anchor: "PLAN_MODE_TOOLS and createPlanModeAgent at lines 159-198"
+    spec_anchor: "spec/08-isolation-and-concurrency.md Topic 06 managed execution modes"
+    evidence_type: SOURCE_VERIFIED
+  - id: BOUNDARY-004
+    statement: "The executor requests a budget stop at 1.5 times task.softRequestBudget and may force a partial yield."
+    source_path: packages/coding-agent/src/task/executor.ts
+    source_anchor: "request counter and stopThreshold logic at lines 1568-1590"
+    spec_anchor: "spec/15-security-and-failure-recovery.md D-9a"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-001
+    statement: "Native compact mode soft selects one local context-full transaction while overriding remote compaction off."
+    source_path: packages/coding-agent/src/session/compact-modes.ts
+    source_anchor: "mode soft overrides at lines 41-55; normalized range sha256 a19bc111d1db23bc81d764b65cc7334d4ad53285fa592f3178c55ee037f1f3c1"
+    spec_anchor: "spec/key/04-decision-log.md KD-031"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-002
+    statement: "Manual compaction preparation invokes session_before_compact and honors a cancelling handler before mutation."
+    source_path: packages/coding-agent/src/session/session-maintenance.ts
+    source_anchor: "manual preparation hook at lines 620-665; normalized range sha256 9a6330c14b11b0fff4ea1dced48486eed1c98fabc965c86683d376180dc212fc"
+    spec_anchor: "spec/key/04-decision-log.md KD-031"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-003
+    statement: "The last session.compacting handler supplies the effective prompt/context and saved session_compact entries retain preserve data."
+    source_path: packages/coding-agent/src/extensibility/extensions/runner.ts
+    source_anchor: "last-result semantics at lines 985-1020, sha256 a6090a8bb479ed48d316892417dcf7056f904c59f8018435142aa59794caf49b; settlement in session-maintenance.ts lines 866-905, sha256 f68bb0650d632eb808d2f4116177a43ceb8e9490f8579f98bebdc52a612b39d4"
+    spec_anchor: "spec/02-runtime-semantics.md Selected Topic 07 runtime semantics"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-004
+    statement: "Context transformation and before-provider hooks run before model entry, and the agent loop honors a stop result before streaming."
+    source_path: packages/coding-agent/src/sdk.ts
+    source_anchor: "request hooks at lines 3108-3160, sha256 f2feca31e9575538841309f261d9a92573627dceff132829ee1a5c060d6342e6; agent-loop.ts lines 1090-1185, sha256 07cf31dbcc51aa96d13e15fd2a094e2941868b8777a91f644a3f2b8e02903790"
+    spec_anchor: "spec/13-validation-and-evaluation.md Topic 07 continuity validation slice"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-005
+    statement: "OMP exposes before-agent-start, turn-end, abort, and automatic-maintenance seams needed for a final pressure guard and disabled automatic profile."
+    source_path: packages/coding-agent/src/session/agent-session.ts
+    source_anchor: "before-agent-start lines 5230-5335 sha256 ab4cd6ce390cb3edffed8f27f197ea85208738046ce6e3da099299c5149eb630; turn-end lines 3345-3368 sha256 9892d0fde46b4a89dd6c5810f06754875b60435a561debc8f6e2b329389bbff2; abort lines 6180-6212 sha256 d16de3d903a7ca23262397508549a7d87e51637d5f7f3a1ea33c5654b8425e6c"
+    spec_anchor: "spec/15-security-and-failure-recovery.md D-9"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-006
+    statement: "Native automatic maintenance can prune/rescue before ordinary compaction hooks, and shake artifact failure can still rewrite content."
+    source_path: packages/coding-agent/src/session/session-maintenance.ts
+    source_anchor: "prune/auto lines 1325-1420 sha256 ecb65c2a9d17129d8f58216fb1a0953720e3d8ccab46f1ee33be06d7a1a7a7fd; rescue lines 2290-2452 sha256 5f3be2e05f72b061c6ba4e0ed93d2a34879735c9e84c4cb4895219147fb49127; shake lines 460-568 sha256 2acfe573fcfbfdf61048d46fc9540dbf46627d905164a98d973edb5448795899"
+    spec_anchor: "spec/key/04-decision-log.md KD-031 Unsupported paths"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-007
+    statement: "The read-only session manager exposes persisted session/artifact/branch APIs required for artifact-first recovery binding."
+    source_path: packages/coding-agent/src/session/session-manager.ts
+    source_anchor: "ReadonlySessionManager at lines 327-348; normalized range sha256 63184da566c237d8e0fe77f9cf91eb5648e8a9a192b8f460c54f6323d9094fb1"
+    spec_anchor: "spec/01-target-architecture.md Selected Topic 07 continuity boundary"
+    evidence_type: SOURCE_VERIFIED
+  - id: CONT-008
+    statement: "Bounded subagents receive isolated effective settings and a session_init entry before their first prompt."
+    source_path: packages/coding-agent/src/task/executor.ts
+    source_anchor: "settings snapshot lines 854-906 sha256 2668ca62f6e9d65907cd5879562160fd8019cacede7a8d15815b1d752732cdee; init-before-prompt lines 3128-3260 sha256 9530bc58880638839e77a34fe6fad31b9ebd0b720575b704697173e5ec879a1d"
+    spec_anchor: "spec/02-runtime-semantics.md Selected Topic 07 runtime semantics"
+    evidence_type: SOURCE_VERIFIED

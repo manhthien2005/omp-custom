@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I+E3-L",
+  "attempt": 7,
+  "selected": false,
+  "model": "omniroute/oc/mimo-v2.5-free",
+  "runtime": {
+    "version": "omp/17.2.10",
+    "sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "executable": "<PINNED_OMP_EXECUTABLE>"
+  },
+  "source_identity": {
+    "path": "docs/evidence/phase-00/E3-L/source-identity.json",
+    "sha256": "CE7B3DF1446788C2996521172FD2BB7B124E1DBBDB854F2E0FBD990FF5EA32FD"
+  },
+  "sessions": {
+    "a": {
+      "invoked": true,
+      "run": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.run.json",
+        "sha256": "9C89C85A0EA7C6CABFE37A7594B740DB73AFBC15F82C259A8494DE12B257B9E2"
+      },
+      "parent_stdout": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.stdout.jsonl",
+        "sha256": "1F585ED5EAE164A3B6FBFEC8C6457A5EC1FFABF257B6830BF55916AFE8B2181A"
+      },
+      "parent_stderr": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.stderr.txt",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "canaries": [
+        {
+          "id": "e3i-project-1",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-project-1.jsonl",
+          "sha256": "6358F84E0C1DEA4FF90D569CDFE046253A611A7859671F2DFEC920FECA61F745"
+        },
+        {
+          "id": "e3i-project-2",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-project-2.jsonl",
+          "sha256": "52936592D30903B68ED23E588412FDBECD59AE50934F345D4403CE9D241CEB55"
+        },
+        {
+          "id": "e3i-project-3",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-project-3.jsonl",
+          "sha256": "C4A732275B20983AA21BBEF169E6DA601504205D0EB5D6C8F6BFA07C21D3C9F5"
+        },
+        {
+          "id": "e3i-runtime-1",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-runtime-1.jsonl",
+          "sha256": "228BAFCAF8F297ED0161F8818EBC5C394B70316F2F475B6FF959ED63C50AED08"
+        },
+        {
+          "id": "e3i-runtime-2",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-runtime-2.jsonl",
+          "sha256": "83EB20102420C626B9882E93E92A90C5181961C1A14B445089F0E4E1FC21593F"
+        },
+        {
+          "id": "e3i-runtime-3",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-runtime-3.jsonl",
+          "sha256": "BAE85A3DD9C7DECE8153A45BD79032E86029EF34B55272A85A25B9DE0C901EF4"
+        }
+      ],
+      "transport_status": "ELIGIBLE",
+      "transport_reasons": [
+        "E3IL_SELECTION_ENVELOPE_EXACT"
+      ],
+      "e3_i_status": "PASS",
+      "e3_l_status": "PASS",
+      "provider_terminal": false,
+      "recovered_provider_retry": false,
+      "boundary": {
+        "parent_content_unchanged": true,
+        "parent_head_unchanged": true,
+        "parent_status_unchanged": true,
+        "fixture_hashes_unchanged": true,
+        "live_home_unchanged": true,
+        "cleanup_succeeded": true
+      }
+    },
+    "b": {
+      "invoked": true,
+      "run": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.run.json",
+        "sha256": "3C65E031030B2D6DBA10886744CDB12CEAF78C713E3610337E5F8E6456354978"
+      },
+      "parent_stdout": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.stdout.jsonl",
+        "sha256": "C87F1292ED6891096B7CB01CE30A4D6F50F6EA508E760F7433C5E5C12888F913"
+      },
+      "parent_stderr": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.stderr.txt",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "canaries": [
+        {
+          "id": "e3i-cli-1",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.canary.e3i-cli-1.jsonl",
+          "sha256": "B7A30D8AEFB749001E27581E65EF5C49239E549E630D1EA01E1BD0E63A76C1F2"
+        },
+        {
+          "id": "e3i-cli-2",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.canary.e3i-cli-2.jsonl",
+          "sha256": "F07C64A36FE2BEDF790B754B88FD5769C3DD923E4B2B425ADB3F31E8852E72A7"
+        },
+        {
+          "id": "e3i-cli-3",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.canary.e3i-cli-3.jsonl",
+          "sha256": "E62EB91CF93E334C6B7CBD15BF89C82B90616BA67848D8A791D685468AC7EE7C"
+        }
+      ],
+      "transport_status": "ELIGIBLE",
+      "transport_reasons": [
+        "E3IL_SELECTION_ENVELOPE_EXACT"
+      ],
+      "e3_i_status": "PASS",
+      "e3_l_status": "PASS",
+      "provider_terminal": false,
+      "recovered_provider_retry": false,
+      "boundary": {
+        "parent_content_unchanged": true,
+        "parent_head_unchanged": true,
+        "parent_status_unchanged": true,
+        "fixture_hashes_unchanged": true,
+        "live_home_unchanged": true,
+        "cleanup_succeeded": true
+      }
+    }
+  },
+  "automatic_retry": false,
+  "e3_i_conclusion_consumed": false,
+  "e3_l_conclusion_consumed": false
+}

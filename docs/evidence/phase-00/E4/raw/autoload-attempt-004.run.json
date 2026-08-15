@@ -1,0 +1,51 @@
+{
+    "schema_version":  1,
+    "experiment":  "E4",
+    "arm":  "AUTOLOAD",
+    "attempt":  4,
+    "selected":  true,
+    "status":  "PASS",
+    "model":  "omniroute/oc/mimo-v2.5-free",
+    "runtime":  {
+                    "version":  "omp/17.2.10",
+                    "sha256":  "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+                },
+    "started_at":  "2026-08-11T12:02:27.4993420+07:00",
+    "completed_at":  "2026-08-11T12:03:03.7888299+07:00",
+    "duration_ms":  36289,
+    "exit_code":  0,
+    "timed_out":  false,
+    "analysis":  {
+                     "Status":  "PASS",
+                     "Reasons":  [
+                                     "E4_SENTINEL_PROPAGATION_EXACT"
+                                 ],
+                     "Tools":  [
+                                   "read",
+                                   "yield",
+                                   "hub"
+                               ],
+                     "BehaviorPhraseCount":  2,
+                     "AutoloadMessageCount":  1,
+                     "PropagationClass":  "AUTOLOAD_HIDDEN_MESSAGE",
+                     "ForbiddenToolCallCount":  0,
+                     "InputTokens":  199,
+                     "Arm":  "AUTOLOAD",
+                     "YieldCallCount":  1,
+                     "SystemPromptSentinelCount":  0,
+                     "AutoloadSentinelCount":  1,
+                     "ReadCallCount":  6,
+                     "SystemPromptMarkerCount":  0,
+                     "TotalTokens":  8388
+                 },
+    "repository_unchanged":  true,
+    "live_home_changed_count":  0,
+    "cleanup_succeeded":  true,
+    "cleanup_error":  null,
+    "artifacts":  {
+                      "parent_stdout":  "2A26B16C0D6538CE812035F76721061D4A79EE54FC1AC510BE82FB75EE0F718D",
+                      "parent_stderr":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                      "child":  "1C9028A3C5D1B0E94B8A2578069F2CA831AE55FB62070C260FF4F495B748343F",
+                      "projection":  "1B2D756BB34E6D2B9AB93676CD7325D5C7BFB60500051751684506E762732532"
+                  }
+}

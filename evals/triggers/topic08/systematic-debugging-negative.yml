@@ -1,0 +1,9 @@
+schema_version: 1
+record_type: topic08_skill_trigger_fixture
+skill: systematic-debugging
+expectation: should_not_trigger
+cases:
+  - "Add a new feature with no existing failure."
+  - "Perform the already planned refactor."
+  - "Correct this obvious documentation typo."
+  - "Review this frozen candidate without editing it."

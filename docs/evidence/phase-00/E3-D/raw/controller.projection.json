@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "session_id": "019feef1-8203-7000-aa61-7a293032dfab",
+  "model_change": {
+    "model": "omniroute/oc/mimo-v2.5-free",
+    "resolved_model_is_fallback": false
+  },
+  "task": {
+    "tool_call_id": "call_6f2619e43ad54273bd3b8689|fc_call_6f2619e43ad54273bd3b8689",
+    "arguments": {
+      "context": "Phase 00 E3-D parallel capture",
+      "tasks": [
+        {
+          "name": "e3d-0",
+          "agent": "phase00-write-probe-0",
+          "task": "Terminal-yield result.data exactly {\"sentinel\":\"E3_D_0_OK\"}.",
+          "isolated": true
+        },
+        {
+          "name": "e3d-1",
+          "agent": "phase00-write-probe-1",
+          "task": "Terminal-yield result.data exactly {\"sentinel\":\"E3_D_1_OK\"}.",
+          "isolated": true
+        }
+      ]
+    },
+    "is_error": false,
+    "results": [
+      {
+        "index": 0,
+        "id": "e3d-0",
+        "agent": "phase00-write-probe-0",
+        "exit_code": 0,
+        "output": "{\n  \"sentinel\": \"E3_D_0_OK\"\n}",
+        "duration_ms": 7341,
+        "resolved_model": "omniroute/oc/mimo-v2.5-free",
+        "patch_path": "<DURABLE_ARTIFACT>/e3d-0.patch",
+        "nested_patches": [],
+        "extracted_tool_data": {
+          "yield": [
+            {
+              "data": {
+                "sentinel": "E3_D_0_OK"
+              },
+              "status": "success"
+            }
+          ]
+        }
+      },
+      {
+        "index": 1,
+        "id": "e3d-1",
+        "agent": "phase00-write-probe-1",
+        "exit_code": 0,
+        "output": "{\n  \"sentinel\": \"E3_D_1_OK\"\n}",
+        "duration_ms": 7633,
+        "resolved_model": "omniroute/oc/mimo-v2.5-free",
+        "patch_path": "<DURABLE_ARTIFACT>/e3d-1.patch",
+        "nested_patches": [],
+        "extracted_tool_data": {
+          "yield": [
+            {
+              "data": {
+                "sentinel": "E3_D_1_OK"
+              },
+              "status": "success"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

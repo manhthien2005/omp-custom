@@ -1,0 +1,45 @@
+{
+    "schema_version":  1,
+    "experiment":  "E4",
+    "arm":  "RULE",
+    "attempt":  3,
+    "selected":  false,
+    "status":  "FAIL",
+    "model":  "omniroute/oc/mimo-v2.5-free",
+    "runtime":  {
+                    "version":  "omp/17.2.10",
+                    "sha256":  "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+                },
+    "started_at":  "2026-08-11T11:58:51.9729904+07:00",
+    "completed_at":  "2026-08-11T11:59:09.1303754+07:00",
+    "duration_ms":  17157,
+    "exit_code":  0,
+    "timed_out":  false,
+    "analysis":  {
+                     "Status":  "FAIL",
+                     "Reasons":  [
+                                     "E4_SENTINEL_BEHAVIOR_MISSING"
+                                 ],
+                     "TotalTokens":  7492,
+                     "SystemPromptSentinelCount":  1,
+                     "InputTokens":  5179,
+                     "Tools":  [
+                                   "read",
+                                   "yield",
+                                   "hub"
+                               ],
+                     "AutoloadMessageCount":  0,
+                     "BehaviorPhraseCount":  2,
+                     "PropagationClass":  "A_PROMPT_VISIBLE"
+                 },
+    "repository_unchanged":  true,
+    "live_home_changed_count":  0,
+    "cleanup_succeeded":  true,
+    "cleanup_error":  null,
+    "artifacts":  {
+                      "parent_stdout":  "15D3B54F3C25412CCA340AA0478363FE6B80D31AA4AEB7DA2FCAA368451A1F87",
+                      "parent_stderr":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                      "child":  "418EC2BFA1BE84D0A2D70328D9C8AF59C29C303A827265A390A99BF9A2C9D893",
+                      "projection":  "6E5D5B95E34512D23C3507D7E0F8D7F7F77EE1031B932BA9BAE41068886FDC3A"
+                  }
+}

@@ -1,0 +1,31 @@
+{
+    "schema_version":  1,
+    "experiment":  "E4",
+    "arm":  "AUTOLOAD",
+    "attempt":  4,
+    "status":  "PASS",
+    "reasons":  [
+                    "E4_SENTINEL_PROPAGATION_EXACT"
+                ],
+    "propagation_class":  "AUTOLOAD_HIDDEN_MESSAGE",
+    "system_prompt_sha256":  "205A51DEE8338BBD586A8680A81C941DAF5A5992099CF33F2EBB888F01C048BD",
+    "system_prompt_sentinel_count":  0,
+    "system_prompt_marker_count":  0,
+    "autoload_message_count":  1,
+    "behavior_phrase_count":  2,
+    "tools":  [
+                  "read",
+                  "yield",
+                  "hub"
+              ],
+    "yield_call_count":  1,
+    "read_call_count":  6,
+    "forbidden_tool_call_count":  0,
+    "input_tokens":  199,
+    "total_tokens":  8388,
+    "sentinel_excerpt":  null,
+    "child_transcript":  {
+                             "path":  "docs/evidence/phase-00/E4/raw/autoload-attempt-004.child.jsonl",
+                             "sha256":  "1C9028A3C5D1B0E94B8A2578069F2CA831AE55FB62070C260FF4F495B748343F"
+                         }
+}

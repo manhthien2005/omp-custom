@@ -225,6 +225,16 @@ function Test-Topic03RoutingContract {
         -PassMessage 'Cheap Scout fallback contains only Pro xhigh' `
         -FailMessage 'retry.fallbackChains.cheap-scout must contain Pro xhigh'
 
+    $workerIdentityValid = $config -match '(?m)^\s{2}worker:\s*omniroute/codex/gpt-5\.6-sol:high\s*$'
+    $results += New-Topic03BooleanResult -Condition $workerIdentityValid -Code 'T03-CONFIG-WORKER-IDENTITY' `
+        -PassMessage 'Worker default high effort is explicit in the resolved selector' `
+        -FailMessage 'modelRoles.worker must carry an explicit :high suffix for observable identity'
+
+    $reviewerIdentityValid = $config -match '(?m)^\s{2}reviewer:\s*omniroute/codex/gpt-5\.6-sol:xhigh\s*$'
+    $results += New-Topic03BooleanResult -Condition $reviewerIdentityValid -Code 'T03-CONFIG-REVIEWER-IDENTITY' `
+        -PassMessage 'Reviewer fixed xhigh effort is explicit in the resolved selector' `
+        -FailMessage 'modelRoles.reviewer must carry an explicit :xhigh suffix for observable identity'
+
     $emptyDefault = $config -match '(?m)^\s{4}default:\s*\[\]\s*$'
     $emptyWorker = $config -match '(?m)^\s{4}worker:\s*\[\]\s*$'
     $emptyReviewer = $config -match '(?m)^\s{4}reviewer:\s*\[\]\s*$'
@@ -265,9 +275,20 @@ function Test-Topic03InstallContract {
         -FailMessage 'installer does not explicitly retire explorer, implementer, tech-lead, and verifier'
 
     $evidence = Get-Topic03NormalizedContent -RepositoryRoot $RepositoryRoot -RelativePath 'docs/evidence/current-product/topic-03/manifest.yml'
-    $supersessionValid = $null -ne $evidence -and
-        $evidence.IndexOf('docs/evidence/phase-00/T-00.3/conclusion.yml', [StringComparison]::OrdinalIgnoreCase) -ge 0 -and
-        $evidence.IndexOf('superseded_for_current_runtime_only', [StringComparison]::OrdinalIgnoreCase) -ge 0
+    $supersessionValid = $false
+    if ($null -ne $evidence) {
+        try {
+            $evidenceManifest = $evidence | ConvertFrom-Json -ErrorAction Stop
+            $supersessionValid =
+                [string]$evidenceManifest.schema_version -ceq '1' -and
+                $evidenceManifest.topic -ceq '03' -and
+                $evidenceManifest.candidate -ceq 'C1' -and
+                $evidenceManifest.phase00_source -ceq 'T-00.3' -and
+                $evidenceManifest.phase00_conclusion_sha256 -cmatch '^[A-F0-9]{64}$'
+        } catch {
+            $supersessionValid = $false
+        }
+    }
     $results += New-Topic03BooleanResult -Condition $supersessionValid -Code 'T03-EVIDENCE-SUPERSESSION' `
         -PassMessage 'current-product evidence explicitly supersedes the Phase 00 runtime snapshot' `
         -FailMessage 'current-product manifest lacks the Phase 00 supersession identity'

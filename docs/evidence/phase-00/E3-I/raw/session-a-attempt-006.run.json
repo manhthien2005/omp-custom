@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 6,
+  "selected": false,
+  "omp_version": "omp/17.2.10",
+  "omp_runtime": {
+    "selection": "EXPLICIT_SOURCE",
+    "launch_path": "<DISPOSABLE_RUNTIME>/omp.exe",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "model": "omniroute/oc/mimo-v2.5-free",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+    "USERPROFILE": "<DISPOSABLE_USER_PROFILE>",
+    "OMP_PHASE00_E3IL_PARENT_CWD": "<DISPOSABLE_PROJECT>",
+    "OMP_PHASE00_E3IL_ENABLE_OVERRIDE": "1"
+  },
+  "command": [
+    "<DISPOSABLE_RUNTIME>/omp.exe",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--model",
+    "omniroute/oc/mimo-v2.5-free",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "12m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:session-a.md>"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "started_at": "2026-08-11T11:22:30.7920889+07:00",
+  "completed_at": "2026-08-11T11:23:41.0700765+07:00",
+  "duration_ms": 70278,
+  "parent_stdout_sha256": "59DC72FCF3D540F410BEBDC8F13738273BB5A6F62E6CBA5B6F1D7C2383968AFF",
+  "parent_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+  "canary_artifacts": [
+    {
+      "id": "e3i-project-1",
+      "sha256": "53E57FDB3CF85B7F0610A892F8DEA81B6E6BED96EC962D596B2F017B043C2AAB",
+      "file": "session-a-attempt-006.canary.e3i-project-1.jsonl"
+    },
+    {
+      "id": "e3i-project-2",
+      "sha256": "3F93960939859FF5F86720353BB0FC0889B474656D2EFBD59275F41319613606",
+      "file": "session-a-attempt-006.canary.e3i-project-2.jsonl"
+    },
+    {
+      "id": "e3i-project-3",
+      "sha256": "30FB16BEC90C699E323536E2D3B3426A0F463156374632DB17293F873C21E68E",
+      "file": "session-a-attempt-006.canary.e3i-project-3.jsonl"
+    },
+    {
+      "id": "e3i-runtime-1",
+      "sha256": "B8732BD5F75D5745CAB7A9871108CD9ACAB5B7B699D17E8DAA329E19645DAD1B",
+      "file": "session-a-attempt-006.canary.e3i-runtime-1.jsonl"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "sha256": "99C92013F1CC040B5E9E6043FEC432A600D62D09CAE460C7AACFEC186DC6F3F6",
+      "file": "session-a-attempt-006.canary.e3i-runtime-2.jsonl"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "sha256": "D9A0BB072C69EC6CAEFBBEB96699459A8A1437F660E4D4B14E6E752C1D765B92",
+      "file": "session-a-attempt-006.canary.e3i-runtime-3.jsonl"
+    }
+  ],
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "live_home_metadata": {
+    "BeforeFileCount": 14,
+    "AfterFileCount": 14,
+    "BeforeSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "AfterSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "ChangedPaths": [],
+    "ChangedCount": 0,
+    "BoundaryResult": "PASS",
+    "MutationAttributableToExperiment": false,
+    "AttributionBasis": "NO_CHANGE"
+  },
+  "cleanup_error": null,
+  "analysis": {
+    "Status": "INVALID_RUN",
+    "Reasons": [
+      "E3I_CANARY_PROVENANCE_MISSING"
+    ],
+    "CanaryId": "e3i-project-1",
+    "Error": "Canary 'e3i-project-1' lacks one exact terminal yield call."
+  }
+}

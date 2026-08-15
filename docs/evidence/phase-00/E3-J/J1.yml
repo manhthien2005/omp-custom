@@ -1,0 +1,68 @@
+schema_version: 1
+phase: "00"
+experiment: E3-J
+case: J1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  shell: PowerShell 7.6.4
+  provider_gateway: omniroute loopback http://127.0.0.1:20128/v1
+  runtime_model_catalog: docs/evidence/phase-00/environment/runtime-models.yml
+  runtime_model_catalog_sha256: 56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779
+
+execution:
+  selected_attempt: 6
+  fixture_commit: 364af4152b30f8cdbde74226a50b32af5acf82d2
+  process_exit_code: 0
+  started_at: "2026-08-08T23:58:37.6014808+07:00"
+  completed_at: "2026-08-08T23:59:33.2383019+07:00"
+  duration_ms: 55637
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - docs/evidence/phase-00/E3-J/raw/J1.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J1.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J1.run.json
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-002.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-002.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-002.run.json
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-003.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-003.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-003.run.json
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-004.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-004.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-004.run.json
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-005.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-005.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-005.run.json
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-006.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-006.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J1-attempt-006.run.json
+
+observation:
+  task_call_count: 1
+  batch_item_count: 3
+  result_order: [0, 1, 2]
+  completion_order: [2, 0, 1]
+  overlap_pairs: ["0-1", "0-2", "1-2"]
+  task_call_returns_after_all: true
+  failed_spawn_count: 0
+  timings:
+    - {index: 0, started_at_ms: 1786208335685, ended_at_ms: 1786208353685, duration_ms: 18000}
+    - {index: 1, started_at_ms: 1786208335870, ended_at_ms: 1786208365871, duration_ms: 30001}
+    - {index: 2, started_at_ms: 1786208335997, ended_at_ms: 1786208341998, duration_ms: 6001}
+
+interpretation:
+  reason: J1_ALL_PREDICATES
+  decision: >-
+    Blocking batch fan-out preserves input-index result order while workers overlap
+    and complete out of order; the task call returns only after all three settle.
+  affected_requirements: [CR-39, T-02.1b, T-02.3b]
+
+history:
+  - Attempts 1 through 4 were environment-blocked and remain preserved.
+  - Attempt 5 was INVALID_RUN because PowerShell variables did not survive the OMP bash-tool boundary.
+  - Attempt 6 used the TDD-hardened portable timing command and is the selected PASS evidence.

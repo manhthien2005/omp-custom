@@ -1,5 +1,12 @@
 # Repo Report — oh-my-pi (prompt assembly & discovery)
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/oh-my-pi`
 > **SHA:** `3a8591a8af5b6d200088d12ca75a5517cb064fa8` (`git -C _research/upstreams/oh-my-pi rev-parse HEAD`)
 > **License:** MIT. `LICENSE` carries a dual copyright line — `Copyright (c) 2025 Mario Zechner` and
@@ -712,7 +719,6 @@ workspace-tree blocks; ~5800 lines unread), `config.ts:1-235`, `capability/fs.ts
   a `.gitignore` line matching `.omp/` itself is neutralized — but a line matching a *file inside*
   `.omp/` is not. This is a plausible silent-degradation source I could not confirm without a run.
   **Grade D.**
-
 
 
 

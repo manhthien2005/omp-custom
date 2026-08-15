@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "case": "H2",
+  "attempt": 1,
+  "operations": [
+    {
+      "name": "no_project_mode",
+      "key": "task.isolation.mode",
+      "context": "NoProject",
+      "overlay_position": "None",
+      "exit_code": 0,
+      "started_at": "2026-08-09T01:07:52.6255650+07:00",
+      "completed_at": "2026-08-09T01:07:53.6200460+07:00",
+      "stdout": "{\n  \"key\": \"task.isolation.mode\",\n  \"value\": \"none\",\n  \"type\": \"enum\",\n  \"description\": \"Isolation backend for subagents. \\\"auto\\\" lets the native PAL pick the best available backend (CoW-aware filesystems, then overlayfs/ProjFS, then a git worktree / recursive-copy fallback).\"\n}\n",
+      "classification": {
+        "Status": "OBSERVED",
+        "Reasons": [
+          "CONFIG_READ_OK"
+        ],
+        "Observation": {
+          "Key": "task.isolation.mode",
+          "Value": "none",
+          "Type": "enum",
+          "Description": "Isolation backend for subagents. \"auto\" lets the native PAL pick the best available backend (CoW-aware filesystems, then overlayfs/ProjFS, then a git worktree / recursive-copy fallback)."
+        },
+        "Fallback": null,
+        "Context": "NoProject"
+      }
+    },
+    {
+      "name": "no_project_apply",
+      "key": "task.isolation.apply",
+      "context": "NoProject",
+      "overlay_position": "None",
+      "exit_code": 0,
+      "started_at": "2026-08-09T01:07:53.6218917+07:00",
+      "completed_at": "2026-08-09T01:07:54.6456666+07:00",
+      "stdout": "{\n  \"key\": \"task.isolation.apply\",\n  \"value\": true,\n  \"type\": \"boolean\",\n  \"description\": \"Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts\"\n}\n",
+      "classification": {
+        "Status": "OBSERVED",
+        "Reasons": [
+          "CONFIG_READ_OK"
+        ],
+        "Observation": {
+          "Key": "task.isolation.apply",
+          "Value": true,
+          "Type": "boolean",
+          "Description": "Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts"
+        },
+        "Fallback": null,
+        "Context": "NoProject"
+      }
+    }
+  ]
+}

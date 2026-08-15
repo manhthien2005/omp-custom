@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 4,
+  "selected": false,
+  "adjudicated_at": "2026-08-09",
+  "adjudication": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "reasons": [
+      "P00-RUNTIME-PROVIDER-OVERLOAD"
+    ],
+    "failure_scope": "parent-terminal",
+    "selection_eligible": false,
+    "semantic_fail": false,
+    "reasoning": "All nine reviewed parent tool calls and all six corrected canaries completed with clean contract and mutation evidence. The parent then ended on a terminal omniroute server_is_overloaded model error instead of producing the required final completion. The environment/provider failure takes precedence over otherwise conforming partial observations, so Attempt 4 cannot be selected or combined with another attempt."
+  },
+  "runtime_record": {
+    "parent_exit_code": 0,
+    "timed_out": false,
+    "duration_ms": 177102,
+    "omp_version": "omp/17.2.10",
+    "model": "omniroute/codex/gpt-5.6-sol-high",
+    "process_environment_redacted": {
+      "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+      "USERPROFILE": "<DISPOSABLE_USER_PROFILE>",
+      "OMP_PHASE00_E3I_PARENT_CWD": "<DISPOSABLE_PROJECT>"
+    }
+  },
+  "runtime_pin": {
+    "selection": "EXPLICIT_SOURCE",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "observed_parent_protocol": {
+    "tool_sequence": [
+      "bash",
+      "task",
+      "task",
+      "task",
+      "phase00_e3i_override_apply_true",
+      "bash",
+      "task",
+      "task",
+      "task"
+    ],
+    "sequence_matches_session_a": true,
+    "required_final_completion_observed": false,
+    "project_diagnostic": {
+      "status": "OBSERVED",
+      "key": "task.isolation.apply",
+      "type": "boolean",
+      "value": false
+    },
+    "runtime_diagnostic": {
+      "status": "OBSERVED",
+      "key": "task.isolation.apply",
+      "type": "boolean",
+      "value": false
+    },
+    "runtime_override": {
+      "status": "PASS",
+      "probe": "phase00-e3i-runtime-override-v1",
+      "setting": "task.isolation.apply",
+      "before": false,
+      "operation": "pi.pi.settings.override",
+      "requested": true,
+      "after": true,
+      "calledSet": false,
+      "calledFlushOrSave": false,
+      "scope": "parent-only"
+    }
+  },
+  "observed_task_samples": [
+    {
+      "id": "e3i-project-1",
+      "branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "summary": "Isolation patch captured under the disposable session (apply=false); not applied.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 5797,
+      "tokens": 6130,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-project-2",
+      "branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "summary": "Isolation patch captured under the disposable session (apply=false); not applied.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 13629,
+      "tokens": 6178,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-project-3",
+      "branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "summary": "Isolation patch captured under the disposable session (apply=false); not applied.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 5448,
+      "tokens": 6191,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-runtime-1",
+      "branch": "APPLY_TRUE_NO_DIFF",
+      "summary": "No changes to apply.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 10073,
+      "tokens": 3672,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "branch": "APPLY_TRUE_NO_DIFF",
+      "summary": "No changes to apply.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 6027,
+      "tokens": 6239,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "branch": "APPLY_TRUE_NO_DIFF",
+      "summary": "No changes to apply.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 6307,
+      "tokens": 6264,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    }
+  ],
+  "canary_protocol_observation": {
+    "canary_count": 6,
+    "all_effective_surfaces": [
+      "read",
+      "yield",
+      "hub"
+    ],
+    "ambient_mcp_or_custom_tools_present": false,
+    "all_read_only": true,
+    "each_tool_call_count": 1,
+    "each_yield_call_count": 1,
+    "each_forbidden_tool_call_count": 0,
+    "each_override_tool_present": false,
+    "all_acknowledgements_exact": true,
+    "nested_provider_failures": 0
+  },
+  "terminal_parent_failure": {
+    "provider": "omniroute",
+    "model": "codex/gpt-5.6-sol-high",
+    "detector_code": "P00-RUNTIME-MODEL-ERROR",
+    "classified_reason": "P00-RUNTIME-PROVIDER-OVERLOAD",
+    "error_code": "server_is_overloaded",
+    "message": "Our servers are currently overloaded. Please try again later.",
+    "terminal": true,
+    "auto_retry_start_observed": true,
+    "auto_retry_attempt": 1,
+    "recovery_observed": false,
+    "superseding_parent_message_observed": false,
+    "selection_consequence": "BLOCKED_ENVIRONMENT before semantic adjudication"
+  },
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "tdd_evidence": {
+    "terminal_artifact_red": {
+      "passed": 40,
+      "failed": 2,
+      "expected_failures": [
+        "Attempt 4 adjudication sidecar absent",
+        "terminal conclusion absent"
+      ]
+    },
+    "new_harness_fix_required": false
+  },
+  "provider_execution": {
+    "session_a_launches": 1,
+    "session_a_retry_launched": false,
+    "session_b_launched": false,
+    "automatic_retry_performed": false,
+    "next_action": "Terminate E3-I as BLOCKED_ENVIRONMENT. Do not launch another unchanged-state retry or Session B."
+  },
+  "raw_artifacts": [
+    {
+      "file": "session-a-attempt-004.stdout.jsonl",
+      "sha256": "52FE23F8217A15FE97120AEF5B8EC3D1C57539912A8AFFB932731BA8E668CF58"
+    },
+    {
+      "file": "session-a-attempt-004.stderr.txt",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "file": "session-a-attempt-004.run.json",
+      "sha256": "311324F650C20F0B2511FDC6E11F8EA6FB98200DFF6CE7C2DE70A8413FCAD78C"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-project-1.jsonl",
+      "sha256": "8CBA907D49983A132CF896AA81CD63428D8F11AD620816EF4FCF606C1D729377"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-project-2.jsonl",
+      "sha256": "915E4B624C9D7E6AC8DB9164076CAAF62EC265CA8D6A2FAEE12178C51C80BF16"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-project-3.jsonl",
+      "sha256": "109AA93BD753565B0432AB27C4F6BC900C6B78F50E146FD7168103E372F59362"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-runtime-1.jsonl",
+      "sha256": "1F53ADE4CEBB96DA9B9E3AFC1EC1065AA58F3C3CD4B43B5015936618303658C8"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-runtime-2.jsonl",
+      "sha256": "415FD739379473A2D5E6A117B4DF6F38D6F2F7BB040C1C7CEA5D6A77B608FC1F"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-runtime-3.jsonl",
+      "sha256": "D04FF975AB28E7CA961AD58BF336C23849592E1CDE3C41A9173F0071C728FC4E"
+    }
+  ],
+  "non_claims": [
+    "Attempt 4 is not selected and provides no I1, I2, I3, or I4 PASS artifact.",
+    "The otherwise conforming Session A observations cannot be reused or combined with another attempt.",
+    "Session B was not launched.",
+    "No semantic or safety contradiction was observed.",
+    "No harness correction can resolve the upstream provider overload.",
+    "E3-I grants no parallel authority."
+  ]
+}

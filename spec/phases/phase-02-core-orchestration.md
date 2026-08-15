@@ -1,13 +1,164 @@
 # Phase 02 — Core Orchestration
 
-> OPUS PROPOSED SPEC v1 | Make the three workflows actually run end to end.
+<!-- topic08-projection:behavior-core -->
+## Topic 08 behavior consumer
+
+Managed dispatch reconciles the manifest-selected project skills and exact role autoload before
+native spawn. Worker alone autoloads completion evidence. The main session explicitly uses
+`agent_tasks` for lifecycle operations; diagnostic reads need no task, while edit/write/bash need
+one valid binding. The current three-skill roster can expand only through the manifest contract.
+
+<!-- topic06-projection:phase-02 -->
+## Topic 06 dispatch consumer
+
+Create one Topic 04 work unit before every managed spawn and call the same-name trusted `task`
+boundary through `.omp/bin/omp-managed.ps1`. Single and batch items carry complete independent
+work-unit identities. Managed v1 is blocking and non-nested; a receipt records a provisional
+outcome only. If the boundary is unavailable, the Tech Lead works inline without fabricating an
+agent packet, independent review, or receipt.
+
+## Topic 04 consumer projection
+
+Topic 04 consumes task, candidate, and work-unit authority. Phase 02 must create accepted task
+contracts before mutation, record bounded work-unit outcomes as provisional, reserve the
+authoritative worktree/scope, and let only the integrated candidate reach acceptance. It consumes
+the shared manual core without adding a DAG edge or mandatory spawn.
+
+> **Active remap:** implement the approved Topic 02 entry/lifecycle contract with the KD-027
+> Topic 03 topology and the later Topic 08 deeper triage adapter. The pre-Topic-02 plan is
+> retained below as a non-executable research appendix.
 
 **Depends on**: phase-01
 **Blocks**: phase-03, phase-04
 
 ---
 
-## Objective
+## Active Topic 02 Runtime Migration
+
+### Objective
+
+Migrate runtime prompts from the Phase 00 snapshot to the Topic 02 contract without rewriting
+historical evidence. Implement no-prefix entry, explicit Quick, and Tech-Lead selection of
+Standard or Orchestrated. Standard is one integrated implementation lane. Orchestrated
+requires independently verifiable work units and an integration contract plus
+cross-boundary verification.
+
+### Authority and dependency boundary
+
+- `spec/04-workflow-sizing.md` and KD-026 own entry and lifecycle semantics.
+- KD-027 selects exactly `cheap-scout`, `worker`, and `reviewer` as spawnable agents. The
+  main-session Tech Lead stays inline by default; stage names never force a spawn.
+- Topic 04 owns durable task/candidate/session state. Phase 02 projects the conceptual
+  contract into behavior but does not invent a second state store.
+- Topic 08 owns the detailed triage procedure and runtime-specific adapters.
+- `spec/08-isolation-and-concurrency.md` applies only if Topic 03 selects a parallel-writer
+  path. Sequential execution is a valid Orchestrated implementation.
+
+### Migration tasks
+
+#### T-02.N1 — Establish a new current-product evidence boundary
+
+Preserve historical Phase 00 evidence; create new current-product validation evidence.
+Do not refresh the hashes in `docs/evidence/phase-00/T-00.3/conclusion.yml`, weaken its
+validator, or rewrite its consumer markers to make a later product state look historical.
+Record the Phase 00 prompt snapshot as the migration source and create a new evidence identity
+for the post-Topic-02 runtime projection.
+
+The current-product manifest records the selected three-agent set, hashes each installed runtime
+artifact, binds the immutable Phase 00 T-00.3 conclusion by path and digest, and marks its roster
+as `superseded_for_current_runtime_only`. It records DeepSeek smoke as `PASS`, `FAIL`, or
+`ENVIRONMENT_BLOCKED` without altering historical evidence.
+
+#### T-02.N2 — Project the entry contract
+
+- Plain natural-language requests enter the main-session Tech Lead normally.
+- `/quick` is an explicit user choice with a short suitability preflight.
+- `/standard` and `/orchestrated` are compatibility/advanced hints.
+- The same words without `/` are natural-language hints, not command errors.
+- Workflow reclassification is an internal transition; it never asks the model to invoke
+  another slash command.
+
+#### T-02.N3 — Project task, candidate, and session boundaries
+
+Prompts must distinguish clarification, accepted task contract, active work, frozen candidate,
+verification, rework, and terminal outcome. The accepted contract locks objective,
+scope/authority, mandatory criteria, and required verification and review obligations.
+Acceptance evidence binds to one frozen snapshot; mutation requires C2 or later. One session
+serves one task and one non-competing candidate lineage. Compaction preserves identity;
+handoff opens a reconciled successor.
+
+#### T-02.N4 — Implement topology-neutral Standard
+
+Implement one integrated lane under Tech Lead ownership. Default to inline/no spawn. Optional
+Cheap Scout retrieval and Worker implementation require a stated benefit; verification remains a
+Tech Lead task-contract obligation; General Reviewer dispatch follows the KD-027 risk gate rather
+than a fixed Explorer-to-Implementer-to-Verifier chain.
+
+#### T-02.N5 — Implement structurally Orchestrated work
+
+Require at least two work-unit contracts with inputs, outputs, ownership, dependencies, and
+completion conditions; one task-level integration contract; and cross-boundary verification.
+Only the fully integrated frozen task candidate may be accepted. Parallelism and multiple
+writers remain optional.
+
+#### T-02.N6 — Preserve work during reclassification and failure
+
+Keep valid discovery and workspace changes. Do not reset, discard, revert, or restart a slash
+command merely because classification changes. Cheap Scout remains optional/read-only and
+fails softly to the retrieval path the Tech Lead needs.
+
+Cheap Scout routes Flash `xhigh` (provider `max`) → Pro `xhigh` (provider `max`) only for
+availability/runtime failure → Tech Lead retrieval. Worker defaults to `high` and uses per-spawn
+`effort: hi` only for Tech-Lead-selected difficult work. Reviewer is fixed at `xhigh`; unavailable
+Opus uses the approved review fallback ladder and is not itself a blocker.
+
+#### T-02.N7 — Validate the runtime projection
+
+Add deterministic and behavioral checks for every Topic 02 scenario in
+`spec/04-workflow-sizing.md`: no-prefix entry, missing slash, explicit Quick, compatibility
+hints, internal escalation, candidate invalidation, rework, compaction, handoff, resume/fork,
+Orchestrated integration, and Scout fallback. Validate both supported runtime adapters and
+record any capability-specific limitation.
+
+### Active deliverables
+
+- runtime-specific entry adapters aligned with one behavioral core;
+- topology-neutral Standard and structural Orchestrated contracts;
+- exactly three discoverable runtime agents: Cheap Scout, Worker, and Reviewer;
+- benefit-gated spawn, dynamic Worker effort, fixed Reviewer `xhigh`, and Scout-only fallback;
+- candidate-bound verification behavior;
+- non-destructive reclassification and fail-soft Scout fallback;
+- new post-Topic-02 evidence and an explicit supersession link from the Phase 00 snapshot.
+
+### Active exit criteria
+
+- [ ] Plain requests and missing-slash hints do not produce command errors.
+- [ ] Quick is user-selected; Standard versus Orchestrated is Tech-Lead-selected.
+- [ ] Orchestrated passes the work-unit/integration structural test; agent count and
+      parallelism do not select it.
+- [ ] Reclassification preserves valid work and never reinvokes a slash command.
+- [ ] Candidate mutation invalidates prior acceptance-bearing evidence.
+- [ ] Compaction and handoff preserve the approved lifecycle identities.
+- [ ] Topology-specific and parallel-writer paths run only when their later contracts select
+      and authorize them.
+- [ ] Runtime discovery is exactly `cheap-scout`, `worker`, `reviewer`; `tech-lead`, `explorer`,
+      `implementer`, and `verifier` are absent from agent discovery.
+- [ ] Current-product evidence binds the immutable Phase 00 source and records the supersession
+      disposition plus actual DeepSeek environment state.
+- [ ] Historical Phase 00 evidence remains byte-stable and the new product state has separate,
+      reproducible evidence.
+
+---
+
+## Appendix A — Superseded Pre-Topic-02 Plan (Reference Only)
+
+<!-- topic08-supersession:fixed-role-autoload -->
+
+The remainder of this file preserves useful source notes and the earlier fixed-worker
+implementation candidate. It is not execution authority. Topic 03 may adopt, revise, or reject
+individual mechanisms; none may override the active remap above.
+
+### Historical objective
 
 Get `/quick`, `/standard`, and `/orchestrated` executing correctly with real agent
 dispatch, real structured results, explicit isolation, and guaranteed discipline
@@ -15,13 +166,13 @@ injection.
 
 ---
 
-## Rationale
+### Historical rationale
 
 Phase-01 removed the defects; this phase supplies what was missing. The commands currently describe a workflow in prose without the mechanics that make it happen: no `output:` frontmatter schemas on worker agents, no `isolated: true` on parallel Implementers, no `autoloadSkills`, no non-git-repo fallback, and no defined sequential integration procedure for captured parallel-worker artifacts. Prose alone does not orchestrate.
 
 ---
 
-## Tasks
+### Historical tasks
 
 ### T-02.1 — Wire autoloadSkills for guaranteed discipline
 
@@ -115,7 +266,7 @@ On failure: **do not launch parallel isolated Implementers.** Fall back to seque
 **CR-38 — the settings read is a diagnostic; the same-session canary is the authority.** `omp config get` runs in a **separate process** and re-resolves settings from files. What actually governs dispatch is the parent session's in-memory `Settings`: `applyChanges: request.isolation?.apply ?? (invocationKind === "task" ? request.session.settings.get("task.isolation.apply") : true)` (`task/structured-subagent.ts:315-317`). Two layers are invisible to a subprocess and both outrank project config:
 
 - `--config <file>` CLI overlay — *"for that one process. Never persisted."* (`docs/settings.md:21`)
-- in-session runtime override — `Settings.set()` writes the in-memory `#overrides` layer (`config/settings.ts:524`), touching no file
+- in-session runtime override — `Settings.override()` writes the in-memory `#overrides` layer (`config/settings.ts:518-526`), touching no file
 
 So a parent launched with `--config` setting `apply: true` over a project config of `false` yields a subprocess read of `false` (preflight PASS) and an actual `applyChanges == true` — restoring the CR-27 concurrent-auto-apply hazard through the check meant to prevent it.
 
@@ -128,10 +279,11 @@ do not fan out — and verify the parent tree is unchanged. If the isolated disp
 errors, parallel mode is unavailable. This exercises the same session, the same `task` tool,
 the same `session.settings`, and the same isolation path — so it attests behavior instead of
 reconstructing config. **CR-44/CR-45 fail-closed:** the behavioral canary does NOT authorize parallel fan-out — it
-is a diagnostic/characterization tool only. E3-L source-verifies that a project custom tool
-can read `ctx.settings.get("task.isolation.apply")` from the live parent-session Settings
-instance (`session-tools.ts:1303`), which sees CLI `--config` overlays and in-session
-overrides that `omp config get` misses. However, E3-L PASS confirms observation capability
+is a diagnostic/characterization tool only. E3-L must source-verify and test an approved
+replacement live-session reader. The earlier project custom-tool `ctx.settings` claim is
+invalid on pinned v17.2.10 because `sdk.ts:885-894,938-955` omits settings from that bridge;
+the `session-tools.ts:1295-1314` settings-bearing context belongs to MCP refresh. E3-L PASS
+confirms observation capability
 only — it is NOT the parallel authority gate. CR-45 TOCTOU: the read at t0 is a snapshot;
 `Settings.override()` (`settings.ts:518-525`) can mutate the value before dispatch at t3.
 **E3-M (guarded dispatch) is the gate**: until E3-M passes, parallel mode is DISABLED.
@@ -143,7 +295,7 @@ The canary requires T-02.1b: it must be synchronous from the coordinator's persp
 
 **CR-32 — Any nested git repo or submodule disables parallel isolated implementation for the whole repository.** On the successful `apply=false` path, OMP v17.2.10 never materializes nested-repo patches to disk (`persistNestedPatches()` is reachable only from the failure/recovery path), and the `apply=false` summary reports only the root patch when the root also changed — so a nested-repo change is silently lost with no signal. Post-integration `git status` on the nested repo **cannot distinguish compliance from silent loss** (the parent tree looks identical in both cases), so scope-exclusion instructions and post-hoc detection are not accepted as enforcement (§08 §D-1.1). The safe v0 policy is **Option A1**: the orchestrator enumerates nested repos before fan-out (`git submodule status --recursive`, `find . -mindepth 2 -name .git -not -path './node_modules/*'`), and **any non-empty result disables parallel isolated implementation for that run**, routing to sequential non-isolated implementation instead. Full source trace and enforcement analysis in `08-isolation-and-concurrency.md §D-1`.
 
-**Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `/orchestrated` runs the settings diagnostics and the E3-L live-settings read (`ctx.settings.get("task.isolation.apply")`), using it as a diagnostic input (behavioral canary is diagnostic-only per CR-44); the nested-repo preflight runs **before** fan-out and a non-empty result **disables parallel isolated implementation for the whole run**, routing to sequential non-isolated implementation with the nested paths disclosed (T-00.E3-G, CR-32 Option A1). Scope exclusion is explicitly NOT an accepted outcome here — an acceptance criterion reading "excluded from parallel scope" would restate the rule §08 §D-1.1 withdrew. **Until E3-M (guarded dispatch) passes, parallel mode is DISABLED; sequential non-isolated is the fallback. E3-L is a prerequisite for E3-M but does not itself enable parallel (CR-45 TOCTOU).**
+**Acceptance**: every parallel Implementer dispatch carries `isolated: true`; observation-phase agents (Explorer, Verifier, Reviewer) carry no isolation; `/orchestrated` runs the settings diagnostics and, only after E3-L passes, may use the scoped `pi.pi.settings.get("task.isolation.apply")` observation for the OMP-owned default main-CLI root-session construction class as a diagnostic input (behavioral canary is diagnostic-only per CR-44; excluded ACP/SDK/injected/cloned/RPC hosts receive no reader claim); the nested-repo preflight runs **before** fan-out and a non-empty result **disables parallel isolated implementation for the whole run**, routing to sequential non-isolated implementation with the nested paths disclosed (T-00.E3-G, CR-32 Option A1). Scope exclusion is explicitly NOT an accepted outcome here — an acceptance criterion reading "excluded from parallel scope" would restate the rule §08 §D-1.1 withdrew. **Until E3-M (guarded dispatch) passes, parallel mode is DISABLED; sequential non-isolated is the fallback. E3-L is a prerequisite for E3-M but does not itself enable parallel (CR-45 TOCTOU).**
 
 ### T-02.3 — Add the non-git-repo fallback
 
@@ -202,9 +354,15 @@ apply tasks[1] → CONFLICT
 
 **CR-03/CR-26 correction:** Per DR-2 and phase-01 T-01.7, each worker agent carries its canonical schema in `output:` frontmatter — this is the primary enforcement path. Task dispatch commands use inline `outputSchema` **only** as an explicit caller override (e.g., a one-off call needing a narrower schema).
 
-Each dispatch must specify: agent, task packet content, `isolated` (write-capable only), and `effort` when `task.enableEffort` is on. `schemaMode: "strict"` should be passed when strict enforcement is required. Inline `outputSchema` is used only when overriding the agent's `output:` frontmatter.
+Each dispatch must specify: agent, task packet content, `isolated` (write-capable only), and
+`effort` only when the selected manifest consumes that lever. When a selected dispatch uses
+effort, task.enableEffort must be effective or the path stops before dispatch; do not silently
+drop the escalation. `schemaMode: "strict"` should be passed when strict enforcement is required.
+Inline `outputSchema` is used only when overriding the agent's `output:` frontmatter.
 
-**Acceptance**: every dispatch specifies agent, task packet, isolation intent (when write-capable), and effort (when enabled). Inline `outputSchema` appears only for explicit overrides, not as a universal requirement.
+**Acceptance**: every dispatch specifies agent, task packet, isolation intent (when
+write-capable), and effort only when selected and proven effective. Inline `outputSchema` appears
+only for explicit overrides, not as a universal requirement.
 
 ### T-02.5 — Implement Quick as genuinely inline
 
@@ -224,12 +382,13 @@ re-scoping.
 
 ### T-02.7 — Handle the schema-override signal
 
-`yield` accepts non-conforming data after three failed retries and sets
-`schemaOverridden`. The Tech Lead must treat such a result as **unvalidated** rather
-than trusting its fields.
+The coordinator must distinguish the full runtime status surface. A malformed schema can return
+`structuredOutput.status: unavailable`; a schema violation can be `invalid`; retry exhaustion may
+set `schemaOverridden`. Malformed schemas and any structuredOutput status other than valid cannot
+satisfy acceptance, and an override remains unvalidated even if its payload looks complete.
 
-**Acceptance**: commands instruct the Tech Lead to re-verify independently when the
-override flag is present.
+**Acceptance**: commands require `structuredOutput.status == "valid"`, reject every override,
+and repair or explicitly replace/reconcile/revalidate the selected contract before redispatch.
 
 ### T-02.8 — Bound concurrency deliberately
 
@@ -241,7 +400,7 @@ work units.
 
 ---
 
-## Deliverables
+### Historical deliverables
 
 - Agent files with `autoloadSkills`
 - Commands with complete dispatch contracts (schema, isolation, effort)
@@ -254,7 +413,7 @@ work units.
 
 ---
 
-## Verification
+### Historical verification
 
 Execute each workflow against a real task in a scratch repository:
 
@@ -289,14 +448,14 @@ Execute each workflow against a real task in a scratch repository:
 
 ---
 
-## Exit Criteria
+### Historical exit criteria
 
 - [ ] All three workflows run end to end without silent failure
 - [ ] Every dispatch returns a schema-valid result
 - [ ] Implementers isolated in parallel; observation-phase agents (Explorer, Verifier, Reviewer) not isolated
 - [ ] `task.isolation.apply: false` confirmed at session/project settings (T-00.E3); parallel Implementers return captured artifacts without auto-apply
 - [ ] **CR-31** — `/orchestrated` performs the effective-settings preflight (`mode != none`, `apply == false`) and never fans out in parallel when it fails; the fallback or refusal is disclosed in the report
-- [ ] **CR-38/CR-42/CR-44/CR-45** — `omp config get` is used as a diagnostic only; **parallel mode is DISABLED until E3-M (guarded dispatch) passes**. E3-L (live custom-tool settings read) confirms `ctx.settings.get("task.isolation.apply")` sees live values including overlays — it is a prerequisite for E3-M — but E3-L PASS alone does NOT enable parallel: CR-45 TOCTOU means the preflight read at t0 is a snapshot; `Settings.override()` (`settings.ts:518-525`) can mutate the value between t0 and actual dispatch. Behavioral canary (§E-9.2) runs as characterization/diagnostic (E3-I) only — its PASS does NOT authorize parallel fan-out. After E3-M PASS: preflight uses the guarded-dispatch mechanism; `ctx.settings` reads inform the gate; `omp config get` explains the diagnosis to the user.
+- [ ] **CR-38/CR-42/CR-44/CR-45** — `omp config get` is used as a diagnostic only; **parallel mode is DISABLED until E3-M (guarded dispatch) passes**. E3-L must prove the scoped `pi.pi.settings.get("task.isolation.apply")` reader for the OMP-owned default main-CLI root-session construction class because the nominal project custom-tool `ctx.settings` bridge is unavailable on pinned v17.2.10. ACP/SDK/injected/cloned/RPC hosts remain excluded. E3-L remains a prerequisite for E3-M, but E3-L PASS alone does NOT enable parallel: CR-45 TOCTOU means the preflight read at t0 is a snapshot; `Settings.override()` (`settings.ts:518-525`) can mutate the value between t0 and actual dispatch. Behavioral canary (§E-9.2) runs as characterization/diagnostic (E3-I) only — its PASS does NOT authorize parallel fan-out. After E3-M PASS: preflight uses the guarded-dispatch mechanism; the scoped reader informs supported-host diagnostics; `omp config get` explains the diagnosis to the user.
 - [ ] **CR-39** — all four worker agents carry `blocking: true`; L0 checks the files, L1 checks discovery; `async.enabled` untouched; `task.batch == true` verified in preflight with a disclosed fallback
 - [ ] **CR-40/CR-41** — project install owns `task.enableLsp: true`; an existing `false` reports CONFLICT and is not overwritten; a run without LSP discloses reduced-capability mode naming which of the **four conditions** failed (`lsp.enabled` is the fourth, distinct from `task.enableLsp`)
 - [ ] **CR-32** — orchestrator performs nested-repo preflight (Option A1); any non-empty nested-repo result disables parallel isolated implementation for that run and routes to sequential non-isolated; withdrawn enforcement: scope exclusion and post-integration `git status`
@@ -311,7 +470,7 @@ Execute each workflow against a real task in a scratch repository:
 
 ---
 
-## Risks
+### Historical risks
 
 | Risk | Mitigation |
 |---|---|

@@ -1,0 +1,313 @@
+{
+  "schema_version": 2,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 7,
+  "selected": false,
+  "omp_version": "omp/17.2.10",
+  "omp_runtime": {
+    "selection": "EXPLICIT_SOURCE",
+    "launch_path": "<DISPOSABLE_RUNTIME>/omp.exe",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "model": "omniroute/oc/mimo-v2.5-free",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+    "USERPROFILE": "<DISPOSABLE_USER_PROFILE>",
+    "OMP_PHASE00_E3IL_PARENT_CWD": "<DISPOSABLE_PROJECT>",
+    "OMP_PHASE00_E3IL_ENABLE_OVERRIDE": "1"
+  },
+  "command": [
+    "<DISPOSABLE_RUNTIME>/omp.exe",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--model",
+    "omniroute/oc/mimo-v2.5-free",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "12m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:session-a.md>"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "started_at": "2026-08-11T11:30:23.8495868+07:00",
+  "completed_at": "2026-08-11T11:32:12.1073823+07:00",
+  "duration_ms": 108258,
+  "parent_stdout_sha256": "1F585ED5EAE164A3B6FBFEC8C6457A5EC1FFABF257B6830BF55916AFE8B2181A",
+  "parent_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+  "canary_artifacts": [
+    {
+      "id": "e3i-project-1",
+      "sha256": "6358F84E0C1DEA4FF90D569CDFE046253A611A7859671F2DFEC920FECA61F745",
+      "file": "session-a-attempt-007.canary.e3i-project-1.jsonl"
+    },
+    {
+      "id": "e3i-project-2",
+      "sha256": "52936592D30903B68ED23E588412FDBECD59AE50934F345D4403CE9D241CEB55",
+      "file": "session-a-attempt-007.canary.e3i-project-2.jsonl"
+    },
+    {
+      "id": "e3i-project-3",
+      "sha256": "C4A732275B20983AA21BBEF169E6DA601504205D0EB5D6C8F6BFA07C21D3C9F5",
+      "file": "session-a-attempt-007.canary.e3i-project-3.jsonl"
+    },
+    {
+      "id": "e3i-runtime-1",
+      "sha256": "228BAFCAF8F297ED0161F8818EBC5C394B70316F2F475B6FF959ED63C50AED08",
+      "file": "session-a-attempt-007.canary.e3i-runtime-1.jsonl"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "sha256": "83EB20102420C626B9882E93E92A90C5181961C1A14B445089F0E4E1FC21593F",
+      "file": "session-a-attempt-007.canary.e3i-runtime-2.jsonl"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "sha256": "BAE85A3DD9C7DECE8153A45BD79032E86029EF34B55272A85A25B9DE0C901EF4",
+      "file": "session-a-attempt-007.canary.e3i-runtime-3.jsonl"
+    }
+  ],
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "live_home_metadata": {
+    "BeforeFileCount": 14,
+    "AfterFileCount": 14,
+    "BeforeSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "AfterSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "ChangedPaths": [],
+    "ChangedCount": 0,
+    "BoundaryResult": "PASS",
+    "MutationAttributableToExperiment": false,
+    "AttributionBasis": "NO_CHANGE"
+  },
+  "cleanup_error": null,
+  "analysis": {
+    "Status": "PASS",
+    "Reasons": [
+      "E3I_SESSION_A_EXACT"
+    ],
+    "Override": {
+      "Status": "PASS",
+      "Reasons": [
+        "E3I_OVERRIDE_ATTESTED"
+      ],
+      "Details": {
+        "probe": "phase00-e3i-runtime-override-v1",
+        "setting": "task.isolation.apply",
+        "before": false,
+        "operation": "pi.pi.settings.override",
+        "requested": true,
+        "after": true,
+        "calledSet": false,
+        "calledFlushOrSave": false,
+        "scope": "parent-only"
+      }
+    },
+    "Session": "A",
+    "Diagnostics": [
+      {
+        "Status": "OBSERVED",
+        "Value": false,
+        "Raw": {
+          "key": "task.isolation.apply",
+          "value": false,
+          "type": "boolean",
+          "description": "Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts"
+        }
+      },
+      {
+        "Status": "OBSERVED",
+        "Value": false,
+        "Raw": {
+          "key": "task.isolation.apply",
+          "value": false,
+          "type": "boolean",
+          "description": "Automatically apply successful isolated task changes to the parent checkout; disable to retain patch or branch artifacts"
+        }
+      }
+    ],
+    "CanarySessions": [
+      {
+        "Id": "e3i-project-1",
+        "Tools": [
+          "read",
+          "yield",
+          "hub"
+        ],
+        "ReadOnly": true,
+        "ToolCallCount": 1,
+        "ToolNames": [
+          "yield"
+        ],
+        "YieldCallCount": 1,
+        "ForbiddenToolCallCount": 0,
+        "OverrideToolPresent": false
+      },
+      {
+        "Id": "e3i-project-2",
+        "Tools": [
+          "read",
+          "yield",
+          "hub"
+        ],
+        "ReadOnly": true,
+        "ToolCallCount": 1,
+        "ToolNames": [
+          "yield"
+        ],
+        "YieldCallCount": 1,
+        "ForbiddenToolCallCount": 0,
+        "OverrideToolPresent": false
+      },
+      {
+        "Id": "e3i-project-3",
+        "Tools": [
+          "read",
+          "yield",
+          "hub"
+        ],
+        "ReadOnly": true,
+        "ToolCallCount": 1,
+        "ToolNames": [
+          "yield"
+        ],
+        "YieldCallCount": 1,
+        "ForbiddenToolCallCount": 0,
+        "OverrideToolPresent": false
+      },
+      {
+        "Id": "e3i-runtime-1",
+        "Tools": [
+          "read",
+          "yield",
+          "hub"
+        ],
+        "ReadOnly": true,
+        "ToolCallCount": 1,
+        "ToolNames": [
+          "yield"
+        ],
+        "YieldCallCount": 1,
+        "ForbiddenToolCallCount": 0,
+        "OverrideToolPresent": false
+      },
+      {
+        "Id": "e3i-runtime-2",
+        "Tools": [
+          "read",
+          "yield",
+          "hub"
+        ],
+        "ReadOnly": true,
+        "ToolCallCount": 1,
+        "ToolNames": [
+          "yield"
+        ],
+        "YieldCallCount": 1,
+        "ForbiddenToolCallCount": 0,
+        "OverrideToolPresent": false
+      },
+      {
+        "Id": "e3i-runtime-3",
+        "Tools": [
+          "read",
+          "yield",
+          "hub"
+        ],
+        "ReadOnly": true,
+        "ToolCallCount": 1,
+        "ToolNames": [
+          "yield"
+        ],
+        "YieldCallCount": 1,
+        "ForbiddenToolCallCount": 0,
+        "OverrideToolPresent": false
+      }
+    ],
+    "RuntimeSamples": [
+      {
+        "Id": "e3i-runtime-1",
+        "Branch": "APPLY_TRUE_NO_DIFF",
+        "Summary": "No changes to apply.",
+        "DurationMs": 4317,
+        "Tokens": 5597,
+        "Requests": 1,
+        "ResolvedModel": "omniroute/oc/mimo-v2.5-free",
+        "Acknowledgement": "PHASE00_E3I_CANARY_OK"
+      },
+      {
+        "Id": "e3i-runtime-2",
+        "Branch": "APPLY_TRUE_NO_DIFF",
+        "Summary": "No changes to apply.",
+        "DurationMs": 4487,
+        "Tokens": 5490,
+        "Requests": 1,
+        "ResolvedModel": "omniroute/oc/mimo-v2.5-free",
+        "Acknowledgement": "PHASE00_E3I_CANARY_OK"
+      },
+      {
+        "Id": "e3i-runtime-3",
+        "Branch": "APPLY_TRUE_NO_DIFF",
+        "Summary": "No changes to apply.",
+        "DurationMs": 5194,
+        "Tokens": 5511,
+        "Requests": 1,
+        "ResolvedModel": "omniroute/oc/mimo-v2.5-free",
+        "Acknowledgement": "PHASE00_E3I_CANARY_OK"
+      }
+    ],
+    "ProjectSamples": [
+      {
+        "Id": "e3i-project-1",
+        "Branch": "APPLY_FALSE_CAPTURE_ONLY",
+        "Summary": "Isolation: changes captured at `<DISPOSABLE_ROOT>\\sessions\\2026-08-11T04-30-25-369Z_019fef16-0459-7000-98bd-a55971092d26\\e3i-project-1.patch` (apply=false). Not applied.",
+        "DurationMs": 5964,
+        "Tokens": 5449,
+        "Requests": 1,
+        "ResolvedModel": "omniroute/oc/mimo-v2.5-free",
+        "Acknowledgement": "PHASE00_E3I_CANARY_OK"
+      },
+      {
+        "Id": "e3i-project-2",
+        "Branch": "APPLY_FALSE_CAPTURE_ONLY",
+        "Summary": "Isolation: changes captured at `<DISPOSABLE_ROOT>\\sessions\\2026-08-11T04-30-25-369Z_019fef16-0459-7000-98bd-a55971092d26\\e3i-project-2.patch` (apply=false). Not applied.",
+        "DurationMs": 4613,
+        "Tokens": 5515,
+        "Requests": 1,
+        "ResolvedModel": "omniroute/oc/mimo-v2.5-free",
+        "Acknowledgement": "PHASE00_E3I_CANARY_OK"
+      },
+      {
+        "Id": "e3i-project-3",
+        "Branch": "APPLY_FALSE_CAPTURE_ONLY",
+        "Summary": "Isolation: changes captured at `<DISPOSABLE_ROOT>\\sessions\\2026-08-11T04-30-25-369Z_019fef16-0459-7000-98bd-a55971092d26\\e3i-project-3.patch` (apply=false). Not applied.",
+        "DurationMs": 5488,
+        "Tokens": 5448,
+        "Requests": 1,
+        "ResolvedModel": "omniroute/oc/mimo-v2.5-free",
+        "Acknowledgement": "PHASE00_E3I_CANARY_OK"
+      }
+    ]
+  }
+}

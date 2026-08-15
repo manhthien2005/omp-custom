@@ -1,0 +1,45 @@
+schema_version: 1
+phase: "00"
+experiment: E3-I
+case: I4
+status: PASS
+selected_attempt: 7
+reason: E3I_CANARY_SAFETY_RELIABILITY_CONFIRMED
+
+runtime:
+  version: "omp/17.2.10"
+  executable_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  model: omniroute/oc/mimo-v2.5-free
+
+selected_joint_transaction:
+  path: docs/evidence/phase-00/E3-L/raw/joint-attempt-007.json
+  sha256: CF8D5AD4BF8A9D75D62CE967B901D2E03C13FCB6B5988C1D695F601DAA34DFCA
+raw_sessions:
+  - {path: docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.run.json, sha256: 9C89C85A0EA7C6CABFE37A7594B740DB73AFBC15F82C259A8494DE12B257B9E2}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-b-attempt-007.run.json, sha256: 3C65E031030B2D6DBA10886744CDB12CEAF78C713E3610337E5F8E6456354978}
+
+observation:
+  session_a_status: PASS
+  session_b_status: PASS
+  canary_count: 9
+  effective_tool_surface: [read, yield, hub]
+  terminal_yield_count: 9
+  forbidden_tool_call_count: 0
+  override_tool_present_in_child_count: 0
+  positive_cost_sample_count: 9
+  total_child_duration_ms: 43664
+  total_child_tokens: 49271
+  total_child_requests: 9
+  project_branch_stability: 3/3
+  runtime_override_branch_stability: 3/3
+  cli_overlay_branch_stability: 3/3
+  boundaries:
+    session_a: {parent_content_unchanged: true, parent_head_unchanged: true, parent_status_unchanged: true, fixture_hashes_unchanged: true, live_home_unchanged: true, cleanup_succeeded: true}
+    session_b: {parent_content_unchanged: true, parent_head_unchanged: true, parent_status_unchanged: true, fixture_hashes_unchanged: true, live_home_unchanged: true, cleanup_succeeded: true}
+
+interpretation:
+  decision: NON_MUTATING_CANARY_IS_STABLE_ACROSS_ALL_NINE_SAMPLES
+  authority: CHARACTERIZATION_ONLY
+  parallel_authorized: false
+  limitation: The canary is behavioral and does not provide an atomic dispatch guard.
+

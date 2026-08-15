@@ -1,0 +1,19 @@
+plan:
+  defaultOnStartup: false
+async:
+  enabled: false
+task:
+  batch: false
+  enableEffort: false
+  maxConcurrency: 1
+  maxRecursionDepth: 2
+  maxRuntimeMs: 180000
+  isolation:
+    mode: none
+    apply: false
+modelRoles:
+  smol: e2project/ddgw/claude-haiku-4-5
+  implementer: e2project/ddgw/claude-haiku-4-5
+  broken: e2unavailable/phase00/unavailable-model-7f3
+  conflict: e2project/ddgw/claude-haiku-4-5
+  default: e2project/ddgw/claude-haiku-4-5

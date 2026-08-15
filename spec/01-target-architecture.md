@@ -1,7 +1,35 @@
 # 01 — Target Architecture
 
+## Selected Topic 04 state authority (KD-028)
+
+The template installs one local deterministic component at `.omp/state`, used explicitly by both
+Claude and Codex/OMP. Operational hierarchy is project → optional phase → task → immutable state
+revisions plus sessions, work units, candidates, evidence, handoffs, and promoted artifacts. Git
+projects store it at `<absolute-git-common-dir>/agent-tasks`; non-Git projects use
+`<project-root>/.agent-tasks`. Installed code and operational authority are separate.
+
+## Selected Topic 07 continuity boundary (KD-031)
+
+The managed entry point loads a trusted continuity extension after the Topic 04 state core.
+Automatic semantic, idle, mid-turn, remote, and auto-continue paths are disabled. After exact
+task arming, argument-free `/safe-compact` may authorize one native soft context-full transaction.
+It persists local recovery bytes before mutation, binds one canonical Topic 04 kernel to the
+current session/revision/lease, and injects it once on the next normal prompt. Summary and kernel
+remain context, never authority. Pressure aborts ordinary provider dispatch; bounded children fail
+without compaction or automatic retry. Bare OMP and direct native compaction are unmanaged.
+
 > OPUS PROPOSED SPEC v1 | Status: awaiting joint review. All claims source-verified against
 > `_research/upstreams/oh-my-pi` unless marked OPEN.
+>
+> **Topic 02 supersession boundary:** the main-session Tech Lead remains architectural
+> authority. The Topic 03-selected topology manifest is the only authority for worker names,
+> count, dispatch, and capability assignment. Former role names below describe the frozen
+> baseline or a migration candidate; they do not require that roster.
+>
+> **Selected by KD-027:** main-session Tech Lead → optional read-only `cheap-scout`, optional
+> bounded writer `worker`, and risk-gated General `reviewer`. Default is inline/no spawn.
+> Verification is owned by the Tech Lead; Reviewer is fixed `xhigh`; Worker is `high` or
+> Tech-Lead-selected `xhigh`; only Scout owns Flash→Pro availability fallback.
 
 ---
 
@@ -89,20 +117,24 @@ OMP enforces subagent output shape through two verified surfaces:
    (`task/types.ts:110-163`, schema builder in `task/spawn-policy.ts`). Per-call,
    overrides the agent's own schema.
 
-Enforcement happens in the `yield` tool: it wraps the declared schema into
+Enforcement starts in the `yield` tool: it wraps the declared schema into
 `{result: {data: …}}`, validates on submit, and retries the model up to
-`MAX_SCHEMA_RETRIES = 3` before accepting non-conforming data with a
-`schemaOverridden` flag (`tools/yield.ts:202, 377-401`). This means:
+`MAX_SCHEMA_RETRIES = 3` (`tools/yield.ts:202,377-401`). Finalization then rejects an ordinary
+invalid payload as `schema_violation`; strict mode also rejects a retry-exhausted override
+(`task/executor.ts:598-700`). This means:
 
 - A declared schema produces **real model-facing retry pressure**, not just documentation.
-- After 3 failures OMP accepts the payload anyway — so a schema is a strong nudge, not a
-  hard gate. The parent must still check `status`.
+- A retry-exhausted `schemaOverridden` result is unvalidated, not acceptance evidence.
+- A malformed schema is the silent hole: it can return
+  `structuredOutput.status: unavailable` without failing the spawn. Every selected
+  structured-result schema is fully linted; acceptance requires structuredOutput.status valid.
 - Incremental section yields (`type: ["findings"]`) validate per-section against the
   matching property sub-schema (`tools/yield.ts:444-454`).
 
 **Decision (DR-2):** put the canonical result shape in agent frontmatter `output:` for
-each worker, because it travels with the agent and cannot be forgotten at the call site.
-Keep task-call `outputSchema` for per-call narrowing only.
+each selected spawned worker with a structured result contract, because it travels with the
+agent and cannot be forgotten at the call site. Keep task-call `outputSchema` for per-call
+narrowing only. Inline responsibilities use the equivalent main-session acceptance check.
 
 ## 5. Skills: Forced Loading
 
@@ -113,21 +145,36 @@ context automatically. This is the correct mechanism for making
 on the skill, because `alwaysApply` affects every session globally whereas
 `autoloadSkills` scopes the cost to the agents that need it.
 
-**Decision (DR-4, revised):** `evidence-before-completion` stays a normal skill; the
-implementer, verifier, and reviewer declare `autoloadSkills: evidence-before-completion`.
-Token cost is paid only in the three agents whose output the invariant governs.
+**Decision (DR-4, revised):** `evidence-before-completion` stays a normal skill. Selected
+completion-claiming roles declare `autoloadSkills: evidence-before-completion` when they are
+spawned; inline completion claims remain governed by main-session rules. Token cost is paid
+only in the selected contexts whose output the invariant governs. Topic 03 determines those
+responsibilities rather than inheriting the former three-role assignment.
 
 ## 6. Tool Allowlists and LSP
 
 `tools:` is a real allowlist; `yield` is auto-appended if missing
-(`discovery/helpers.ts:261-267`). Two consequences the current template gets wrong:
+(`discovery/helpers.ts:261-267`). Effective subagent LSP uses a four-condition conjunction:
+allowlist, `task.enableLsp`, parent session not disabled and not plan mode, and `lsp.enabled`
+(`task/structured-subagent.ts:318-320`, `tools/index.ts:593`,
+`task/executor.ts:2675-2678`). Consequences for the current template:
 
 - `task.enableLsp` defaults to `false` and only *permits* the `lsp` tool in subagents
-  (`config/settings-schema.ts:4615-4624`, gate at `lsp/index.ts:1639`). Permission is not
-  provision: an agent whose `tools:` list omits `lsp` cannot call it regardless of the
-  setting. Explorer's prompt instructs LSP use while its allowlist forbids it.
-- Any agent needing LSP must list `lsp` explicitly **and** run with
-  `task.enableLsp: true`. **The latter is NOT a given (CR-40)** — it defaults to `false`, so the project install must own it; see `07-retrieval-and-code-understanding.md §A-1`.
+  (`config/settings-schema.ts:4615-4624`). It contributes one condition to the child-session
+  gate alongside parent-session enablement and plan mode (`task/structured-subagent.ts:318-320`);
+  `lsp.enabled` is enforced separately by tool creation (`tools/index.ts:593`). Permission is
+  not provision: an agent whose `tools:` list omits `lsp` cannot call it regardless of the
+  settings. Explorer's prompt instructs LSP use while its allowlist forbids it.
+- A selected LSP consumer must list `lsp`, run with `task.enableLsp == true`, inherit a
+  parent session that has not disabled LSP and is not in plan mode, and have
+  `lsp.enabled == true`. The project install owns the conditional CR-40 key, while CR-41 and
+  parent-session state remain effective-runtime checks; see `07-retrieval-and-code-understanding.md §A-1`.
+
+The four registration gates establish LSP tool presence only; selected symbol-aware work also
+requires an applicable working language server and successful required LSP calls. The pinned
+runtime returns ordinary tool content with `details.success: false` when no server applies or no
+server is configured (`lsp/index.ts:2145-2160`); that result is failed capability evidence, not a
+valid substitute for the selected semantic contract.
 
 ## 7. Model Roles
 
@@ -139,9 +186,19 @@ Custom role names resolve, conditionally. `getModelRoleAlias` accepts a candidat
 `reviewer` are **not** built-in, so `@explorer` resolves **only when `config.yml`
 defines `modelRoles.explorer`**.
 
-This creates a hidden coupling: the installer permits installing `agents` without
-`config`, which silently degrades every worker's model selection. The architecture must
-make `config.yml` a hard dependency of the `agents` component.
+This creates a hard coupling for any selected agent that references a custom role. Phase-00
+experiment E2 closed the terminal behavior: missing and unknown aliases hard-error before
+session creation, an unavailable configured model surfaces a downstream error, and neither
+case falls back. Selected model-role aliases fail closed with no fallback, and project
+configuration wins precedence over the global value. The architecture therefore makes
+`config.yml` a hard dependency whenever the Topic 03-selected topology manifest references a
+custom alias. Selected-model preflight reconciles task.agentModelOverrides before dispatch.
+Acceptance compares returned modelRole and resolvedModel with the reconciled expected identity;
+any mismatch fails even when resolvedModelIsFallback is false. A
+`resolvedModelIsFallback == true` result is independently rejected because that flag marks retry
+fallback, while the exact identity comparison also catches settings overrides and unflagged
+credential fallback to the parent model (`task/structured-subagent.ts:281-294`,
+`config/model-resolver.ts:1399-1421`, `task/executor.ts:1707-1715,2840-2867`).
 
 ## 8. Agent Topology Decision
 
@@ -155,8 +212,9 @@ main session. Nothing spawns `agents/tech-lead.md`. Two coherent options:
 - **B — spawn a Tech Lead agent.** Consumes a recursion level immediately; workers then
   sit at depth 2, leaving no headroom under the frozen baseline.
 
-**Decision (DR-1):** Option A. Under `task.maxRecursionDepth: 2`, option B leaves zero
-spare depth, and the orchestrated workflow's parallel exploration would sit at the limit.
+**Decision (DR-1):** Option A for final-ownership placement: the main session is the Tech
+Lead. The earlier fixed parallel-exploration topology is reopened by KD-026/Topic 03; recursion
+depth remains a runtime constraint if Topic 03 later selects worker dispatch.
 
 ## 9. Invariants This Architecture Must Preserve
 
@@ -165,9 +223,10 @@ spare depth, and the orchestrated workflow's parallel exploration would sit at t
 3. No agent prompt references a URI scheme OMP cannot resolve.
 4. Result shapes are declared where OMP enforces them, not only described in prose.
 5. A component's install-time dependencies are explicit and checked.
-6. Isolation is requested explicitly for write-capable workers, never assumed.
+6. Isolation is requested explicitly for selected concurrently write-capable workers, never assumed.
 7. Token budgets are enforced by the validator, not merely documented.
-8. Static validation passing implies runtime discovery succeeded.
+8. Static validation proves only L0 filesystem and text properties; runtime discovery requires a
+   separate L1 OMP discovery check. Neither tier may claim evidence owned by the other.
 
 ## 10. Open Items
 

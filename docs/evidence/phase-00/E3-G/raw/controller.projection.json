@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "projection_of": "controller JSONL",
+  "task_calls": 1,
+  "task_is_error": false,
+  "result_exit_code": 0,
+  "model_facing_summary": "Isolation: changes captured at <ROOT_PATCH> (apply=false). Not applied.",
+  "model_facing_summary_mentions_nested": false,
+  "internal_details_nested_patch_count": 2,
+  "internal_details_nested_paths": ["deep/level/two", "nested-plain"],
+  "terminal_text": "E3_G_PARENT_DONE",
+  "omitted": ["system_prompt", "reasoning", "thinking_signature", "private_context", "inline_nested_patch_text"]
+}

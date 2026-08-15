@@ -10,6 +10,9 @@
 >
 > This file is the evidence layer under `04-decision-log.md`. Where it proposes something
 > new, §G lists it as an actionable delta — nothing here silently changes a decision.
+>
+> Former fixed worker names and counts are historical research examples; Topic 03-selected
+> responsibilities are the only current topology input.
 
 ---
 
@@ -528,10 +531,9 @@ than most mechanisms in this corpus.
 roles."*
 
 This is the justification for `spec/03`'s topology stated in one line, and it is a live
-constraint rather than a slogan: it is the test that rejects the ECC design (§E) and it is
-the reason our four workers are named for what they *isolate* (retrieval, edit, evidence,
-judgement) rather than for job titles. An agent added because an org chart has that role
-fails this test.
+constraint rather than a slogan: it is the test that rejects the ECC design (§E).
+Each selected responsibility names the distinct context it isolates; no worker count is
+selected here. A responsibility added only because an org chart has that role fails this test.
 
 *"The correct optimization target is tokens-per-task, not tokens-per-request."*
 
@@ -601,8 +603,8 @@ construct:
 Applied to §D-4's test: most of the 67 agents (`java-reviewer`, `django-reviewer`,
 `go-reviewer`, `rust-reviewer`…) are the **same context isolation** parameterized by
 language. They simulate roles rather than isolating distinct contexts. This is the
-strongest available illustration of why our topology has four workers and why adding a
-fifth requires naming what it isolates that no existing worker does.
+strongest available illustration of why every responsibility in a selected topology must
+name what it isolates that no existing selected responsibility does.
 
 **Delta: none.** Cite in `spec/03 §H` and `03-token-quality-model.md §B` as the priced
 counter-example. This is the highest-value thing an unadopted repository can contribute.
@@ -662,6 +664,21 @@ Also stale: `superpowers` and `anthropics-skills` list
 that the skill is delivered via `autoloadSkills` frontmatter on `implementer` and
 `verifier`, which is the actual attachment point and the thing that would break if the
 skill were renamed.
+
+---
+
+## G-1. Topic 06 selected attachment point
+
+KD-030 closes the earlier `task`-versus-`eval` mechanism question. The selected product attaches
+its portable packet/result contract to a trusted same-name OMP `task` extension and launches it
+through `.omp/bin/omp-managed.ps1`. The extension delegates to the pinned native executor; it is
+not a second scheduler. `eval`, Vibe, and unrelated internal-agent paths remain unmanaged and may
+not claim the resulting receipt.
+
+This projection also retires the synthesis-era `.omp/schemas` destination. Historical schema
+files remain evidence of the former design, while current enforcement lives in the contract core,
+agent `output:` blocks, runtime result checks, and Topic 04 outcome compare-and-swap. The only open
+runtime scope item is nonblocking `OPEN-T06-RUNTIME-01`, a possible future upstream universal seam.
 
 ---
 

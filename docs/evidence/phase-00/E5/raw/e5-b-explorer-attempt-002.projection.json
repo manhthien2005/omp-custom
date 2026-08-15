@@ -1,0 +1,39 @@
+{
+    "schema_version":  1,
+    "experiment":  "E5-B",
+    "role":  "explorer",
+    "attempt":  2,
+    "status":  "PASS",
+    "reasons":  [
+                    "E5_CONDITION_DISCRIMINATED"
+                ],
+    "tools":  [
+                  "lsp",
+                  "yield",
+                  "hub"
+              ],
+    "lsp_present":  true,
+    "lsp_call_count":  1,
+    "lsp_result_count":  1,
+    "lsp_result_success":  true,
+    "lsp_result_text":  "Found 1 reference(s):\n  probe.ts:1:17\n    1: export function alpha(): number { return 1; }\n    2: ",
+    "lsp_server_name":  "phase00-fake",
+    "yield_call_count":  1,
+    "marker":  "E5_B_EXPLORER_LSP_OK",
+    "marker_count":  1,
+    "cause":  "ALL_LSP_GATES_SATISFIED",
+    "remediation":  "NONE",
+    "first_turn_prompt_tokens":  7261,
+    "final_total_tokens":  7526,
+    "fixture":  {
+                    "task_enable_lsp":  true,
+                    "parent_session_lsp":  true,
+                    "lsp_enabled":  true,
+                    "agent_allowlist_includes_lsp":  true,
+                    "language_server_configured":  true
+                },
+    "child_transcript":  {
+                             "path":  "docs/evidence/phase-00/E5/raw/e5-b-explorer-attempt-002.child.jsonl",
+                             "sha256":  "D4F03529CC98E3BBEC5666854ADC4025BA6B6D3AAF2966614CD80E5D7BA72D70"
+                         }
+}

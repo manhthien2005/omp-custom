@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 1,
+  "selected": false,
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+    "OMP_PHASE00_E3I_PARENT_CWD": "<DISPOSABLE_PROJECT>"
+  },
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "12m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:session-a.md>"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "started_at": "2026-08-09T11:36:12.4766358+07:00",
+  "completed_at": "2026-08-09T11:39:58.3657130+07:00",
+  "duration_ms": 225889,
+  "parent_stdout_sha256": "7D642B2577769438AAA7F49168A4F0679CC21C70B19D3C12AC03CBA5118FEF99",
+  "parent_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+  "canary_artifacts": [
+    {
+      "id": "e3i-project-1",
+      "sha256": "2B5DA725E79488DFF70098E380BA95439E2B1FF0E9FCCF3E6DAABA39A1F0A396",
+      "file": "session-a.canary.e3i-project-1.jsonl"
+    },
+    {
+      "id": "e3i-project-2",
+      "sha256": "45A33EBA94E264E3E7DADBB6E71413C9050E8FB993FF98FE77154A313DA681FD",
+      "file": "session-a.canary.e3i-project-2.jsonl"
+    },
+    {
+      "id": "e3i-project-3",
+      "sha256": "FA50A7B27D57276EEE6AE1043A0F57AE87E9AEC6B3A0B833A5DA501A33EFA298",
+      "file": "session-a.canary.e3i-project-3.jsonl"
+    },
+    {
+      "id": "e3i-runtime-1",
+      "sha256": "87522BB56849D7E54D27C57BADE5A829E0ED42878193290D36F426C3DE629218",
+      "file": "session-a.canary.e3i-runtime-1.jsonl"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "sha256": "176031AC39268797A12E9AF7172D71BDBE4DD08847148311E64169CF3F03BD91",
+      "file": "session-a.canary.e3i-runtime-2.jsonl"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "sha256": "4739A3B3011C20979A0B2BAD0B706D967E8C345BAA5F14965CAB590E8D71BD46",
+      "file": "session-a.canary.e3i-runtime-3.jsonl"
+    }
+  ],
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": false,
+    "CleanupSucceeded": true
+  },
+  "live_home_metadata": {
+    "BeforeFileCount": 15,
+    "AfterFileCount": 14,
+    "BeforeSha256": "8DC3A271DDE376829A076BC47F1F1C33DCD5E3F81238D089B5444E31D2CA4E83",
+    "AfterSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "ChangedPaths": [
+      "agent.db-shm",
+      "agent.db-wal",
+      "history.db-shm",
+      "history.db-wal",
+      "last-changelog-version",
+      "models.db",
+      "sessions/--D--Dev-Projects-omp-template--/2026-08-09T04-35-37-000Z_019fe4ce-0da8-7000-9c6e-337cb480aa4a.jsonl"
+    ],
+    "ChangedCount": 7,
+    "BoundaryResult": "FAIL"
+  },
+  "cleanup_error": null,
+  "analysis": {
+    "Status": "FAIL",
+    "Reasons": [
+      "E3I_LIVE_HOME_MUTATION"
+    ]
+  }
+}

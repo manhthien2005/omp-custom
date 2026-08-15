@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 2,
+  "selected": false,
+  "adjudicated_at": "2026-08-09",
+  "original_runner_analysis": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "reasons": [
+      "P00-RUNTIME-PROVIDER-ENVIRONMENT"
+    ],
+    "error": "The property 'Name' cannot be found on this object. Verify that the property exists.",
+    "authority": "immutable_attempt_2_run_record",
+    "superseded_for_selection": true
+  },
+  "intermediate_reanalysis": {
+    "status": "FAIL",
+    "reasons": [
+      "E3I_CANARY_TOOL_SURFACE_CONTAMINATED"
+    ],
+    "authority": "diagnostic_only_pre_contract-correction_reanalysis",
+    "superseded_for_selection": true,
+    "reasoning": "Fixing only the empty-object parser exposed the old canary contract's false [read, hub] expectation and the ambient user-profile MCP tools. This intermediate result was not a valid semantic contradiction because the experiment's own canary protocol and discovery boundary were wrong."
+  },
+  "corrected_adjudication": {
+    "status": "INVALID_RUN",
+    "reasons": [
+      "E3I_NESTED_PROVIDER_RECOVERY",
+      "E3I_CANARY_PROTOCOL_CONTRACT_INVALID",
+      "E3I_AMBIENT_CAPABILITY_DISCOVERY",
+      "E3I_CAPTURE_CLASSIFIER_INVALID"
+    ],
+    "selection_eligible": false,
+    "retry_eligible_after_regression": true,
+    "machine_reanalysis_after_correction": {
+      "status": "INVALID_RUN",
+      "reasons": [
+        "E3I_NESTED_PROVIDER_RECOVERY"
+      ],
+      "canary_id": "e3i-project-3",
+      "provider_failure": "server_is_overloaded",
+      "recovery": "auto-retry recovered inside the nested canary"
+    },
+    "reasoning": "Attempt 2 completed all parent calls and left every observed mutation boundary clean, but it is not selectable. One nested canary recovered from a provider overload, the reviewed canary contract incorrectly prohibited TaskTool's mandatory terminal yield, unrestricted user-profile discovery widened all six child surfaces with ambient MCP tools, and a parser exception was incorrectly promoted to an environment block by scanning unrelated historical transcript text. These are sample-integrity and harness defects, not evidence for or against the isolation-apply semantics."
+  },
+  "observed_parent_protocol": {
+    "exit_code": 0,
+    "timed_out": false,
+    "duration_ms": 200987,
+    "tool_sequence": [
+      "bash",
+      "task",
+      "task",
+      "task",
+      "phase00_e3i_override_apply_true",
+      "bash",
+      "task",
+      "task",
+      "task"
+    ],
+    "sequence_matches_session_a": true,
+    "project_diagnostic": {
+      "status": "OBSERVED",
+      "key": "task.isolation.apply",
+      "type": "boolean",
+      "value": false
+    },
+    "runtime_diagnostic": {
+      "status": "OBSERVED",
+      "key": "task.isolation.apply",
+      "type": "boolean",
+      "value": false
+    },
+    "runtime_override": {
+      "before": false,
+      "after": true,
+      "operation": "pi.pi.settings.override",
+      "requested_value": true,
+      "called_set": false,
+      "called_flush_or_save": false,
+      "scope": "parent-only"
+    }
+  },
+  "observed_task_samples": [
+    {
+      "id": "e3i-project-1",
+      "expected_branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "exit_code": 1,
+      "duration_ms": 9114,
+      "tokens": 8192,
+      "requests": 2,
+      "merge_summary": "Isolation: no changes captured.",
+      "task_output_shape": "null-yield warning plus acknowledgement prose"
+    },
+    {
+      "id": "e3i-project-2",
+      "expected_branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "exit_code": 1,
+      "duration_ms": 10937,
+      "tokens": 8272,
+      "requests": 2,
+      "merge_summary": "Isolation: no changes captured.",
+      "task_output_shape": "null-yield warning plus acknowledgement prose"
+    },
+    {
+      "id": "e3i-project-3",
+      "expected_branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "exit_code": 0,
+      "duration_ms": 40329,
+      "tokens": 9891,
+      "requests": 4,
+      "merge_summary": "Isolation: changes captured at a disposable-session patch path (apply=false). Not applied.",
+      "task_output_shape": "structured acknowledgement after terminal yield",
+      "provider_recovery_observed": true
+    },
+    {
+      "id": "e3i-runtime-1",
+      "expected_branch": "APPLY_TRUE_NO_DIFF",
+      "exit_code": 0,
+      "duration_ms": 34405,
+      "tokens": 11699,
+      "requests": 4,
+      "merge_summary": "No changes to apply.",
+      "task_output_shape": "structured acknowledgement"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "expected_branch": "APPLY_TRUE_NO_DIFF",
+      "exit_code": 0,
+      "duration_ms": 24320,
+      "tokens": 8224,
+      "requests": 4,
+      "merge_summary": "No changes to apply.",
+      "task_output_shape": "string acknowledgement"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "expected_branch": "APPLY_TRUE_NO_DIFF",
+      "exit_code": 0,
+      "duration_ms": 21630,
+      "tokens": 10042,
+      "requests": 3,
+      "merge_summary": "No changes to apply.",
+      "task_output_shape": "structured acknowledgement"
+    }
+  ],
+  "canary_environment_observation": {
+    "canary_count": 6,
+    "declared_agent_tools": [
+      "read"
+    ],
+    "source_proven_minimum_effective_tools": [
+      "read",
+      "yield",
+      "hub"
+    ],
+    "attempt_2_effective_tools": [
+      "read",
+      "yield",
+      "hub",
+      "mcp__context_query_docs",
+      "mcp__context_resolve_library_id"
+    ],
+    "all_six_surfaces_ambiently_widened": true,
+    "ambient_source": "user-profile discovery outside PI_CODING_AGENT_DIR",
+    "protocol_defect": "The Attempt 2 prompt said not to call tools, while TaskTool requires a terminal yield and repeatedly reminds a text-only child to call it.",
+    "selection_consequence": "No Attempt 2 canary transcript satisfies the corrected controlled-surface and terminal-yield protocol."
+  },
+  "nested_provider_failure": {
+    "canary_id": "e3i-project-3",
+    "terminal": false,
+    "error_code": "server_is_overloaded",
+    "message": "Our servers are currently overloaded. Please try again later.",
+    "retry_kind": "auto-retry",
+    "retry_status": "recovered",
+    "selection_consequence": "The sample is not clean or retry-free and therefore remains INVALID_RUN even though the child later completed."
+  },
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "runtime_pin": {
+    "version": "omp/17.2.10",
+    "selection": "EXPLICIT_SOURCE",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "harness_defects": [
+    {
+      "id": "EMPTY_PSCUSTOMOBJECT_STRICTMODE",
+      "symptom": "The real override tool supplied {}, decoded as an empty PSCustomObject; $Object.PSObject.Properties.Name threw under StrictMode.",
+      "correction": "Enumerate PSObject properties with foreach and return an empty name list for an empty object."
+    },
+    {
+      "id": "TRANSCRIPT_WIDE_ENVIRONMENT_REGEX",
+      "symptom": "The capture catch block scanned all stdout/stderr and matched the unrelated recovered overload text from e3i-project-3, promoting a local parser exception to BLOCKED_ENVIRONMENT.",
+      "correction": "Capture/provenance exceptions are always INVALID_RUN from their own typed cause; transcript text is never used to promote them."
+    },
+    {
+      "id": "FALSE_ZERO_TOOL_CANARY_CONTRACT",
+      "symptom": "The reviewed contract expected [read, hub] with zero calls, but TaskTool makes yield mandatory and the pinned runtime force-includes it.",
+      "correction": "Require exact controlled [read, yield, hub], one exact terminal yield acknowledgement, and zero other calls."
+    },
+    {
+      "id": "AMBIENT_USER_PROFILE_DISCOVERY",
+      "symptom": "Relocating only PI_CODING_AGENT_DIR did not isolate external user-level tool discovery; two context MCP tools appeared in every child.",
+      "correction": "Give the captured process a disposable USERPROFILE and verify Node os.homedir() resolves to it."
+    },
+    {
+      "id": "RECOVERED_NESTED_PROVIDER_FAILURE",
+      "symptom": "One child suffered server_is_overloaded and recovered through an internal auto-retry.",
+      "correction": "Any terminal or recovered nested provider failure invalidates the whole attempt before semantic adjudication."
+    }
+  ],
+  "root_cause_source_evidence": [
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/task/executor.ts",
+      "sha256": "8DC3C9BD3593BAA54FEA4D4966808815598AB613A46D8D2FA541116FEA09248E",
+      "anchors": "596-675,2675-2692,3019-3024",
+      "finding": "TaskTool sets requireYieldTool=true, ordinary explicit child surfaces gain hub, and yielded data determines finalized task output."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/tools/index.ts",
+      "sha256": "2FF417C1F111AD94A2A8B0066ECB88FE4808325DC7DE3B548D7B5AF41FF95A9D",
+      "anchors": "641-643",
+      "finding": "The registry includes yield when the caller requires it."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/sdk.ts",
+      "sha256": "EEE5412D1847E6BC274DF4E29A25188C8831A27957BFCFCC93EBBD0DFD94D3F4",
+      "anchors": "2964-2977,3025-3036",
+      "finding": "Yield is force-included into an explicit list when required, while unrestricted custom and extension-registered tools widen the active surface."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/discovery/helpers.ts",
+      "sha256": "BF3773C47DFD3110DBDC713BF57EB20055214F428C22EC57778433921E80A8DE",
+      "anchors": "87-99",
+      "finding": "External user-level discovery paths resolve from the load context home, not only from the native agent directory."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/config.ts",
+      "sha256": "1C18918EBEFC512F5195B37423C1D53A7EB4CB04A3CCC5362B76282F17C8700E",
+      "anchors": "78-86",
+      "finding": "User configuration bases are rooted at os.homedir(), including .codex and other external tool homes."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/tools/yield.ts",
+      "sha256": "CB1B8992E87B5C594C2271DBC3E4F6FCD784AFAC9588CFEB4DBEED5EE231AE66",
+      "anchors": "310-420",
+      "finding": "The yield tool validates and submits structured terminal results; it is an execution protocol, not a passive surface entry."
+    }
+  ],
+  "regression_corrections": [
+    "Empty PSCustomObject property enumeration is valid and deterministic under StrictMode.",
+    "Capture failures can no longer scan transcript text to invent provider/environment provenance.",
+    "Canary task prompts and agent instructions require one exact terminal yield and forbid every other tool call.",
+    "Canary result parsing accepts only the exact acknowledgement object and rejects prose or widened objects.",
+    "Canary session parsing requires exact [read, yield, hub], deduplicates message/execution records by tool-call ID, and exposes all forbidden calls.",
+    "Recovered non-terminal nested provider errors invalidate an attempt before semantic classification.",
+    "The runner creates a disposable user profile, injects USERPROFILE only into the child process, and redacts that path in durable run metadata.",
+    "The E3-I phase contract, cross-cutting isolation contract, design, plan, fixture agent, and prompts now describe the same terminal-yield-only protocol."
+  ],
+  "tdd_evidence": {
+    "empty_object_and_capture_classifier_red": {
+      "passed": 33,
+      "failed": 2
+    },
+    "empty_object_and_capture_classifier_green": {
+      "passed": 35,
+      "failed": 0
+    },
+    "corrected_canary_protocol_red": {
+      "passed": 24,
+      "failed": 12
+    },
+    "corrected_canary_protocol_intermediate": [
+      {
+        "passed": 33,
+        "failed": 3
+      },
+      {
+        "passed": 35,
+        "failed": 1
+      }
+    ],
+    "corrected_canary_protocol_green": {
+      "passed": 36,
+      "failed": 0
+    },
+    "recovered_provider_error_red": {
+      "passed": 36,
+      "failed": 1
+    },
+    "recovered_provider_error_green": {
+      "passed": 37,
+      "failed": 0
+    },
+    "mixed_event_parser_red": {
+      "passed": 37,
+      "failed": 1
+    },
+    "mixed_event_parser_and_user_profile_green": {
+      "passed": 38,
+      "failed": 0
+    },
+    "provider_calls_during_correction": 0
+  },
+  "provider_execution": {
+    "session_a_launches": 1,
+    "session_a_retry_launched": false,
+    "session_b_launched": false,
+    "automatic_retry_performed": false,
+    "note": "The nested runtime's recovered provider request is recorded as sample contamination, not as a Codex-authorized experiment retry."
+  },
+  "raw_artifacts": [
+    {
+      "file": "session-a-attempt-002.stdout.jsonl",
+      "sha256": "ABA4E5BA691A5FA872674E427813B01212533138CF507DB5FDB80EBA4049674A"
+    },
+    {
+      "file": "session-a-attempt-002.stderr.txt",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "file": "session-a-attempt-002.run.json",
+      "sha256": "A4290981871FF00DE7C3FFDAB043D6A768EA702B6DA4F62FE2B037F4912007A2"
+    },
+    {
+      "file": "session-a-attempt-002.canary.e3i-project-1.jsonl",
+      "sha256": "205C374B3D9C75E831EA95AA9CB0850FF665F026F2EF9C402203BA4588137D92"
+    },
+    {
+      "file": "session-a-attempt-002.canary.e3i-project-2.jsonl",
+      "sha256": "C0CB53998F4C8172CE62DC32D8735F1305D2340B66654459F62F27B912E10707"
+    },
+    {
+      "file": "session-a-attempt-002.canary.e3i-project-3.jsonl",
+      "sha256": "AD4545FFD79AB50FBB463218F91FB4637C1A7B94494A5F8F1B1516D6DCE2A341"
+    },
+    {
+      "file": "session-a-attempt-002.canary.e3i-runtime-1.jsonl",
+      "sha256": "3B9006339F0BCB96A113E1A122335C1F8CDE019181AFC7ED38776BDF260A8E24"
+    },
+    {
+      "file": "session-a-attempt-002.canary.e3i-runtime-2.jsonl",
+      "sha256": "D651EDE773277BE326EC0C7BB8F73CF148B830B890119175C7E88436C64A9A29"
+    },
+    {
+      "file": "session-a-attempt-002.canary.e3i-runtime-3.jsonl",
+      "sha256": "2CB7A176651B594F2C3323EF31258CE7FAE552718A64EFE6F07614B7EB80DC26"
+    }
+  ],
+  "non_claims": [
+    "Attempt 2 provides no selected I1, I2, I3, or I4 PASS evidence.",
+    "The apparent project/runtime branch split is not selectable because the canary protocol, capability boundary, and retry-free sample requirement were violated.",
+    "Session B was not launched and no Attempt 2 observation may be combined with a later selected attempt.",
+    "E3-I remains diagnostic evidence only and does not gate or authorize parallel execution.",
+    "This adjudication does not claim that ambient MCP discovery is a product defect; it is an experiment-isolation defect for this controlled canary."
+  ]
+}

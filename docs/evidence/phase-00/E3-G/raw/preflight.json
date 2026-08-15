@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "tracked_submodules": ["tracked-submodule"],
+  "omp_semantic_non_submodule_preflight": ["deep/level/two", "nested-plain"],
+  "preflight_union": ["deep/level/two", "nested-plain", "tracked-submodule"],
+  "full_fixture_git_entries": [".git", "deep/level/two/.git", "nested-plain/.git", "node_modules/pkg/.git", "tracked-submodule/.git"],
+  "node_modules_excluded_by_semantic_walk": true,
+  "runtime_nested_paths": ["deep/level/two", "nested-plain"],
+  "runtime_is_subset_of_preflight": true,
+  "cases": {
+    "tracked_submodule": {"preflight_detected": true, "runtime_nested_capture": false},
+    "plain_nested_repo": {"preflight_detected": true, "runtime_nested_capture": true},
+    "node_modules_nested_repo": {"preflight_detected": false, "runtime_nested_capture": false},
+    "two_level_nested_repo": {"preflight_detected": true, "runtime_nested_capture": true}
+  }
+}

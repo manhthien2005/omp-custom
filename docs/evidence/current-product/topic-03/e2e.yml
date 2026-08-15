@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "status": "IMPLEMENTED_WITH_ENVIRONMENT_BLOCK",
+  "observed_at_utc": "2026-08-12T17:45:33.0850250Z",
+  "raw_output_retained": false,
+  "disposable_project": {
+    "path": "<TEMP>/omp-topic03-e2e-750fe065d769412ab209c8bff7fd9af9",
+    "dry_run_mutation_count": 0,
+    "installed_agents": [
+      "cheap-scout.md",
+      "reviewer.md",
+      "worker.md"
+    ],
+    "retired_agent_count": 0,
+    "omp_project_agents_dir_observed": true
+  },
+  "cases": {
+    "inline_low_risk_and_lead_retrieval_fallback": {
+      "status": "PASS",
+      "process_exit_code": 0,
+      "task_call_count": 0,
+      "read_tool_observed": true,
+      "sentinel_observed": true
+    },
+    "cheap_scout": {
+      "status": "ENVIRONMENT_BLOCKED",
+      "reason_code": "DEEPSEEK_CREDENTIAL_MISSING",
+      "flash_selector": "omniroute/ds/deepseek-v4-flash:xhigh",
+      "pro_selector": "omniroute/ds/deepseek-v4-pro:xhigh",
+      "repository_mutation_check": "NOT_APPLICABLE_PROVIDER_BLOCKED_BEFORE_TOOL",
+      "tech_lead_retrieval_fallback_observed": true
+    },
+    "worker_normal": {
+      "status": "PASS",
+      "agent": "worker",
+      "agent_source": "project",
+      "model_role": "worker",
+      "resolved_model_observed": "omniroute/codex/gpt-5.6-sol-high",
+      "final_selector_contract": "omniroute/codex/gpt-5.6-sol:high",
+      "fallback_observed": false,
+      "structured_output_status": "valid",
+      "file_state": "state=normal",
+      "child_tokens": 23466,
+      "child_requests": 4
+    },
+    "worker_difficult": {
+      "status": "PASS",
+      "agent": "worker",
+      "agent_source": "project",
+      "model_role": "worker",
+      "wire_effort": "hi",
+      "resolved_model": "omniroute/codex/gpt-5.6-sol-high:xhigh",
+      "fallback_observed": false,
+      "structured_output_status": "valid",
+      "file_state": "state=hard",
+      "child_tokens": 24668,
+      "child_requests": 5
+    },
+    "reviewer_high_risk": {
+      "status": "PASS_AFTER_OBSERVABILITY_CORRECTION",
+      "concern_profile": [
+        "public-api",
+        "destructive-change"
+      ],
+      "agent": "reviewer",
+      "agent_source": "project",
+      "model_role": "reviewer",
+      "resolved_model": "omniroute/codex/gpt-5.6-sol-high:xhigh",
+      "fallback_observed": false,
+      "structured_output_status": "valid",
+      "same_model_separate_session_disclosed": true,
+      "correction": "Added explicit Worker :high and Reviewer :xhigh role-selector suffixes because agent-default effort was not visible in returned resolvedModel identity.",
+      "confirmation_child_tokens": 12458,
+      "confirmation_child_requests": 3
+    },
+    "parallel_preflight_fallback": {
+      "status": "PASS",
+      "temporary_batch_setting": false,
+      "task_call_count": 3,
+      "sequential_writer_fallback_disclosed": true,
+      "task_blocked": false
+    }
+  },
+  "limitations": [
+    "DeepSeek provider behavior is not claimed until OmniRoute has an active DeepSeek credential.",
+    "Opus was unavailable and was not treated as a blocker.",
+    "Same-family Reviewer independence is session-level and explicitly disclosed."
+  ]
+}

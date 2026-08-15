@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-G-A2-lift-path",
+  "status": "PASS_DIAGNOSTIC_ONLY",
+  "fixture_head": "c8dfc5763cf325c821f9d0569adf37194edbfe30",
+  "started_at": "2026-08-11T11:17:33.9191932+07:00",
+  "completed_at": "2026-08-11T11:18:16.4266626+07:00",
+  "duration_ms": 42507,
+  "process_exit_code": 0,
+  "parent_poll_count": 106,
+  "parent_poll_violation_count": 0,
+  "worker_exit_code": 0,
+  "write_tool_called": true,
+  "write_tool_result_is_error": true,
+  "write_tool_error": "Phase00 nested-path guard blocked nested-plain/a2-blocked.txt",
+  "audit_patch_materialized": true,
+  "target_materialized": false,
+  "worker_yield_attempts": 4,
+  "final_terminal_yield_valid": true,
+  "policy_effect": "Lift path technically reachable; not adopted for v0."
+}

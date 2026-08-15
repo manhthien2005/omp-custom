@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 1,
+  "selected": false,
+  "adjudicated_at": "2026-08-09",
+  "original_runner_analysis": {
+    "status": "FAIL",
+    "reasons": [
+      "E3I_LIVE_HOME_MUTATION"
+    ],
+    "authority": "immutable_attempt_1_run_record",
+    "superseded_for_selection": true
+  },
+  "corrected_adjudication": {
+    "status": "INVALID_RUN",
+    "reasons": [
+      "E3I_EVENT_PAIRING_INVALID",
+      "E3I_OVERRIDE_EXECUTION_ERROR",
+      "E3I_LIVE_HOME_CONCURRENT_ACTIVITY"
+    ],
+    "selection_eligible": false,
+    "retry_eligible_after_regression": true,
+    "reasoning": "Attempt 1 did not execute the reviewed diagnostic or runtime-override primitives. Its live-home comparison also overlapped activity with no disposable-project identity in the changed paths. These are evidence-shape and attribution failures, not a complete attributable contradiction of task.isolation.apply behavior."
+  },
+  "observed_parent_transcript": {
+    "jsonl_objects": 853,
+    "paired_parent_tool_calls": 9,
+    "tool_sequence": [
+      "bash",
+      "task",
+      "task",
+      "task",
+      "phase00_e3i_override_apply_true",
+      "bash",
+      "task",
+      "task",
+      "task"
+    ],
+    "task_calls_completed": 6,
+    "canary_jsonl_files_preserved": 6,
+    "tool_errors": [
+      {
+        "tool": "bash",
+        "occurrences": 2,
+        "classification": "HARNESS_COMMAND_INVALID",
+        "evidence": "The outer shell expanded $raw, $code, and $value before the nested PowerShell command ran, producing a parser error at the bare ampersand."
+      },
+      {
+        "tool": "phase00_e3i_override_apply_true",
+        "occurrences": 1,
+        "classification": "PINNED_RUNTIME_CONTEXT_BRIDGE_MISMATCH",
+        "evidence": "P00_E3I_SETTINGS_UNAVAILABLE"
+      }
+    ]
+  },
+  "live_home_adjudication": {
+    "changed_count": 7,
+    "changed_paths": [
+      "agent.db-shm",
+      "agent.db-wal",
+      "history.db-shm",
+      "history.db-wal",
+      "last-changelog-version",
+      "models.db",
+      "sessions/--D--Dev-Projects-omp-template--/2026-08-09T04-35-37-000Z_019fe4ce-0da8-7000-9c6e-337cb480aa4a.jsonl"
+    ],
+    "attributable_to_experiment": false,
+    "attribution_status": "UNRESOLVED_CONCURRENT_ACTIVITY",
+    "evidence": [
+      "The changed session path identifies the live repository cwd, not the disposable E3-I project.",
+      "The selected process recorded PI_CODING_AGENT_DIR as the disposable agent directory.",
+      "No changed live-home path contains the disposable root identity.",
+      "Because unrelated and selected activity overlapped, unchanged-boundary proof is absent; the attempt remains invalid and cannot pass."
+    ]
+  },
+  "runtime_drift": {
+    "attempt_runtime": "omp/17.2.10",
+    "runtime_observed_after_attempt": "omp/17.2.12",
+    "live_install_binary_last_write_within_attempt_interval": true,
+    "trigger_attribution": "UNRESOLVED",
+    "preserved_17_2_10_source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "correction": "A retry must explicitly select the preserved 17.2.10 executable, copy it into the disposable root, verify source/copy hash equality, and prepend that disposable directory for nested omp resolution."
+  },
+  "root_cause_source_evidence": [
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/extensibility/custom-tools/types.ts",
+      "sha256": "E02160F1922EF56FA86AEE9CF77F81266FD8AD0EDFDFFBE1FB3C975C96DA9277",
+      "anchors": "85-105",
+      "finding": "CustomToolContext nominally declares optional settings."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/sdk.ts",
+      "sha256": "EEE5412D1847E6BC274DF4E29A25188C8831A27957BFCFCC93EBBD0DFD94D3F4",
+      "anchors": "885-894,938-955",
+      "finding": "The project custom-tool bridge constructs the runtime context without settings."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/extensibility/custom-tools/loader.ts",
+      "sha256": "BEE6F829A01E3D2E9D7345718E50F8A9E67BB0061F5DC52EEE18341C0A038823",
+      "anchors": "132-154",
+      "finding": "The CustomToolAPI injects the package namespace as pi."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/index.ts",
+      "sha256": "3EFC237498D428C3D9C8C3523ACB3CD7090DCCCF4369E433792912471E389377",
+      "anchors": "17",
+      "finding": "The package namespace exports Settings and the settings proxy."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/config/settings.ts",
+      "sha256": "B2CD4FB72159A200FB32ECB0F7ED5983573C16942425D5929034872631524F49",
+      "anchors": "404-416,518-526,2371-2389",
+      "finding": "Settings.init binds the global proxy; override mutates only the runtime override layer."
+    },
+    {
+      "path": "_research/upstreams/oh-my-pi/packages/coding-agent/src/main.ts",
+      "sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5",
+      "anchors": "1282-1283,1545",
+      "finding": "The default main CLI initializes one Settings instance and passes it into the session."
+    }
+  ],
+  "regression_corrections": [
+    "The reviewed child diagnostic is now the direct command: omp config get task.isolation.apply --json.",
+    "The strict parser now consumes the exact direct OMP object with description, key, type, and boolean value.",
+    "The parent-only tool now calls pi.pi.settings.override only in the selected default main-CLI host.",
+    "Tool execution errors are INVALID_RUN; only a complete wrong attestation is semantic FAIL.",
+    "Unattributed live-home changes are INVALID_RUN; only attributable mutation is FAIL.",
+    "The runner can select and copy-hash an exact 17.2.10 executable and forces nested PATH resolution to the disposable copy."
+  ],
+  "tdd_evidence": {
+    "diagnostic_and_proxy_red": {
+      "passed": 28,
+      "failed": 2
+    },
+    "pinned_runtime_red": {
+      "passed": 29,
+      "failed": 2
+    },
+    "classification_red": {
+      "passed": 29,
+      "failed": 3
+    },
+    "post_correction_green": {
+      "passed": 32,
+      "failed": 0
+    },
+    "provider_calls_during_correction": 0
+  },
+  "provider_execution": {
+    "session_a_launches": 1,
+    "session_a_retry_launched": false,
+    "session_b_launched": false,
+    "automatic_retry_performed": false
+  },
+  "raw_artifacts": [
+    {
+      "file": "session-a.stdout.jsonl",
+      "sha256": "7D642B2577769438AAA7F49168A4F0679CC21C70B19D3C12AC03CBA5118FEF99"
+    },
+    {
+      "file": "session-a.stderr.txt",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "file": "session-a.run.json",
+      "sha256": "4C90CFBFE9E9116335782C570F89946AAC33BA5B88EB341DBB85A4E684B4AD75"
+    },
+    {
+      "file": "session-a.canary.e3i-project-1.jsonl",
+      "sha256": "2B5DA725E79488DFF70098E380BA95439E2B1FF0E9FCCF3E6DAABA39A1F0A396"
+    },
+    {
+      "file": "session-a.canary.e3i-project-2.jsonl",
+      "sha256": "45A33EBA94E264E3E7DADBB6E71413C9050E8FB993FF98FE77154A313DA681FD"
+    },
+    {
+      "file": "session-a.canary.e3i-project-3.jsonl",
+      "sha256": "FA50A7B27D57276EEE6AE1043A0F57AE87E9AEC6B3A0B833A5DA501A33EFA298"
+    },
+    {
+      "file": "session-a.canary.e3i-runtime-1.jsonl",
+      "sha256": "87522BB56849D7E54D27C57BADE5A829E0ED42878193290D36F426C3DE629218"
+    },
+    {
+      "file": "session-a.canary.e3i-runtime-2.jsonl",
+      "sha256": "176031AC39268797A12E9AF7172D71BDBE4DD08847148311E64169CF3F03BD91"
+    },
+    {
+      "file": "session-a.canary.e3i-runtime-3.jsonl",
+      "sha256": "4739A3B3011C20979A0B2BAD0B706D967E8C345BAA5F14965CAB590E8D71BD46"
+    }
+  ],
+  "non_claims": [
+    "Attempt 1 provides no I1, I2, I3, or I4 PASS evidence.",
+    "The global settings proxy is not proven equivalent for ACP, injected SDK, or cloned-settings hosts.",
+    "E3-I does not replace E3-L or E3-M and does not authorize parallel work.",
+    "No observation from Attempt 1 may be combined with a later selected attempt."
+  ]
+}

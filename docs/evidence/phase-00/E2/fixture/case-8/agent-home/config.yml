@@ -1,0 +1,15 @@
+plan:
+  defaultOnStartup: false
+async:
+  enabled: false
+task:
+  batch: false
+  enableEffort: false
+  maxConcurrency: 1
+  maxRecursionDepth: 2
+  maxRuntimeMs: 180000
+  isolation:
+    mode: none
+    apply: false
+modelRoles:
+  conflict: e2global/oc/mimo-v2.5-free

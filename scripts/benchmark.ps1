@@ -1,55 +1,43 @@
-# Benchmark Script
-# Run evaluation tasks and record metrics.
-# Usage: .\scripts\benchmark.ps1 [-Task all|<id>] [-Workflow quick|standard|orchestrated|compare]
+# Compatibility entry point for the governed Round 09-12 evaluator.
 
 param(
-    [string]$Task = "all",
-    [string]$Workflow = "compare",
-    [switch]$DryRun
+    [string]$Task = 'all',
+    [string]$Workflow = 'compare',
+    [switch]$DryRun,
+    [ValidateSet('Deterministic', 'Campaign')]
+    [string]$Mode = 'Deterministic',
+    [string]$OutputDirectory,
+    [string]$OmpPath,
+    [switch]$AllowProviderCalls,
+    [ValidateRange(0, 1000000)]
+    [int]$EvidenceBudget = 0,
+    [string]$FixtureManifest,
+    [ValidateRange(1, 3600)]
+    [int]$TimeoutSeconds = 120
 )
 
-$ErrorActionPreference = "Stop"
-$root = Split-Path $PSScriptRoot -Parent
-$evals_dir = Join-Path $root "evals"
-$results_dir = Join-Path $root "evals\results"
-
-if (-not (Test-Path $results_dir)) {
-    New-Item -ItemType Directory -Path $results_dir -Force | Out-Null
+$ErrorActionPreference = 'Stop'
+$runner = Join-Path $PSScriptRoot 'run-round09-12-evaluation.ps1'
+if (-not (Test-Path -LiteralPath $runner -PathType Leaf)) {
+    throw "Round 09-12 evaluator is unavailable: $runner"
 }
 
-Write-Host ""
-Write-Host "OMP Workflow Template — Benchmark Runner" -ForegroundColor Cyan
-Write-Host "Note: This script records task fixture metadata." -ForegroundColor Yellow
-Write-Host "Actual OMP session execution must be done manually per fixture." -ForegroundColor Yellow
-Write-Host ""
-
-# List available fixtures
-$fixtures = Get-ChildItem $evals_dir -Filter "*.yml" -Recurse -ErrorAction SilentlyContinue |
-            Where-Object { $_.DirectoryName -notlike "*results*" }
-
-if ($fixtures.Count -eq 0) {
-    Write-Host "No evaluation fixtures found in $evals_dir" -ForegroundColor Yellow
-    Write-Host "Add fixture files (*.yml) to evals/triage/, evals/implementation/, etc."
-    exit 0
+Write-Host 'DEPRECATED: scripts/benchmark.ps1 now forwards to the governed Round 09-12 evaluator.' -ForegroundColor Yellow
+Write-Host 'Hand-authored result files cannot support promotion.' -ForegroundColor Yellow
+if ($Task -cne 'all' -or $Workflow -cne 'compare') {
+    Write-Host "Legacy selectors Task=$Task and Workflow=$Workflow are retained for compatibility but do not alter the closed fixture manifest." -ForegroundColor Yellow
 }
 
-Write-Host "Available fixtures:" -ForegroundColor White
-foreach ($f in $fixtures) {
-    $rel = $f.FullName.Substring($evals_dir.Length).TrimStart("\")
-    Write-Host "  $rel"
-}
+$selectedMode = if ($DryRun) { 'Deterministic' } else { $Mode }
+$arguments = @(
+    '-Mode', $selectedMode,
+    '-EvidenceBudget', [string]$EvidenceBudget,
+    '-TimeoutSeconds', [string]$TimeoutSeconds
+)
+if (-not [string]::IsNullOrWhiteSpace($OutputDirectory)) { $arguments += @('-OutputDirectory', $OutputDirectory) }
+if (-not [string]::IsNullOrWhiteSpace($OmpPath)) { $arguments += @('-OmpPath', $OmpPath) }
+if (-not [string]::IsNullOrWhiteSpace($FixtureManifest)) { $arguments += @('-FixtureManifest', $FixtureManifest) }
+if ($AllowProviderCalls) { $arguments += '-AllowProviderCalls' }
 
-Write-Host ""
-Write-Host "Benchmark record format:" -ForegroundColor White
-Write-Host "  Each fixture records: task_id, workflow_used, agents_spawned, tool_calls,"
-Write-Host "  input_tokens, output_tokens, accepted_outcome, test_pass_rate, retries"
-Write-Host ""
-Write-Host "To record a benchmark result, create:"
-Write-Host "  evals\results\<task-id>-<workflow>-<timestamp>.yml"
-Write-Host ""
-Write-Host "Compare workflows: evals\results\compare-*.yml (side-by-side records)"
-
-if ($DryRun) {
-    Write-Host ""
-    Write-Host "DRY-RUN: no benchmark sessions started." -ForegroundColor Yellow
-}
+& pwsh -NoLogo -NoProfile -File $runner @arguments
+exit $LASTEXITCODE

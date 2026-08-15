@@ -1,0 +1,27 @@
+schema_version: 1
+phase: "00"
+experiment: E5-D
+status: PASS
+selected_attempt: 1
+authority: CHARACTERIZATION_ONLY
+
+fixture:
+  task_enable_lsp: true
+  parent_session_lsp: true
+  lsp_enabled: true
+  agent_allowlist_includes_lsp: false
+
+observation:
+  tools: [read, yield, hub]
+  lsp_present: false
+  lsp_call_count: 0
+  terminal_yield_count: 1
+  cause: AGENT_ALLOWLIST_MISSING
+  remediation: ADD_LSP_TO_AGENT_ALLOWLIST
+
+evidence:
+  - {path: docs/evidence/phase-00/E5/raw/e5-d-attempt-001.run.json, sha256: E3D71882C3290A313FF663DD25BC26BD66AB06ED90DE6C20CF2B45652E89F861}
+  - {path: docs/evidence/phase-00/E5/raw/e5-d-attempt-001.projection.json, sha256: 20C0F8C0DBBAE69AB260B5E2BA6FFFA278074594D86DEE34D23C8B842FA2B01B}
+  - {path: docs/evidence/phase-00/E5/raw/e5-d-attempt-001.child.jsonl, sha256: 4C46D8F055AFC59FCAEA159E7A73B2BBDF1344C19F964623F76503D3D1731891}
+
+safety: {repository_unchanged: true, live_home_changed_count: 0, cleanup_succeeded: true}

@@ -1,0 +1,6 @@
+Model "@missingcustom" not found
+
+Set an API key environment variable:
+  <CREDENTIAL_VARIABLE>, <CREDENTIAL_VARIABLE>, <CREDENTIAL_VARIABLE>, etc.
+
+Or create <DISPOSABLE_ROOT>\agent-home\models.yml

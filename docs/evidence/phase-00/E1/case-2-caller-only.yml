@@ -1,0 +1,105 @@
+schema_version: 1
+experiment: "E1"
+case_id: "CallerOnly"
+matrix_artifact: "case-2-caller-only"
+status: "PASS"
+attempt: 2
+runtime:
+  pinned_source_commit: "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+  omp_sha256: "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+  omp_version: "omp/17.2.10"
+  model: "omniroute/codex/gpt-5.6-sol-high"
+inputs:
+  prompt_sha256: "5D6F452B7AD069CB09070EC7C297BD533F0F0E17B3565C3C82A216C71541BF17"
+  agent: "phase00-e1-caller-only"
+  caller_schema_state: "PRESENT"
+  agent_schema_state: "ABSENT"
+  agent_schema_dialect: "NONE"
+  session_schema_state: "ABSENT"
+observations:
+  selected_result:
+    agent: "phase00-e1-caller-only"
+    is_async_acknowledgement: false
+    source: "caller"
+    mode: "permissive"
+    structured_status: "valid"
+    data_property_names:
+      - "sentinel"
+    expected_sentinel_matches: true
+    forbidden_property_present: false
+  attributable_result_count: 1
+  selected_result_role: "target"
+  child_initialization_source: "caller"
+  schema_override_observable: true
+  schema_override_observed: true
+  blocking_executions:
+    -
+      Role: "target"
+      Agent: "phase00-e1-caller-only"
+      DefinitionBlocking: true
+      SetupBlocking: true
+      ExecutionMode: "blocking"
+      AsyncAcknowledgement: false
+provider_ledger:
+  selected_session:
+    requests: 1
+    attributed_requests: 1
+    unattributed_requests: 0
+    response_ends: 1
+    recovered_retries: 0
+    retry_exhausted: false
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+    terminal_failure_found: false
+    terminal_failure_code: ""
+  process:
+    requests: 3
+    attributed_requests: 3
+    unattributed_requests: 0
+    response_ends: 3
+    recovered_retries: 0
+    retry_exhausted_count: 0
+    terminal_failure_count: 0
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+  controller_stdout_duplicates_excluded: true
+raw_artifacts:
+  -
+    kind: "stdout"
+    path: "docs/evidence/phase-00/E1/raw/caller-only/attempt-002.stdout.jsonl"
+    sha256: "AF19C4590CA42436AB82B9E6F07298BEECD2CB0B0B3E4091060894BB3863BA33"
+    lines: 123
+    source_capture_sha256: "FF612F97CF5289047C6B6540DB2D1D73A3ADA9C7EAC1AAEEE7F952B0CC067CC6"
+  -
+    kind: "stderr"
+    path: "docs/evidence/phase-00/E1/raw/caller-only/attempt-002.stderr.jsonl"
+    sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    lines: 0
+    source_capture_sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/caller-only/attempt-002.sessions/session-001.jsonl"
+    sha256: "F67EB0D6087B3182FF2EE3000D141CBE7468EEAE317F3AC265843674623D03E6"
+    lines: 10
+    source_capture_sha256: "693C9CD34A7A198AA540BEC2D6AA5661E93A4CF2BEABE45374BB2AF8373AC4D2"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/caller-only/attempt-002.sessions/session-002.jsonl"
+    sha256: "0C3AAE84A96EB6D31B9A756A5DBB7B2500F3D8AA4E9B7B410EC45FE1E947A263"
+    lines: 10
+    source_capture_sha256: "00F431AE0C8BB331F7DB9EC18817F7E6526A4878E4B5E4DC2DC2B4E2B37A3155"
+  -
+    kind: "run"
+    path: "docs/evidence/phase-00/E1/raw/caller-only/attempt-002.run.json"
+    sha256: "0D1E808B13ED01E2B9B79279FC9932A0DE1B32F792B77C62A0F0EDAEE55E6F7C"
+    lines: 315
+    source_capture_sha256: null
+protected_surface:
+  unchanged: true
+  cleanup_succeeded: true
+  remaining_child_pid_count: 0
+reason_codes:
+  - "E1_CALLER_ONLY_PASS"
+limitations:
+  - "Provider counts are attributed from persisted sessions; duplicated controller stdout events are excluded."
+  - "Sanitized raw artifacts omit private prompts, reasoning, credentials, and complete provider bodies."

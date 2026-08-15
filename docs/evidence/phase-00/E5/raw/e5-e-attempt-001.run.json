@@ -1,0 +1,60 @@
+{
+    "schema_version":  1,
+    "experiment":  "E5-E",
+    "role":  "allowlisted",
+    "attempt":  1,
+    "selected":  true,
+    "status":  "PASS",
+    "model":  "omniroute/oc/mimo-v2.5-free",
+    "runtime":  {
+                    "version":  "omp/17.2.10",
+                    "sha256":  "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+                    "source_commit":  "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+                },
+    "node":  {
+                 "version":  "v24.16.0",
+                 "sha256":  "B3094D0B49F9AD602262A9921551737BB97637C05DD357A06AE98188D7290AA3",
+                 "used_as_language_server":  false
+             },
+    "started_at":  "2026-08-11T13:06:25.8435429+07:00",
+    "completed_at":  "2026-08-11T13:06:56.7245158+07:00",
+    "duration_ms":  30881,
+    "exit_code":  0,
+    "timed_out":  false,
+    "analysis":  {
+                     "Status":  "PASS",
+                     "Reasons":  [
+                                     "E5_CONDITION_DISCRIMINATED"
+                                 ],
+                     "FinalTotalTokens":  7536,
+                     "Marker":  "E5_E_TOOL_PRESENT_NO_SERVER",
+                     "LspServerName":  null,
+                     "Cause":  "LANGUAGE_SERVER_UNAVAILABLE",
+                     "Tools":  [
+                                   "lsp",
+                                   "yield",
+                                   "hub"
+                               ],
+                     "LspResultSuccess":  false,
+                     "LspPresent":  true,
+                     "MarkerCount":  1,
+                     "LspResultCount":  1,
+                     "LspCallCount":  1,
+                     "YieldCallCount":  1,
+                     "CaseId":  "E5-E",
+                     "Role":  "allowlisted",
+                     "FirstTurnPromptTokens":  7292,
+                     "LspResultText":  "No language server found for this action",
+                     "Remediation":  "INSTALL_OR_CONFIGURE_LANGUAGE_SERVER"
+                 },
+    "repository_unchanged":  true,
+    "live_home_changed_count":  0,
+    "cleanup_succeeded":  true,
+    "cleanup_error":  null,
+    "artifacts":  {
+                      "parent_stdout":  "29803EB886B5346B35BE212290799590C243C280146AC029DF08FA11627D2A80",
+                      "parent_stderr":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                      "child":  "49DCF6B95ED4ECAA82A59FB122A03D79B3C7D7A9A29E853986C211BBAD060E57",
+                      "projection":  "699DE25F49A0CA5A881B0B0FB7D411E2DC135F45BE6CA06C4F2C8A07213859EF"
+                  }
+}

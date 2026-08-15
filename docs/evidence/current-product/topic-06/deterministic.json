@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "record_type": "topic06_agent_boundary_evidence",
+  "status": "PASS",
+  "captured_at_utc": "2026-08-14T07:36:32.4427739Z",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "repository": {
+    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "topic06_present_in_head": false,
+    "working_tree_clean": false,
+    "dirty_paths_sha256": "01918751b13bccf324f80fe10f189a0ee2148c765b63c6470791f8a79d4349b4",
+    "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
+  },
+  "environment": {
+    "os": "Microsoft Windows 10.0.26100",
+    "architecture": "X64",
+    "pwsh_version": "7.6.4",
+    "node_version": "v24.16.0",
+    "git_version": "git version 2.54.0.windows.1",
+    "installed_omp_version": "omp/17.2.12"
+  },
+  "pinned_omp": {
+    "commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+    "version": "17.2.10",
+    "clean": true
+  },
+  "cases": {
+    "contract_core_roles_receipts_wrapper": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Closed portable core, role contracts, receipts, and native wrapper seams.",
+      "stdout_sha256": "349f9aa525a840ed52257d9ec6c2b63df46ea18187c44f34bed80be80a041895",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "state_projection": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free state projection.",
+      "stdout_sha256": "2b9e5a2cd46f203ec68c3fb4f510ff86b411038447d79c822c848e5c7e68a486",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "installer_transaction": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free installer transaction.",
+      "stdout_sha256": "b59a489c78605c80dbaa3bc0e846be07a00773585559891ff5a60960f5e1e95c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "installed_managed_runtime": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free installed managed runtime.",
+      "stdout_sha256": "1f7b8c1a64f498d7ce4a439e0548a73b62c135ddb84b0f0b5e6611f0da4ca615",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "adversarial_lifecycle_e2e": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Model-free adversarial lifecycle e2e.",
+      "stdout_sha256": "15fc6e50151546d930c058fed87ccaa23a81c6a8802f119156025ca0a63a8716",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "focused_contract_bootstrap": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Focused authority/implementation validation without its not-yet-written evidence pair (17 records).",
+      "stdout_sha256": "f7015d5476c7a767251b8b30002a9cda2236e76a450eec0e04d2e2ef4a959870",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "full_validator_bootstrap": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Full repository validator with Topic 06 self-evidence and the downstream Topic 07 evidence hash skipped during dependency-ordered recapture.",
+      "stdout_sha256": "2fd37f7f7918f297735b2266384f8b76fefa2d704e90d14b94f855fa7966fcb6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    },
+    "pinned_omp_source": {
+      "status": "PASS",
+      "exit_code": 0,
+      "scope": "Pinned OMP commit and clean-source check for same-name delegation/runtime claims.",
+      "stdout_sha256": "5aecb6c85c6b53703268ff3a334d34061166d286ddbc430f93b1011137b7769f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "provider_calls": 0,
+      "model_processes_started": 0
+    }
+  },
+  "limitations": {
+    "universal_internal_agent_hook": "OPEN-T06-RUNTIME-01_NONBLOCKING",
+    "unrelated_vibe_eval_internal_agents": "UNMANAGED",
+    "provider_smoke": "NOT_RUN_MODEL_FREE_CAMPAIGN",
+    "parent_acceptance": "NOT_GRANTED_BY_RECEIPT",
+    "operational_state": "LOCAL_OUTSIDE_GIT"
+  }
+}

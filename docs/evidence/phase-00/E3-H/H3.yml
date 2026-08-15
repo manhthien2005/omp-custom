@@ -1,0 +1,31 @@
+schema_version: 1
+phase: "00"
+experiment: E3-H
+case: H3
+status: PASS
+
+execution:
+  selected_attempt: 1
+  provider_call: false
+  direct_process_count: 2
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-H/raw/H3.stdout.json, sha256: 73CDD144895AF8ABFB41EA42BEFA5A4744B9E786F0C8EB98335A5AC108C9E55D}
+    - {path: docs/evidence/phase-00/E3-H/raw/H3.stderr.txt, sha256: 6BDAC0AC268EB0F152267385F49878F40FFC228F7FB89EC86150DD26A10147EA}
+    - {path: docs/evidence/phase-00/E3-H/raw/H3.run.json, sha256: 8641A2A59CE6764200D20EBD393273C92AD7B6881DF46AA9CCCDADC7CF8A7A1B}
+
+observation:
+  before_subcommand_placement: {exit_code: 1, accepted_value: false}
+  after_subcommand_placement: {exit_code: 1, accepted_value: false}
+  decision: REFUSE
+  reasons: [CONFIG_CLI_OVERLAY_UNSUPPORTED, CLI_OVERLAY_UNOBSERVABLE]
+  precedence_read: false
+
+interpretation:
+  reason: H3_CONFIG_CLI_OVERLAY_UNSUPPORTED_FAIL_CLOSED
+  decision: >-
+    The OMP 17.2.10 config subcommand rejects --config in both plausible positions.
+    This is characterization PASS for fail-closed behavior, not launch-overlay precedence proof.
+  non_claim: Actual launch-session overlay precedence remains assigned to E3-I.
+

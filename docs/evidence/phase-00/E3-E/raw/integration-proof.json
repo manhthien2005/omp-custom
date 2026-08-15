@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "fixture_head": "398e9ce919d492a3bc3576149e4dafaea98aa9b3",
+  "worker_start_window_ms": 32,
+  "completion_order": [2, 0, 1],
+  "integration_order": [0, 1, 2],
+  "integration_steps": [
+    {"index": 0, "check_exit": 0, "apply_exit": 0, "content": "E3_E_0", "patch_sha256": "56037ECA8B0802EB485D10B4A9E43241589394F46D7880E1932AB4792852B2D0"},
+    {"index": 1, "check_exit": 0, "apply_exit": 0, "content": "E3_E_1", "patch_sha256": "A1DB6B896CED19332328C7AF8E42D4AD1B9F828CE43EE20DF6940AF0AB0CA821"},
+    {"index": 2, "check_exit": 0, "apply_exit": 0, "content": "E3_E_2", "patch_sha256": "942C15D379DB7D9D8AD7A783ACCD546D1B05214A5BFD5130B7F4FCC9474A74DB"}
+  ],
+  "parent_poll_count": 86,
+  "parent_poll_violation_count": 0
+}

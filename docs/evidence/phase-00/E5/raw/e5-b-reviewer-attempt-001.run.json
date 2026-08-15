@@ -1,0 +1,60 @@
+{
+    "schema_version":  1,
+    "experiment":  "E5-B",
+    "role":  "reviewer",
+    "attempt":  1,
+    "selected":  true,
+    "status":  "PASS",
+    "model":  "omniroute/oc/mimo-v2.5-free",
+    "runtime":  {
+                    "version":  "omp/17.2.10",
+                    "sha256":  "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+                    "source_commit":  "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+                },
+    "node":  {
+                 "version":  "v24.16.0",
+                 "sha256":  "B3094D0B49F9AD602262A9921551737BB97637C05DD357A06AE98188D7290AA3",
+                 "used_as_language_server":  true
+             },
+    "started_at":  "2026-08-11T13:03:36.2495857+07:00",
+    "completed_at":  "2026-08-11T13:04:18.2016274+07:00",
+    "duration_ms":  41952,
+    "exit_code":  0,
+    "timed_out":  false,
+    "analysis":  {
+                     "Status":  "PASS",
+                     "Reasons":  [
+                                     "E5_CONDITION_DISCRIMINATED"
+                                 ],
+                     "FinalTotalTokens":  7467,
+                     "Marker":  "E5_B_REVIEWER_LSP_OK",
+                     "LspServerName":  "phase00-fake",
+                     "Cause":  "ALL_LSP_GATES_SATISFIED",
+                     "Tools":  [
+                                   "lsp",
+                                   "yield",
+                                   "hub"
+                               ],
+                     "LspResultSuccess":  true,
+                     "LspPresent":  true,
+                     "MarkerCount":  1,
+                     "LspResultCount":  1,
+                     "LspCallCount":  1,
+                     "YieldCallCount":  1,
+                     "CaseId":  "E5-B",
+                     "Role":  "reviewer",
+                     "FirstTurnPromptTokens":  7261,
+                     "LspResultText":  "Found 1 reference(s):\n  probe.ts:1:17\n    1: export function alpha(): number { return 1; }\n    2: ",
+                     "Remediation":  "NONE"
+                 },
+    "repository_unchanged":  true,
+    "live_home_changed_count":  0,
+    "cleanup_succeeded":  true,
+    "cleanup_error":  null,
+    "artifacts":  {
+                      "parent_stdout":  "89D249A7722C408D8B82E5979798592226D5B51C9FB49F980BD797438219EE33",
+                      "parent_stderr":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                      "child":  "045DC5D98C9447671B0B78CCF0443A40842D3D48D038E4241EE0296D17879F83",
+                      "projection":  "9A7D0B7FDA865D05D910F1947C91634A88D10AE8744212152D4B2572FCCC7FBC"
+                  }
+}

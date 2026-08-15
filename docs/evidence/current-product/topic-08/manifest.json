@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "record_type": "topic08_evidence_manifest",
+  "component": "behavior-core",
+  "component_version": "1.0.0",
+  "generated_at_utc": "2026-08-14T05:04:39.0628313Z",
+  "files": [
+    {
+      "path": "behavior-manifest.json",
+      "sha256": "ce440439a21d7219da2913929068fe513845c96b82b4d520e9338e0b13bbfd9d"
+    },
+    {
+      "path": "deterministic.json",
+      "sha256": "1f861f9940a46ad9dbd9669d4aa74b0eaf6b8e412026e877273e8235f44afc81"
+    }
+  ]
+}

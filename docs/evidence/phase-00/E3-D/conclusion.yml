@@ -1,0 +1,8 @@
+schema_version: 1
+phase: "00"
+experiment: E3-D
+status: PASS
+decision: Two overlapping isolated workers captured distinct patches while continuous polling proved the parent remained unchanged.
+cases: {D1: PASS}
+downstream: {E3-E: ELIGIBLE}
+artifacts: [docs/evidence/phase-00/E3-D/D1.yml]

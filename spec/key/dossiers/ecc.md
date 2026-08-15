@@ -1,5 +1,12 @@
 # Dossier: ECC (Everything Claude Code)
 
+> Authority boundary: This dossier is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 **Upstream:** `_research/upstreams/ECC` @ `9aac8585ab887d9c51252730240b25d9cca180da` (2026-08-06)
 **Surveyed:** this pass, read-only. All line citations verified against the commit above.
 **Scale:** 3,438 files — 67 agents, 282 skills, 94 commands, 122 rule files, 11 JSON schemas, 1,510 docs.

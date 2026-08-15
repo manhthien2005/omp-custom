@@ -1,0 +1,321 @@
+{
+  "record_type": "phase00_e1_run",
+  "schema_version": 1,
+  "case_id": "CallerOnly",
+  "case_slug": "caller-only",
+  "attempt": 1,
+  "execution_order": 3,
+  "capture_integrity_status": "INVALID_RUN",
+  "case_status": null,
+  "case_oracle_evaluated": false,
+  "reason_codes": [
+    "E1_SANITIZER_PROCESSING_ERROR"
+  ],
+  "runner_started_at": "2026-08-10T09:47:17.1950727+07:00",
+  "runner_completed_at": "2026-08-10T09:47:30.8045122+07:00",
+  "pinned_source": {
+    "source_root": "<E1_REPOSITORY_ROOT>/_research/upstreams/oh-my-pi",
+    "commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+    "clean": true,
+    "origin": "https://github.com/can1357/oh-my-pi.git"
+  },
+  "pinned_runtime": {
+    "sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "version": "omp/17.2.10",
+    "version_probe_arguments": [
+      "--version"
+    ],
+    "version_probe_exit_code": 0,
+    "version_probe_timed_out": false
+  },
+  "fixture": {
+    "source_fixture_matched": true,
+    "copied_fixture_matched": true,
+    "fixture_hashes": {
+      ".omp/config.yml": "C1B6B21417044393E91BE3079545959D42CB72F00E0601D8909DF58527E10619",
+      "agents/phase00-e1-agent-json-schema.md": "2292140A382F80E8ADA2F0005626AD8E0716A180B004C4C78C81E33484DBE9E8",
+      "agents/phase00-e1-agent-jtd.md": "B6A9CA4AF3A4E0365C8D2166F1FB143C34779001DBCC11138777CDA0D45B9E79",
+      "agents/phase00-e1-caller-only.md": "1C266E64CAC83797E7D7DA052631F858D624B5DDC4D2AA048BB607C7E54676B1",
+      "agents/phase00-e1-caller-over-agent.md": "E68AF921F59BA6FD7FD12ECF95DBC5FBBA2D800683AAF6D8843C405A401A1B24",
+      "agents/phase00-e1-provider-strict.md": "F8E53C651A41707CA2226F3CE687F97236BB0F0600024E42E87ACD14B85293EA",
+      "agents/phase00-e1-session-carrier.md": "02A737F9D61B7D0BE62B85AAA5B72F1820F7C44946A61B9B087A6EEE0EEF91B8",
+      "agents/phase00-e1-session-leaf.md": "ECC6A1F4E415EF6E34893754EEE233676B440636FC376415E95BE8A3F1B9F801",
+      "prompts/agent-json-schema.md": "D5D1BD76225910C5112B1C6F07513B1CB6E677429A3B113699A47C395BD7B6B6",
+      "prompts/agent-jtd.md": "EE192EA1419604FDC8814F4A44D1B848F525DC41274DD6661C33A2877826742C",
+      "prompts/caller-only.md": "5D6F452B7AD069CB09070EC7C297BD533F0F0E17B3565C3C82A216C71541BF17",
+      "prompts/caller-over-agent.md": "6C1F4C76DEC505690B2E4D62FA259CCE885061FE753E7B6152629C034A8FF5E7",
+      "prompts/provider-strict.md": "15B1C1BA9133F89B1125FCD089F87147F282DC1AAF315FFB303322A46AC87113",
+      "prompts/session-only.md": "D93A14C4AF93541DB049C3A7154593FADF5275CCC07D2D912EFCEB20EF8BE817"
+    },
+    "model_catalog_sha256": "56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779",
+    "runtime_source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "runtime_copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "runtime_version": "omp/17.2.10"
+  },
+  "command": {
+    "executable": "<E1_DISPOSABLE_ROOT>/runtime/omp.exe",
+    "arguments": [
+      "-p",
+      "--mode",
+      "json",
+      "--cwd",
+      "<E1_DISPOSABLE_ROOT>/project",
+      "--session-dir",
+      "<E1_DISPOSABLE_ROOT>/sessions",
+      "--config",
+      "<E1_DISPOSABLE_ROOT>/project/.omp/config.yml",
+      "--model",
+      "omniroute/codex/gpt-5.6-sol-high",
+      "--tools",
+      "task",
+      "--approval-mode",
+      "yolo",
+      "--max-time",
+      "8m",
+      "--no-extensions",
+      "--no-skills",
+      "--no-rules",
+      "--no-lsp",
+      "--no-title",
+      "<PROMPT_SHA256:5D6F452B7AD069CB09070EC7C297BD533F0F0E17B3565C3C82A216C71541BF17>"
+    ],
+    "prompt_sha256": "5D6F452B7AD069CB09070EC7C297BD533F0F0E17B3565C3C82A216C71541BF17",
+    "model": "omniroute/codex/gpt-5.6-sol-high",
+    "launch_invoked": true
+  },
+  "environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_HOME>",
+    "HOME": "<DISPOSABLE_ROOT>",
+    "USERPROFILE": "<DISPOSABLE_ROOT>",
+    "PATH_PREFIX": "<DISPOSABLE_RUNTIME>",
+    "PI_NO_STRICT": "<ABSENT>",
+    "PROFILES": "<REMOVED>",
+    "EXTRA_CONFIG": "<REMOVED>",
+    "AUTH_BROKER": "<REMOVED>",
+    "LOOPBACK_NO_PROXY": true
+  },
+  "process": {
+    "process_id": 33828,
+    "exit_code": 0,
+    "started_at": "2026-08-10T09:47:18.3848692+07:00",
+    "completed_at": "2026-08-10T09:47:30.0987805+07:00",
+    "timed_out": false,
+    "descendant_pids_observed": [],
+    "remaining_child_pids": []
+  },
+  "artifacts": [
+    {
+      "kind": "stdout",
+      "path": "docs/evidence/phase-00/E1/raw/caller-only/attempt-001.stdout.jsonl",
+      "source_relative_path_sha256": null,
+      "metadata": {
+        "Status": "INVALID_RUN",
+        "ReasonCodes": [
+          "E1_SANITIZER_PROCESSING_ERROR"
+        ],
+        "SourceCaptureSha256": "E766CDA06DC053E0F01F256164601CC00CCB569AE4F6D4D7D12DA54C3C61E389",
+        "SanitizedOutputSha256": "0642E3B13EE3D873B15886C1BBB4C06042EE659462DB2F70E80A7F51B1F3C767",
+        "SourceLineCount": 123,
+        "SanitizedLineCount": 123,
+        "MalformedLines": [],
+        "InvalidShapeLines": [],
+        "ProcessingErrorLines": [
+          6
+        ],
+        "CredentialLines": [],
+        "FixtureHashes": {
+          ".omp/config.yml": "C1B6B21417044393E91BE3079545959D42CB72F00E0601D8909DF58527E10619",
+          "agents/phase00-e1-agent-json-schema.md": "2292140A382F80E8ADA2F0005626AD8E0716A180B004C4C78C81E33484DBE9E8",
+          "agents/phase00-e1-agent-jtd.md": "B6A9CA4AF3A4E0365C8D2166F1FB143C34779001DBCC11138777CDA0D45B9E79",
+          "agents/phase00-e1-caller-only.md": "1C266E64CAC83797E7D7DA052631F858D624B5DDC4D2AA048BB607C7E54676B1",
+          "agents/phase00-e1-caller-over-agent.md": "E68AF921F59BA6FD7FD12ECF95DBC5FBBA2D800683AAF6D8843C405A401A1B24",
+          "agents/phase00-e1-provider-strict.md": "F8E53C651A41707CA2226F3CE687F97236BB0F0600024E42E87ACD14B85293EA",
+          "agents/phase00-e1-session-carrier.md": "02A737F9D61B7D0BE62B85AAA5B72F1820F7C44946A61B9B087A6EEE0EEF91B8",
+          "agents/phase00-e1-session-leaf.md": "ECC6A1F4E415EF6E34893754EEE233676B440636FC376415E95BE8A3F1B9F801",
+          "prompts/agent-json-schema.md": "D5D1BD76225910C5112B1C6F07513B1CB6E677429A3B113699A47C395BD7B6B6",
+          "prompts/agent-jtd.md": "EE192EA1419604FDC8814F4A44D1B848F525DC41274DD6661C33A2877826742C",
+          "prompts/caller-only.md": "5D6F452B7AD069CB09070EC7C297BD533F0F0E17B3565C3C82A216C71541BF17",
+          "prompts/caller-over-agent.md": "6C1F4C76DEC505690B2E4D62FA259CCE885061FE753E7B6152629C034A8FF5E7",
+          "prompts/provider-strict.md": "15B1C1BA9133F89B1125FCD089F87147F282DC1AAF315FFB303322A46AC87113",
+          "prompts/session-only.md": "D93A14C4AF93541DB049C3A7154593FADF5275CCC07D2D912EFCEB20EF8BE817"
+        }
+      }
+    },
+    {
+      "kind": "stderr",
+      "path": "docs/evidence/phase-00/E1/raw/caller-only/attempt-001.stderr.jsonl",
+      "source_relative_path_sha256": null,
+      "metadata": {
+        "Status": "PASS",
+        "ReasonCodes": [],
+        "SourceCaptureSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "SanitizedOutputSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "SourceLineCount": 0,
+        "SanitizedLineCount": 0,
+        "MalformedLines": [],
+        "InvalidShapeLines": [],
+        "ProcessingErrorLines": [],
+        "CredentialLines": [],
+        "FixtureHashes": {}
+      }
+    },
+    {
+      "kind": "session",
+      "path": "docs/evidence/phase-00/E1/raw/caller-only/attempt-001.sessions/session-001.jsonl",
+      "source_relative_path_sha256": "C300EC2B8EBE5C5C59D9E91DB38FB5B8A1DB985214CF31BDE499B59DC5BCD928",
+      "metadata": {
+        "Status": "PASS",
+        "ReasonCodes": [],
+        "SourceCaptureSha256": "48FDC165B4FBE69CC4590E4A002B670E3565D66F115DB243EE06703EABEC7076",
+        "SanitizedOutputSha256": "AB07175B14AF2C6B6E2782589127ADC14AAFBB4075613FC9F8D06E96080777B8",
+        "SourceLineCount": 10,
+        "SanitizedLineCount": 10,
+        "MalformedLines": [],
+        "InvalidShapeLines": [],
+        "ProcessingErrorLines": [],
+        "CredentialLines": [],
+        "FixtureHashes": {
+          ".omp/config.yml": "C1B6B21417044393E91BE3079545959D42CB72F00E0601D8909DF58527E10619",
+          "agents/phase00-e1-agent-json-schema.md": "2292140A382F80E8ADA2F0005626AD8E0716A180B004C4C78C81E33484DBE9E8",
+          "agents/phase00-e1-agent-jtd.md": "B6A9CA4AF3A4E0365C8D2166F1FB143C34779001DBCC11138777CDA0D45B9E79",
+          "agents/phase00-e1-caller-only.md": "1C266E64CAC83797E7D7DA052631F858D624B5DDC4D2AA048BB607C7E54676B1",
+          "agents/phase00-e1-caller-over-agent.md": "E68AF921F59BA6FD7FD12ECF95DBC5FBBA2D800683AAF6D8843C405A401A1B24",
+          "agents/phase00-e1-provider-strict.md": "F8E53C651A41707CA2226F3CE687F97236BB0F0600024E42E87ACD14B85293EA",
+          "agents/phase00-e1-session-carrier.md": "02A737F9D61B7D0BE62B85AAA5B72F1820F7C44946A61B9B087A6EEE0EEF91B8",
+          "agents/phase00-e1-session-leaf.md": "ECC6A1F4E415EF6E34893754EEE233676B440636FC376415E95BE8A3F1B9F801",
+          "prompts/agent-json-schema.md": "D5D1BD76225910C5112B1C6F07513B1CB6E677429A3B113699A47C395BD7B6B6",
+          "prompts/agent-jtd.md": "EE192EA1419604FDC8814F4A44D1B848F525DC41274DD6661C33A2877826742C",
+          "prompts/caller-only.md": "5D6F452B7AD069CB09070EC7C297BD533F0F0E17B3565C3C82A216C71541BF17",
+          "prompts/caller-over-agent.md": "6C1F4C76DEC505690B2E4D62FA259CCE885061FE753E7B6152629C034A8FF5E7",
+          "prompts/provider-strict.md": "15B1C1BA9133F89B1125FCD089F87147F282DC1AAF315FFB303322A46AC87113",
+          "prompts/session-only.md": "D93A14C4AF93541DB049C3A7154593FADF5275CCC07D2D912EFCEB20EF8BE817"
+        }
+      }
+    },
+    {
+      "kind": "session",
+      "path": "docs/evidence/phase-00/E1/raw/caller-only/attempt-001.sessions/session-002.jsonl",
+      "source_relative_path_sha256": "55C74316C868EE333DEF7E125E46C421C1C648557CECC03628FDAF3546D83FBC",
+      "metadata": {
+        "Status": "PASS",
+        "ReasonCodes": [],
+        "SourceCaptureSha256": "A5875E61475FB48BA9157F0A40AE6D26A3E5AD18E388F51F2A308E5D9EA94CD8",
+        "SanitizedOutputSha256": "EDA0B6D39C41EF103383B6A6C84E768F4CC6C60D93C9A4F8FA0C37C88D794878",
+        "SourceLineCount": 10,
+        "SanitizedLineCount": 10,
+        "MalformedLines": [],
+        "InvalidShapeLines": [],
+        "ProcessingErrorLines": [],
+        "CredentialLines": [],
+        "FixtureHashes": {
+          ".omp/config.yml": "C1B6B21417044393E91BE3079545959D42CB72F00E0601D8909DF58527E10619",
+          "agents/phase00-e1-agent-json-schema.md": "2292140A382F80E8ADA2F0005626AD8E0716A180B004C4C78C81E33484DBE9E8",
+          "agents/phase00-e1-agent-jtd.md": "B6A9CA4AF3A4E0365C8D2166F1FB143C34779001DBCC11138777CDA0D45B9E79",
+          "agents/phase00-e1-caller-only.md": "1C266E64CAC83797E7D7DA052631F858D624B5DDC4D2AA048BB607C7E54676B1",
+          "agents/phase00-e1-caller-over-agent.md": "E68AF921F59BA6FD7FD12ECF95DBC5FBBA2D800683AAF6D8843C405A401A1B24",
+          "agents/phase00-e1-provider-strict.md": "F8E53C651A41707CA2226F3CE687F97236BB0F0600024E42E87ACD14B85293EA",
+          "agents/phase00-e1-session-carrier.md": "02A737F9D61B7D0BE62B85AAA5B72F1820F7C44946A61B9B087A6EEE0EEF91B8",
+          "agents/phase00-e1-session-leaf.md": "ECC6A1F4E415EF6E34893754EEE233676B440636FC376415E95BE8A3F1B9F801",
+          "prompts/agent-json-schema.md": "D5D1BD76225910C5112B1C6F07513B1CB6E677429A3B113699A47C395BD7B6B6",
+          "prompts/agent-jtd.md": "EE192EA1419604FDC8814F4A44D1B848F525DC41274DD6661C33A2877826742C",
+          "prompts/caller-only.md": "5D6F452B7AD069CB09070EC7C297BD533F0F0E17B3565C3C82A216C71541BF17",
+          "prompts/caller-over-agent.md": "6C1F4C76DEC505690B2E4D62FA259CCE885061FE753E7B6152629C034A8FF5E7",
+          "prompts/provider-strict.md": "15B1C1BA9133F89B1125FCD089F87147F282DC1AAF315FFB303322A46AC87113",
+          "prompts/session-only.md": "D93A14C4AF93541DB049C3A7154593FADF5275CCC07D2D912EFCEB20EF8BE817"
+        }
+      }
+    }
+  ],
+  "session_capture": {
+    "jsonl_source_count": 2,
+    "expected_output_file_count": 1,
+    "unexpected_file_count": 0
+  },
+  "capture_verification": {
+    "Status": "PASS",
+    "ReasonCodes": [],
+    "ArtifactCount": 4,
+    "TotalSourceLines": 143,
+    "TotalSanitizedLines": 143
+  },
+  "provider_observations": {
+    "per_artifact": [
+      {
+        "Artifact": "docs/evidence/phase-00/E1/raw/caller-only/attempt-001.stdout.jsonl",
+        "RequestCount": 1,
+        "AttributedRequestCount": 1,
+        "UnattributedRequestCount": 0,
+        "ResponseEndCount": 2,
+        "RetryStartCount": 0,
+        "RetryEndCount": 0,
+        "RecoveredRetryCount": 0,
+        "RetryExhaustedCount": 0,
+        "Provider": "omniroute",
+        "Model": "codex/gpt-5.6-sol-high"
+      },
+      {
+        "Artifact": "docs/evidence/phase-00/E1/raw/caller-only/attempt-001.sessions/session-001.jsonl",
+        "RequestCount": 2,
+        "AttributedRequestCount": 2,
+        "UnattributedRequestCount": 0,
+        "ResponseEndCount": 2,
+        "RetryStartCount": 0,
+        "RetryEndCount": 0,
+        "RecoveredRetryCount": 0,
+        "RetryExhaustedCount": 0,
+        "Provider": "omniroute",
+        "Model": "codex/gpt-5.6-sol-high"
+      },
+      {
+        "Artifact": "docs/evidence/phase-00/E1/raw/caller-only/attempt-001.sessions/session-002.jsonl",
+        "RequestCount": 1,
+        "AttributedRequestCount": 1,
+        "UnattributedRequestCount": 0,
+        "ResponseEndCount": 1,
+        "RetryStartCount": 0,
+        "RetryEndCount": 0,
+        "RecoveredRetryCount": 0,
+        "RetryExhaustedCount": 0,
+        "Provider": "omniroute",
+        "Model": "codex/gpt-5.6-sol-high"
+      }
+    ],
+    "counts_are_per_artifact_not_deduplicated": true
+  },
+  "forwarder": {
+    "required": false,
+    "artifact_present": false
+  },
+  "protected_repository": {
+    "unchanged": true,
+    "before_all_expected": true,
+    "after_all_expected": true,
+    "changed_paths": [],
+    "changed_count": 0
+  },
+  "live_agent_home": {
+    "Unchanged": true,
+    "SurfaceCount": 1,
+    "ChangedCount": 0,
+    "Surfaces": [
+      {
+        "Id": "LIVE_HOME_1",
+        "Unchanged": true,
+        "BeforeExists": true,
+        "AfterExists": true,
+        "BeforeFileCount": 14,
+        "AfterFileCount": 14,
+        "BeforeSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+        "AfterSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+        "ChangedCount": 0
+      }
+    ]
+  },
+  "cleanup": {
+    "Required": true,
+    "Attempted": true,
+    "Succeeded": true,
+    "ErrorType": null
+  },
+  "operation_error_type": null
+}

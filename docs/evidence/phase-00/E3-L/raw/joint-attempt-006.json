@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I+E3-L",
+  "attempt": 6,
+  "selected": false,
+  "model": "omniroute/oc/mimo-v2.5-free",
+  "runtime": {
+    "version": "omp/17.2.10",
+    "sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "executable": "<PINNED_OMP_EXECUTABLE>"
+  },
+  "source_identity": {
+    "path": "docs/evidence/phase-00/E3-L/source-identity.json",
+    "sha256": "CE7B3DF1446788C2996521172FD2BB7B124E1DBBDB854F2E0FBD990FF5EA32FD"
+  },
+  "sessions": {
+    "a": {
+      "invoked": true,
+      "run": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.run.json",
+        "sha256": "B539F7A7FD01B3665D25E98724E0A5DBDCED4723A6C748C82B8A5B44DD0011DD"
+      },
+      "parent_stdout": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.stdout.jsonl",
+        "sha256": "59DC72FCF3D540F410BEBDC8F13738273BB5A6F62E6CBA5B6F1D7C2383968AFF"
+      },
+      "parent_stderr": {
+        "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.stderr.txt",
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "canaries": [
+        {
+          "id": "e3i-project-1",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.canary.e3i-project-1.jsonl",
+          "sha256": "53E57FDB3CF85B7F0610A892F8DEA81B6E6BED96EC962D596B2F017B043C2AAB"
+        },
+        {
+          "id": "e3i-project-2",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.canary.e3i-project-2.jsonl",
+          "sha256": "3F93960939859FF5F86720353BB0FC0889B474656D2EFBD59275F41319613606"
+        },
+        {
+          "id": "e3i-project-3",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.canary.e3i-project-3.jsonl",
+          "sha256": "30FB16BEC90C699E323536E2D3B3426A0F463156374632DB17293F873C21E68E"
+        },
+        {
+          "id": "e3i-runtime-1",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.canary.e3i-runtime-1.jsonl",
+          "sha256": "B8732BD5F75D5745CAB7A9871108CD9ACAB5B7B699D17E8DAA329E19645DAD1B"
+        },
+        {
+          "id": "e3i-runtime-2",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.canary.e3i-runtime-2.jsonl",
+          "sha256": "99C92013F1CC040B5E9E6043FEC432A600D62D09CAE460C7AACFEC186DC6F3F6"
+        },
+        {
+          "id": "e3i-runtime-3",
+          "path": "docs/evidence/phase-00/E3-I/raw/session-a-attempt-006.canary.e3i-runtime-3.jsonl",
+          "sha256": "D9A0BB072C69EC6CAEFBBEB96699459A8A1437F660E4D4B14E6E752C1D765B92"
+        }
+      ],
+      "transport_status": "INVALID_RUN",
+      "transport_reasons": [
+        "E3IL_CANARY_PROVENANCE_MISSING"
+      ],
+      "e3_i_status": "INVALID_RUN",
+      "e3_l_status": "INVALID_RUN",
+      "provider_terminal": false,
+      "recovered_provider_retry": false,
+      "boundary": {
+        "parent_content_unchanged": true,
+        "parent_head_unchanged": true,
+        "parent_status_unchanged": true,
+        "fixture_hashes_unchanged": true,
+        "live_home_unchanged": true,
+        "cleanup_succeeded": true
+      }
+    },
+    "b": {
+      "invoked": false,
+      "skip_reason": "A_INVALID_RUN"
+    }
+  },
+  "automatic_retry": false,
+  "e3_i_conclusion_consumed": false,
+  "e3_l_conclusion_consumed": false
+}

@@ -1,0 +1,15 @@
+[overlay_before]
+error: Unknown option '--config'. To specify a positional argument starting with a '-', place it at the end of the command after '--', as in '-- "--config"
+
+USAGE
+  $ omp config [ACTION] [KEY] [VALUE...] [FLAGS]
+
+Run `omp config --help` for details.
+
+[overlay_after]
+error: Unknown option '--config'. To specify a positional argument starting with a '-', place it at the end of the command after '--', as in '-- "--config"
+
+USAGE
+  $ omp config [ACTION] [KEY] [VALUE...] [FLAGS]
+
+Run `omp config --help` for details.

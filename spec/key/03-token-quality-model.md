@@ -1,28 +1,164 @@
 # 03 — Token / Quality Decision Model
 
-> How a cost/quality trade-off is judged in this project. This file is the tie-breaker
-> when two candidate designs differ in token cost and neither is obviously wrong.
+<!-- topic08-projection:behavior-core -->
+> **Topic 08 cost projection:** descriptions are ≤80 approximate tokens, visible catalog ≤900,
+> lazy bodies ≤900, and the sole current autoload body (Worker completion evidence) ≤500 per
+> Worker spawn. Three is the selected roster, not a permanent cap; additions must fit the same
+> manifest, provenance, trigger, and consumer accounting.
+
+<!-- topic05-projection:token -->
+> **KD-029 cost projection:** abundant Cheap Scout tokens may reduce expensive Lead retrieval, but
+> Scout/raw/provider/cache totals remain separate truthful telemetry. Missing usage is
+> `not_measured`; estimates and graph-vendor benchmark claims cannot justify promotion.
+
+## KD-028 durable-state cost/quality rule
+
+Raw `.task/` output and runtime artifacts are cheap transient transport, never acceptance evidence
+or lifecycle authority. Promote only compact sanitized proof that binds the exact contract,
+candidate, acceptance inputs, and relevant environment/source identity. Rehash at freeze,
+verification, review, handoff, resume/takeover, and acceptance boundaries. The extra deterministic
+hashing cost buys protection from stale plausible results; there is no global evidence TTL because
+validity is trigger-based.
+
+> How a cost/quality trade-off is judged in this project. Quality gates are authority;
+> token cost and latency may distinguish only candidates that clear them.
 >
 > Every OMP setting named here is source-verified; the citation is `packages/coding-agent/src/<path>:<line>`
 > in `_research/upstreams/oh-my-pi` @ `3a8591a`.
+>
+> **Topic 02 supersession boundary:** role names below are frozen-baseline examples, not
+> topology authority. Cost decisions attach to responsibilities selected by Topic 03.
 
 ---
 
 ## A. The objective function
 
-```
-minimize   total_tokens / accepted_outcomes
-subject to false_completion_rate not increasing
+The project uses a lexicographic objective. A lower-priority term can never compensate for
+a failure above it:
+
+```text
+1. clear every mandatory quality gate
+2. maximize validated accepted-outcome rate
+3. minimize core_workflow_tokens / validated_accepted_outcomes
+4. use latency only as a final tie-breaker
 ```
 
-**Tokens per accepted outcome**, not tokens. The denominator is what makes the metric
-honest. A run that spends 15k and produces a rejected change did not cost 15k — it cost
-15k plus the whole retry, plus the user's attention.
+There is no weighted quality score, model-price multiplier, premium-token equivalent, or
+latency composite. This supersedes the earlier unqualified
+`total_tokens / accepted_outcomes` formula. A cheap wrong run remains worse than an
+expensive correct run, but a large volume of deliberately cheap Scout retrieval must not
+distort the ledger used to optimize the expensive workflow core.
 
-The constraint is doing real work. Without it the optimizer has a trivial solution:
-delete the Verifier, halve the token count, and let wrong answers through. Every
-token-reduction proposal in this project is therefore checked against the constraint
-first and the objective second.
+### A-1. Validated accepted outcome
+
+A task contributes one validated accepted outcome only when all five conditions hold:
+
+1. the task objective is complete;
+2. every mandatory acceptance criterion has authoritative PASS evidence, with no SKIP or
+   coverage gap;
+3. every verification and review gate required by that task's contract is clear;
+4. no blocking finding, unresolved authority conflict, or unresolved scope issue remains;
+5. the Tech Lead records final acceptance.
+
+The lifecycle has three terminal task outcomes: `accepted`, `cancelled`, and
+`terminally_blocked`. `partial`, recoverable `blocked`, `waiting_for_user`, and rework are
+nonterminal observations and remain inside the open task cycle.
+
+`accepted_with_waiver` is an evaluation classification, not a shortcut around the task
+contract. It remains outside the validated benchmark denominator and cannot silently promote
+a candidate. If a waiver changes a mandatory criterion, that is a contract change: the old
+candidate remains non-validated and a linked task contract must evaluate a new candidate.
+
+### A-2. Full task-cycle accounting
+
+The task cycle starts when the task contract is accepted and ends only at `accepted`,
+`cancelled`, or `terminally_blocked`. It includes initial and repeated retrieval, rejected
+candidates, schema/provider/workflow retries, verification and review rework, attributable
+handoff or compaction, and fallback work after Scout failure. A genuinely new task contract
+starts a new cycle.
+
+Acceptance-bearing evidence binds to one immutable candidate snapshot. Any mutation after
+freeze invalidates that snapshot's evidence; the next attempt is a new candidate within the
+same task unless the contract itself changed.
+
+Failed and rejected cycles remain in the aggregate numerator. Their tokens are not erased or
+moved into the successful retry. Report three unweighted ledgers:
+
+| Ledger | Contents | Decision role |
+|---|---|---|
+| `core_workflow_tokens` | Tech Lead plus every non-Scout worker/reviewer activity in the task cycle | Primary optimization ledger |
+| `cheap_scout_tokens` | Optional read-only Cheap Scout retrieval | Telemetry only; never a routing or promotion gate |
+| `raw_total_tokens` | Sum of the two ledgers using token fields actually emitted by the runtime/provider | Observational only |
+
+If a token class is not exposed, report it as not measured; do not estimate it silently.
+The aggregate metric is:
+
+```text
+sum(core_workflow_tokens across every attempted task cycle)
+----------------------------------------------------------------
+count(validated accepted outcomes)
+```
+
+Zero validated accepted outcomes means infinite cost, not zero cost. Models are not
+weighted against one another. Provider cost, quota consumption, cache reads, and model
+identity may be reported as diagnostics, but they do not alter the formula.
+
+### A-3. Cheap Scout is deliberately simple
+
+The Tech Lead decides whether a Cheap Scout is useful. The role may resolve to DeepSeek,
+Gemini, or another suitable cheap model through configuration; workflow prose does not
+hardcode a model ID. The Scout performs read-only retrieval and returns compact evidence.
+If it is unavailable, fails, or returns unusable evidence, the workflow fails softly to the
+retrieval path the Tech Lead needs. The Tech Lead rechecks critical evidence. Scout token
+volume is telemetry, not a budget to optimize.
+
+### A-4. Latency is not an objective
+
+Record wall time, provider waits, and timeouts for diagnosis. A timeout, deadlock, or
+unbounded wait is a reliability failure rather than a merely slow result. An explicit user
+deadline becomes a task constraint. Otherwise latency is considered only when quality and
+core-token efficiency are equivalent.
+
+### A-5. Frozen dual baselines
+
+Two baselines answer different questions:
+
+- `stable_product_baseline`: the last promoted template, used for every candidate mechanism
+  or optimization;
+- `pinned_plain_omp_runtime_baseline`: pinned plain OMP without the template, used at release
+  and major architecture checkpoints to prove the product still adds value.
+
+Both arms freeze the fixture version, OMP binary SHA, provider/model policy, retry/timeout
+policy, cache policy, and tool environment; template-bearing arms also freeze the template
+artifact SHA. The stable baseline advances only after promotion and records the identity it
+supersedes. A baseline never moves silently.
+
+### A-6. Promotion
+
+Every candidate first clears deterministic hard gates: all required operational/adversarial
+gate fixtures pass, acceptance-criteria coverage is complete, no new false completion occurs,
+no blocking or critical correctness/security regression occurs, and the observed validated
+accepted-outcome rate does not decrease.
+
+A candidate may then promote by either path defined operationally in `spec/13 §C`:
+
+- **Efficiency win:** quality is statistically non-inferior, the observed acceptance rate is
+  not lower, the one-sided 95% non-inferiority bound permits at most five percentage points of
+  uncertainty, and core workflow tokens per validated accepted outcome improve by at least
+  10% with a paired 95% interval supporting a real improvement.
+- **Quality win:** the validated accepted-outcome rate is credibly better at 95% confidence,
+  while the paired 95% bound keeps core workflow tokens per validated accepted outcome within
+  a 10% regression ceiling.
+
+Three independent paired runs per arm are a pilot minimum only; pilot evidence may reject an
+obvious regression but cannot promote. Final runs follow a predeclared sequentially valid
+adaptive procedure whose joint error control preserves at least 95% confidence across all
+interim looks, both promotion paths, and every promotion-bearing bound. A nominal per-look 95%
+interval cannot trigger adaptive promotion. Pilot data enter final inference only when that
+procedure was frozen before the pilot and includes it as the first look. An inconclusive result
+is deferred or rejected. Higher-risk comparisons may predeclare stricter thresholds;
+thresholds cannot be loosened after final sampling begins. A user waiver is recorded
+separately and is not a validated promotion.
 
 ### Never-acceptable reductions
 
@@ -30,7 +166,7 @@ These are cuts that move cost from the measured column into the unmeasured one:
 
 | Cut | What it actually does |
 |---|---|
-| Skip the Verifier because the Implementer said it passed | Removes the only independent evidence. The Implementer is the worst judge of its own output — it knows what it intended. |
+| Remove required independent verification because the candidate author reported success | Removes the only independent evidence required by the accepted contract. The author is the worst judge of its own output because it knows what it intended. |
 | Drop the failing-test-first step on a bug fix | Removes the proof the bug existed. A fix with no red-to-green transition is a guess. |
 | Reduce thinking level on a high-risk task | Buys tokens with correctness on exactly the tasks where correctness is expensive to recover. |
 | Trim acceptance criteria below what the change needs | Makes the run cheaper *to score*, not cheaper to produce. |
@@ -109,17 +245,20 @@ bytes. Setting `read-summarize: false` on a read-heavy role is a token regressio
 no offsetting benefit — it is the mechanism that bounds the reads the role's own
 instructions try to avoid. The one defensible exception is an agent whose *evidence*
 is the literal file content; note that command output from `bash` is not affected by
-this setting at all, so a Verifier reading test output does not need the override.
+this setting at all, so a command-output verification responsibility does not need the override.
 
-### C-2. Compaction — `compaction.strategy` (default `snapcompact`)
+### C-2. Managed continuity — automatic compaction off
 
-Enum: `context-full | handoff | shake | snapcompact | off` (`config/settings-schema.ts:2164-2198`).
+OMP exposes `context-full | handoff | shake | snapcompact | off`
+(`config/settings-schema.ts:2164-2198`), but native availability is not the selected product
+policy. KD-031 sets the managed profile to `off` and disables automatic, idle, mid-turn, remote,
+and auto-continue paths.
 
 | Strategy | Mechanism | Cost profile |
 |---|---|---|
-| `snapcompact` (default) | Archives history onto dense bitmap images the model reads back. **No LLM call.** | Zero compaction *output* tokens; image tokens on read-back |
-| `shake` | Drops heavy content (tool results, large blocks) in place; recover via artifact | No LLM call; loses the dropped content unless re-read |
-| `handoff` / `context-full` | Summarize-and-continue | Pays an LLM call per compaction |
+| `/safe-compact` | One explicit native `mode: "soft"` local context-full transaction | One bounded configured-model summarization call |
+| `snapcompact` / `shake` | Native mechanisms, not managed fallbacks | Outside the Topic 07 continuity guarantee |
+| automatic/remote/handoff strategy | Disabled | No hidden summarization, continuation, or ownership transfer |
 
 Two pruners are on by default and matter more than the strategy choice:
 
@@ -132,10 +271,11 @@ Two pruners are on by default and matter more than the strategy choice:
 
 `compaction.keepRecentTokens` = 20000 (`:2285`).
 
-**Decision rule:** the template does not implement its own compaction. It has no
-summarize-the-conversation step in any command. OMP owns this, and a second compactor
-would fight the first. If a strategy other than the default is wanted, that is a
-`config.yml` line with a recorded reason — not prose in a command.
+**Decision rule:** after the Topic 04 task is armed, `/safe-compact` may authorize one native soft
+transaction. It accepts no focus text, persists verified local recovery bytes before the call,
+and injects one canonical continuity kernel into the next normal prompt. It schedules no hidden
+continuation and does not change task authority. Pressure aborts ordinary provider dispatch;
+one unresolved attempt requires explicit handoff or user action.
 
 ### C-3. Artifact spill — keeps bulk out of context entirely
 
@@ -186,15 +326,24 @@ partial result rather than a completion.
 
 ### C-7. Per-spawn telemetry — the measurement surface already exists
 
-Each spawn returns `tokens` (input + output + cacheWrite, excluding cacheRead),
-`requests`, `contextTokens`, `contextWindow`, `cost`, `usage`, `durationMs`,
-`structuredOutput`, `modelRole`, `resolvedModel`, `resolvedModelIsFallback`
-(`task/types.ts:471-539`, `:428-434`, `:500-505`). Live equivalents stream on
-`AgentProgress` over `task:subagent:{event,progress,lifecycle}` (`:395-469`, `:59-65`).
+Each spawn returns `tokens`, `requests`, `contextTokens`, `contextWindow`, `cost`, `usage`,
+`durationMs`, `structuredOutput`, `modelRole`, `resolvedModel`, and
+`resolvedModelIsFallback` (`task/types.ts:471-539`, `:428-434`, `:500-505`). Live
+equivalents stream on `AgentProgress` over `task:subagent:{event,progress,lifecycle}`
+(`:395-469`, `:59-65`).
 
-**Decision rule:** the benchmark harness reads these fields. It does not estimate. And
-because `resolvedModelIsFallback` is returned per spawn, a model-role misroute is
-*observable at the result* — it is only silent if the caller ignores it.
+The `tokens` field is documented as input + output + cacheWrite excluding cacheRead, but
+`getUsageTokens()` falls back to provider `totalTokens` when the breakdown is missing and
+explicitly notes that this fallback may include cacheRead (`task/executor.ts:759-782`).
+Therefore the promotion harness derives its ledger only from the `usage` breakdown. Missing
+input/output/cacheWrite attribution means `not_measured`; the display fallback is diagnostic,
+not promotion evidence.
+
+**Decision rule:** the benchmark harness reads runtime fields and never estimates. Model identity
+is observable only by comparing returned modelRole and resolvedModel; resolvedModelIsFallback
+covers retry fallback but not credential fallback. The benchmark and acceptance paths reconcile
+`task.agentModelOverrides`, compare the exact expected identity, and separately reject a true
+fallback flag.
 
 ---
 
@@ -243,13 +392,12 @@ Six real decisions, run through §D.
 |---|---|---|---|
 | Lazy skill | lazy | ~0–500 | **None.** The model must choose to read it. The failure mode *is* a model that doesn't think to check. |
 | `RULES.md` line | sticky | 500 × 15 = 7,500 | Strong for the main session |
-| `autoloadSkills` on implementer + verifier | per-spawn | 500 × 2 = 1,000 | Deterministic injection at spawn (`task/executor.ts:3235-3248`) |
+| `autoloadSkills` on Worker only | per-spawn | ≤500 × Worker spawns | Deterministic injection at spawn (`task/executor.ts:3235-3248`) |
 
-**Decision: `autoloadSkills` on the agents whose contract it governs, plus a one-line
-sticky invariant for the main session.** 7.5× cheaper than the sticky-only option and
-strictly stronger than lazy. The duplication between the sticky line and the skill body
-is intentional and must be documented as such — the two serve disjoint audiences, and a
-future deduplication pass would otherwise delete the worker copy.
+**Decision: `autoloadSkills` on Worker, plus a one-line sticky invariant for the main session.**
+This is strictly stronger than lazy delivery for the candidate-producing role. The duplication
+between the sticky line and the skill body is intentional: the two serve disjoint audiences, and
+a future deduplication pass must not delete the Worker copy.
 
 Body budget ≤500 tokens, hard. It is now paid per spawn, so growth compounds.
 
@@ -275,46 +423,57 @@ that matches how it is actually consumed.
 
 ### E-3. LSP in worker allowlists
 
-`task.enableLsp` is `false` by default (`config/settings-schema.ts:4615-4625`); the
-baseline sets it `true`. The tool must *also* be in the agent's `tools:` allowlist —
-permission is not provision.
+`task.enableLsp` is `false` by default (`config/settings-schema.ts:4615-4625`); the frozen
+Phase-00 baseline sets it `true`. Effective LSP requires all four independent gates: `lsp` in
+the selected worker allowlist, `task.enableLsp == true`, parent session not disabled and not
+plan mode, and `lsp.enabled == true`. The parent/plan/settings conjunction is implemented in
+`task/structured-subagent.ts:318-320` and `tools/index.ts:593`; the selected allowlist comes
+from `task/executor.ts:2675-2678`. Permission is not provision, and no single gate proves the
+selected symbol-aware contract can run.
+
+An LSP tool result with details.success false is a failed capability result, not symbol-aware
+evidence. The four gates only make the tool callable; an applicable working language server and
+successful required calls are additional acceptance conditions (`lsp/index.ts:2145-2160`). A
+silent switch to text retrieval after a failed semantic call changes the contract and must be
+reconciled and revalidated.
 
 Naively this reads as a cost (another tool, another turn). It is the opposite:
 `lsp references` answers "who calls this" without loading callers, and `lsp symbols`
 answers "what does this export" without loading the file. Both replace whole-file reads
 with targeted queries.
 
-**Decision: ADOPT for explorer, implementer, reviewer.** Not verifier — it runs commands
-and reads output; symbol navigation is outside its contract and invites scope creep into
-review territory. Note the deeper point: `task.enableLsp: true` with no agent listing
-`lsp` means the template pays a baseline deviation and receives nothing for it.
+**Decision: ADOPT for every selected LSP-consuming responsibility.** Topic 03 assigns the
+capability from the selected contract, never from a role name. Do not add LSP to an exact-output
+command-verification responsibility unless its selected contract also consumes symbol-aware
+retrieval. The deeper point remains: `task.enableLsp: true` with no selected consumer listing
+`lsp` pays a baseline deviation and receives nothing for it.
 
-### E-4. `read-summarize: false` on the Explorer
+### E-4. `read-summarize: false` on the former Explorer adapter
 
 The Explorer's own instructions say to prefer symbol lookup over full reads. Its
 frontmatter disables the mechanism that would bound the reads it does perform. The
 frontmatter wins, because it is machinery and the instruction is prose.
 
-**Decision: REMOVE from Explorer.** Its output is ranked evidence — `file:line` plus
-brief context — and summarized reads are *better* input for that than full contents.
+**Decision:** remove the override from any selected discovery role whose output is ranked
+evidence—`file:line` plus brief context—because summarized reads are better input than full
+contents.
 
-For the Verifier the case is weaker than it looks: its evidence comes from `bash`
-output, which `read.summarize` does not touch. The override only affects files it reads
-with `read`. **Decision: remove, with a documented restore condition** — if a fixture
-shows the Verifier missing failure detail because of summarization, restore it for the
-Verifier only and record why.
+For a selected exact-output verification responsibility, the case is weaker than it looks:
+evidence from `bash` output is not touched by `read.summarize`; the override affects only files
+read with `read`. **Decision:** remove it by default. Restore it only for a selected contract
+when a fixture proves required file evidence is lost, and record why.
 
 ### E-5. Parallel exploration in `/orchestrated`
 
-Two Explorers over *different* modules: legitimate. Two Explorers asked the same
-question: duplicated reads, duplicated tokens, no new information.
+Two selected discovery workers over *different* modules can be legitimate. Two workers asked
+the same question create duplicated reads, duplicated tokens, and no new information.
 
 **Decision: parallelize only on genuine independence, and independence means disjoint
 scope.** Size alone never justifies fan-out. A large sequential task is Standard with
 more steps — spawning four agents to do four dependent things is strictly worse than one
 agent doing them, because each handoff loses context and costs a spawn.
 
-For parallel Implementers, independence additionally means **disjoint file sets**,
+For selected parallel writers, independence additionally means **disjoint file sets**,
 because `merge: patch` resolves conflicts at `git apply` time — a late, confusing failure
 rather than an early, clear one.
 
@@ -391,7 +550,7 @@ prediction. The claims that specifically need numbers:
 |---|---|
 | Tier placement saves what §B computes | Token accounting per tier across a fixture set |
 | `autoloadSkills` cost is ~1 body per spawn | Per-spawn `tokens` delta with autoload on vs off |
-| Removing `read-summarize: false` reduces Explorer cost | A/B on the same fixtures, same scope |
+| Removing `read-summarize: false` reduces selected discovery cost | A/B on the same fixtures, same scope |
 | LSP in allowlists is net-negative cost | A/B with `lsp` present vs absent, same tasks |
 | Prewalk preserves quality | A/B with false-completion rate as the gate |
 | The workflow beats no workflow | Baseline arm with no template installed |
@@ -407,3 +566,20 @@ inconvenient.
 Reporting a token count without the acceptance denominator is the specific failure this
 model exists to prevent. A cheaper number next to a higher false-completion rate is a
 regression being reported as an improvement.
+
+---
+
+## I. Topic 06 boundary accounting
+
+The managed packet is a per-dispatch projection, not a transcript or a duplicate task record.
+The receipt is a bounded observation, not a place for reasoning or raw logs. Topic 04 stores the
+authoritative acceptance criteria and evidence identities; Topic 06 carries only the fields the
+selected role needs and returns compact verified facts.
+
+Cheap Scout tokens remain cheap-scout telemetry even when Flash falls back to Pro. Worker `high`
+versus Tech-Lead-selected `xhigh`, and Reviewer fixed `xhigh`, remain visible as exact returned
+identity. The wrapper refuses a forced partial at the 300-request boundary, so a schema-shaped
+partial cannot improve token metrics by masquerading as an accepted outcome. The managed overlay
+sets `task.softRequestBudget: 200`. Topic 07 additionally owns the exact disabled
+automatic-compaction profile required by KD-031; this is continuity safety, not model routing or a
+token-metric optimization.

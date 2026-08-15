@@ -1,0 +1,60 @@
+schema_version: 1
+phase: "00"
+experiment: E3-B
+case: B1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  repository_status_before: docs/evidence/phase-00/environment/repository-status-before.txt
+  repository_status_after: docs/evidence/phase-00/E3-B/raw/run.json
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+  provider_gateway: OmniRoute loopback; credential value excluded
+
+setup:
+  working_directory: disposable committed git fixture
+  fixture: docs/evidence/phase-00/E3-B/fixture
+  effective_settings: {task.isolation.mode: rcopy, task.isolation.apply: false, task.isolation.merge: patch}
+  deterministic_write: child-only session_start extension guarded by exact parent cwd
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model omniroute/oc/mimo-v2.5-free --tools task --max-time 120 <SYNTHETIC_PROMPT>
+  selected_attempt: 2
+  exit_code: 0
+  started_at: "2026-08-11T10:44:18.8319726+07:00"
+  completed_at: "2026-08-11T10:44:36.8545543+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-B/raw/attempt-001.invalid.json, sha256: 5A4D6E5D18AE851FFC36D5328947F56FBCBD3B0C9A2849529978A57222477D96}
+    - {path: docs/evidence/phase-00/E3-B/raw/run.json, sha256: 30909569023EEE024D353E48EB48A7BA509B778345B54F37027CD95F3AE786BA}
+    - {path: docs/evidence/phase-00/E3-B/raw/controller.projection.json, sha256: 82771F6CFAE3CA40041845F1CC77B9849963A6D8EB1B4F24215E0963A11A88D2}
+    - {path: docs/evidence/phase-00/E3-B/raw/worker.projection.json, sha256: 8D2FF70A77968A4F1CA1A1FE79550292DBFC8E5BCE35FA6DDAAFE2E99D93E9FC}
+    - {path: docs/evidence/phase-00/E3-B/raw/worker-output.txt, sha256: C8E8249059BB949D05E96EFD5B272D67C919942820A909A58AA03DC101C9C19D}
+    - {path: docs/evidence/phase-00/E3-B/raw/e3b-root.patch, sha256: 3AE85033D37DA5AB655DEFB2E1E413CA83F0E75C6718C7B6287417B44516F020}
+    - {path: docs/evidence/phase-00/E3-B/raw/stderr.txt, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+
+observation:
+  facts:
+    - Worker exited 0 and yielded E3_B_ROOT_OK.
+    - Parent HEAD and porcelain status were byte-for-byte unchanged; e3b-root.txt never appeared in the parent.
+    - OMP returned a non-empty patchPath and the patch remained readable after isolation teardown.
+    - A fresh clone passed git apply --check, applied the patch, and contained exactly E3_B_ROOT.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/structured-subagent.ts::runStructuredSubagent
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/isolation-runner.ts::captureDeltaPatch
+  limitations:
+    - The write is deterministic extension side-effect inside the child cwd; it avoids making PASS depend on model-specific bash tool syntax.
+
+interpretation:
+  decision: CAPTURE_ONLY_ROOT_PATCH_IS_DURABLE_AND_APPLICABLE
+  spec_effect: RETAIN
+  affected_requirements: [E3-B, CR-27, CR-31]
+
+history:
+  - attempt: 1
+    adjudication: INVALID_RUN_MODEL_TOOL_PROTOCOL
+    gate_power: NONE
+    cause: The worker emitted textual pseudo-tool markup and exited before any write.

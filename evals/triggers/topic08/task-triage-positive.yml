@@ -1,0 +1,8 @@
+schema_version: 1
+record_type: topic08_skill_trigger_fixture
+skill: task-triage
+expectation: should_trigger
+cases:
+  - "Improve the API; the desired behavior and success criteria are not specified."
+  - "Handle this request; it has no prefix and the workflow size is unclear."
+  - "Implement the change, but scope and mandatory acceptance criteria are missing."

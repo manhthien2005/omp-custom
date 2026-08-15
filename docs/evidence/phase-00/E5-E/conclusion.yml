@@ -1,0 +1,30 @@
+schema_version: 1
+phase: "00"
+experiment: E5-E
+status: PASS
+selected_attempt: 1
+authority: CHARACTERIZATION_ONLY
+
+fixture:
+  task_enable_lsp: true
+  parent_session_lsp: true
+  lsp_enabled: true
+  agent_allowlist_includes_lsp: true
+  matching_language_server_configured: false
+
+observation:
+  tools: [lsp, yield, hub]
+  lsp_present: true
+  lsp_call_count: 1
+  lsp_result_success: false
+  verbatim_error: "No language server found for this action"
+  terminal_yield_count: 1
+  cause: LANGUAGE_SERVER_UNAVAILABLE
+  remediation: INSTALL_OR_CONFIGURE_LANGUAGE_SERVER
+
+evidence:
+  - {path: docs/evidence/phase-00/E5/raw/e5-e-attempt-001.run.json, sha256: 577FE030AF28AAB1204F60F7EBC47B97A7EECB137EFEC50A184DC3F7199ED89E}
+  - {path: docs/evidence/phase-00/E5/raw/e5-e-attempt-001.projection.json, sha256: 699DE25F49A0CA5A881B0B0FB7D411E2DC135F45BE6CA06C4F2C8A07213859EF}
+  - {path: docs/evidence/phase-00/E5/raw/e5-e-attempt-001.child.jsonl, sha256: 49DCF6B95ED4ECAA82A59FB122A03D79B3C7D7A9A29E853986C211BBAD060E57}
+
+safety: {repository_unchanged: true, live_home_changed_count: 0, cleanup_succeeded: true}

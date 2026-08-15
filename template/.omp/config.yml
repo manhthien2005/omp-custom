@@ -1,32 +1,28 @@
 # OMP Workflow Template — Project Model Roles
-# Install to: .omp/config.yml in your project directory
-# This file defines role aliases only. Do NOT duplicate the global config.yml baseline settings here.
-# Edit the role → model mappings to match your OmniRoute model catalog.
+# Install to: .omp/config.yml in your project directory.
+# Gateway model IDs use ds/...; OMP selectors use omniroute/ds/....
+# The external model catalog and provider credentials remain user-owned.
 
 modelRoles:
-  # Tech Lead: highest reasoning, plans and coordinates
-  tech-lead: omniroute/codex/gpt-5.6-sol-high
+  # Cheap Scout owns bounded read-only retrieval.
+  cheap-scout: omniroute/ds/deepseek-v4-flash:xhigh
 
-  # Explorer: fast symbol and reference lookup
-  explorer: omniroute/codex/gpt-5.6-sol-high
+  # Tech Lead selects per-spawn effort: omitted for high, hi for xhigh.
+  worker: omniroute/codex/gpt-5.6-sol:high
 
-  # Implementer: edit-verify loop
-  implementer: omniroute/codex/gpt-5.6-sol-high
+  # Reviewer never drops below xhigh.
+  reviewer: omniroute/codex/gpt-5.6-sol:xhigh
 
-  # Verifier: independent verification, deterministic tools
-  verifier: omniroute/codex/gpt-5.6-sol-high
+retry:
+  modelFallback: true
+  usageAwareFallback: false
+  fallbackChains:
+    default: []
+    cheap-scout:
+      - omniroute/ds/deepseek-v4-pro:xhigh
+    worker: []
+    reviewer: []
 
-  # Reviewer: code review against diff
-  reviewer: omniroute/codex/gpt-5.6-sol-high
-
-# ─── Optional project-level overrides ───────────────────────────────────────
-# Uncomment and adjust as needed. Only set values that differ from your global
-# config.yml baseline. The global config remains the primary source of truth.
-#
-# task:
-#   maxConcurrency: 4    # default from global baseline
-#   maxRecursionDepth: 2
-#
-# read:
-#   summarize:
-#     enabled: true
+task:
+  enableEffort: true
+  maxEffort: xhigh

@@ -1,0 +1,11 @@
+plan:
+  defaultOnStartup: false
+async:
+  enabled: true
+task:
+  batch: false
+  enableEffort: false
+  maxConcurrency: 3
+  isolation:
+    mode: none
+    apply: false

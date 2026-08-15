@@ -1,0 +1,47 @@
+schema_version: 1
+phase: "00"
+experiment: E2
+case: 5
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  repository_status_before: docs/evidence/phase-00/E2/raw/repository-status-before.txt
+  repository_status_after: docs/evidence/phase-00/E2/raw/repository-status-after.txt
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+  provider_gateway: OmniRoute loopback 127.0.0.1:20128; credential value excluded
+
+setup:
+  working_directory: disposable E2 project root
+  fixture: docs/evidence/phase-00/E2/fixture
+  selector: "@broken"
+  configured_value: e2unavailable/phase00/unavailable-model-7f3
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model @broken --no-tools --no-skills --no-rules --max-time 5
+  exit_code: 0
+  started_at: "2026-08-11T10:29:33.6317073+07:00"
+  completed_at: "2026-08-11T10:29:35.4344030+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E2/raw/case-5/run.json, sha256: A89D18E8F8CC005BEE6D2A85547A673B2A3EE98D5D88AC4223FD338F48C6EE2D}
+    - {path: docs/evidence/phase-00/E2/raw/case-5/stdout.jsonl, sha256: D381EE9C541D38F2B6CE9157598459394DAAEA4427FF0431A19EE7275623FCE5}
+    - {path: docs/evidence/phase-00/E2/raw/case-5/stderr.txt, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+    - {path: docs/evidence/phase-00/E2/raw/case-5/session-001.jsonl, sha256: E025C6FC942CADC0F0EA5C0C1F0BCE66D911CE3CD24E3F6B5CACE824574CC29A}
+
+observation:
+  facts:
+    - The alias first resolved to e2unavailable/phase00/unavailable-model-7f3.
+    - The downstream gateway then returned model_not_found and OMP selected no fallback.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/config/model-resolver.ts::resolveModelRoleValue
+  limitations:
+    - OMP print mode returned process exit 0 even though the durable assistant message has stopReason error; the session error is authoritative.
+
+interpretation:
+  decision: CONFIGURED_ALIAS_RESOLVES_THEN_DOWNSTREAM_FAILURE_SURFACES
+  spec_effect: CHANGE
+  affected_requirements: [CR-24, E2-5, D-6]

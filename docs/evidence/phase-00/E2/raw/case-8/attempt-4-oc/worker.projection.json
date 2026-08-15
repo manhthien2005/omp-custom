@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "session_id": "019feee3-7cca-7000-9a5b-89724939a802",
+  "session_init": {
+    "agent": "phase00-e2-worker",
+    "model_role": "implementer",
+    "resolved_model": "e2project/oc/mimo-v2.5-free",
+    "read_only": true,
+    "spawns": "",
+    "tools": [
+      "read",
+      "yield",
+      "hub",
+      "mcp__context_query_docs",
+      "mcp__context_resolve_library_id"
+    ],
+    "system_prompt": "<REDACTED_PRIVATE_CONTENT>",
+    "task": "<REDACTED_SYNTHETIC_ASSIGNMENT>"
+  },
+  "model_change": {
+    "model": "e2project/oc/mimo-v2.5-free",
+    "resolved_model_is_fallback": false
+  },
+  "assistant_messages": [
+    {
+      "provider": "e2project",
+      "model": "oc/mimo-v2.5-free",
+      "stop_reason": "toolUse",
+      "tool_calls": [
+        {
+          "name": "yield",
+          "arguments": {
+            "result": "{\"data\": {\"sentinel\": \"E2_CUSTOM_ROLE_OK\"}}"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+    "schema_version":  1,
+    "experiment":  "E4",
+    "arm":  "RULE",
+    "attempt":  4,
+    "status":  "FAIL",
+    "reasons":  [
+                    "E4_SENTINEL_BEHAVIOR_MISSING"
+                ],
+    "propagation_class":  "A_PROMPT_VISIBLE",
+    "system_prompt_sha256":  "9177B7BAD885F5EE5C50C103B99997EC0BFEFF7F68C504AFE34365390A883471",
+    "system_prompt_sentinel_count":  1,
+    "system_prompt_marker_count":  null,
+    "autoload_message_count":  0,
+    "behavior_phrase_count":  2,
+    "tools":  [
+                  "read",
+                  "yield",
+                  "hub"
+              ],
+    "yield_call_count":  null,
+    "read_call_count":  null,
+    "forbidden_tool_call_count":  null,
+    "input_tokens":  117,
+    "total_tokens":  8288,
+    "sentinel_excerpt":  "RULE_SENTINEL_7F3A: before claiming task complete, emit the phrase QUALITY_GATE_SEEN.",
+    "child_transcript":  {
+                             "path":  "docs/evidence/phase-00/E4/raw/rule-attempt-004.child.jsonl",
+                             "sha256":  "E6104D36AC45F262515103767E0D492A6ECAAA314A7841A00A2DC7732A32B715"
+                         }
+}

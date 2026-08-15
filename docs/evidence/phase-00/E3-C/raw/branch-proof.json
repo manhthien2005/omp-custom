@@ -1,0 +1,11 @@
+{
+  "branch_name": "omp/task/e3c-branch",
+  "branch_commit": "18d94612083c4210ef82580cf57dadd34ba006a3",
+  "parent_head": "16d1a0eadbc5fc26b336cc4c17b58c58d78e0486",
+  "branch_exists": true,
+  "branch_added_by_run": true,
+  "branch_is_ancestor_of_parent": false,
+  "parent_target_exists": false,
+  "branch_target_content": "E3_C_BRANCH",
+  "parent_status_after": []
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "topic": "03",
+  "candidate": "C1",
+  "phase00_source": "T-00.3",
+  "phase00_conclusion_sha256": "B0792E6109C9FB767F4B821EF6F56B2BE655B52C9C244865033C2F25E842834F",
+  "superseded_agents": [
+    {
+      "historical_path": "template/.omp/agents/tech-lead.md",
+      "disposition": "rehomed",
+      "current_path": "docs/roles/tech-lead.md"
+    },
+    {
+      "historical_path": "template/.omp/agents/explorer.md",
+      "disposition": "replaced",
+      "current_path": "template/.omp/agents/cheap-scout.md"
+    },
+    {
+      "historical_path": "template/.omp/agents/implementer.md",
+      "disposition": "renamed",
+      "current_path": "template/.omp/agents/worker.md"
+    },
+    {
+      "historical_path": "template/.omp/agents/verifier.md",
+      "disposition": "retired",
+      "current_path": null
+    }
+  ],
+  "selected_agents": [
+    "cheap-scout",
+    "worker",
+    "reviewer"
+  ],
+  "current_files": [
+    {
+      "path": "docs/roles/tech-lead.md",
+      "sha256": "1BC405F9F64C036A5C66FB067073848467B427745BBC1AF8D18149AE121962A5"
+    },
+    {
+      "path": "template/.omp/agents/cheap-scout.md",
+      "sha256": "D2A75279C8C0B271E8C4DC2E581D314D018C9101BB0234D12F07DB0A795A28E4"
+    },
+    {
+      "path": "template/.omp/agents/worker.md",
+      "sha256": "51FF4442C1E8F262CDCF6B2B423B72E06335292E3FD7799A14AEE9C690C9895C"
+    },
+    {
+      "path": "template/.omp/agents/reviewer.md",
+      "sha256": "08CBB0112202F9CD33C150762E502C7C4BDACE2C7703CF5A372E9189B20BD537"
+    },
+    {
+      "path": "template/.omp/AGENTS.md",
+      "sha256": "0555CD17BD4CC0D235CB178C8CCB7B3AB78DCE30388FEEA009D2FD4297EFA1F0"
+    },
+    {
+      "path": "template/.omp/commands/quick.md",
+      "sha256": "829B10489F346DB19C8B4125C1355FDDF56FE6EC3E1E4DD49EEF473439392BF9"
+    },
+    {
+      "path": "template/.omp/commands/standard.md",
+      "sha256": "98ABD42C1B23F601302AE882C55356B8F89EA8E17FE93DED86EDEC8FF2236549"
+    },
+    {
+      "path": "template/.omp/commands/orchestrated.md",
+      "sha256": "1346710C4857DD8B9D0FDAC0EA040256FC70FC9ABBEBF6BE946C13FBBE5D4A72"
+    },
+    {
+      "path": "template/.omp/config.yml",
+      "sha256": "5450A5BF06BC22C1390C88FDE388A8DEBA718FA4F629FFF9C98A234023429A38"
+    },
+    {
+      "path": "scripts/install-template.ps1",
+      "sha256": "1283CC5FCDD5E8F909EBB7F5320802CAC1D6F25DBB8D188214D588F814C8D29B"
+    },
+    {
+      "path": "scripts/validate-template.ps1",
+      "sha256": "B0D2C9D9F88C5E6883619591883DF70420D4772E50168006D6FBC8EC80C644ED"
+    },
+    {
+      "path": "template/.omp/schemas/verification-result.schema.yml",
+      "sha256": "FB7561F01A5BE1C628FEC34B0EC1FAE1AC2F2EF8480CE6518D28E6A8E766366A"
+    },
+    {
+      "path": "scripts/lib/topic03-topology-routing.ps1",
+      "sha256": "B772845FA90FF7C4B53CEB65DD438A0C82F8C0BE118F2C27E427D687BF755BC3"
+    },
+    {
+      "path": "scripts/validate-topic03-topology-routing.ps1",
+      "sha256": "5C252D5B0BD05FBA15C0BBA945D10EF599B804E7CE56489434AF1F7C8F7AC9F1"
+    },
+    {
+      "path": "docs/evidence/current-product/topic-03/deepseek-smoke.yml",
+      "sha256": "112F4CCC147F51CA88C42AC9E30011588002F8876111A37231CAE1B4CD994BA1"
+    },
+    {
+      "path": "docs/evidence/current-product/topic-03/e2e.yml",
+      "sha256": "128AF2B353381D26C62EBEF73D5BD951755AC6893CE9F226AC122C7EB5464186"
+    }
+  ],
+  "deepseek_environment": "ENVIRONMENT_BLOCKED"
+}

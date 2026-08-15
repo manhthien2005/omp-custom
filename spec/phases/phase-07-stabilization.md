@@ -1,6 +1,34 @@
 # Phase 07 — Stabilization
 
+<!-- round09-12-projection:release -->
+## Round 09–12 release-readiness supersession
+
+Release status is derived from focused/full validators, bounded evidence hashes, and scratch
+package proof. Unless a separately authorized final campaign clears spec 13, OMP remains
+`IMPLEMENTED_NOT_PROMOTED`; Claude remains `DESIGNED_NOT_VERIFIED / installable false`. OMP
+17.2.10, Claude runtime, and model-assisted arms stay named limitations. Local implementation
+does not imply live install, Git staging/commit, remote mutation, or mandatory Opus review.
+
+<!-- topic06-projection:phase-07 -->
+## Topic 06 stabilization consumer
+
+Release only with reproducible current-product evidence, manifest hashes, focused/full validator
+passes, transactional uninstall coverage, and the managed launcher documented as the supported
+entry point. Keep changes local and unstaged unless the user separately requests Git. Preserve
+`OPEN-T06-RUNTIME-01` as a scoped upstream enhancement, not a release blocker.
+
+## Topic 04 consumer projection
+
+Topic 04 consumes release limitation and migration reconciliation. Phase 07 keeps same-machine and
+repository-metadata-loss limits explicit, verifies schema/root migration and rollback retention,
+and reports the Topic 08 automatic-adapter gate without claiming an unprobed hook.
+
 > OPUS PROPOSED SPEC v1 | Governance, upgradeability, and the honest production-ready call.
+>
+> **KD-027 stabilization scope:** promote only after the exact three-agent manifest, Scout
+> Flash→Pro route, Worker high/xhigh selection, Reviewer xhigh/risk gate, stale-agent retirement,
+> and current-product evidence boundary pass. `ENVIRONMENT_BLOCKED` DeepSeek credentials are
+> reported honestly and retain Tech Lead retrieval fallback; Opus absence is not a blocker.
 
 **Depends on**: phase-06
 **Blocks**: nothing (terminal phase)
@@ -121,7 +149,7 @@ Canonical source: `README.md §14` (Definition of Production Ready), with
 | PR-4 | Malformed worker result is demonstrably rejected and retried | README §14.4 |
 | PR-5 | Installer: dry-run, diff, backup, manifest, rollback, idempotent re-run, config merged not clobbered | README §14.5 |
 | PR-6 | Validation tiers report independently; no aggregate score conceals a tier failure | README §14.6 |
-| PR-7 | **L0–L3 operational gates green**; L4 comparative criterion meets its threshold (quality neutral-or-better at equal-or-lower tokens per accepted outcome) | README §14.7, spec/13 |
+| PR-7 | Evaluate the canonical L4 comparative contract by ID; do not restate its dual-baseline or promotion thresholds locally | README §14.7, spec/13 §C |
 | PR-8 | Every remaining abstraction has a named runtime consumer, or is documented as non-runtime | README §14.8 |
 
 Note the L-level split in PR-7: L0–L3 are pass/fail operational gates; **L4 is a

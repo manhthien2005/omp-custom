@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 4,
+  "selected": false,
+  "adjudicated_at": "2026-08-09",
+  "correction_of": {
+    "path": "docs/evidence/phase-00/E3-I/raw/session-a.attempt-004.adjudication.json",
+    "sha256": "5B0C4B594C406A5B030013AA9E9EEA2C24F347D6D68BA3D90D9241F0919D84B9"
+  },
+  "correction_reason": "E3I_PARENT_TERMINAL_PRECEDENCE_SUPERSESSION",
+  "original_adjudication": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "reasons": [
+      "P00-RUNTIME-PROVIDER-OVERLOAD"
+    ],
+    "failure_scope": "parent-terminal"
+  },
+  "corrected_adjudication": {
+    "status": "INVALID_RUN",
+    "reasons": [
+      "E3I_PARENT_SEQUENCE_MISMATCH"
+    ],
+    "selection_eligible": false,
+    "semantic_fail": false,
+    "reasoning": "The assistant error at event line 592 was superseded by auto_retry_start at line 594, successful E3I_SESSION_A_DONE at line 610, and terminal agent_end stop at line 612. With the false terminal block removed, the nine-call pre-joint parent sequence lacks the two required phase00_e3l_read_apply calls and is not selection-eligible."
+  },
+  "authoritative_outcome": {
+    "source": "terminal-agent-end",
+    "event_line": 612,
+    "stop_reason": "stop",
+    "completion_text": "E3I_SESSION_A_DONE",
+    "parent_exit_code": 0
+  },
+  "parent_retry_recovery": {
+    "observed": true,
+    "count": 1,
+    "start_event_lines": [
+      594
+    ],
+    "final_outcome_event_line": 612,
+    "final_stop_reason": "stop"
+  },
+  "nested_provider_recovery": {
+    "observed": false,
+    "count": 0
+  },
+  "observed_parent_protocol": {
+    "expected_joint_sequence": [
+      "phase00_e3l_read_apply",
+      "bash",
+      "task",
+      "task",
+      "task",
+      "phase00_e3i_override_apply_true",
+      "phase00_e3l_read_apply",
+      "bash",
+      "task",
+      "task",
+      "task"
+    ],
+    "actual_sequence": [
+      "bash",
+      "task",
+      "task",
+      "task",
+      "phase00_e3i_override_apply_true",
+      "bash",
+      "task",
+      "task",
+      "task"
+    ],
+    "sequence_matches_joint_session_a": false
+  },
+  "provider_execution": {
+    "new_provider_call": false,
+    "session_a_launches_in_original_attempt": 1,
+    "session_a_replay_launched": false,
+    "session_b_launched": false,
+    "attempt_6_launched": false,
+    "parallel_authorized": false
+  },
+  "raw_artifacts": [
+    {
+      "file": "session-a-attempt-004.stdout.jsonl",
+      "sha256": "52FE23F8217A15FE97120AEF5B8EC3D1C57539912A8AFFB932731BA8E668CF58"
+    },
+    {
+      "file": "session-a-attempt-004.stderr.txt",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "file": "session-a-attempt-004.run.json",
+      "sha256": "311324F650C20F0B2511FDC6E11F8EA6FB98200DFF6CE7C2DE70A8413FCAD78C"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-project-1.jsonl",
+      "sha256": "8CBA907D49983A132CF896AA81CD63428D8F11AD620816EF4FCF606C1D729377"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-project-2.jsonl",
+      "sha256": "915E4B624C9D7E6AC8DB9164076CAAF62EC265CA8D6A2FAEE12178C51C80BF16"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-project-3.jsonl",
+      "sha256": "109AA93BD753565B0432AB27C4F6BC900C6B78F50E146FD7168103E372F59362"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-runtime-1.jsonl",
+      "sha256": "1F53ADE4CEBB96DA9B9E3AFC1EC1065AA58F3C3CD4B43B5015936618303658C8"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-runtime-2.jsonl",
+      "sha256": "415FD739379473A2D5E6A117B4DF6F38D6F2F7BB040C1C7CEA5D6A77B608FC1F"
+    },
+    {
+      "file": "session-a-attempt-004.canary.e3i-runtime-3.jsonl",
+      "sha256": "D04FF975AB28E7CA961AD58BF336C23849592E1CDE3C41A9173F0071C728FC4E"
+    }
+  ],
+  "non_claims": [
+    "Attempt 4 is not selected and supplies no I1-I4 authority.",
+    "The local replay made no provider call and did not launch Session B or Attempt 6.",
+    "Recovered parent transport does not cure the exact joint-sequence mismatch.",
+    "This correction grants no parallel authority and does not execute E3-M."
+  ]
+}

@@ -1,0 +1,73 @@
+schema_version: 1
+phase: "00"
+experiment: E3-A
+case: A4
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  shell: PowerShell 7.6.4
+  provider_gateway: omniroute loopback http://127.0.0.1:20128/v1
+  runtime_model_catalog: docs/evidence/phase-00/environment/runtime-models.yml
+  runtime_model_catalog_sha256: 56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779
+
+execution:
+  selected_attempt: 4
+  fixture_commit: b2f644e68cfe6a42d341c0fe2624ce03ee2f645b
+  process_exit_code: 0
+  started_at: "2026-08-09T01:17:13.6557215+07:00"
+  completed_at: "2026-08-09T01:17:40.6242536+07:00"
+  duration_ms: 26969
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-A/raw/A4-attempt-004.stdout.jsonl, sha256: 91095C2217137A8DA726E45000EAA6B4087C49A1909E8AA28420CB5608708DD1}
+    - {path: docs/evidence/phase-00/E3-A/raw/A4-attempt-004.stderr.txt, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+    - {path: docs/evidence/phase-00/E3-A/raw/A4-attempt-004.run.json, sha256: 11E4D0C81407C76267D464182B8A823376642D8A3920F4735768F364076AE711}
+
+observation:
+  bash_attestation_call_count: 1
+  eval_call_count: 1
+  direct_task_call_count: 0
+  attested_item_keys: [agent, isolated, name, outputSchema, schemaMode, task]
+  has_isolated: true
+  has_apply: false
+  raw_eval_item_apply: false
+  session_apply: true
+  sentinel_applied_to_parent: true
+  merge_summary: "Applied patches: yes"
+  eval_bridge_proves_arktype_deletion: false
+
+interpretation:
+  reason: A4_PER_ITEM_APPLY_NOT_AUTHORITY
+  decision: >-
+    The supported batch-item wire excludes apply. A controlled eval bridge forced a raw
+    apply:false field, yet session apply:true governed the isolated worker and applied its sentinel.
+  non_claims:
+    - The eval bridge does not prove where ArkType deletion occurs in a normal model tool call.
+    - Source plus the model-visible wire, not the eval bridge alone, establish supported-field exclusion.
+  affected_requirements: [CR-30, CR-31, E3-A]
+
+history:
+  - attempt: 1
+    adjudication: INVALID_RUN_POST_AUDIT
+    cause: The worker used a .NET expression unsupported by the brush shell and aborted before a merge observation.
+    raw_run_sha256: D7E1FBE040583ADACC68954BBF5CC8EAB39FCD24EE71D5CED6F5EC22E2AF62F0
+    sanitization_repair:
+      stdout_before_sha256: D942F955FEAA3D9C57CCA873E584AF9D65B123B905D97FE81F585F1F693A07C7
+      stdout_after_sha256: 5D0F48C8C722E34EAAD56786FEFC902F4CC6B87DD0119C417D2DD67B87547B18
+      semantic_payload_changed: false
+      repair: Deeply JSON-escaped disposable paths were replaced by the existing placeholder.
+    gate_power: NONE
+  - attempt: 2
+    adjudication: INVALID_RUN_POST_AUDIT
+    cause: The parent retried a failed bash attestation, violating the one-bash-call fixture contract.
+    raw_run_sha256: 202F972CA9C6199D23A2A59233CE1CEF8D129C1E0DBADB0582893F50DBF8450A
+    gate_power: NONE
+  - attempt: 3
+    adjudication: INVALID_RUN_PROVENANCE_INCOMPLETE
+    cause: Runtime predicates passed but the run record lacked process exit and timing provenance.
+    raw_run_sha256: 5FEA649ACE5B4BAAA42A4C2CF002F1F8C431F6AC21A4C80767A6246CDE25864A
+    gate_power: NONE

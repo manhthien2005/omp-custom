@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "case": "case-4",
+  "selector": "@phase00-unknown-7f3",
+  "command": [
+    "<PINNED_RUNTIME>/omp.exe",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSIONS>",
+    "--model",
+    "@phase00-unknown-7f3",
+    "--no-tools",
+    "--no-skills",
+    "--no-rules",
+    "--max-time",
+    "5",
+    "Return exactly E2_PROBE."
+  ],
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_HOME>",
+    "credential_binding": "<PROCESS_ENVIRONMENT_VALUE_EXCLUDED>"
+  },
+  "started_at": "2026-08-11T10:29:31.7553968+07:00",
+  "completed_at": "2026-08-11T10:29:33.4129803+07:00",
+  "duration_ms": 1657,
+  "exit_code": 1,
+  "session_count": 0,
+  "selected_models": [],
+  "terminal_provider_errors": [],
+  "runtime_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+  "omp_version": "17.2.10",
+  "omp_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+}

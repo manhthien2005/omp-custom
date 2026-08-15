@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "attempt": 1,
+  "adjudication": "INVALID_RUN_MODEL_TOOL_PROTOCOL",
+  "started_at": "2026-08-11T10:40:25.2634308+07:00",
+  "completed_at": "2026-08-11T10:42:52.8755614+07:00",
+  "duration_ms": 147610,
+  "process_exit_code": 0,
+  "worker_exit_code": 1,
+  "worker_output": "<tool_call><function=bash>...textual pseudo-tool...</function></tool_call>",
+  "patch_path": null,
+  "parent_head_unchanged": true,
+  "parent_status_unchanged": true,
+  "gate_power": "NONE",
+  "cause": "Worker emitted textual pseudo-tool markup instead of a structured bash call."
+}

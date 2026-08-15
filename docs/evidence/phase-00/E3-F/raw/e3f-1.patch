@@ -1,0 +1,7 @@
+diff --git a/conflict.txt b/conflict.txt
+index 60c1157..60c9af5 100644
+--- a/conflict.txt
++++ b/conflict.txt
+@@ -1 +1 @@
+-E3_F_BASE
++E3_F_TASK_1

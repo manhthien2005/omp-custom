@@ -1,0 +1,9 @@
+schema_version: 1
+record_type: topic08_skill_trigger_fixture
+skill: evidence-before-completion
+expectation: should_not_trigger
+cases:
+  - "Report current implementation progress without claiming completion."
+  - "Write a plan only; do not implement or claim success."
+  - "Return an honest partial, blocked, or failed Worker status."
+  - "Return a Cheap Scout evidence packet without a parent-task completion claim."

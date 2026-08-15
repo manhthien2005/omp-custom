@@ -1,7 +1,18 @@
 # Authority Map
+
+> Authority boundary: This research file is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
 <!-- Generated: 2026-08-07 — Phase 2 -->
 
-## Design rule
+Historical research input only; no current design, execution, routing, fallback, topology, or capability authority.
+Current authority lives in the accepted design, key decisions, active specs, and Topic 03-selected manifest.
+Labels below record the 2026-08-07 research pass.
+
+## Historical design rule (superseded)
 
 Each concern has exactly ONE primary authority. If an upstream source conflicts with the authority, the authority wins. If evidence shows the authority is wrong, amend this document before changing any implementation.
 
@@ -40,7 +51,7 @@ Each concern has exactly ONE primary authority. If an upstream source conflicts 
 | Concern | Primary | Fallback |
 |---------|---------|---------|
 | Specification: clarification gate | Spec Kit | Task-triage skill (triggers clarification) |
-| Code understanding: symbol lookup | OMP LSP | Aider repo-map principles (if LSP unavailable) |
+| Code understanding: symbol lookup | OMP LSP | Explicit non-LSP contract, reconciled and validated before continuation |
 | Context management: offloading | OMP shake compaction | Context-budget policy filesystem-offloading guidance |
 | Documentation retrieval | Local docs first | Context7 (last resort in retrieval order) |
 

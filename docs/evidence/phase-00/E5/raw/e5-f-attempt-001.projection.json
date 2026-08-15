@@ -1,0 +1,38 @@
+{
+    "schema_version":  1,
+    "experiment":  "E5-F",
+    "role":  "allowlisted",
+    "attempt":  1,
+    "status":  "PASS",
+    "reasons":  [
+                    "E5_CONDITION_DISCRIMINATED"
+                ],
+    "tools":  [
+                  "yield",
+                  "hub"
+              ],
+    "lsp_present":  false,
+    "lsp_call_count":  0,
+    "lsp_result_count":  0,
+    "lsp_result_success":  null,
+    "lsp_result_text":  null,
+    "lsp_server_name":  null,
+    "yield_call_count":  1,
+    "marker":  "E5_F_LSP_ABSENT",
+    "marker_count":  1,
+    "cause":  "LSP_ENABLED_FALSE",
+    "remediation":  "ENABLE_PROJECT_LSP_ENABLED",
+    "first_turn_prompt_tokens":  6469,
+    "final_total_tokens":  6536,
+    "fixture":  {
+                    "task_enable_lsp":  true,
+                    "parent_session_lsp":  true,
+                    "lsp_enabled":  false,
+                    "agent_allowlist_includes_lsp":  true,
+                    "language_server_configured":  false
+                },
+    "child_transcript":  {
+                             "path":  "docs/evidence/phase-00/E5/raw/e5-f-attempt-001.child.jsonl",
+                             "sha256":  "3E9B3F0F882DB9D631468FB01EE50F5ABB7E3C1A30D79662669017C1A98F253A"
+                         }
+}

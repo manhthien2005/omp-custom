@@ -1,5 +1,12 @@
 # Dossier — Retrieval Cluster (aider, serena, repomix, context7)
 
+> Authority boundary: This dossier is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > commits (read from each `_research/upstreams/<repo>/.git`):
 > - `aider` — `5dc9490bb35f9729ef2c95d00a19ccd30c26339c` (Apache-2.0)
 > - `serena` — `c7af2c09ef45faa4367c0e2a9f770fb73a62a612`
@@ -240,7 +247,7 @@ primitive:
 - `ast_grep` matches syntactic patterns; it does not rank. **[NOT READ THIS PASS: I did not
   read `src/tools/ast-grep.ts`, so I cannot rule out an undocumented ranking/summary mode.
   This should be checked before the spec text is finalized.]**
-- The Explorer's "ranked evidence" (`spec/07:121`) is ranked by an **LLM's judgement after
+- The selected discovery responsibility's "ranked evidence" (`spec/07 §D`) is ranked by an **LLM's judgement after
   reading things**, which is precisely the expensive path the ranking is supposed to avoid.
   Calling that "the repository map" is a rhetorical move, not an equivalence.
 
@@ -373,7 +380,7 @@ and records CR-18: Context7 availability depends on an MCP server being wired in
 guaranteed for every OMP session, and agents MUST NOT assume it is available.
 
 **Stale citation corrected (round 6).** This dossier was written against a revision that
-said levels are **gates, not preferences** and cited `spec/07:79` for it. That line is
+said levels are **gates, not preferences** and cited a pre-CR-20 line in `spec/07` for it. That framing is
 **withdrawn** (CR-20, now `spec/07 §B-1`): it contradicted `spec/05 §D`, and "exhausted local
 sources" has no falsifiable definition, so it was a gate satisfiable by asserting a sentence —
 untestable by L2/L3. The operative rule is **default priority + bounded escalation + named
@@ -392,8 +399,9 @@ not encode. That is a narrow but real slot, and level 4 is the right slot.
 **Verdict on reject-012: UPHELD.** Rejecting Context7 as *first-pass* is correct — local
 types dominate on both cost and authority. The registry's `condition_to_revisit` already
 notes it is placed at position 4. One addition I would make to the spec: because CR-18 makes
-availability conditional, the doctrine table (section 7) must give every Context7 row a
-**defined fallback**, not just an ordering. Token profile: **[UNMEASURED]**.
+availability conditional, every skipped Context7 level needs a named, disclosed reason rather
+than an implicit fallback. Context7 unavailability uses the named reason context7_unavailable and
+discloses the skipped level. Token profile: **[UNMEASURED]**.
 
 ---
 
@@ -404,7 +412,7 @@ Anchored where possible on read source: aider's default map budget of 1024 token
 (`repomap.py:48`), its model-scaled ceiling of 4096 (`models.py:787`), its ~25-tokens-per-
 rendered-tag prior (`repomap.py:676`), and its 8× no-files multiplier (`repomap.py:56`).
 Everything else is an order-of-magnitude engineering estimate, **not measured in this
-project**. All rows assume `read.summarize.enabled = true` (`spec/07:103`).
+project**. All rows assume `read.summarize.enabled = true` (`spec/07 §C`).
 
 | # | Question type | Cheapest correct tool | Est. tokens | Failure mode if you use the cheaper tool | Escalate to |
 |---|---|---|---|---|---|
@@ -414,11 +422,11 @@ project**. All rows assume `read.summarize.enabled = true` (`spec/07:103`).
 | 4 | What does module `M` export? | `lsp symbols file:M` | 150–600 | whole-file `read` costs 5–20× and buries the answer | ranged `read` of the export block |
 | 5 | **Which 30 definitions in this unfamiliar repo matter for task T?** | **no OMP primitive — see §3.3 `repo_rank`** | ~1,200 | `glob`+`read` sampling produces a **confidently wrong architectural model**; the agent picks the file with the most familiar *name*, not the most central one | `repo_rank`, else Explorer subagent with an explicit read budget |
 | 6 | What files match this shape/layout? | `glob` | 50–200 | `bash ls` recursion is unbounded and unfiltered | `glob` with narrower pattern |
-| 7 | What is this function's body? | `read` with line range | 200–800 | whole-file read; on a 2k-line file that is 15k+ tokens for 30 lines | full `read` only if short / being rewritten (`spec/07:105`) |
+| 7 | What is this function's body? | `read` with line range | 200–800 | whole-file read; on a 2k-line file that is 15k+ tokens for 30 lines | full `read` only if short / being rewritten (`spec/07 §C`) |
 | 8 | All places matching a syntactic pattern (e.g. every `useEffect` with no deps array) | `ast_grep` | 300–1,500 | `grep` regex over syntax produces false positives and misses multi-line forms | `ast_grep`; then `lsp` per hit |
 | 9 | Does the code currently compile / what is broken? | `lsp diagnostics` | 200–1,000 | reasoning-from-reading claims correctness without evidence | full build/test via `bash` (Verifier) |
-| 10 | How do I call external library `L` at the pinned version? | local `node_modules` types via `lsp`/`read` (level 1) | 300–1,500 | **model recalls a plausible older API**; code looks right, fails at runtime | local docs (2) → bundled versioned docs (3) → Context7 (4) → web (5), per `spec/07:69-76`; **Context7 needs a fallback, CR-18** |
-| 11 | Library not vendored, or behaviour is docs-only (config keys, migration) | Context7 (level 4) | **[UNMEASURED]** | levels 1–3 return nothing and the agent invents an answer | web (5) with mandatory source disclosure (`spec/07:80`) |
+| 10 | How do I call external library `L` at the pinned version? | local `node_modules` types via `lsp`/`read` (level 1) | 300–1,500 | **model recalls a plausible older API**; code looks right, fails at runtime | local docs (2) → bundled versioned docs (3) → Context7 (4) → web (5); if Context7 is unavailable, record/disclose `context7_unavailable`, then choose the next fitting source under `spec/07 §B-1` |
+| 11 | Library not vendored, or behaviour is docs-only (config keys, migration) | Context7 (level 4) | **[UNMEASURED]** | levels 1–3 return nothing and the agent invents an answer | web (5) with mandatory source disclosure (`spec/07 §B-1`) |
 | 12 | First-contact orientation on a repo nobody has read | project `AGENTS.md` prose, then `repo_rank` / bounded repomix | 500 (AGENTS.md) → ~1,200–10,000 | reading 5 random files yields a wrong mental model that persists for the whole session | raise the map budget deliberately (aider's 8× rule, `repomap.py:56`) — **not** an unbounded dump |
 | 13 | Is this behaviour actually reachable / who constructs this object? | `lsp references` + ranged `read` | 500–2,000 | grep-for-classname finds the type annotation, not the construction site | `lsp references` on the constructor |
 | 14 | Cross-file rename | `lsp rename` / `rename_file` | 300–1,500 | `ast_edit`/`sed` **silently drops callsites** (`lsp.md:17`) | `lsp rename` only — this is stated as a prohibition upstream |
@@ -439,28 +447,26 @@ failure is silent:
    states text renames "silently drop callsites" (`lsp.md:17`). Any token budget that pushes
    an agent from `lsp` to `grep` on a blast-radius question is buying tokens with
    correctness. **Mitigation:** this must be a rule, not a preference — which is why the
-   LSP allowlist defect (`spec/07:17-49`) is a correctness bug, not an efficiency bug. An
-   Explorer instructed to be "symbol first" (`spec/07:33`) but denied `lsp` will
+   LSP allowlist defect (`spec/07 §A/A-1`) is a correctness bug, not an efficiency bug. A
+   selected discovery responsibility instructed to be "symbol first" (`spec/07 §C`) but denied `lsp` will
    *substitute grep and not report the substitution*.
 2. **Ranking absence masquerading as ranking presence (row 5, §3.2).** When no ranking tool
    exists, an agent asked "what matters here" will answer from filename plausibility and
    its own priors. The output is fluent and wrong. There is no error signal. This is the
    single strongest argument for §3.3, and the reason the spec's "the Explorer's ranked
-   evidence *is* the repository map" (`spec/07:121`) is a risk: it relabels the failure mode
+   evidence *is* the repository map" (`spec/07 §D`) is a risk: it relabels the failure mode
    as the solution.
 3. **`read.summarize` on evidence-bearing reads.** Summarization is a real saving
-   (`spec/07:103`) but it paraphrases. The Verifier's `read-summarize: false` is correct
+   (`spec/07 §C`) but it paraphrases. The former Verifier adapter's `read-summarize: false` is correct
    because "verification evidence must be exact output lines, not a paraphrase"
-   (`spec/07:107`). The generalization: **any read whose output will be quoted as evidence
+   (`spec/07 §C`). The generalization: **any read whose output will be quoted as evidence
    must not be summarized.** A token-optimizer that turns summarization on globally
    converts verification into vibes.
 4. **Version-plausible external API recall (rows 10–11).** Levels 1–3 being "cheap" makes
    skipping level 4 attractive. But an outdated-API answer is indistinguishable from a
-   correct one until runtime. The gate framing (`spec/07:79`) handles the *downward*
-   direction (don't skip to Context7); it does not handle the *upward* one (don't stop at
-   level 1 when level 1 was silent rather than affirmative). **Proposed rule: a level may
-   only terminate the search if it returned an affirmative answer, not merely no
-   contradiction.**
+   correct one until runtime. Current retrieval authority is spec/07 section B-1: bounded
+   escalation with named permitted skips. A source may terminate retrieval only when it is fit
+   for the claim; unavailable levels are named and disclosed, never silently treated as tried.
 5. **Compaction interacting with retrieval order.** `supersedeReads=true` means a re-read
    drops the earlier read. An agent that reads file A, reads file B, then re-reads A has
    lost nothing — but an agent whose *reasoning* referenced the first read of A now has a
@@ -519,7 +525,7 @@ failure is silent:
 4. **Repomix compressed-mode token profile**, and whether it has any hard ceiling
    (see §5).
 5. **Context7 token profile per lookup**, and its availability rate in real sessions (CR-18,
-   `spec/07:82`). Without this, level 4 is unbudgeted.
+   `spec/07 §B-1`). Without this, level 4 is unbudgeted.
 6. **How often does `grep` silently disagree with `lsp references`?** Sample real symbols;
    measure precision/recall of grep against LSP ground truth. This quantifies risk #1 in §8
    and tells us how hard the prohibition must be.

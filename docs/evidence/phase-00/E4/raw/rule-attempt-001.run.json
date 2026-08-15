@@ -1,0 +1,35 @@
+{
+    "schema_version":  1,
+    "experiment":  "E4",
+    "arm":  "RULE",
+    "attempt":  1,
+    "selected":  false,
+    "status":  "INVALID_RUN",
+    "model":  "omniroute/oc/mimo-v2.5-free",
+    "runtime":  {
+                    "version":  "omp/17.2.10",
+                    "sha256":  "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+                },
+    "started_at":  "2026-08-11T11:54:21.5515330+07:00",
+    "completed_at":  "2026-08-11T11:54:23.0760453+07:00",
+    "duration_ms":  1525,
+    "exit_code":  null,
+    "timed_out":  false,
+    "analysis":  {
+                     "Status":  "INVALID_RUN",
+                     "Reasons":  [
+                                     "E4_HARNESS_FAILURE"
+                                 ],
+                     "Error":  "The property \u0027PathSeparatorChar\u0027 cannot be found on this object. Verify that the property exists."
+                 },
+    "repository_unchanged":  false,
+    "live_home_changed_count":  0,
+    "cleanup_succeeded":  true,
+    "cleanup_error":  null,
+    "artifacts":  {
+                      "parent_stdout":  null,
+                      "parent_stderr":  null,
+                      "child":  null,
+                      "projection":  null
+                  }
+}

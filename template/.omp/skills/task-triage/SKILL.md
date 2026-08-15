@@ -1,10 +1,8 @@
 ---
 name: task-triage
 description: >
-  Use when a task is ambiguous, scope is unclear, or the right workflow size is uncertain.
-  Guides clarification of requirements, scope definition, and workflow selection.
-  Activate before starting any task where the objective, acceptance criteria, or risk level
-  is not immediately clear.
+  Use when an unprefixed request has unclear objective, scope, acceptance criteria, risk, or
+  workflow size. Do not use after the user explicitly selects quick, standard, or orchestrated.
 ---
 
 # Task Triage

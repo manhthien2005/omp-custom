@@ -1,0 +1,8 @@
+schema_version: 1
+phase: "00"
+experiment: E3-B
+status: PASS
+decision: Capture-only rcopy/patch mode keeps the parent unchanged and persists an independently applicable root patch after teardown.
+cases: {B1: PASS}
+downstream: {E3-D: ELIGIBLE}
+artifacts: [docs/evidence/phase-00/E3-B/B1.yml]

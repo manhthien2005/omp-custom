@@ -13,6 +13,10 @@
 > about it would be negligent.
 >
 > Grades per `00-method.md §B`. OMP citations are `packages/coding-agent/src/<path>:<line>`.
+>
+> Former fixed-role topology statements below are historical audit observations, not current
+> topology authority. Current topology and review behavior derive from the accepted design,
+> active specs, phase plans, and Topic 03-selected manifest.
 
 ---
 
@@ -147,8 +151,8 @@ I am **not** recommending a rewrite on this evidence, and the honest reasons are
 **Decision needed, not made.** This belongs in `04-decision-log.md` as a KD with a named
 experiment, because the current spec chose `task` *without knowing `eval` existed* — which
 is not a decision, it is an accident. The cheapest resolution: one `/orchestrated` fixture
-implemented both ways, compared on tokens per accepted outcome and on failure-mode
-visibility.
+implemented both ways, compared through the frozen stable-product and promotion contract in
+`spec/13 §C`, including failure-mode visibility.
 
 ---
 
@@ -276,8 +280,8 @@ substance, not wording:
 
 | `orchestrate-notice.md` says | Our spec says |
 |---|---|
-| "**NEVER launch a one-off task**… If you are about to dispatch exactly one subagent, stop" | `/standard` dispatches exactly one Explorer, then one Implementer, then one Verifier |
-| "**Subagents do not verify, lint, or format.** Every `task` assignment MUST instruct the subagent to skip all gates" | The **Verifier is a subagent whose entire purpose is running gates** (`spec/10 §A`) |
+| "**NEVER launch a one-off task**… If you are about to dispatch exactly one subagent, stop" | Standard may remain integrated or select one responsibility; Orchestrated may execute selected work units sequentially. Dispatch count does not define workflow identity (`spec/04`) |
+| "**Subagents do not verify, lint, or format.** Every `task` assignment MUST instruct the subagent to skip all gates" | A selected non-author verification mechanism may be a subagent, so its contract must preserve the required gates (`spec/10`) |
 | "Parallelize maximally" | "Parallelize only on genuine independence; size alone never justifies fan-out" (`spec/08 §C`) |
 | Orchestrator makes trivial edits inline with `edit`/`write` | Tech Lead never edits; `/quick` is the inline path |
 
@@ -357,10 +361,9 @@ settings include per-source toggles for Codex/Claude/pi/AGENTS at user and proje
 
 Direct consequence for us: this repository has a `.claude/` directory. A user installing our
 template into a repo that also uses Claude Code, Cursor, or opencode gets a **merged**
-capability set, and `spec/13` L1 asserts an exact agent roster (`{explorer, implementer,
-verifier, diff-reviewer}`, with `tech-lead` a FAIL). That assertion will fail — correctly —
-on any such repo, and the spec has no answer for it. L1 must assert on *our* names plus
-report foreign ones, not assert on the total set.
+capability set. L1 compares the Topic 03-selected worker set and reports foreign discovered
+agents separately. Foreign discovery neither expands the selected set nor invalidates its
+exact comparison; the former fixed-roster assertion in this audit is superseded.
 
 ### G-9 — settings-level agent control
 
@@ -394,10 +397,13 @@ Stated so this reads as an audit and not a complaint. Verified as covered, corre
   rejects and that a malformed schema degrades silently.
 - **Isolation on the `task` path** — every claim holds. G-2 does not contradict it; it adds
   a second path the spec did not know about.
-- **Compaction, read summarization, artifact spill, subagent budgets** — all four verified
-  with correct defaults, including the `snapcompact`-not-`shake` correction.
-- **Telemetry** — `SingleResult` fields, and `resolvedModelIsFallback` closing the
-  "silent misroute" hole.
+- **Native compaction, read summarization, artifact spill, subagent budgets** — source defaults
+  were verified, including `snapcompact` rather than `shake`. KD-031 separately selects managed
+  `strategy: off` plus explicit `/safe-compact`; this audit statement is source evidence, not
+  current deployment authority.
+- **Telemetry** — `SingleResult` fields expose selected identity. resolvedModelIsFallback detects
+  retry fallback only; credential fallback requires returned modelRole and resolvedModel identity
+  comparison. Malformed schemas and non-valid structured outputs fail acceptance.
 - **Hooks** — correctly identified as TS modules with a discarded path convention, and
   correctly deferred on OQ-B rather than adopted.
 
@@ -410,9 +416,10 @@ The user asked for this explicitly. Six items, in the order they can hurt.
 ### 1. `orchestrate` is a live contradiction, and the word is unavoidable
 
 The single highest-risk finding. A 40-line contract claiming override authority, triggered
-by an ordinary English word, that disagrees with our topology on **subagents-must-not-verify**
-— which would disable the Verifier, the one agent the whole template exists to justify.
-Decide it before writing command prose.
+by an ordinary English word, disagrees with any selected contract that assigns required
+verification to a subagent. A selected subagent verification mechanism is incompatible with
+the injected prohibition on subagent verification. The notice cannot silently override the
+accepted task contract; decide its handling before writing command prose.
 
 ### 2. Silent-failure catalogue — now eleven entries
 
@@ -447,6 +454,19 @@ number.
 
 Not something we ship, and precisely why it needs a check: a pre-existing advisor mutates
 the tree during our workflow, and no validation tier or threat-model row currently sees it.
+
+---
+
+## J-1. Topic 06 closure of the dispatch gap
+
+KD-030 selects the same-name trusted `task` wrapper, so §J.3 is no longer an open product
+mechanism choice. The wrapper delegates to the native executor and adds deterministic validation;
+`eval` remains an available but unmanaged OMP facility. Its output, Vibe output, and unrelated
+internal-agent output cannot claim an `agent_boundary_receipt`.
+
+The remaining gap is narrower and nonblocking: `OPEN-T06-RUNTIME-01` asks upstream for a universal
+interception seam if future product scope must cover those unrelated facilities. Managed v1 does
+not pretend to cover them and does not need them for acceptance.
 
 ---
 

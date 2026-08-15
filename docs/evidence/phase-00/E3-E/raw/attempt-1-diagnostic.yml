@@ -1,0 +1,21 @@
+schema_version: 1
+experiment: E3-E
+attempt: 1
+selection_status: INVALID_TIMEOUT
+fixture_head: 2fe542ae3864ba1914758067ae585670eceb99b8
+max_time_seconds: 180
+observed_completion_order: [2, 0, 1]
+workers:
+  - {index: 0, exit_code: 0, patch_materialized: true}
+  - {index: 1, exit_code: 1, patch_materialized: false}
+  - {index: 2, exit_code: 0, patch_materialized: true}
+root_cause:
+  worker_1_called_terminal_yield: true
+  final_session_state: aborted
+  error: Request was aborted
+  timing: parent global max-time expired during worker finalization
+retry_policy:
+  authorized: true
+  changed_variable: timeout budget only
+  retry_limit: one
+  rationale: the first attempt isolated a global-timeout boundary rather than a fixture or tool-protocol defect

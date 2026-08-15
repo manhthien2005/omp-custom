@@ -1,0 +1,105 @@
+schema_version: 1
+experiment: "E1"
+case_id: "CallerOverAgent"
+matrix_artifact: "case-3-caller-over-agent"
+status: "PASS"
+attempt: 1
+runtime:
+  pinned_source_commit: "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+  omp_sha256: "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+  omp_version: "omp/17.2.10"
+  model: "omniroute/codex/gpt-5.6-sol-high"
+inputs:
+  prompt_sha256: "6C1F4C76DEC505690B2E4D62FA259CCE885061FE753E7B6152629C034A8FF5E7"
+  agent: "phase00-e1-caller-over-agent"
+  caller_schema_state: "PRESENT"
+  agent_schema_state: "PRESENT"
+  agent_schema_dialect: "JSON_SCHEMA"
+  session_schema_state: "ABSENT"
+observations:
+  selected_result:
+    agent: "phase00-e1-caller-over-agent"
+    is_async_acknowledgement: false
+    source: "caller"
+    mode: "permissive"
+    structured_status: "valid"
+    data_property_names:
+      - "caller_sentinel"
+    expected_sentinel_matches: true
+    forbidden_property_present: false
+  attributable_result_count: 1
+  selected_result_role: "target"
+  child_initialization_source: "caller"
+  schema_override_observable: true
+  schema_override_observed: true
+  blocking_executions:
+    -
+      Role: "target"
+      Agent: "phase00-e1-caller-over-agent"
+      DefinitionBlocking: true
+      SetupBlocking: true
+      ExecutionMode: "blocking"
+      AsyncAcknowledgement: false
+provider_ledger:
+  selected_session:
+    requests: 1
+    attributed_requests: 1
+    unattributed_requests: 0
+    response_ends: 1
+    recovered_retries: 0
+    retry_exhausted: false
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+    terminal_failure_found: false
+    terminal_failure_code: ""
+  process:
+    requests: 3
+    attributed_requests: 3
+    unattributed_requests: 0
+    response_ends: 3
+    recovered_retries: 0
+    retry_exhausted_count: 0
+    terminal_failure_count: 0
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+  controller_stdout_duplicates_excluded: true
+raw_artifacts:
+  -
+    kind: "stdout"
+    path: "docs/evidence/phase-00/E1/raw/caller-over-agent/attempt-001.stdout.jsonl"
+    sha256: "B7B69E9F75F365A9B5544B4C0E3CEE9E84CD69D254855A76EF18D8E0A07808E8"
+    lines: 133
+    source_capture_sha256: "A48BAB3FCB72CDA55AE5876EDC709BF56E4F05B618051B666EF9062CE4F95C71"
+  -
+    kind: "stderr"
+    path: "docs/evidence/phase-00/E1/raw/caller-over-agent/attempt-001.stderr.jsonl"
+    sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    lines: 0
+    source_capture_sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/caller-over-agent/attempt-001.sessions/session-001.jsonl"
+    sha256: "79FA696E483A96A28F25D03B3802932A579BD1E3AA55C8BD5EEFD689CC303478"
+    lines: 10
+    source_capture_sha256: "00261742CE0E977B109858F967E0A1ED8503B5AC5DE4249788D612D2BF40D7C9"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/caller-over-agent/attempt-001.sessions/session-002.jsonl"
+    sha256: "F2697A14F1DF10217A008C4C41AA00963AE69B4208CADFABCAA5A03F8471C8DD"
+    lines: 10
+    source_capture_sha256: "1CBD839C426852917549444157951227A9F5758AA11CABD493EAB753A0B8B553"
+  -
+    kind: "run"
+    path: "docs/evidence/phase-00/E1/raw/caller-over-agent/attempt-001.run.json"
+    sha256: "BA0D717E4E294190E3BEC96CB547835F9406D32902B0B2CE5331C7128570CCE7"
+    lines: 315
+    source_capture_sha256: null
+protected_surface:
+  unchanged: true
+  cleanup_succeeded: true
+  remaining_child_pid_count: 0
+reason_codes:
+  - "E1_CALLER_OVER_AGENT_PASS"
+limitations:
+  - "Provider counts are attributed from persisted sessions; duplicated controller stdout events are excluded."
+  - "Sanitized raw artifacts omit private prompts, reasoning, credentials, and complete provider bodies."

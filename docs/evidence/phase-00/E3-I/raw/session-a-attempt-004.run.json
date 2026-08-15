@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 4,
+  "selected": false,
+  "omp_version": "omp/17.2.10",
+  "omp_runtime": {
+    "selection": "EXPLICIT_SOURCE",
+    "launch_path": "<DISPOSABLE_RUNTIME>/omp.exe",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+    "USERPROFILE": "<DISPOSABLE_USER_PROFILE>",
+    "OMP_PHASE00_E3I_PARENT_CWD": "<DISPOSABLE_PROJECT>"
+  },
+  "command": [
+    "<DISPOSABLE_RUNTIME>/omp.exe",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "12m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:session-a.md>"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "started_at": "2026-08-09T13:01:56.5855549+07:00",
+  "completed_at": "2026-08-09T13:04:53.6875385+07:00",
+  "duration_ms": 177102,
+  "parent_stdout_sha256": "52FE23F8217A15FE97120AEF5B8EC3D1C57539912A8AFFB932731BA8E668CF58",
+  "parent_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+  "canary_artifacts": [
+    {
+      "id": "e3i-project-1",
+      "sha256": "8CBA907D49983A132CF896AA81CD63428D8F11AD620816EF4FCF606C1D729377",
+      "file": "session-a-attempt-004.canary.e3i-project-1.jsonl"
+    },
+    {
+      "id": "e3i-project-2",
+      "sha256": "915E4B624C9D7E6AC8DB9164076CAAF62EC265CA8D6A2FAEE12178C51C80BF16",
+      "file": "session-a-attempt-004.canary.e3i-project-2.jsonl"
+    },
+    {
+      "id": "e3i-project-3",
+      "sha256": "109AA93BD753565B0432AB27C4F6BC900C6B78F50E146FD7168103E372F59362",
+      "file": "session-a-attempt-004.canary.e3i-project-3.jsonl"
+    },
+    {
+      "id": "e3i-runtime-1",
+      "sha256": "1F53ADE4CEBB96DA9B9E3AFC1EC1065AA58F3C3CD4B43B5015936618303658C8",
+      "file": "session-a-attempt-004.canary.e3i-runtime-1.jsonl"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "sha256": "415FD739379473A2D5E6A117B4DF6F38D6F2F7BB040C1C7CEA5D6A77B608FC1F",
+      "file": "session-a-attempt-004.canary.e3i-runtime-2.jsonl"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "sha256": "D04FF975AB28E7CA961AD58BF336C23849592E1CDE3C41A9173F0071C728FC4E",
+      "file": "session-a-attempt-004.canary.e3i-runtime-3.jsonl"
+    }
+  ],
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "live_home_metadata": {
+    "BeforeFileCount": 14,
+    "AfterFileCount": 14,
+    "BeforeSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "AfterSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "ChangedPaths": [],
+    "ChangedCount": 0,
+    "BoundaryResult": "PASS",
+    "MutationAttributableToExperiment": false,
+    "AttributionBasis": "NO_CHANGE"
+  },
+  "cleanup_error": null,
+  "analysis": {
+    "Status": "BLOCKED_ENVIRONMENT",
+    "Reasons": [
+      "P00-RUNTIME-PROVIDER-OVERLOAD"
+    ],
+    "TerminalFailure": {
+      "Found": true,
+      "IsEnvironmentBlock": false,
+      "Code": "P00-RUNTIME-MODEL-ERROR",
+      "Provider": "omniroute",
+      "Model": "codex/gpt-5.6-sol-high",
+      "ErrorMessage": "Error Code server_is_overloaded: Our servers are currently overloaded. Please try again later."
+    }
+  }
+}

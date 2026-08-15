@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "session_id": "019feeeb-e332-7000-ad8f-ed15d0f66222",
+  "session_init": {
+    "agent": "phase00-write-probe",
+    "model_role": "implementer",
+    "resolved_model": "omniroute/oc/mimo-v2.5-free",
+    "read_only": true,
+    "tools": [
+      "read",
+      "yield",
+      "hub"
+    ],
+    "system_prompt": "<REDACTED_PRIVATE_CONTENT>",
+    "task": "<REDACTED_SYNTHETIC_ASSIGNMENT>"
+  },
+  "model_change": {
+    "model": "omniroute/oc/mimo-v2.5-free",
+    "resolved_model_is_fallback": false
+  },
+  "assistant_messages": [
+    {
+      "provider": "omniroute",
+      "model": "oc/mimo-v2.5-free",
+      "stop_reason": "toolUse",
+      "tool_calls": [
+        {
+          "name": "yield",
+          "arguments": {
+            "result": "{\"data\": {\"sentinel\": \"E3_B_ROOT_OK\"}}"
+          }
+        }
+      ]
+    }
+  ]
+}

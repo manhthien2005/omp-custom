@@ -1,0 +1,11 @@
+plan:
+  defaultOnStartup: false
+async:
+  enabled: true
+task:
+  batch: true
+  enableEffort: false
+  maxConcurrency: 3
+  isolation:
+    mode: rcopy
+    apply: false

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "experiment": "E5",
+  "upstream": {
+    "repository": "oh-my-pi",
+    "commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+  },
+  "claims": [
+    {
+      "id": "TASK_ENABLE_LSP_CONJUNCTION",
+      "path": "packages/coding-agent/src/task/structured-subagent.ts",
+      "line_range": [318, 320],
+      "file_sha256": "7404F4619262706E75ACB8B5F06F96B089A409F6CB5B58DE2F700D5645CC9AB7"
+    },
+    {
+      "id": "LSP_ENABLED_REGISTRATION_GATE",
+      "path": "packages/coding-agent/src/tools/index.ts",
+      "line_range": [593, 593],
+      "file_sha256": "2FF417C1F111AD94A2A8B0066ECB88FE4808325DC7DE3B548D7B5AF41FF95A9D"
+    },
+    {
+      "id": "TASK_ENABLE_LSP_DEFAULT_FALSE",
+      "path": "packages/coding-agent/src/config/settings-schema.ts",
+      "line_range": [4615, 4617],
+      "file_sha256": "82CEB8800241007A9EF75C9384D880321A2B680D483C9E2905C8709209DD28C4"
+    },
+    {
+      "id": "NO_SERVER_ERROR_SHAPE",
+      "path": "packages/coding-agent/src/lsp/index.ts",
+      "line_range": [2423, 2428],
+      "file_sha256": "9BA66C14D4D18CEAB4C5B1E8CA82A31DFD0D7B931EEAD227082744EAB6BFA201"
+    }
+  ],
+  "fixture": {
+    "fake_language_server": "docs/evidence/phase-00/E5/fixture/project/fake-lsp-server.cjs",
+    "sha256": "AA78C38B6E8F078C317660DAC3DB11D1C6D15A16F37BCD004F4D6C9DC0914E6C",
+    "transport": "stdio JSON-RPC",
+    "reference_result_count": 1
+  }
+}

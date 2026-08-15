@@ -1,0 +1,387 @@
+{
+  "schema_version": 1,
+  "record_type": "topic05_retrieval_fixture_registry",
+  "contamination_controls": {
+    "native_forbidden_paths": [
+      ".omp/codegraph",
+      ".omp/tools/codegraph-retrieve.js",
+      ".codegraph"
+    ],
+    "native_forbidden_content": [
+      "codegraph_retrieve",
+      "CODEGRAPH_"
+    ],
+    "native_forbidden_environment_prefixes": [
+      "CODEGRAPH_"
+    ],
+    "separate_capability_targets": true,
+    "identical_snapshot_required": true
+  },
+  "fixtures": [
+    {
+      "fixture_id": "t05-multi-file-call-path",
+      "fixture_class": "multi_file_call_path",
+      "question": "Trace the request from the public handler to the persistence call.",
+      "materializer": {
+        "graph_condition": "healthy",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "src/handler.ts",
+            "content": "import { executeOrder } from './service.js';\nexport async function postOrder(input) {\n  return executeOrder(input);\n}\n"
+          },
+          {
+            "path": "src/service.ts",
+            "content": "import { saveOrder } from './store.js';\nexport async function executeOrder(input) {\n  return saveOrder({ ...input, accepted: true });\n}\n"
+          },
+          {
+            "path": "src/store.ts",
+            "content": "export async function saveOrder(order) {\n  return { id: 'ord-1', ...order };\n}\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "call-chain",
+          "statement": "postOrder calls executeOrder, which calls saveOrder.",
+          "required_terms": ["postOrder", "executeOrder", "saveOrder"],
+          "citations": [
+            "src/handler.ts:1-3",
+            "src/service.ts:1-3"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/handler.ts:1-3",
+        "src/service.ts:1-3",
+        "src/store.ts:1-2"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "complete",
+        "reason": null,
+        "native_corroboration_required": false,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-blast-radius-tests",
+      "fixture_class": "blast_radius_affected_tests",
+      "question": "Which tests are affected if normalizeInvoice changes its rounding rule?",
+      "materializer": {
+        "graph_condition": "healthy",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "src/invoice.ts",
+            "content": "export function normalizeInvoice(total) {\n  return Math.round(total * 100) / 100;\n}\n"
+          },
+          {
+            "path": "test/invoice-unit.test.ts",
+            "content": "import { normalizeInvoice } from '../src/invoice.js';\nexport const unitResult = normalizeInvoice(1.005);\n"
+          },
+          {
+            "path": "test/checkout-flow.test.ts",
+            "content": "import { normalizeInvoice } from '../src/invoice.js';\nexport const checkoutResult = normalizeInvoice(9.995);\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "affected-tests",
+          "statement": "Both invoice-unit and checkout-flow tests directly import normalizeInvoice.",
+          "required_terms": ["invoice-unit", "checkout-flow", "normalizeInvoice"],
+          "citations": [
+            "test/invoice-unit.test.ts:1-2",
+            "test/checkout-flow.test.ts:1-2"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/invoice.ts:1-2",
+        "test/invoice-unit.test.ts:1-2",
+        "test/checkout-flow.test.ts:1-2"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "complete",
+        "reason": null,
+        "native_corroboration_required": false,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-unfamiliar-symbol",
+      "fixture_class": "unfamiliar_symbol_localization",
+      "question": "Locate LeaseClock and identify the file that constructs it.",
+      "materializer": {
+        "graph_condition": "healthy",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "src/runtime/lease-clock.ts",
+            "content": "export class LeaseClock {\n  now() { return 1700000000; }\n}\n"
+          },
+          {
+            "path": "src/runtime/bootstrap.ts",
+            "content": "import { LeaseClock } from './lease-clock.js';\nexport const clock = new LeaseClock();\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "symbol-location",
+          "statement": "LeaseClock is declared in lease-clock.ts and constructed in bootstrap.ts.",
+          "required_terms": ["LeaseClock", "lease-clock.ts", "bootstrap.ts"],
+          "citations": [
+            "src/runtime/lease-clock.ts:1-2",
+            "src/runtime/bootstrap.ts:1-2"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/runtime/lease-clock.ts:1-2",
+        "src/runtime/bootstrap.ts:1-2"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "complete",
+        "reason": null,
+        "native_corroboration_required": false,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-exact-config",
+      "fixture_class": "exact_text_config_native_fit",
+      "question": "What exact value is assigned to task.maxEffort?",
+      "materializer": {
+        "graph_condition": "native_fit",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "config/runtime.yml",
+            "content": "task:\n  enableEffort: true\n  maxEffort: xhigh\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "max-effort",
+          "statement": "task.maxEffort is exactly xhigh.",
+          "required_terms": ["task.maxEffort", "xhigh"],
+          "citations": [
+            "config/runtime.yml:1-3"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "config/runtime.yml:1-3"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "native_preferred",
+        "reason": "exact_text_native_fit",
+        "native_corroboration_required": true,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-dynamic-graph-gap",
+      "fixture_class": "dynamic_or_heuristic_graph_gap",
+      "question": "Which handler is selected at runtime for the beta tenant?",
+      "materializer": {
+        "graph_condition": "graph_gap",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "src/dispatch.ts",
+            "content": "const handlers = { alpha: 'stable', beta: process.env.BETA_HANDLER ?? 'safe' };\nexport function selected(tenant) { return handlers[tenant]; }\n"
+          },
+          {
+            "path": "test/dispatch-runtime.test.ts",
+            "content": "process.env.BETA_HANDLER = 'experimental';\nexport const expected = 'experimental';\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "dynamic-selection",
+          "statement": "The beta handler depends on BETA_HANDLER at runtime and defaults to safe.",
+          "required_terms": ["beta", "BETA_HANDLER", "safe"],
+          "citations": [
+            "src/dispatch.ts:1-2"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/dispatch.ts:1-2",
+        "test/dispatch-runtime.test.ts:1-2"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "graph_gap",
+        "reason": "dynamic_runtime_behavior",
+        "native_corroboration_required": true,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-absence-claim",
+      "fixture_class": "deterministic_absence_claim",
+      "question": "Does any source file define or call deleteAllAccounts?",
+      "materializer": {
+        "graph_condition": "healthy",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "src/accounts.ts",
+            "content": "export function deleteAccount(id) { return { deleted: id }; }\n"
+          },
+          {
+            "path": "src/admin.ts",
+            "content": "import { deleteAccount } from './accounts.js';\nexport const removeOne = deleteAccount;\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "absence-native-oracle",
+          "statement": "deleteAllAccounts is absent; only deleteAccount exists and is re-exported as removeOne.",
+          "required_terms": ["deleteAllAccounts", "deleteAccount", "removeOne"],
+          "citations": [
+            "src/accounts.ts:1",
+            "src/admin.ts:1-2"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/accounts.ts:1",
+        "src/admin.ts:1-2"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "native_absence_required",
+        "reason": "absence_requires_native_oracle",
+        "native_corroboration_required": true,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-stale-partial-index",
+      "fixture_class": "stale_partial_pending_index",
+      "question": "Trace pendingReference to its final consumer.",
+      "materializer": {
+        "graph_condition": "stale_partial_pending",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "src/pending.ts",
+            "content": "export const pendingReference = 'current';\n"
+          },
+          {
+            "path": "src/consumer.ts",
+            "content": "import { pendingReference } from './pending.js';\nexport const consumed = pendingReference;\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "pending-consumer",
+          "statement": "consumer.ts imports and assigns pendingReference to consumed.",
+          "required_terms": ["consumer.ts", "pendingReference", "consumed"],
+          "citations": [
+            "src/consumer.ts:1-2"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/pending.ts:1",
+        "src/consumer.ts:1-2"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "stale_partial_pending",
+        "reason": "index_incomplete",
+        "native_corroboration_required": true,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-linked-worktree-mismatch",
+      "fixture_class": "linked_worktree_index_mismatch",
+      "question": "Which worktree owns the activeMarker value?",
+      "materializer": {
+        "graph_condition": "worktree_mismatch",
+        "candidate_present": false,
+        "files": [
+          {
+            "path": "src/worktree.ts",
+            "content": "export const activeMarker = 'linked-b';\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "worktree-owner",
+          "statement": "The frozen linked worktree contains activeMarker linked-b.",
+          "required_terms": ["linked worktree", "activeMarker", "linked-b"],
+          "citations": [
+            "src/worktree.ts:1"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/worktree.ts:1"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "index_mismatch",
+        "reason": "worktree_mismatch",
+        "native_corroboration_required": true,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    },
+    {
+      "fixture_id": "t05-source-candidate-mutation",
+      "fixture_class": "source_or_candidate_mutation",
+      "question": "Report the frozen candidate value without accepting concurrent mutation.",
+      "materializer": {
+        "graph_condition": "source_mutation",
+        "candidate_present": true,
+        "files": [
+          {
+            "path": "src/candidate.ts",
+            "content": "export const candidateValue = 'frozen';\n"
+          },
+          {
+            "path": "candidate/identity.txt",
+            "content": "candidate:t05-frozen\n"
+          }
+        ]
+      },
+      "required_facts": [
+        {
+          "fact_id": "frozen-candidate",
+          "statement": "The frozen candidate value is frozen and must be rejected if source changes during retrieval.",
+          "required_terms": ["candidate", "frozen", "source changes"],
+          "citations": [
+            "src/candidate.ts:1",
+            "candidate/identity.txt:1"
+          ]
+        }
+      ],
+      "allowed_citations": [
+        "src/candidate.ts:1",
+        "candidate/identity.txt:1"
+      ],
+      "failure_oracle": {
+        "expected_graph_outcome": "source_mutation",
+        "reason": "candidate_drift",
+        "native_corroboration_required": true,
+        "false_absence_prohibited": true,
+        "false_completion_prohibited": true
+      }
+    }
+  ]
+}

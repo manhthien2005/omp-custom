@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "case": "A4",
+  "attempt": 3,
+  "experiment": "E3-A",
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "provider_call": true,
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+    "PATH": "INHERITED"
+  },
+  "fixture_commit": "e858a84f7dd506d15dd27ad6a9cd545919169f36",
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSIONS>",
+    "--config",
+    "<DISPOSABLE_PROJECT>/overlay.yml",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash,eval",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "8m",
+    "<REVIEWED_PROMPT>"
+  ],
+  "cleanup_succeeded": true,
+  "cleanup_error": null,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "after_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "changed_count": 0,
+    "changed_paths": [],
+    "boundary_result": "PASS_LIVE_HOME_READ_ONLY"
+  },
+  "sentinel_observed": true,
+  "analysis": {
+    "Status": "PASS",
+    "Reasons": [
+      "A4_PER_ITEM_APPLY_NOT_AUTHORITY"
+    ],
+    "EvalBridgeProvesArkTypeDeletion": false,
+    "SentinelApplied": true,
+    "HasIsolated": true,
+    "AppliedSummary": true,
+    "HasApply": false
+  }
+}

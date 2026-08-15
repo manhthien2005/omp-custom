@@ -1,0 +1,26 @@
+schema_version: 1
+phase: "00"
+experiment: E3-J
+status: PASS
+decision: >-
+  Runtime evidence proves the blocking barrier, concurrent inline fan-out, stable
+  input-order result merge, missing-blocking background control, and ordered
+  Verifier/Reviewer stage barriers on OMP 17.2.10 at the pinned source commit.
+cases:
+  J1: PASS
+  J2: PASS
+  J3: PASS
+downstream:
+  E3-K: ELIGIBLE
+  parallel_mode: DISABLED
+limitations:
+  - E3-J closes only the tested task semantics; it does not prove the E3-K flat wire or E3-L guarded dispatch.
+  - Parallel v0 remains disabled until every independent gate required by the manifest passes.
+artifacts:
+  - docs/evidence/phase-00/E3-J/J1.yml
+  - docs/evidence/phase-00/E3-J/J2.yml
+  - docs/evidence/phase-00/E3-J/J3.yml
+  - docs/evidence/phase-00/E3-J/environment-resume-diagnostic.yml
+  - docs/evidence/phase-00/E3-J/raw/J1-attempt-006.run.json
+  - docs/evidence/phase-00/E3-J/raw/J2.run.json
+  - docs/evidence/phase-00/E3-J/raw/J3-attempt-002.run.json

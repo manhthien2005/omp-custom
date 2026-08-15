@@ -1,0 +1,62 @@
+schema_version: 1
+phase: "00"
+experiment: E2
+case: 8
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  repository_status_before: docs/evidence/phase-00/E2/raw/repository-status-before.txt
+  repository_status_after: docs/evidence/phase-00/E2/raw/repository-status-after.txt
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+  provider_gateway: OmniRoute loopback 127.0.0.1:20128; credential value excluded
+
+setup:
+  working_directory: disposable E2 project root
+  fixture: docs/evidence/phase-00/E2/fixture/case-8
+  controller_selector: e2control/<attempt-model>
+  worker_agent_selector: "@implementer"
+  expected_worker_value: e2project/<same-attempt-model>
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --tools task <synthetic-controller-prompt>
+  exit_code: 0
+  started_at: "2026-08-11T10:12:53.8700000+07:00"
+  completed_at: "2026-08-11T10:35:31.0007534+07:00"
+  attempts: 4
+  retry_budget_exhausted: false
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempts.json, sha256: B864F5886AAA0B664C5D2E59E20B52845BE8C1C2151A1A2F2C42E1F6D4C73CF8}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-1-codex/stdout.jsonl, sha256: 734A6AEDE73DA35BA2284EE09F39A59699C04F35F191E7947FC2C53D5DAA65BF}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-1-codex/session-001.jsonl, sha256: 0538086D8BBB0E712A4F2F029F58BD4625461AA2D693A8EC282965FB194AC340}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-2-aug/stdout.jsonl, sha256: 7EAA9658DA82F088390A77DE49C8CB31E0026CD80769AA5EA9692B4D5F87381C}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-2-aug/session-001.jsonl, sha256: 40A447104CF478776C98F2C71A472C3C0215DA85ED4DF68D1F6C8D6D577CFFC4}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-3-ddgw/stdout.jsonl, sha256: 93081D33311409DCC5EC59DDDBEBACBB30CDEF4030402D66F45291A735C21A9D}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-3-ddgw/session-001.jsonl, sha256: 263DE0F2E80EEBC9C3A6C3AC85BEF9A034079D2E339D6C5E92B42725004E7526}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-4-oc/run.json, sha256: 6A2B405D5C891BA173173391879F7D253E8625BFF59437CBDA81EFE2A71EA435}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-4-oc/controller.projection.json, sha256: AFE857A1D8303D68355B0C08BA9E96898524A383F1D49882CE61F36E5A1D14E7}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-4-oc/worker.projection.json, sha256: 3718EE56BC36395A80297EA7A852F2A6E5E05485EAA3B390B519717F687F1932}
+    - {path: docs/evidence/phase-00/E2/raw/case-8/attempt-4-oc/worker-output.txt, sha256: 8FE1D6F406AC694A73DEE90C731A9ABA80E887617855FD686F4575A030181978}
+
+observation:
+  facts:
+    - The selected controller model was e2control/oc/mimo-v2.5-free with no fallback.
+    - The task result recorded modelRole implementer and resolvedModel e2project/oc/mimo-v2.5-free.
+    - The worker session independently recorded the same resolved model with resolvedModelIsFallback false.
+    - The worker exited 0 and terminal-yielded the exact E2_CUSTOM_ROLE_OK sentinel.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/structured-subagent.ts::resolveExecutionPolicy
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/executor.ts::executeSingleTask
+  limitations:
+    - Main and worker intentionally use different provider aliases over one gateway/model so the two resolver paths remain distinguishable without changing model behavior.
+
+interpretation:
+  decision: MAIN_AND_WORKER_SHARE_ROLE_RESOLUTION_SEMANTICS
+  reason: BOTH_PATHS_RESOLVED_EXACT_CONFIGURED_VALUES_WITHOUT_FALLBACK
+  retry_policy: FOURTH_ATTEMPT_ADMITTED_BY_EXPLICIT_TOOL_CALLING_CAPABILITY
+  spec_effect: CHANGE
+  affected_requirements: [CR-24, E2-8]

@@ -1,0 +1,30 @@
+schema_version: 1
+phase: "00"
+experiment: E3-H
+status: PASS
+decision: >-
+  H1-H6 prove project/global precedence, unsafe defaults refusal, the unsupported
+  config-subcommand overlay surface, cwd-scoping diagnosis, structured tool-unavailable
+  refusal, and distinct nonzero/malformed analyzer controls on OMP 17.2.10.
+cases:
+  H1: PASS
+  H2: PASS
+  H3: PASS
+  H4: PASS
+  H5: PASS
+  H6: PASS
+gate_power: E3-H_COMPLETE_DEPENDENCY_HALF
+non_claims:
+  - A config-get subprocess does not attest a parent launch overlay or an in-memory runtime override.
+  - H3 does not prove launch-overlay precedence; E3-I owns that runtime comparison.
+  - No E3-H result authorizes parallel dispatch.
+artifacts:
+  - docs/evidence/phase-00/E3-H/H1.yml
+  - docs/evidence/phase-00/E3-H/H2.yml
+  - docs/evidence/phase-00/E3-H/H3.yml
+  - docs/evidence/phase-00/E3-H/H4.yml
+  - docs/evidence/phase-00/E3-H/H5.yml
+  - docs/evidence/phase-00/E3-H/H6.yml
+  - docs/evidence/phase-00/E3-H/raw/H2.run.json
+  - docs/evidence/phase-00/E3-H/raw/H3.run.json
+  - docs/evidence/phase-00/E3-H/raw/H5-attempt-002.run.json

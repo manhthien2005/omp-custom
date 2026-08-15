@@ -1,0 +1,23 @@
+schema_version: 1
+phase: "00"
+experiment: E3-H
+case: H4
+status: PASS
+
+execution:
+  shared_raw_case: A3
+  provider_call: false
+  selected_raw_run: docs/evidence/phase-00/E3-A/raw/A3.run.json
+  selected_raw_run_sha256: 84E39DE7FEFA94BAD62AD04C51F4E9FE18D4C935CEFD9F2FDDBD7C0E76498953
+
+observation:
+  nested_mode: none
+  nested_apply: true
+  decision: REFUSE
+  reasons: [ISOLATION_MODE_NONE, ISOLATION_APPLY_TRUE, CWD_PROJECT_CONFIG_NOT_DISCOVERED]
+  fallback: SEQUENTIAL_NON_ISOLATED_DISCLOSED
+
+interpretation:
+  reason: H4_NESTED_CWD_REFUSED
+  decision: Refusal names cwd scoping as the likely cause instead of reporting a generic wrong value.
+

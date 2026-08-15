@@ -1,0 +1,105 @@
+schema_version: 1
+experiment: "E1"
+case_id: "AgentJtd"
+matrix_artifact: "case-1-agent-jtd"
+status: "PASS"
+attempt: 2
+runtime:
+  pinned_source_commit: "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+  omp_sha256: "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+  omp_version: "omp/17.2.10"
+  model: "omniroute/codex/gpt-5.6-sol-high"
+inputs:
+  prompt_sha256: "EE192EA1419604FDC8814F4A44D1B848F525DC41274DD6661C33A2877826742C"
+  agent: "phase00-e1-agent-jtd"
+  caller_schema_state: "ABSENT"
+  agent_schema_state: "PRESENT"
+  agent_schema_dialect: "JTD"
+  session_schema_state: "ABSENT"
+observations:
+  selected_result:
+    agent: "phase00-e1-agent-jtd"
+    is_async_acknowledgement: false
+    source: "agent"
+    mode: "permissive"
+    structured_status: "valid"
+    data_property_names:
+      - "sentinel"
+    expected_sentinel_matches: true
+    forbidden_property_present: false
+  attributable_result_count: 1
+  selected_result_role: "target"
+  child_initialization_source: "agent"
+  schema_override_observable: false
+  schema_override_observed: false
+  blocking_executions:
+    -
+      Role: "target"
+      Agent: "phase00-e1-agent-jtd"
+      DefinitionBlocking: true
+      SetupBlocking: true
+      ExecutionMode: "blocking"
+      AsyncAcknowledgement: false
+provider_ledger:
+  selected_session:
+    requests: 5
+    attributed_requests: 5
+    unattributed_requests: 0
+    response_ends: 5
+    recovered_retries: 0
+    retry_exhausted: false
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+    terminal_failure_found: false
+    terminal_failure_code: ""
+  process:
+    requests: 7
+    attributed_requests: 7
+    unattributed_requests: 0
+    response_ends: 7
+    recovered_retries: 0
+    retry_exhausted_count: 0
+    terminal_failure_count: 0
+    provider: "omniroute"
+    model: "codex/gpt-5.6-sol-high"
+  controller_stdout_duplicates_excluded: true
+raw_artifacts:
+  -
+    kind: "stdout"
+    path: "docs/evidence/phase-00/E1/raw/agent-jtd/attempt-002.stdout.jsonl"
+    sha256: "78F8466FD1A8017E939F35CA9BC329E1BA6D214934643EE8D2D690DB4C754F19"
+    lines: 129
+    source_capture_sha256: "0454A43A042816DF35C807512109117205E5BFF84225E196413FA1FC8E720351"
+  -
+    kind: "stderr"
+    path: "docs/evidence/phase-00/E1/raw/agent-jtd/attempt-002.stderr.jsonl"
+    sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    lines: 0
+    source_capture_sha256: "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/agent-jtd/attempt-002.sessions/session-001.jsonl"
+    sha256: "5A7B432586F50E2E0C6FC8DC4DD5A435FF777C8AF89873D913CEF00DE21BDC51"
+    lines: 11
+    source_capture_sha256: "84C7254B27ED6DD2972856184C8A5CB5766597F1EE6FEB392232652492A0890D"
+  -
+    kind: "session"
+    path: "docs/evidence/phase-00/E1/raw/agent-jtd/attempt-002.sessions/session-002.jsonl"
+    sha256: "6242C975075769FBD9850FCED14AFD077560E531CE805FF7A001F0517854FD19"
+    lines: 26
+    source_capture_sha256: "A3DF7C510461B433A0A0E3779E51063803908C942A5B6BC10A68FF5F2DD52A4F"
+  -
+    kind: "run"
+    path: "docs/evidence/phase-00/E1/raw/agent-jtd/attempt-002.run.json"
+    sha256: "7C5AA7841DBA9B324B850AE766320B6D7F43DA11310A2077500AE575A6A53EF3"
+    lines: 315
+    source_capture_sha256: null
+protected_surface:
+  unchanged: true
+  cleanup_succeeded: true
+  remaining_child_pid_count: 0
+reason_codes:
+  - "E1_AGENT_JTD_PASS"
+limitations:
+  - "Provider counts are attributed from persisted sessions; duplicated controller stdout events are excluded."
+  - "Sanitized raw artifacts omit private prompts, reasoning, credentials, and complete provider bodies."

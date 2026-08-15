@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "record_type": "portable_behavior_manifest",
+  "component": "behavior-core",
+  "component_version": "1.0.0",
+  "reviewed_on": "2026-08-14",
+  "constitution": {
+    "path": ".omp/RULES.md",
+    "behavior_ids": [
+      "evidence-before-completion",
+      "constitution.user-authority",
+      "constitution.scope-discipline"
+    ],
+    "intentional_duplications": [
+      "evidence-before-completion"
+    ]
+  },
+  "budgets": {
+    "rules_target_max_tokens": 700,
+    "rules_hard_warning_tokens": 800,
+    "skill_description_max_tokens": 80,
+    "visible_catalog_max_tokens": 900,
+    "visible_skill_soft_cap": 10,
+    "visible_skill_hard_cap": 12,
+    "worker_autoload_body_max_tokens": 500,
+    "lazy_skill_body_max_tokens": 900
+  },
+  "skills": [
+    {
+      "name": "task-triage",
+      "path": ".omp/skills/task-triage/SKILL.md",
+      "sha256": "2b8c38d24dcbecc8336dea0a16766387de9385cd952d28ea480da3c23a0092ea",
+      "visibility": "visible",
+      "loading": "lazy",
+      "intended_consumers": [
+        "tech-lead"
+      ],
+      "autoload_roles": [],
+      "positive_trigger_fixture": "evals/triggers/topic08/task-triage-positive.yml",
+      "negative_trigger_fixture": "evals/triggers/topic08/task-triage-negative.yml",
+      "description_max_tokens": 80,
+      "body_max_tokens": 900,
+      "provenance_id": "prov-task-triage",
+      "license_id": "spec-kit",
+      "status": "active",
+      "replacement": null,
+      "behavior_ids": [
+        "skill.task-triage"
+      ]
+    },
+    {
+      "name": "systematic-debugging",
+      "path": ".omp/skills/systematic-debugging/SKILL.md",
+      "sha256": "2c501983a6b7c48781f8e414424fbc700d6d88c299ee0021e69ec0320d24f1ba",
+      "visibility": "visible",
+      "loading": "lazy",
+      "intended_consumers": [
+        "tech-lead",
+        "worker"
+      ],
+      "autoload_roles": [],
+      "positive_trigger_fixture": "evals/triggers/topic08/systematic-debugging-positive.yml",
+      "negative_trigger_fixture": "evals/triggers/topic08/systematic-debugging-negative.yml",
+      "description_max_tokens": 80,
+      "body_max_tokens": 900,
+      "provenance_id": "prov-systematic-debugging",
+      "license_id": "superpowers",
+      "status": "active",
+      "replacement": null,
+      "behavior_ids": [
+        "skill.systematic-debugging"
+      ]
+    },
+    {
+      "name": "evidence-before-completion",
+      "path": ".omp/skills/evidence-before-completion/SKILL.md",
+      "sha256": "fc89c5e73205f961d8bf383771c943c7afc9181d1cb91ca81ae639bc3c7b0613",
+      "visibility": "visible",
+      "loading": "autoload",
+      "intended_consumers": [
+        "worker"
+      ],
+      "autoload_roles": [
+        "worker"
+      ],
+      "positive_trigger_fixture": "evals/triggers/topic08/evidence-before-completion-positive.yml",
+      "negative_trigger_fixture": "evals/triggers/topic08/evidence-before-completion-negative.yml",
+      "description_max_tokens": 80,
+      "body_max_tokens": 500,
+      "provenance_id": "prov-evidence-before-completion",
+      "license_id": "superpowers",
+      "status": "active",
+      "replacement": null,
+      "behavior_ids": [
+        "evidence-before-completion"
+      ]
+    }
+  ],
+  "roles": {
+    "cheap-scout": {
+      "agent_path": ".omp/agents/cheap-scout.md",
+      "required_autoload": [],
+      "forbidden_responsibilities": [
+        "write",
+        "verify-acceptance",
+        "review",
+        "accept"
+      ],
+      "behavior_ids": [
+        "role.cheap-scout.identity"
+      ]
+    },
+    "worker": {
+      "agent_path": ".omp/agents/worker.md",
+      "required_autoload": [
+        "evidence-before-completion"
+      ],
+      "forbidden_responsibilities": [
+        "accept"
+      ],
+      "behavior_ids": [
+        "role.worker.identity"
+      ]
+    },
+    "reviewer": {
+      "agent_path": ".omp/agents/reviewer.md",
+      "required_autoload": [],
+      "forbidden_responsibilities": [
+        "write",
+        "accept"
+      ],
+      "behavior_ids": [
+        "role.reviewer.identity"
+      ]
+    }
+  },
+  "commands": {
+    "quick": {
+      "path": ".omp/commands/quick.md",
+      "behavior_ids": [
+        "command.quick.sequence"
+      ]
+    },
+    "standard": {
+      "path": ".omp/commands/standard.md",
+      "behavior_ids": [
+        "command.standard.sequence"
+      ]
+    },
+    "orchestrated": {
+      "path": ".omp/commands/orchestrated.md",
+      "behavior_ids": [
+        "command.orchestrated.sequence"
+      ]
+    }
+  },
+  "hooks": [
+    {
+      "name": "agent-task-boundary",
+      "extension": ".omp/extensions/agent-task-boundary.js",
+      "boundary": "tool_call",
+      "predicate": "managed state and behavior preflight",
+      "failure_policy": "fail_closed",
+      "error_prefix": "BHV-",
+      "observation_policy": "warn_only",
+      "behavior_ids": [
+        "hook.agent-task-boundary"
+      ]
+    },
+    {
+      "name": "context-continuity",
+      "extension": ".omp/extensions/context-continuity.js",
+      "boundary": "session",
+      "predicate": "managed context continuity",
+      "failure_policy": "fail_closed",
+      "error_prefix": "T07_",
+      "observation_policy": "warn_only",
+      "behavior_ids": [
+        "hook.context-continuity"
+      ]
+    }
+  ],
+  "tools": {
+    "external_capabilities": {
+      "policy_authority": false,
+      "workflow_selection": false
+    }
+  },
+  "adapters": {
+    "omp": {
+      "status": "IMPLEMENTED_NOT_PROMOTED",
+      "installable": true,
+      "mappings": {
+        "constitution": ".omp/RULES.md",
+        "agents": ".omp/agents",
+        "commands": ".omp/commands",
+        "skills": ".omp/skills",
+        "hooks": ".omp/extensions"
+      }
+    },
+    "claude": {
+      "status": "DESIGNED_NOT_VERIFIED",
+      "installable": false,
+      "mappings": {
+        "constitution": "CLAUDE.md",
+        "agents": ".claude/agents",
+        "commands": ".claude/commands",
+        "skills": ".claude/skills",
+        "hooks": ".claude/settings.json"
+      }
+    }
+  },
+  "provenance": [
+    {
+      "id": "prov-task-triage",
+      "license_id": "spec-kit",
+      "kind": "derived",
+      "source": "github/spec-kit",
+      "commit": "81d5cdbbf2c96f7ce1a2801c6185f2951f1f61be"
+    },
+    {
+      "id": "prov-systematic-debugging",
+      "license_id": "superpowers",
+      "kind": "derived",
+      "source": "obra/superpowers",
+      "commit": "44c9b2d6e889982ac18c27d05a19fefe335194e1"
+    },
+    {
+      "id": "prov-evidence-before-completion",
+      "license_id": "superpowers",
+      "kind": "derived",
+      "source": "obra/superpowers",
+      "commit": "44c9b2d6e889982ac18c27d05a19fefe335194e1"
+    }
+  ]
+}

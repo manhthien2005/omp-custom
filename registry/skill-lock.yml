@@ -1,28 +1,15 @@
-# Skill Lock — content hashes for installed skills
-# Prevents unreviewed changes to skill bodies.
-# Regenerate with: scripts/update-skill-lock.ps1 (post-v0)
-# Format: SHA256 of the UTF-8 content of each SKILL.md file.
-
-version: "1.0"
-generated: "2026-08-07"
-note: "Run scripts/update-skill-lock.ps1 after any skill change to regenerate this file. A mismatch between recorded and actual hashes triggers a validation warning."
-
+# Generated from template/.omp/contracts/behavior-manifest.json; do not edit hashes by hand.
+version: "2.0"
+source_manifest: template/.omp/contracts/behavior-manifest.json
+component_version: "1.0.0"
+reviewed_on: "2026-08-14"
 skills:
   - name: task-triage
     path: template/.omp/skills/task-triage/SKILL.md
-    # hash populated by scripts/update-skill-lock.ps1
-    hash: null
-    last_reviewed: "2026-08-07"
-    reviewer: "initial-construction"
-
+    hash: 2b8c38d24dcbecc8336dea0a16766387de9385cd952d28ea480da3c23a0092ea
   - name: systematic-debugging
     path: template/.omp/skills/systematic-debugging/SKILL.md
-    hash: null
-    last_reviewed: "2026-08-07"
-    reviewer: "initial-construction"
-
+    hash: 2c501983a6b7c48781f8e414424fbc700d6d88c299ee0021e69ec0320d24f1ba
   - name: evidence-before-completion
     path: template/.omp/skills/evidence-before-completion/SKILL.md
-    hash: null
-    last_reviewed: "2026-08-07"
-    reviewer: "initial-construction"
+    hash: fc89c5e73205f961d8bf383771c943c7afc9181d1cb91ca81ae639bc3c7b0613

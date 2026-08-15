@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 3,
+  "selected": false,
+  "adjudicated_at": "2026-08-09",
+  "corrected_adjudication": {
+    "status": "INVALID_RUN",
+    "reasons": [
+      "E3I_NESTED_PROVIDER_RECOVERY"
+    ],
+    "canary_id": "e3i-project-2",
+    "selection_eligible": false,
+    "retry_eligible_after_external_recovery_and_fresh_gate": true,
+    "reasoning": "The corrected harness, canary protocol, capability boundary, parent sequence, task result shapes, runtime override attestation, and all mutation boundaries behaved as reviewed. However, e3i-project-2 encountered server_is_overloaded and recovered through an internal provider auto-retry. E3-I requires one clean retry-free attempt, so this otherwise complete observation cannot be selected or combined with another attempt."
+  },
+  "runtime_record": {
+    "parent_exit_code": 0,
+    "timed_out": false,
+    "duration_ms": 194469,
+    "omp_version": "omp/17.2.10",
+    "model": "omniroute/codex/gpt-5.6-sol-high",
+    "process_environment_redacted": {
+      "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+      "USERPROFILE": "<DISPOSABLE_USER_PROFILE>",
+      "OMP_PHASE00_E3I_PARENT_CWD": "<DISPOSABLE_PROJECT>"
+    }
+  },
+  "runtime_pin": {
+    "selection": "EXPLICIT_SOURCE",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "observed_parent_protocol": {
+    "tool_sequence": [
+      "bash",
+      "task",
+      "task",
+      "task",
+      "phase00_e3i_override_apply_true",
+      "bash",
+      "task",
+      "task",
+      "task"
+    ],
+    "sequence_matches_session_a": true,
+    "project_diagnostic": {
+      "status": "OBSERVED",
+      "key": "task.isolation.apply",
+      "type": "boolean",
+      "value": false
+    },
+    "runtime_diagnostic": {
+      "status": "OBSERVED",
+      "key": "task.isolation.apply",
+      "type": "boolean",
+      "value": false
+    },
+    "runtime_override": {
+      "status": "PASS",
+      "probe": "phase00-e3i-runtime-override-v1",
+      "setting": "task.isolation.apply",
+      "before": false,
+      "operation": "pi.pi.settings.override",
+      "requested": true,
+      "after": true,
+      "calledSet": false,
+      "calledFlushOrSave": false,
+      "scope": "parent-only"
+    }
+  },
+  "observed_task_samples": [
+    {
+      "id": "e3i-project-1",
+      "branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "summary": "Isolation patch captured under the disposable session (apply=false); not applied.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 6881,
+      "tokens": 6132,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-project-2",
+      "branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "summary": "Isolation patch captured under the disposable session (apply=false); not applied.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 12025,
+      "tokens": 6180,
+      "requests": 2,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK",
+      "provider_recovery_observed": true
+    },
+    {
+      "id": "e3i-project-3",
+      "branch": "APPLY_FALSE_CAPTURE_ONLY",
+      "summary": "Isolation patch captured under the disposable session (apply=false); not applied.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 11381,
+      "tokens": 6207,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-runtime-1",
+      "branch": "APPLY_TRUE_NO_DIFF",
+      "summary": "No changes to apply.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 18814,
+      "tokens": 3641,
+      "requests": 3,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "branch": "APPLY_TRUE_NO_DIFF",
+      "summary": "No changes to apply.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 2954,
+      "tokens": 6252,
+      "requests": 1,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "branch": "APPLY_TRUE_NO_DIFF",
+      "summary": "No changes to apply.",
+      "exit_code": 0,
+      "aborted": false,
+      "duration_ms": 12395,
+      "tokens": 6268,
+      "requests": 2,
+      "acknowledgement": "PHASE00_E3I_CANARY_OK"
+    }
+  ],
+  "canary_protocol_observation": {
+    "canary_count": 6,
+    "all_effective_surfaces": [
+      "read",
+      "yield",
+      "hub"
+    ],
+    "ambient_mcp_or_custom_tools_present": false,
+    "all_read_only": true,
+    "each_tool_call_count": 1,
+    "each_yield_call_count": 1,
+    "each_forbidden_tool_call_count": 0,
+    "each_override_tool_present": false,
+    "all_acknowledgements_exact": true
+  },
+  "nested_provider_failure": {
+    "canary_id": "e3i-project-2",
+    "provider": "omniroute",
+    "model": "codex/gpt-5.6-sol-high",
+    "terminal": false,
+    "error_code": "server_is_overloaded",
+    "message": "Our servers are currently overloaded. Please try again later.",
+    "retry_kind": "auto-retry",
+    "retry_status": "recovered",
+    "retry_attempt": 1,
+    "selection_consequence": "INVALID_RUN before semantic adjudication"
+  },
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "regression_evidence": {
+    "pre_existing_recovered_provider_test": "invalidates a nested provider error that recovered inside the same canary",
+    "expected_and_observed_reason": "E3I_NESTED_PROVIDER_RECOVERY",
+    "new_harness_fix_required": false,
+    "attempt_3_sidecar_red": {
+      "passed": 39,
+      "failed": 1,
+      "expected_failure": "sidecar absent"
+    }
+  },
+  "provider_execution": {
+    "session_a_launches": 1,
+    "session_a_retry_launched": false,
+    "session_b_launched": false,
+    "automatic_retry_performed": false,
+    "next_action": "Stop the execution batch; preserve and report. A numbered retry requires external recovery, a fresh gate, and renewed authorization."
+  },
+  "raw_artifacts": [
+    {
+      "file": "session-a-attempt-003.stdout.jsonl",
+      "sha256": "013AF2B02992AD693648AEF3989005BFFFB7A8DA946F3A15F93EF2E8ED1B194B"
+    },
+    {
+      "file": "session-a-attempt-003.stderr.txt",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "file": "session-a-attempt-003.run.json",
+      "sha256": "3C96C4D73A542FDF84C1E2A0D47B529DD2F013B9857DF389457641868325B3E4"
+    },
+    {
+      "file": "session-a-attempt-003.canary.e3i-project-1.jsonl",
+      "sha256": "1F3562F2FE46F210C688BA901C4CB131461F920B9507BF358DB492EEF77D65F3"
+    },
+    {
+      "file": "session-a-attempt-003.canary.e3i-project-2.jsonl",
+      "sha256": "9FBDB9744B51A35AFAD045C0825019EA171A79F7C7207322736AD5B5991C1DC2"
+    },
+    {
+      "file": "session-a-attempt-003.canary.e3i-project-3.jsonl",
+      "sha256": "7165DFF06584EF036D50B9B314499BF01B88DBB2CED2A53493800770E47A0C57"
+    },
+    {
+      "file": "session-a-attempt-003.canary.e3i-runtime-1.jsonl",
+      "sha256": "2D17291659D378360E67C8886D75281C662905F5D5DAC0A8FD809A7465B00C1B"
+    },
+    {
+      "file": "session-a-attempt-003.canary.e3i-runtime-2.jsonl",
+      "sha256": "69AEAC25C55D297BBA064CBE966B168525AC156F74A5D4D92A461977653BE959"
+    },
+    {
+      "file": "session-a-attempt-003.canary.e3i-runtime-3.jsonl",
+      "sha256": "5A16E8FB40464CC43571086DB32B296683C145C92ACCBF29711A42746A1F7F62"
+    }
+  ],
+  "non_claims": [
+    "Attempt 3 is not selected and provides no I1, I2, I3, or I4 PASS artifact.",
+    "The otherwise conforming branch split cannot be reused or combined with a later attempt.",
+    "Session B was not launched.",
+    "No semantic or safety contradiction was observed.",
+    "No new harness defect was discovered; the pre-existing recovered-provider regression correctly rejected the run.",
+    "E3-I remains RUNNING and parallel mode remains DISABLED."
+  ]
+}

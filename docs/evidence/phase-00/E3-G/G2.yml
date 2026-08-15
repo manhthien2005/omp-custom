@@ -1,0 +1,24 @@
+schema_version: 1
+phase: "00"
+experiment: E3-G
+case: G2
+status: PASS
+
+execution:
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-G/raw/preflight.json, sha256: D8AB40F118FE25A511513B4F9015BF15CBA9E9CEFF81BF003970958C1DF0B499}
+
+observation:
+  cases:
+    tracked_submodule: {preflight_detected: true, runtime_nested_capture: false}
+    plain_nested_repo: {preflight_detected: true, runtime_nested_capture: true}
+    node_modules_nested_repo: {preflight_detected: false, runtime_nested_capture: false}
+    two_level_nested_repo: {preflight_detected: true, runtime_nested_capture: true}
+  runtime_nested_paths: [deep/level/two, nested-plain]
+  preflight_union: [deep/level/two, nested-plain, tracked-submodule]
+  runtime_is_subset_of_preflight: true
+
+interpretation:
+  decision: PREFLIGHT_IS_A_SUPERSET_OF_OMP_CAPTURE_WALK
+  spec_effect: RETAIN_OPTION_A1_PREFLIGHT
+  affected_requirements: [E3-G, CR-32]

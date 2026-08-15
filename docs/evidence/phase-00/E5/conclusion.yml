@@ -1,0 +1,44 @@
+schema_version: 1
+phase: "00"
+experiment: E5
+status: PASS
+authority: CHARACTERIZATION_ONLY
+
+selected_transaction:
+  path: docs/evidence/phase-00/E5/selected-transaction.json
+  sha256: 90C9C527745A2D45B7322ABC59B9961C98CA3AB723EB584BF50B86D4A997847F
+
+result:
+  cases_passed: [E5-A, E5-B, E5-C, E5-D, E5-E, E5-F]
+  selected_runtime_rows: 9
+  selected_runtime_pass_rows: 9
+  production_roles_with_callable_lsp: [explorer, implementer, reviewer]
+  verifier_control_lsp_present: false
+  exact_no_server_error: "No language server found for this action"
+
+four_condition_contract:
+  task_enable_lsp_required: true
+  parent_session_lsp_required: true
+  agent_allowlist_lsp_required: true
+  lsp_enabled_required: true
+  matching_language_server_required_for_successful_query: true
+
+remediation_map:
+  TASK_ENABLE_LSP_FALSE: MERGE_PROJECT_TASK_ENABLE_LSP_TRUE
+  PARENT_SESSION_LSP_DISABLED: RELAUNCH_PARENT_WITH_LSP
+  AGENT_ALLOWLIST_MISSING: ADD_LSP_TO_AGENT_ALLOWLIST
+  LANGUAGE_SERVER_UNAVAILABLE: INSTALL_OR_CONFIGURE_LANGUAGE_SERVER
+  LSP_ENABLED_FALSE: ENABLE_PROJECT_LSP_ENABLED
+
+unblocks:
+  - phase-01/T-01.3
+  - phase-05/T-05.3
+  - spec/07-retrieval-and-code-understanding.md/A-1
+
+safety:
+  raw_hash_mismatch_count: 0
+  sensitive_field_violation_count: 0
+  repository_mutation_count: 0
+  live_home_changed_count: 0
+  cleanup_failure_count: 0
+  targeted_processes_after: 0

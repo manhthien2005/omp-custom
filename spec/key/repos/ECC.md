@@ -1,5 +1,12 @@
 # Repo Report — ECC
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/ECC` ("Everything Claude Code")
 > **SHA:** `9aac8585ab887d9c51252730240b25d9cca180da` (`git -C ECC rev-parse HEAD`)
 > **License:** **MIT**, `LICENSE:1-3`: `MIT License` / `Copyright (c) 2026 Affaan Mustafa`.

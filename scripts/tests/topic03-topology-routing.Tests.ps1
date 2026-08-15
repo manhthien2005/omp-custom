@@ -122,8 +122,8 @@ Opus is a preference, not a gate. Use another suitable strong model or a same-mo
     Set-Topic03FixtureFile -Root $Root -RelativePath 'template/.omp/config.yml' -Content @'
 modelRoles:
   cheap-scout: omniroute/ds/deepseek-v4-flash:xhigh
-  worker: omniroute/codex/gpt-5.6-sol
-  reviewer: omniroute/codex/gpt-5.6-sol
+  worker: omniroute/codex/gpt-5.6-sol:high
+  reviewer: omniroute/codex/gpt-5.6-sol:xhigh
 retry:
   modelFallback: true
   usageAwareFallback: false
@@ -150,16 +150,17 @@ foreach ($retiredAgentName in $retiredAgentNames) {
 '@
 
     Set-Topic03FixtureFile -Root $Root -RelativePath 'docs/evidence/current-product/topic-03/manifest.yml' -Content @'
-schema_version: 1
-topic: topic-03-agent-topology-model-routing
-authority: current-product
-historical_evidence:
-  phase00_conclusion: docs/evidence/phase-00/T-00.3/conclusion.yml
-  disposition: superseded_for_current_runtime_only
-selected_agents:
-  - cheap-scout
-  - worker
-  - reviewer
+{
+  "schema_version": 1,
+  "topic": "03",
+  "candidate": "C1",
+  "phase00_source": "T-00.3",
+  "phase00_conclusion_sha256": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "superseded_agents": [],
+  "selected_agents": ["cheap-scout", "worker", "reviewer"],
+  "current_files": [],
+  "deepseek_environment": "ENVIRONMENT_BLOCKED"
+}
 '@
 }
 
@@ -273,6 +274,16 @@ Invoke-Topic03Mutation -Name 'scout-fallback' -ExpectedCode 'T03-CONFIG-SCOUT-FA
     $path = Join-Path $root 'template/.omp/config.yml'
     (Get-Content -Raw $path).Replace('      - omniroute/ds/deepseek-v4-pro:xhigh', '      []') | Set-Content $path
 }
+Invoke-Topic03Mutation -Name 'worker-observable-effort' -ExpectedCode 'T03-CONFIG-WORKER-IDENTITY' -Mutate {
+    param($root)
+    $path = Join-Path $root 'template/.omp/config.yml'
+    (Get-Content -Raw $path).Replace('worker: omniroute/codex/gpt-5.6-sol:high', 'worker: omniroute/codex/gpt-5.6-sol') | Set-Content $path
+}
+Invoke-Topic03Mutation -Name 'reviewer-observable-effort' -ExpectedCode 'T03-CONFIG-REVIEWER-IDENTITY' -Mutate {
+    param($root)
+    $path = Join-Path $root 'template/.omp/config.yml'
+    (Get-Content -Raw $path).Replace('reviewer: omniroute/codex/gpt-5.6-sol:xhigh', 'reviewer: omniroute/codex/gpt-5.6-sol:high') | Set-Content $path
+}
 Invoke-Topic03Mutation -Name 'default-fallback' -ExpectedCode 'T03-CONFIG-DEFAULT-FALLBACK' -Mutate {
     param($root)
     $path = Join-Path $root 'template/.omp/config.yml'
@@ -295,7 +306,7 @@ Invoke-Topic03Mutation -Name 'stale-retirement' -ExpectedCode 'T03-INSTALL-STALE
 Invoke-Topic03Mutation -Name 'evidence-supersession' -ExpectedCode 'T03-EVIDENCE-SUPERSESSION' -Mutate {
     param($root)
     $path = Join-Path $root 'docs/evidence/current-product/topic-03/manifest.yml'
-    (Get-Content -Raw $path).Replace('  disposition: superseded_for_current_runtime_only', '  disposition: current') | Set-Content $path
+    (Get-Content -Raw $path).Replace('"phase00_source": "T-00.3"', '"phase00_source": "T-00.2"') | Set-Content $path
 }
 
 Write-Host "PASS Topic 03 topology/routing mutation tests ($script:assertions assertions)" -ForegroundColor Green

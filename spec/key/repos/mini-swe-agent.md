@@ -1,5 +1,12 @@
 # Repo Report — mini-swe-agent
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/mini-swe-agent`
 > **SHA:** `a83fcae82d2a08f0ee0c688f9d137b3566c097f8` (`git -C mini-swe-agent rev-parse HEAD`)
 > **License:** **MIT**, single grant, no split. `LICENSE.md:1-3`: `MIT License` /
@@ -335,4 +342,3 @@ infrastructure to port, only decisions to copy.
   after 3 schema failures OMP **drops the schema and accepts the data**
   (`tools/yield.ts:388-399`). Whether the *budget* force-stop path also bypasses validation
   needs a live run.
-

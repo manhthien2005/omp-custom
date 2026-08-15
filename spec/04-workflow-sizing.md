@@ -1,279 +1,389 @@
-# 04 — Workflow Sizing
+# 04 — Workflow Entry and Task Lifecycle
 
-> OPUS PROPOSED SPEC v1 | When each of the three workflows applies, and how the choice is made.
+## Durable boundary for every workflow (KD-028)
 
----
+After objective, authority, mandatory acceptance criteria, and verification/review obligations are
+accepted, Quick, Standard, and Orchestrated create task state before mutation. Quick uses the same
+minimal authority and may finish in one session. Standard adds checkpoints as needed. Orchestrated
+records bounded work-unit contracts/outcomes, but subordinate results remain provisional and only
+the integrated frozen task candidate can close the parent. Session switches use checked handoff,
+not conversation prose.
 
-## A. What Exists Today
-
-Three command files — `quick.md`, `standard.md`, `orchestrated.md` — each open
-with a "When to use / When NOT to use" section. The signals in them are good.
-They are the most immediately reusable artifacts in the current template.
-
-Two problems:
-
-1. `tech-lead.md` instructs the model to select a size "based on
-   `policy:workflow-sizing`" — an unresolvable reference (F-09). The signals in
-   `workflow-sizing.yml` are never read.
-2. Nothing selects a workflow. The user types `/quick` or `/standard`
-   themselves. The triage step inside each command can only confirm or
-   contradict a choice already made.
-
-The second is not necessarily a defect. It may be the better design.
+> USER-APPROVED SPEC v2 | Canonical authority for workflow entry, classification, and the
+> conceptual phase/task/candidate/session lifecycle. Detailed agent topology belongs to
+> Topic 03; durable state belongs to Topic 04.
 
 ---
 
-## B. Who Chooses
+## A. Authority, Scope, and Runtime Grounding
 
-Two options.
+This file owns five decisions:
 
-**Option A — user chooses.** The user types `/quick`. The command's first step
-checks the choice against its own criteria and escalates if wrong.
+1. how a request enters the workflow;
+2. who selects Quick, Standard, or Orchestrated;
+3. what distinguishes those workflows;
+4. when task, candidate, and session boundaries change; and
+5. how reclassification, compaction, handoff, fork, and resume affect those boundaries.
 
-**Option B — router chooses.** A single `/work` command triages, then routes
-internally to quick/standard/orchestrated logic.
+Commands, agents, skills, phase plans, and human documentation project this contract. They do
+not create local variants. Agent count, model routing, and writer ownership are Topic 03
+decisions. Durable IDs, storage, ownership leases, recovery, and state reconciliation are
+Topic 04 decisions. Detailed task-triage interaction is Topic 08 work.
 
-Opus recommends **Option A with mandatory escalation**, for three reasons:
+The entry contract follows pinned OMP behavior:
 
-- The user usually knows the scope better than a triage pass does. "Fix the
-  typo in line 12" does not need a classification step.
-- Option B adds a triage turn to every task, including the trivial ones. That
-  is a real token cost paid on every interaction to save the user one word.
-- Escalation is cheap and safe; de-escalation is not. If `/quick` discovers
-  mid-flight that the change spans four modules, it can stop and say so. The
-  reverse — `/orchestrated` discovering the task was trivial — has already
-  spent the tokens.
+- `expandSlashCommand()` returns unchanged text unless it begins with `/`
+  (`packages/coding-agent/src/extensibility/slash-commands.ts:110-129`);
+- `AgentSession.prompt()` enters extension/custom/file-command handling only for `/`-prefixed
+  text (`session/agent-session.ts:4942-4966`);
+- therefore a main model cannot perform a runtime workflow transition merely by emitting
+  prose such as “restart as `/standard`”; and
+- `/handoff` uses a model-generated document, creates a new child session, and injects the
+  document as a custom message (`session/session-handoff.ts:97-103,217-275`). The generated
+  document carries context; it is not structurally validated task state.
 
-Option B remains available later as a thin `/work` wrapper that picks a size
-and then behaves exactly as that size. It is not needed for v0.
-
----
-
-## C. Sizing Criteria
-
-Consolidated from the three command files, with the contradictions resolved.
-
-| Signal | Quick | Standard | Orchestrated |
-|---|---|---|---|
-| Files touched | 1 | 2–several | Across modules |
-| Root cause known | Yes, from the task text | No — needs investigation | No, and may be several |
-| Behaviour change | No | Yes | Yes |
-| Public API / wire format | Unchanged | May change | Changes |
-| Independent workstreams | None | None | ≥2, genuinely parallel |
-| Security / migration risk | None | Low | Present |
-| Worker agents | 0 | 2–4, sequential | 4+, some parallel |
-
-The decisive question for each boundary:
-
-- **Quick → Standard**: do I know which file to change before I look? If no,
-  Standard.
-- **Standard → Orchestrated**: are there two pieces of work that could proceed
-  simultaneously without either waiting on the other? If no, Standard —
-  regardless of how large the task feels. Size alone does not justify
-  Orchestrated; independence does.
-
-That second rule is the one the current `orchestrated.md` gets right and
-`workflow-sizing.yml` blurs. A large sequential task is Standard with more
-steps, not Orchestrated. Spawning four agents to do four dependent things in
-sequence is strictly worse than one agent doing them, because each handoff
-loses context and costs a task spawn.
+OMP conversation history, session persistence, compaction summaries, and handoff text are
+context carriers. None is project lifecycle authority by itself.
 
 ---
 
-## D. Escalation
+## B. Vocabulary
 
-Escalation is the only mid-flight size change permitted.
+### B-1. Phase
 
-| From | To | Trigger | Action |
-|---|---|---|---|
-| Quick | Standard | Change spans >1 file, or root cause not found after inspection | Stop, report why, restart as Standard |
-| Quick | Standard | Verification fails twice for different reasons | Stop; the task was misclassified |
-| Standard | Orchestrated | Exploration reveals ≥2 independent workstreams | Stop, present the split, restart as Orchestrated |
-| Any | Halt | Ambiguity that changes the acceptance criteria | Ask the user (`RULES.md` invariant 8) |
+A phase is a large program composed of multiple tasks. A phase is not a session and does not
+become complete merely because one task is accepted.
 
-Escalation **restarts**, it does not continue. A Quick run that escalates
-discards its partial work and begins the Standard flow with what it learned as
-input. Continuing in place is how the Tech Lead ends up holding a transcript it
-was supposed to compact.
+### B-2. Task contract and task
 
-De-escalation is not permitted. An Orchestrated run that discovers the task was
-small finishes as Orchestrated. The waste is already sunk; abandoning
-mid-flight to save the remaining tokens risks leaving isolated worktrees
-unmerged.
+A task contract contains one objective, its scope and authority boundary, its mandatory
+acceptance criteria, and its required verification and review obligations. Clarification before
+that contract is accepted is outside the task cycle.
 
----
+**A task begins when its contract is accepted.** Retry, retrieval, rework, rejected candidate
+snapshots, verification, review, compaction, handoff, and fallback stay within that task while
+they pursue the same contract.
 
-## E. Flows
+A material change to objective, mandatory criteria, required verification or review
+obligations, authority, or scope after contract lock opens a new linked task. A clarification
+that merely resolves the accepted contract does not.
 
-Each flow below is the corrected version of the corresponding command file.
-Changes from current: no `policy:` references, **per-workflow** explicit
-isolation on Implementer dispatch (`false` in Standard, `true` in Orchestrated —
-CR-02), explicit `outputSchema` reliance, and named escalation points.
+### B-3. Candidate
 
-**CR-02 — isolation is not uniform across sizes.** An earlier revision of this
-file dispatched the Standard Implementer with `isolated: true`. That contradicted
-the canonical isolation policy in `08-isolation-and-concurrency.md §B`, which the
-capture-first architecture (CR-09/27/30) is built on:
+A candidate is a coherent implementation snapshot frozen for verification against one task
+contract. Work in progress is not a candidate merely because files have changed.
 
-```yaml
-Standard:
-  implementer:
-    isolated: false          # single writer; no concurrency to defend against
-Orchestrated:
-  parallel_implementer:
-    isolated: true
-    apply: false             # capture-first; Tech Lead integrates serially
-```
+Candidates form a sequence within a task: C1, C2, and so on. Once C1 is frozen, any
+**acceptance-bearing mutation invalidates** its verification and review evidence. The changed
+state must be frozen as C2 before it can be accepted. Evidence never transfers silently from
+one snapshot to another.
 
-Standard has exactly one Implementer and no concurrent writer, so isolation buys
-nothing and costs a git-repo requirement (`prepareIsolationContext` throws
-without one), worktree materialization, and an integration step that can fail.
-Isolation in Standard would also drag Standard onto the capture-first path — the
-`task.isolation.apply: false` preflight, artifact retention, and integration
-ordering — none of which Standard needs. The contradiction was load-bearing
-because this file defines flow steps and verification criteria that an
-implementation agent follows literally.
+A deliberately competing implementation alternative has its own candidate lineage and must
+not share an active session with another alternative.
 
-### Quick
+### B-4. Session
 
-```
-1. Confirm size        — 1 file? root cause known? if no → escalate
-2. State criteria      — 1–3 verifiable, plus the exact verify command
-3. Inspect             — targeted read; grep/glob before full file
-4. Implement           — inline, in the main session; minimal diff
-5. Verify              — run the command, read the output
-6. Report              — files changed, evidence, unresolved
-```
+A session serves **one task and one active candidate lineage**. Bounded rework from C1 to C2
+may remain in that session, provided there is no competing alternative and stale evidence is
+discarded from acceptance consideration.
 
-No workers. The session does the work. This is the point of Quick: for a
-one-file change, a task spawn costs more than it saves.
+### B-5. Work unit
 
-### Standard
-
-```
-1. Triage              — confirm size; resolve ambiguity or ask
-2. Explore             — task → explorer (no isolation)
-3. Mini-spec           — inline; 2–5 Given/When/Then criteria; out-of-scope
-4. Plan                — ≤7 steps with checkpoints
-5. Implement           — task → implementer (isolated: false — CR-02)
-6. Verify              — task → verifier (no isolation)
-7. Review              — task → reviewer (no isolation), risk-gated
-8. Summarize           — criteria results, evidence, unresolved
-```
-
-Step 5 is **not** isolated. One Implementer writing to the checkout it was
-dispatched against is the whole point of Standard: there is no second writer to
-corrupt, and the edits are already in the working tree when the Verifier runs.
-Standard therefore never enters the capture-first path and never needs the
-`task.isolation.apply` preflight (`08-isolation-and-concurrency.md §E-9`).
-
-**Standard still depends on stage barriers (CR-39).** Steps 2→3, 5→6, 6→7, and 7→8 each
-consume the previous step's completed result, so every worker Standard dispatches must carry
-`blocking: true` — without it the Verifier would run against an unfinished implementation and
-the summary would be written before any result arrived. Standard needs no batch and no
-canary, but it needs the barrier exactly as much as Orchestrated does. See §08 §C-1.
-
-Review is gated on: public API change, security-relevant code, or a diff the
-Verifier passed but the session finds hard to reason about. Not gated on size.
-
-### Orchestrated
-
-```
-0. Preflight           — nested-repo scan → task.batch → settings diagnostics → capture
-                          canary; any failure disables parallel (§D-1.2, §C-1.4, §E-9, §E-9.2)
-1. Triage + decompose  — identify genuinely independent workstreams
-2. Explore in parallel — task batch → N explorers, distinct scopes
-3. Architecture review — synthesize; write the spec; assign quality gates
-4. Task graph          — dependencies explicit; only independent nodes parallel
-5. Implement in parallel — task batch → implementers (isolated: true, apply: false)
-                          → capture only; nothing lands in the parent tree
-6. Integrate serially  — main Tech Lead applies retained artifacts in
-                          original task-index order (§E-10); stop on first conflict
-7. Verify              — task → verifier, once, against the integrated tree
-8. Review              — task → reviewer, independent
-9. Report              — cross-workstream validation, evidence report
-```
-
-Concurrency is capped at 4 by the frozen baseline (`task.maxConcurrency`).
-Step 5's parallel implementers are the reason `isolated: true` matters most
-here: concurrent writers to one checkout corrupt each other.
-
-**Steps 5→6 are the capture-first split (CR-29).** Workers do not apply their own
-changes; `apply: false` retains a patch or branch artifact per worker and the
-main-session Tech Lead integrates them one at a time. Integration order is the
-**original task-list index**, never worker completion order — see
-`08-isolation-and-concurrency.md §E-10`. On the first conflict, integration stops,
-the remaining artifacts are preserved unapplied, and the partial parent state is
-reported; the Verifier does **not** run on a partially integrated tree.
-
-Step 0 can veto parallelism entirely. Four conditions force the sequential
-non-isolated fallback, checked in this order — cheapest and most decisive first:
-
-| # | Check | Failure means | Ref |
-|---|---|---|---|
-| 1 | nested git repo / submodule present | structural: a lost nested change is undetectable | §D-1.2 |
-| 2 | effective `task.batch != true` | the wire has no `tasks[]`, so no stable index | §C-1.4 |
-| 3 | `omp config get` isolation diagnostics | produces the actionable message; **not** the gate | §E-9 |
-| 4 | same-session capture canary | authoritative: does this session actually capture? | §E-9.2 |
-
-Checks 3 and 4 are both required and are not redundant — 3 explains *why* to the user
-(wrong file, wrong cwd, or an overlay), 4 decides *whether*. A subprocess settings read
-cannot see the parent's `--config` overlay or an in-session override, both of which outrank
-project config and both of which govern the real dispatch (CR-38, §E-9.1).
-
-**Every stage arrow above is a barrier, and barriers are not free (CR-39).** OMP defaults
-`async.enabled` to `true`, so a worker agent that does not declare `blocking: true` becomes a
-background job: the `task` call returns immediately and the next stage begins with no result.
-All four workers therefore carry `blocking: true` in frontmatter (§03, §08 §C-1.3). This does
-not serialize step 5 — an all-blocking batch still fans out concurrently under the
-concurrency cap and returns results in task-index order, which is what step 6 depends on.
-
-Step 7 runs *after* integration, once, against the integrated result. Verifying
-each isolated worktree separately proves each piece works alone and nothing about
-the whole.
+A work unit is a bounded part of an Orchestrated task. It has explicit inputs, outputs,
+ownership, dependencies, and completion conditions. It is not an independent task unless it
+receives its own accepted task contract. Completing a work unit cannot accept its parent task.
 
 ---
 
-## F. Anti-Patterns
+## C. Workflow Entry
 
-| Pattern | Why it is wrong |
-|---|---|
-| Orchestrated for a large sequential task | Handoff cost with no parallelism gain |
-| Multiple explorers over the same files | Duplicated reads, duplicated tokens, no new evidence |
-| Reviewer on every Quick task | Cost with no risk to justify it |
-| Quick with a worker spawn | If it needs a worker it is not Quick |
-| Skipping the Verifier because the Implementer said it passed | `RULES.md` invariant 1; the Verifier exists for this |
-| Escalating by continuing in place | Leaks the accumulated transcript the size change was meant to shed |
+### C-1. Plain request
 
----
+**Plain natural-language requests are the normal default entry.** No workflow prefix is
+required. The main-session Tech Lead clarifies the contract as needed and selects Standard or
+Orchestrated. The user is not required to understand or choose between those workflows.
 
-## G. Verification
+When evidence is insufficient to distinguish them, the Tech Lead performs bounded
+Standard-style clarification or discovery. It selects Orchestrated only after the structural
+test in §D-3 is satisfied.
 
-- Each command file's "when to use" matches the table in section C.
-- No command file contains a `policy:` reference.
-- Standard dispatches its Implementer with `isolated: false`; Orchestrated
-  dispatches its parallel Implementers with `isolated: true` and does **not**
-  rely on worker-side apply (CR-02).
-- Orchestrated integration happens in the main session, in original task-index
-  order, after all workers settle — not inside the workers (CR-29).
-- Orchestrated preflight runs before fan-out and can downgrade to the sequential
-  non-isolated flow: nested-repo scan (CR-32), `task.batch` check (CR-39), settings
-  diagnostics (CR-31), same-session capture canary (CR-38).
-- **Every worker agent the flows dispatch carries `blocking: true` (CR-39).** A flow diagram
-  whose arrows are not backed by barriers is not a flow. Verify per-agent, not per-workflow —
-  the frontmatter is the mechanism, in both Standard and Orchestrated.
-- LSP-dependent roles (Explorer, Implementer, Reviewer) either have all three LSP conditions
-  met or the run discloses reduced-capability mode naming which condition failed (CR-40,
-  `07-retrieval-and-code-understanding.md §A-1`).
-- Escalation triggers are named explicitly in each command.
-- A fixture per size confirms the flow runs end to end (`13-validation-and-evaluation.md`).
+### C-2. Quick request
 
----
+The user invokes `/quick` when they judge a task to be light and bounded. This is the user's
+explicit Quick choice, but not an instruction to bypass correctness. The Tech Lead performs a
+short preflight and may reclassify the workflow when the observed boundary is unsuitable.
 
-## H. Open Items
+### C-3. Compatibility commands and missing-slash hints
 
-| # | Item | Position |
+`/standard` and `/orchestrated` remain available for compatibility and advanced use. The
+command files are **compatibility hints**, not final authority. The Tech Lead validates the
+classification before mutating the workspace and may choose a different suitable workflow.
+
+The words `quick`, `standard`, or `orchestrated` without `/` are natural-language routing hints,
+not runtime commands. A missing slash is not an error and never requires the user to resend the
+request.
+
+| User input | Runtime interpretation | Decision owner |
 |---|---|---|
-| W-1 | `/work` auto-router | Deferred past v0; Option A first |
-| W-2 | Is Reviewer ever mandatory in Standard? | Yes for public API and security; otherwise session judgment |
-| W-3 | Should `workflow-sizing.yml` survive? | Yes, as the source for section C; not as a runtime reference |
+| Plain natural-language request | Normal entry; no command expansion required | Tech Lead chooses Standard or Orchestrated |
+| `/quick ...` | Explicit Quick request; preflight may reclassify | User initiates; Tech Lead validates |
+| `/standard ...` or `/orchestrated ...` | Compatibility or advanced routing hint | Tech Lead validates before mutation |
+| `quick`, `standard`, or `orchestrated` without `/` | Natural-language hint, not a slash command | Tech Lead interprets it in context |
+
+When a hint conflicts with the task's actual boundary, the Tech Lead selects the safe suitable
+workflow and reports the reason briefly. No entry form authorizes a material contract change.
+
+---
+
+## D. Workflow Classification
+
+### D-1. Quick
+
+Quick is a reduced-ceremony path for a small, clear, bounded task explicitly selected by the
+user. It retains the same task contract, candidate-evidence binding, verification, and honest
+terminal-state rules as every other workflow.
+
+Quick implementation is inline by default. Optional read-only Cheap Scout retrieval does not
+change the workflow classification by itself.
+
+### D-2. Standard
+
+Standard is **one integrated implementation lane** controlled by the Tech Lead. Discovery,
+implementation, verification, and review may occur inline or use specialists under the active
+Topic 03 topology. A stage name never forces a spawn.
+
+Standard may be large, cross-module, slow, or high-risk. Those properties increase planning
+and verification depth; they do not select Orchestrated by themselves.
+
+### D-3. Orchestrated
+
+Orchestrated applies only when all four conditions hold:
+
+1. the task has **at least two independently verifiable work units**;
+2. every work unit states its inputs, outputs, ownership, dependencies, and completion
+   conditions;
+3. all work-unit outputs share one task-level integration contract; and
+4. acceptance requires integration or cross-boundary verification beyond checking each work
+   unit separately.
+
+The Tech Lead integrates work-unit outputs into one task-level candidate. Only the integrated
+candidate can be accepted.
+
+**Parallel writers are optional.** Orchestrated does not inherently require multiple agents,
+multiple writers, parallel execution, or a separate session for every work unit. Sequential
+execution remains Orchestrated when the integration graph exists. Conversely, several parallel
+read-only Scouts do not turn a Standard task into Orchestrated.
+
+If Topic 03 later selects parallel writers for particular work units, every applicable
+isolation, capture, guarded-dispatch, deterministic-integration, and conflict-stop rule in
+`08-isolation-and-concurrency.md` remains mandatory. Those safety mechanics constrain an
+optional execution path; they do not define the workflow.
+
+### D-4. Non-decisive signals
+
+These signals affect risk handling but cannot select Orchestrated alone:
+
+- number of files or modules;
+- estimated duration;
+- architecture, API, security, or migration risk;
+- number of available agents;
+- possible wall-time savings; or
+- desire for a more elaborate review.
+
+Without independently verifiable work units and a real integration boundary, use Standard.
+
+---
+
+## E. Lifecycle States and Candidate Evidence
+
+The conceptual lifecycle is:
+
+```text
+Clarifying (outside the task cycle)
+  -> Active
+  -> Candidate frozen
+  -> Verifying
+  -> Accepted
+
+Verification failure
+  -> Active/Rework
+  -> next frozen candidate
+
+Other task terminals
+  -> Cancelled | Terminally blocked
+```
+
+`Clarifying` ends when the task contract is accepted. At that point the task cycle becomes
+`Active` and Topic 01 accounting begins.
+
+`Candidate frozen` is an evidence boundary, not necessarily a commit. Topic 04 owns the final
+durable identifier and snapshot representation. Until that mechanism exists, conversational
+claims such as “this is still C1” cannot substitute for reconciling the actual workspace.
+
+A verification failure returns the task to `Active/Rework`. Any acceptance-bearing mutation
+then invalidates the frozen snapshot's evidence, and the next verification attempt targets a
+newly frozen candidate.
+
+Task lifecycle has three terminal outcomes:
+
+- `Accepted`: the current frozen candidate satisfies the accepted contract with required
+  evidence;
+- `Cancelled`: authorized work ends without an accepted candidate; or
+- `Terminally blocked`: the task cannot proceed within its accepted authority or available
+  conditions and closes honestly as non-accepted.
+
+`waiting_for_user`, a recoverable `blocked` condition, `partial`, and rework are not task
+terminals. Topic 01's `accepted_with_waiver` remains an evaluation classification excluded
+from validated acceptance and promotion. Waiving a mandatory criterion changes the contract;
+it cannot relabel the old candidate as a validated accepted outcome.
+
+If later evidence proves an accepted candidate violated its original contract, history is not
+rewritten. Mark the acceptance invalid and open a linked remediation task.
+
+---
+
+## F. Reclassification and Escalation
+
+Workflow changes are internal classification transitions. They do not require the user to run
+another command, and the model does not claim to invoke a slash command from prose.
+
+Before mutation, reclassification retains valid clarification and discovery evidence. During
+preflight, the Tech Lead may also reduce an overestimated workflow when evidence proves the
+simpler boundary.
+
+After mutation, escalation does not delete, reset, revert, or abandon existing work. The Tech
+Lead records the current boundary and continues under the suitable workflow. Reclassification
+alone creates neither a new task nor a new candidate; candidate creation remains governed by
+the freeze rule.
+
+The Tech Lead may reclassify within the accepted contract without asking permission and reports
+the reason briefly. If the proposed change materially alters objective, mandatory criteria,
+required verification or review obligations, authority, or scope, stop at the old boundary and
+obtain the user decision needed for a new linked task contract.
+
+---
+
+## G. Session Operations
+
+### G-1. Continue
+
+Continue in the current session only while it serves the same open task and the same
+non-competing candidate lineage. Bounded C1-to-C2 rework is allowed after invalidating C1's
+evidence.
+
+### G-2. New
+
+A new task or materially changed contract requires a new session. Link the old task for
+provenance; do not absorb the new objective into the old conversation.
+
+### G-3. Safe compaction
+
+**Safe compaction does not change** session, task, candidate lineage, workflow, work-unit
+ownership, or acceptance state. KD-031 permits only armed argument-free `/safe-compact` for one
+native soft transaction in the managed path. Its summary, recovery artifact, and injected kernel
+are not lifecycle authority; pressure recovery is one attempt or explicit Topic 04 handoff.
+
+### G-4. Handoff
+
+**Handoff creates a successor session** for the same task and candidate lineage. After a
+successful handoff, the predecessor session no longer has active ownership, though its history
+remains available.
+
+The successor reconciles generated handoff text with the accepted task contract and actual
+workspace before mutation. Handoff prose cannot alter the contract or validate a candidate.
+
+### G-5. Fork
+
+Fork is deliberate: use it for a competing candidate alternative or a work unit with explicit
+ownership. It is not the normal continuation mechanism. A forked session cannot accept the
+parent task; its output returns through Tech Lead integration and the task-level freeze boundary.
+
+### G-6. Resume or continue a persisted session
+
+Resume only when the task remains open and the candidate lineage still matches the contract and
+workspace. On drift, stop and reconcile before mutation. Do not continue silently from stale
+conversation context.
+
+---
+
+## H. Topology-neutral Execution and Cheap Scout
+
+Topic 02 specifies outcomes and boundaries, not a fixed worker graph:
+
+- the main session owns Tech Lead classification and final task acceptance;
+- optional specialists are used only when they provide a clear quality benefit;
+- work-unit concurrency is an execution optimization, not classification authority;
+- no stage name mandates an Explorer, Implementer, Verifier, or Reviewer spawn; and
+- no subagent or work unit may claim parent-task acceptance.
+
+Cheap Scout is an optional, configurable, read-only retrieval role. The Tech Lead may use
+DeepSeek, Gemini, or another suitable inexpensive model. Cheap Scout owns neither workflow
+classification nor lifecycle state. If it is unavailable, fails, or returns unusable evidence,
+fall back to the retrieval path the Tech Lead needs. The fallback does not change task,
+candidate, session, or workflow by itself.
+
+---
+
+## I. Failure and Recovery Rules
+
+| Situation | Required response |
+|---|---|
+| Ambiguous objective, scope, authority, mandatory criteria, or required verification/review obligations | Remain in clarification; inspect available evidence, then ask one decision question if still necessary |
+| No workflow prefix | Treat as normal entry; Tech Lead selects Standard or Orchestrated |
+| Missing slash on a workflow word | Treat as a natural-language hint; do not reject or ask for resubmission |
+| Unsuitable explicit command or hint | Reclassify safely and report why |
+| Cheap Scout unavailable or unusable | Fall back without lifecycle side effects |
+| Escalation after workspace mutation | Preserve work; never perform an automatic destructive reset |
+| Material contract change | Close the old boundary honestly and open a linked task/session |
+| Mutation after candidate freeze | Invalidate prior acceptance-bearing evidence and freeze the next candidate |
+| Incomplete or misleading handoff | Reconcile against contract and workspace |
+| Resume-time workspace drift | Stop mutation until reconciliation |
+| Orchestrated work unit completes | Keep parent task open until integrated candidate verification passes |
+| Accepted candidate later proves invalid | Mark acceptance invalid and open linked remediation |
+
+---
+
+## J. Verification Matrix
+
+Static and later behavioral evaluation must cover at least:
+
+1. plain request without a prefix;
+2. `quick`, `standard`, and `orchestrated` without `/`;
+3. explicit `/quick`, `/standard`, and `/orchestrated`;
+4. Quick reclassification before and after mutation;
+5. preflight reduction of an overestimated hint;
+6. material contract change versus in-contract clarification;
+7. C1 freeze, failed verification, mutation, and C2 evidence isolation;
+8. bounded rework in the same task/session;
+9. compaction with unchanged lifecycle identity;
+10. handoff to a reconciled successor session;
+11. forked competing candidate isolation;
+12. resume with matching state and resume with drift;
+13. sequential Orchestrated execution;
+14. optional parallel retrieval without Orchestrated classification;
+15. integrated-candidate cross-boundary verification; and
+16. Cheap Scout failure with retrieval fallback.
+
+Static checks must reject active prose that requires users to select all three workflows,
+claims a model can re-enter a slash command, discards work during escalation, uses modified-
+candidate evidence, treats compaction/handoff text as task authority, or defines Orchestrated
+by size, risk, agent count, or mandatory parallel writers.
+
+Passing static checks does not prove runtime lifecycle enforcement. Behavioral enforcement and
+durable reconciliation depend on the Topic 03 and Topic 04 mechanisms selected later.
+
+---
+
+## K. Deferred Ownership and Migration
+
+| Concern | Owner | Topic 02 position |
+|---|---|---|
+| Detailed agent/model topology and sticky model behavior | Topic 03 | Deferred; workflow prompts remain topology-neutral |
+| Durable task/candidate/session IDs and state | Topic 04 | Deferred; conceptual boundaries defined here |
+| Deep task-triage interaction and heuristics | Topic 08 | Deferred; remove contradictions only |
+| Parallel-writer isolation and integration safety | `spec/08` plus Topic 03 choice | Mandatory only if that optional path is selected |
+| Candidate evaluation and token accounting | Topic 01 / `spec/13` | Consume these task and candidate boundaries |
+
+The retired `workflow-sizing.yml` does not return as runtime authority. It remains only as
+hash-recorded migration history. This file and the command adapters are the active sizing and
+lifecycle contract.

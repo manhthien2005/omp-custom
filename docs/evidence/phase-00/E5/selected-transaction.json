@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "phase": "00",
+  "experiment": "E5",
+  "status": "PASS",
+  "runtime": {
+    "version": "omp/17.2.10",
+    "executable_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "source_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+  },
+  "fake_language_server_runtime": {
+    "node_version": "v24.16.0",
+    "node_executable_sha256": "B3094D0B49F9AD602262A9921551737BB97637C05DD357A06AE98188D7290AA3",
+    "server_fixture_sha256": "AA78C38B6E8F078C317660DAC3DB11D1C6D15A16F37BCD004F4D6C9DC0914E6C",
+    "processes_after_selected_runs": 0
+  },
+  "source_identity": {
+    "path": "docs/evidence/phase-00/E5/source-identity.json",
+    "sha256": "734D2BB55BF0BE98E8EA8DF24FC9A05770A90C0C7C58228D4CD1D34ADFE3DEF2"
+  },
+  "cases": [
+    {
+      "id": "E5-A",
+      "status": "PASS",
+      "cause": "TASK_ENABLE_LSP_FALSE",
+      "remediation": "MERGE_PROJECT_TASK_ENABLE_LSP_TRUE",
+      "artifact": {"path": "docs/evidence/phase-00/E5-A/conclusion.yml", "sha256": "05A5CE4951065F300E19C629247FF2DCA1B89EB186895FA2B03D0A0F4BFA4061"}
+    },
+    {
+      "id": "E5-B",
+      "status": "PASS",
+      "production_roles_callable": ["explorer", "implementer", "reviewer"],
+      "verifier_control_lsp_present": false,
+      "artifact": {"path": "docs/evidence/phase-00/E5-B/conclusion.yml", "sha256": "B2F092EBEDE8133D0B43EF3DC86F204878E1A35D060E149F0AD131F25B3A42C3"}
+    },
+    {
+      "id": "E5-C",
+      "status": "PASS",
+      "cause": "PARENT_SESSION_LSP_DISABLED",
+      "remediation": "RELAUNCH_PARENT_WITH_LSP",
+      "artifact": {"path": "docs/evidence/phase-00/E5-C/conclusion.yml", "sha256": "2EDEFEA57A306FE16DCCB4FAADC87919B7D11B9D930097EC7034D3E98F3375F4"}
+    },
+    {
+      "id": "E5-D",
+      "status": "PASS",
+      "cause": "AGENT_ALLOWLIST_MISSING",
+      "remediation": "ADD_LSP_TO_AGENT_ALLOWLIST",
+      "artifact": {"path": "docs/evidence/phase-00/E5-D/conclusion.yml", "sha256": "25F6080C6EBC5C7A09B216D53C26F707F47BBFCD646951C866C1C2859CA7D5E5"}
+    },
+    {
+      "id": "E5-E",
+      "status": "PASS",
+      "cause": "LANGUAGE_SERVER_UNAVAILABLE",
+      "verbatim_error": "No language server found for this action",
+      "remediation": "INSTALL_OR_CONFIGURE_LANGUAGE_SERVER",
+      "artifact": {"path": "docs/evidence/phase-00/E5-E/conclusion.yml", "sha256": "897C6BCE04B296E101CD339897D382F441A91D086CB3EF36AFC662072B155E58"}
+    },
+    {
+      "id": "E5-F",
+      "status": "PASS",
+      "cause": "LSP_ENABLED_FALSE",
+      "remediation": "ENABLE_PROJECT_LSP_ENABLED",
+      "artifact": {"path": "docs/evidence/phase-00/E5-F/conclusion.yml", "sha256": "358477054B8510B4DFE2890B3A90D235F4A51A40B19CFDC04E406183524210FE"}
+    }
+  ],
+  "selected_runtime_rows": 9,
+  "selected_runtime_pass_rows": 9,
+  "terminal_yield_count": 9,
+  "hash_mismatch_count": 0,
+  "sensitive_field_violation_count": 0,
+  "repository_mutation_count": 0,
+  "live_home_changed_count": 0,
+  "cleanup_failure_count": 0,
+  "superseded_environment_attempts": [
+    {
+      "case": "E5-B",
+      "role": "explorer",
+      "attempt": 1,
+      "status": "BLOCKED_ENVIRONMENT",
+      "cause": "OMNIROUTE_LISTENER_ABSENT_BEFORE_CHILD_SPAWN",
+      "selected": false
+    }
+  ],
+  "non_claims": [
+    "E5 characterizes the pinned OMP runtime and controlled fixture; it is not a latency benchmark.",
+    "A present lsp tool does not imply that a matching language server is installed.",
+    "The failed provider-health attempt carries no LSP contract power."
+  ]
+}

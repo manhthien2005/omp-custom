@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 5,
+  "selected": false,
+  "adjudicated_at": "2026-08-09",
+  "adjudication": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "reasons": [
+      "P00-RUNTIME-PROVIDER-OVERLOAD"
+    ],
+    "failure_scope": "parent-terminal",
+    "selection_eligible": false,
+    "semantic_fail": false,
+    "precedence": "The parent terminal provider capacity failure is authoritative before the recovered nested retry and before incomplete semantic evidence."
+  },
+  "classifier_replay": {
+    "parent_events": 735,
+    "canary_sessions": 6,
+    "status": "BLOCKED_ENVIRONMENT",
+    "reasons": [
+      "P00-RUNTIME-PROVIDER-OVERLOAD"
+    ],
+    "e3_l_conclusion_consumed": false
+  },
+  "runtime_record": {
+    "parent_exit_code": 0,
+    "timed_out": false,
+    "duration_ms": 410990,
+    "omp_version": "omp/17.2.10",
+    "model": "omniroute/codex/gpt-5.6-sol-high"
+  },
+  "runtime_pin": {
+    "selection": "EXPLICIT_SOURCE",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "terminal_parent_failure": {
+    "provider": "omniroute",
+    "model": "codex/gpt-5.6-sol-high",
+    "detector_code": "P00-RUNTIME-MODEL-ERROR",
+    "classified_reason": "P00-RUNTIME-PROVIDER-OVERLOAD",
+    "error_code": "server_is_overloaded",
+    "terminal": true,
+    "selection_consequence": "BLOCKED_ENVIRONMENT before semantic adjudication"
+  },
+  "nested_provider_recovery": {
+    "observed": true,
+    "canary_id": "e3i-runtime-3",
+    "count": 1,
+    "provider": "omniroute",
+    "model": "codex/gpt-5.6-sol-high",
+    "kind": "auto-retry",
+    "status": "recovered",
+    "attempt": 1,
+    "affects_terminal_status": false
+  },
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "provider_execution": {
+    "session_a_launches": 1,
+    "session_a_retry_launched": false,
+    "session_b_launched": false,
+    "automatic_retry_performed": false,
+    "next_action": "Preserve Attempt 5 as BLOCKED_ENVIRONMENT; do not select, combine, or retry it."
+  },
+  "raw_artifacts": [
+    {
+      "file": "session-a-attempt-005.stdout.jsonl",
+      "sha256": "5F8DF445A52D54E6C48D11D35D75706E435D67B51D2CEB518B4C89F1804F44F0"
+    },
+    {
+      "file": "session-a-attempt-005.stderr.txt",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "file": "session-a-attempt-005.run.json",
+      "sha256": "8A2EAFC45F771268FCB872F7ED0D6A278AD1F4217CDC625F0F431FF55CF3230B"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-project-1.jsonl",
+      "sha256": "97B8B7C06A57159C9865A06D179C2CE77B7EBA01869C10E4ABD13B328C2B3325"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-project-2.jsonl",
+      "sha256": "6A96C0C1A6DCBE0CA37F4A7C6EEBDF0FFE2DC7E786D9BC1F2A1BAC56D2BCE65A"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-project-3.jsonl",
+      "sha256": "0CDCAC4964F479BDEC49179A9EB6BEE045208C08FDCD5D0194E22BB7D4E47D16"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-runtime-1.jsonl",
+      "sha256": "D80867A0744FF62B846170D9CD9E3A28B23F5A2C73BA1B719BE3311A575EE4A1"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-runtime-2.jsonl",
+      "sha256": "5940D7F9C9AF277439F5D3F9D213FC7F06115117BBFB32137DF08E5F2268AB21"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-runtime-3.jsonl",
+      "sha256": "76CD96E3D797C290A2B92358F8800605BF609024E7F6B89C6BF8A13C9D08432B"
+    }
+  ],
+  "non_claims": [
+    "Attempt 5 is not selected and provides no I1, I2, I3, or I4 PASS artifact.",
+    "The recovered nested retry is recorded but does not override the parent terminal capacity failure.",
+    "Session B was not launched.",
+    "No E3-L conclusion or verdict was consumed by the E3-I adjudicator.",
+    "E3-I grants no parallel authority."
+  ]
+}

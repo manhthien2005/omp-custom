@@ -1,0 +1,8 @@
+schema_version: 1
+record_type: topic08_skill_trigger_fixture
+skill: task-triage
+expectation: should_not_trigger
+cases:
+  - "Use /quick for this clear typo fix and run the named focused test."
+  - "Use /standard for the accepted scoped behavior change."
+  - "Use /orchestrated for the approved cross-module migration plan."

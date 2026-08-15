@@ -1,0 +1,82 @@
+schema_version: 1
+phase: "00"
+experiment: E3-J
+diagnostic: resume-after-user-login
+captured_at: "2026-08-08T23:43:00+07:00"
+status: BLOCKED_ENVIRONMENT
+
+method:
+  - Read container identity, mount metadata, and non-secret environment variable names.
+  - Probe local model and inference endpoints using the already-configured process credential without persisting its value.
+  - Query a read-only projection of provider_connections that excludes IDs, names, emails, tokens, API keys, and provider-specific data.
+  - Parse the sanitized attempt-004 JSON event stream.
+
+gateway:
+  image: diegosouzapw/omniroute:3.8.49
+  endpoint: http://127.0.0.1:20128
+  container_started_at: "2026-08-08T16:13:41.917584044Z"
+  models_endpoint:
+    http_status: 200
+    total_models: 183
+    codex_models: 30
+    required_model_advertised: true
+  responses_endpoint:
+    http_status: 404
+    error_type: invalid_request_error
+    error_message: No active credentials for provider codex
+  chat_completions_endpoint:
+    http_status: 404
+    error_type: invalid_request_error
+    error_message: No active credentials for provider codex
+
+codex_connection_projection:
+  connection_count: 1
+  provider: codex
+  auth_type: oauth
+  is_active: true
+  test_status: expired
+  error_code: "401.0"
+  last_error_type: unauthorized
+  has_access_token: true
+  has_refresh_token: true
+  has_api_key: false
+  expires_at: "2026-08-18T16:14:30.198Z"
+  last_tested: "2026-08-08T16:34:17.073Z"
+  updated_at: "2026-08-08T16:37:09.411Z"
+
+attempt_004:
+  process_exit_code: 0
+  task_start_count: 1
+  task_batch_items: 3
+  child_result_indexes: [0, 1, 2]
+  child_exit_codes: [1, 1, 1]
+  successful_probe_timings: 0
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  safety_boundary: PASS_LIVE_HOME_READ_ONLY
+
+interpretation:
+  root_cause: >-
+    The model catalog and local gateway are reachable. The persisted Codex OAuth
+    connection exists and is_active is true, but OmniRoute marks it expired after a
+    401 unauthorized test, so the router excludes it from the active credential pool.
+  next_action: >-
+    Use the authenticated OmniRoute dashboard to refresh/re-authenticate and test the
+    Codex connection until it reports active/success. Do not edit credential columns
+    directly.
+  e3_j_contract_power: NONE
+  e3_k_eligible: false
+
+resolution:
+  verified_at: "2026-08-08T23:53:21+07:00"
+  direct_inference_http_status: 200
+  direct_inference_status: completed
+  final_test_status: active
+  final_error_code: null
+  final_last_error_type: null
+  e3_j_runtime_resumed: true
+
+security:
+  credential_values_persisted_to_repository: false
+  token_columns_selected: false
+  connection_identity_fields_selected: false

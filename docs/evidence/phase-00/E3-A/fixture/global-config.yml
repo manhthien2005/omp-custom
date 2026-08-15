@@ -1,0 +1,4 @@
+task:
+  isolation:
+    mode: none
+    apply: true

@@ -66,7 +66,7 @@ Delete `template/.omp/policies/` from the installed surface. Re-home its 5 files
 | `context-budget.yml` | `docs/` + validator thresholds | reference + enforced numbers |
 | `model-routing.yml` | inlined into the dispatching command prose | prose |
 | `workflow-sizing.yml` | inlined into the dispatching command prose | prose |
-| `escalation.yml` | agent "Must not" sections (per `03-token-quality-model.md`) | per-spawn prose |
+| `escalation.yml` | agent "Must not" sections (per `03-agent-topology.md`) | per-spawn prose |
 
 Every re-homed file keeps a provenance line naming the YAML it came from, so
 `registry/` entries stay traceable.
@@ -332,7 +332,8 @@ or ambiguous result changes nothing** — A1 remains the v0 policy either way.
 
 #### E3-H — Config precedence and preflight refusal (CR-31 — decisive)
 
-Run every case through the concrete preflight command, not by reading files:
+Run every project/default/cwd case through the concrete preflight command, not by reading
+files:
 
 ```bash
 omp config get task.isolation.mode  --json
@@ -344,9 +345,18 @@ global apply=true + project apply=false  → effective false   (project wins)
 project config absent, global/default true → effective true
   → /orchestrated preflight MUST refuse the parallel path
   → falls back to sequential non-isolated, and discloses it
-CLI overlay (--config) apply=true over project apply=false → effective true
-  → preflight MUST refuse (this is why file inspection is insufficient)
 ```
+
+**CLI-overlay characterization boundary (E3-H/H3; observed on pinned OMP 17.2.10).** The
+`config` command exposes `--json` but does not accept the launch-level `--config` option.
+Both plausible placements — `omp --config <overlay> config get ... --json` and
+`omp config get ... --json --config <overlay>` — exit non-zero with `Unknown option
+'--config'`. Therefore H3 cannot truthfully report the overlay's effective value through
+`omp config get`. H3 passes only as a characterization when both forms are rejected and the
+preflight returns `REFUSE` with `CONFIG_CLI_OVERLAY_UNSUPPORTED` and
+`CLI_OVERLAY_UNOBSERVABLE`; it is **not** a precedence-read pass and can never authorize
+parallel dispatch. Launch-session CLI-overlay precedence remains an E3-I concern. Durable
+evidence is recorded in `docs/evidence/phase-00/E3-H/H3.yml` and its selected raw artifacts.
 
 **Also record the cwd-scoping case (CR-31 §2.5).** `docs/settings.md` states settings
 discovery checks only the current working directory's `.omp/`, **not ancestor directories**.
@@ -386,15 +396,21 @@ subprocess inherits more context than `docs/settings.md:21` implies, and CR-38's
 revision.
 
 **CR-42/CR-44 canary contract.** The canary is an agent with declared tools `[read]`. Its
-**effective tool surface is `[read, hub]`** — `executor.ts:2689-2692` adds `hub` when
-`!restrictToolNames`, and ordinary TaskTool paths have `restrictToolNames=false`
-(`structured-subagent.ts:385`). The canary is therefore a **behavioral guard, not a mechanical
-sandbox**: it MUST NOT directly write files (no write/edit/bash/lsp in declared surface), and
-its prompt instructs "make no changes". Under `apply=false`, any files written into the isolated
-worktree are never applied to the parent — the parent-tree invariant holds by isolation design.
-Under `apply=true` detection, the canary's isolated context is merged; a cooperative canary
-model will not use hub. E3-I must record the effective canary tool surface to confirm hub is
-present and whether it is exercised.
+controlled effective tool surface is **`[read, yield, hub]`**. `executor.ts:2689-2692` adds
+`hub` when `!restrictToolNames`; ordinary TaskTool paths have `restrictToolNames=false`
+(`structured-subagent.ts:385`); every TaskTool child is created with
+`requireYieldTool:true` (`executor.ts:3019-3024`); and `tools/index.ts:641-643` plus
+`sdk.ts:2964-2977` force-include `yield` so the child can satisfy that termination protocol.
+The runner MUST relocate the child process's user-profile discovery root in addition to
+`PI_CODING_AGENT_DIR`; otherwise ambient user MCP configuration may widen the surface and
+invalidate the characterization. The canary is therefore a **behavioral guard, not a
+mechanical sandbox**: it MUST NOT directly write files (no write/edit/bash/lsp in the
+controlled surface), must call exactly one terminal `yield` with the fixed acknowledgement,
+and must call no other tool. Under `apply=false`, any files written into the isolated worktree
+are never applied to the parent — the parent-tree invariant holds by isolation design. Under
+`apply=true` detection, the canary's isolated context is merged; a cooperative canary model
+will use only the mandatory terminal `yield`, not `read`, `hub`, or any ambient capability.
+E3-I must record the full effective surface and every child call.
 
 The discrimination is via merge summary text (SC-01: three apply=false variants all start
 "Isolation:"; the "no changes captured" fallback is only reached if `!patchPath && !branchName
@@ -408,22 +424,43 @@ apply=true  → merge-summary is "No changes to apply." (§E-9.2 apply=true, no-
 Assert that after the canary runs: `parent HEAD == before`, `parent git status == before`,
 `no files directly created or modified in parent by the canary itself`. On the apply=true path
 the canary must still produce zero direct parent mutations. **Also assert: the effective canary
-tool surface contains `hub`** (confirming CR-44 executor auto-widening). If the canary directly
-modifies any parent file, that is a violation of §08 §E-9.2's behavioral-guard contract.
+tool surface is `[read, yield, hub]`, the exact terminal `yield` occurs once, and no other child
+tool is called.** If the canary directly modifies any parent file, or calls `read`, `hub`, or an
+ambient tool, that is a violation of §08 §E-9.2's behavioral-guard contract.
 
-Run the same shape a second time with an **in-session** override instead of a CLI overlay
-(change the setting via `/settings` mid-session, then dispatch). `Settings.set()` writes the
-in-memory `#overrides` layer (`config/settings.ts:524`), so no file changes at all — this is
-the harder variant and the one no external read can ever catch.
+Run the same shape a second time with an **in-session runtime override** instead of a CLI
+overlay. On pinned v17.2.10, project custom tools cannot use the nominal
+`CustomToolContext.settings`: the type declares it (`custom-tools/types.ts:85-105`), but the
+actual SDK bridge omits it (`sdk.ts:885-894,938-955`). For this exact default main-CLI host,
+use a disposable project custom tool whose parent-scoped execute path calls
+`pi.pi.settings.override("task.isolation.apply", true)` exactly once through the exported
+global settings proxy. The host restriction is source-backed: the loader injects the package
+namespace as `pi` (`custom-tools/loader.ts:132-154`), the package exports `settings`
+(`index.ts:17`), and the default main CLI initializes one Settings instance and passes that
+same instance to the session (`main.ts:1282-1283,1545`). Record the value immediately before
+and after, and call neither `Settings.set()` nor any flush/save path.
+`Settings.override()` writes the non-persistent in-memory `#overrides` layer
+(`config/settings.ts:518-526`). The normal `/settings` selector is **not** this primitive:
+it calls `Settings.set()` (`modes/components/settings-selector.ts:1272-1282`), which updates
+global settings and queues persistence (`config/settings.ts:498-505`). The custom-tool
+factory MUST return no tools for the isolated child cwd; otherwise the override tool would
+contaminate the canary surface because custom-tool paths are forwarded to subagents and
+registered tools are force-included (`structured-subagent.ts:439-440`,
+`sdk.ts:1980-1990,3025-3036`). This runtime-override variant is the harder case and the one
+no external read can catch. A successful false→true attestation plus the changed dispatch
+summary proves only the observed default main-CLI host path. It does not establish proxy
+identity for ACP, injected-SDK, or cloned-settings hosts; it does not replace E3-L; and it
+does not close E3-M's independently unresolved atomic-timing conjunction.
 
 Also record the canary's own cost and reliability: wall time, tokens, and whether the
 summary-discrimination assertion is stable across repeated runs (a flaky gate is worse than
 none).
 
 **Records**: whether `omp config get` can be trusted as a gate (expected: no, diagnostic only),
-whether the canary reliably discriminates apply=false vs apply=true, whether hub appears in the
-effective tool surface (expected: yes), whether hub is exercised by the model (expected: no),
-and whether the behavioral non-mutation contract holds in both cases. If hub is exercised,
+whether the canary reliably discriminates apply=false vs apply=true, whether mandatory `yield`
+and auto-added `hub` appear in the controlled effective surface (expected: yes), whether exactly
+one terminal `yield` and no forbidden tool call are observed, and whether the behavioral
+non-mutation contract holds in both cases. If `hub` or any other forbidden tool is exercised,
 §08 §E-9.2 must be updated before phase-02.
 
 **E3-I authority: characterization/diagnostic only.** E3-I PASS does NOT authorize parallel
@@ -490,71 +527,95 @@ but does NOT itself enable parallel — CR-45 TOCTOU: the preflight read at t0 i
 **E3-M (guarded dispatch) is the gate that enables parallel mode**: without a passing E3-M,
 the canary (E3-I) is characterization-only and parallel fan-out remains disabled.
 
-#### E3-L — Live-session settings authority via custom-tool ctx (CR-44 — Branch A gate)
+#### E3-L — Live-session settings authority (CR-44 — Branch A gate)
 
-Source-verify and empirically confirm that a project custom tool can read the live parent
-session's `task.isolation.apply` — the same value that governs actual `applyChanges`.
+Source-verify and empirically confirm the approved reader
+`pi.pi.settings.get("task.isolation.apply")` through the public exported settings proxy. The
+supported v0 host is exactly the **OMP-owned default main-CLI root-session construction
+class**, exercised through deterministic print mode. This is the same construction class
+used before the interactive text/print presentation split; it is not a universal OMP host
+claim.
 
-**Source pre-verification (v17.2.10 — already confirmed):**
+**Pinned-source identity chain (v17.2.10):** all seven links are conjunctive.
 
-```text
-custom-tools/types.ts:99:
-    settings?: Settings
-    // "Settings instance for the current session. Prefer over the global singleton."
+1. `packages/coding-agent/src/index.ts:17` exports `Settings` and `settings`.
+2. `config/settings.ts:404-416` assigns and returns the same `globalInstance` from
+   `Settings.init()`.
+3. `main.ts:1282-1283` creates the default CLI `settingsInstance` through `Settings.init()`
+   when no dependency settings are injected.
+4. `main.ts:1533-1545` supplies that exact object as `sessionOptions.settings`.
+5. `sdk.ts:1271-1274` consumes an explicitly supplied `options.settings`.
+6. `task/structured-subagent.ts:315-317` reads
+   `request.session.settings.get("task.isolation.apply")` for actual task apply behavior.
+7. `config/settings.ts:2371-2388` delegates the exported proxy to `globalInstance` and binds
+   methods to that same object.
 
-session-tools.ts:1295-1307  getCustomToolContext():
-    settings: this.#host.settings    // live parent-session Settings instance
+The supported scope excludes ACP `session/new` and its `cloneForCwd()` instance
+(`main.ts:397-424`, `config/settings.ts:603-620`), arbitrary SDK-injected `settings` or
+`settingsManager`, injected `deps.settings`, all cloned settings instances, RPC, and RPC-UI.
+Any future scope expansion requires a new source chain and runtime evidence.
 
-structured-subagent.ts:315-317:
-    applyChanges: request.isolation?.apply
-        ?? request.session.settings.get("task.isolation.apply")
-```
+The nominal project custom-tool `ctx.settings` surface remains retired. The type advertises
+it (`custom-tools/types.ts:85-105`), but the actual project-tool SDK bridge omits it
+(`sdk.ts:885-894,938-955`). E3-I Attempt 1 corroborates that mismatch. The connected-MCP
+adapter at `session/session-tools.ts:1295-1314` is a different in-process wrapper and does not
+transmit the JavaScript `Settings` object to an external MCP server.
 
-`this.#host.settings` is the **same** `Settings` instance that `structured-subagent.ts`
-reads for `applyChanges`. CLI `--config` overlays, in-session `Settings.set()` overrides, and
-all config layers are visible.
-
-**Procedure — three cases required:**
+**Required cases — all three remain mandatory in one attempt-atomic E3-I/E3-L transaction:**
 
 ```yaml
 case_1_project_config:
   setup: task.isolation.apply: false in .omp/config.yml
-  preflight_tool: ctx.settings.get("task.isolation.apply")
+  live_reader: pi.pi.settings.get("task.isolation.apply")
   expected: false
+  subprocess_diagnostic: false
+  task_branch: APPLY_FALSE_CAPTURE_ONLY
 
 case_2_cli_overlay:
   setup: project config apply:false; launch with --config /tmp/overlay.yml apply:true
-  preflight_tool: ctx.settings.get("task.isolation.apply")
-  expected: true   # same overlay that defeats omp-config-get (CR-38)
-  compare: omp config get reports false (subprocess miss)
+  live_reader: pi.pi.settings.get("task.isolation.apply")
+  expected: true
+  subprocess_diagnostic: false
+  task_branch: APPLY_TRUE_NO_DIFF
 
 case_3_in_session_override:
-  setup: project config apply:false; change via /settings mid-session (Settings.set())
-  preflight_tool: ctx.settings.get("task.isolation.apply")
-  expected: true   # in-memory override, no file change
-  compare: omp config get reports false (subprocess miss)
+  setup: project config apply:false; Settings.override("task.isolation.apply", true)
+  live_reader: pi.pi.settings.get("task.isolation.apply")
+  expected: true
+  subprocess_diagnostic: false
+  task_branch: APPLY_TRUE_NO_DIFF
+  persistence: none
 ```
 
-Case 2 and Case 3 are the decisive tests: they are the exact scenarios where `omp config get`
-gives a false PASS (CR-38). If `ctx.settings.get(...)` returns the correct value in both cases,
-the mechanical authority path is confirmed.
+Case 3 uses `Settings.override()`, not `/settings` or `Settings.set()`. On pinned 17.2.10,
+`set()` updates the global layer and queues persistence (`config/settings.ts:498-505`), while
+project settings merge later and would keep project `false` effective
+(`config/settings.ts:2143-2147`). `override()` writes the non-persistent highest-precedence
+runtime layer, rebuilds synchronously, and queues no save (`config/settings.ts:518-526`).
+
+Case 2 and Case 3 are decisive because their approved reader must disagree with the child
+subprocess diagnostic while agreeing with native task behavior. One selected transaction
+must contain both sessions, three reader calls, every diagnostic/canary, exact runtime/source
+identity, retry provenance, and mutation boundaries. E3-I and E3-L apply independent oracles
+directly to those raw events; neither conclusion consumes the other.
 
 **E3-L PASS consequence:**
 
 ```yaml
 preflight_mechanism:
-  type: custom-tool live-settings read
-  call: ctx.settings.get("task.isolation.apply")
+  type: host-scoped live-session settings observation
+  call: pi.pi.settings.get("task.isolation.apply")
+  supported_host: OMP-owned default main-CLI root-session construction class
   authority: observation (not atomic dispatch guard)
   note: >
-    CR-45 TOCTOU: ctx.settings.get() at t0 (preflight) is a snapshot.
+    CR-45 TOCTOU: the live read at t0 (preflight) is a snapshot.
     Settings.override() (settings.ts:518-525) mutates the in-memory value
     synchronously — between the preflight read (t0) and actual task dispatch (t3),
-    a Settings.set() or external override can change the effective value.
+    another runtime override can change the effective value.
     Observation ≠ atomic enforcement.
 behavioral_canary_E3_I:
   role: regression / characterization test only
-live_settings_read_verified: true   # ctx.settings.get sees live value including overlays
+live_settings_read_verified: true   # only after all seven links and L1-L3 pass
 parallel_mode: DISABLED             # CR-45 TOCTOU: read at t0 ≠ atomic guard at t3
 parallel_mode_requires: guarded_dispatch (E3-M or equivalent)
 ```
@@ -567,16 +628,17 @@ behavioral_canary: diagnostic/experiment only — never authorizes parallel
 required_action: identify alternative (Option A restrictToolNames path or other)
 ```
 
-**Artifact:** Three-case transcript with `ctx.settings` read values vs `omp config get` values
-vs actual `applyChanges` observed; confirmation that the custom tool executes in parent-session
-context (not subagent context).
+**Artifact:** source-identity record plus an attempt-atomic three-case transaction comparing
+approved-reader values, child `omp config get` values, and native task branches for the
+bounded default main-CLI root-session class. The artifact must state all excluded hosts,
+re-hash every raw input, preserve parallel disabled, and carry no authority for E3-M.
 
 #### E3-M — Guarded dispatch (optional — CR-45 resolution gate)
 
 Design and empirically test an atomic check-and-dispatch mechanism that closes the CR-45 TOCTOU
 gap. E3-L proves the live-read capability; E3-M turns it into an enforceable gate.
 
-**Problem:** `ctx.settings.get("task.isolation.apply")` at preflight time (t0) is a snapshot.
+**Problem:** any live settings read at preflight time (t0) is a snapshot.
 `Settings.override()` (`settings.ts:518-525`) is synchronously mutable — a value change
 between t0 and the actual task dispatch (t3) is undetectable by any preflight read alone.
 
@@ -777,7 +839,8 @@ worker_side_fingerprint:
   status: NOT a path to E3-M PASS
   approach: >
     Capture a settings fingerprint (hash of relevant keys) at preflight; the worker's
-    first action reads ctx.settings and verifies the fingerprint; abort if mismatch.
+    first action uses an approved live reader and verifies the fingerprint; abort if
+    mismatch. The unavailable project-tool `ctx.settings` path cannot implement this.
   authority: defense_in_depth_only
   e3_m_pass_power: none
   limitation: >
@@ -834,7 +897,8 @@ pass_equivalence_rule:
     need a new identifier — it is admitted on its properties, not its label.
   requirements:   # all four
     - unsafe state cannot cross into worker spawn
-    - the invariant covers the COMPLETE guard-read → spawn interval (no interleavable window)
+    - the protection covers the COMPLETE guard-read → spawn interval, with no UNPROTECTED
+      interleavable window in which unsafe state can become visible to allocation/spawn
     - direct bypass fails closed (case M2b)
     - gating cases M1, M2, M2b, M4 all pass
   note: >
@@ -898,7 +962,8 @@ case_M2_guard_read_to_spawn_race:
       - effective apply remains FALSE at allocation
       - safe spawn MAY proceed — this is NOT a false-positive failure
       - the trace proves mutation_effect occurred only AFTER the protected interval,
-        or was rejected / deferred / inert
+        or was rejected / deferred / inert / NOT_REACHED because the override call itself
+        was not reached within the observation boundary
       - the corresponding atomicity_proof option is satisfied (option_1 or option_2)
   trace_schema:   # F5-03/F5-04 — branch-TOTAL and observer-aware; every field has a
                   # legal value for a correct run in EITHER branch. A bare `_time` name is
@@ -908,8 +973,8 @@ case_M2_guard_read_to_spawn_race:
       status: OBSERVED | SOURCE_PROVEN
       time: timestamp | null
       evidence_kind: RUNTIME | SOURCE_CALL_GRAPH        # F6-02 — mandatory
-      evidence_anchor: source_or_artifact_reference | null
-      proved_order_relations: [guard_read_before_override_call_enter]
+      evidence_anchor: source_or_artifact_reference
+      proved_order_relations: [relation_identifier] | []   # nonempty when SOURCE_PROVEN
     mutation_trigger:                 # F5-04 event 1 of 3 — arming/scheduling
       status: ARMED | REQUESTED
       time: timestamp
@@ -919,13 +984,13 @@ case_M2_guard_read_to_spawn_race:
       relation_to_guard_read: AFTER
       earliest_reachable: true
       proof: source_or_harness_argument
-      trigger_armed_time: timestamp
+      trigger_armed_or_requested_time: timestamp
       actual_override_call_enter_time_or_status: timestamp | DEFERRED_UNTIL_AFTER_INTERVAL | NOT_REACHED
     override_call_enter:              # F5-04 event 2 of 3 — the call actually begins
       status: OBSERVED | DEFERRED_UNTIL_AFTER_INTERVAL | NOT_REACHED
       time: timestamp | null
-    mutation_effect:                  # F5-04 event 3 of 3 — the value actually changes
-      status: EFFECTIVE | REJECTED | DEFERRED | INERT
+    mutation_effect:                  # F5-04/F8-01 event 3 of 3 — effect or disposition
+      status: EFFECTIVE | REJECTED | DEFERRED | INERT | NOT_REACHED
       time: timestamp | null
     native_task_execute_enter:
       status: OBSERVED | NOT_REACHED | NOT_APPLICABLE
@@ -939,12 +1004,14 @@ case_M2_guard_read_to_spawn_race:
     worker_allocation_attempt:
       status: OBSERVED | NOT_REACHED
       time: timestamp | null
-    worker_spawn_count: integer
+    worker_spawn_count: nonnegative_integer   # F8-04 — counts cannot be negative
+    proved_event_relations: [relation_identifier]   # F8-02 — observer-safe order/causality proof
     effective_apply_at_allocation:   # F6-01 — CONDITIONAL on allocation existing
       status: OBSERVED | SOURCE_PROVEN | RUNTIME_UNOBSERVABLE | NOT_APPLICABLE_NO_ALLOCATION
       value: false | true | null
       evidence_kind: RUNTIME | SOURCE_CALL_GRAPH | SPANNING_INVARIANT | NOT_APPLICABLE
       evidence_anchor: source_or_artifact_reference | null
+      proved_order_relations: [relation_identifier] | []   # nonempty when SOURCE_PROVEN
     observer_non_interference:
       required: true
       proof: >
@@ -952,6 +1019,116 @@ case_M2_guard_read_to_spawn_race:
         emission, or other seam that changes the candidate's atomicity/re-entrancy
         properties. An observer that creates the interleaving it measures invalidates both
         the measurement and any option_1 proof that depends on the interval being seam-free.
+  trace_status_time_coherence:   # F8-01 — tagged statuses constrain their time payloads
+    guard_read:
+      OBSERVED: {time: timestamp}
+      SOURCE_PROVEN: {time: null}
+    mutation_trigger:
+      ARMED_or_REQUESTED: {time: timestamp}
+    override_call_enter:
+      OBSERVED: {time: timestamp}
+      DEFERRED_UNTIL_AFTER_INTERVAL_or_NOT_REACHED: {time: null}
+    mutation_effect:
+      EFFECTIVE_or_REJECTED_or_DEFERRED_or_INERT: {time: timestamp}
+      NOT_REACHED: {time: null}
+    native_task_execute_enter:
+      OBSERVED: {time: timestamp}
+      NOT_REACHED_or_NOT_APPLICABLE: {time: null}
+    worker_allocation_attempt:
+      OBSERVED: {time: timestamp}
+      NOT_REACHED: {time: null}
+    rationale: >
+      The earlier union types allowed impossible pairs such as OBSERVED with time:null or
+      NOT_REACHED with a timestamp. They also left no truthful mutation_effect state when the
+      override call itself never entered. A status/time pair outside this table is schema-invalid.
+  trace_cross_field_consistency:   # F8-02 — duplicated provenance must mirror canonical events
+    trigger_identity:
+      rule: attack_placement.trigger_armed_or_requested_time == mutation_trigger.time
+    guard_to_attack_order:
+      - proved_event_relations includes guard_read_before_attack_target_seam
+      - if override_call_enter.status is OBSERVED, proved_event_relations includes
+        guard_read_before_override_call_enter
+      - if override_call_enter.status is DEFERRED_UNTIL_AFTER_INTERVAL | NOT_REACHED,
+        proved_event_relations includes override_call_nonentry_through_protected_interval
+    override_entry_identity:
+      timestamp_case: >
+        attack_placement.actual_override_call_enter_time_or_status is a timestamp IFF
+        override_call_enter.status is OBSERVED, and that timestamp MUST equal
+        override_call_enter.time.
+      deferred_case: >
+        attack_placement.actual_override_call_enter_time_or_status is
+        DEFERRED_UNTIL_AFTER_INTERVAL IFF override_call_enter.status has the same value;
+        override_call_enter.time is null.
+      not_reached_case: >
+        attack_placement.actual_override_call_enter_time_or_status is NOT_REACHED IFF
+        override_call_enter.status is NOT_REACHED; override_call_enter.time is null.
+    mutation_causality:
+      - override_call_enter.status OBSERVED requires mutation_effect.status one of
+        EFFECTIVE | REJECTED | DEFERRED | INERT
+      - override_call_enter.status DEFERRED_UNTIL_AFTER_INTERVAL | NOT_REACHED requires
+        mutation_effect.status NOT_REACHED and mutation_effect.time null
+      - any mutation_effect.status other than NOT_REACHED requires
+        override_call_enter.status OBSERVED
+    native_allocation_causality:
+      - native_task_execute_enter.status NOT_REACHED requires
+        worker_allocation_attempt.status NOT_REACHED
+      - worker_allocation_attempt.status OBSERVED requires
+        native_task_execute_enter.status OBSERVED | NOT_APPLICABLE
+      - worker_allocation_attempt.status NOT_REACHED requires worker_spawn_count 0
+      - worker_spawn_count > 0 requires worker_allocation_attempt.status OBSERVED
+    branch_A:
+      - override_call_enter.status: OBSERVED
+      - mutation_effect.status: EFFECTIVE
+      - worker_allocation_attempt.status: NOT_REACHED   # no allocation timestamp exists
+      - proved_event_relations includes override_call_enter_before_mutation_effect
+      - proved_event_relations includes mutation_effect_before_protected_boundary_BLOCK
+      - proved_event_relations includes protected_boundary_BLOCK_prevents_worker_allocation
+    branch_B:
+      - proved_event_relations includes
+        protected_boundary_ALLOW_before_or_atomically_coupled_to_worker_allocation
+      - if mutation_effect.status is EFFECTIVE, mutation_effect.time MUST be after
+        worker_allocation_attempt.time
+      - otherwise mutation_effect.status is REJECTED | DEFERRED | INERT | NOT_REACHED
+    rationale: >
+      attack_placement repeats trigger and call-entry facts for provenance. Without equality
+      rules, the same transcript could claim a timestamp there while the canonical event said
+      NOT_REACHED. Likewise an effect/disposition cannot exist before its override call enters.
+  trace_evidence_coherence:   # F8-03 — discriminants constrain value, kind, and provenance
+    guard_read:
+      OBSERVED:
+        requires: {time: timestamp, evidence_kind: RUNTIME, evidence_anchor: runtime_artifact_reference}
+      SOURCE_PROVEN:
+        requires: {time: null, evidence_kind: SOURCE_CALL_GRAPH,
+                   evidence_anchor: pinned_SHA_file_and_line_or_symbol_range}
+    protected_boundary_decision_effective_apply:
+      boolean_value:
+        value: false | true
+        evidence_kind: RUNTIME | SOURCE_CALL_GRAPH | SPANNING_INVARIANT
+        evidence_anchor: concrete_source_or_artifact_reference
+      runtime_unobservable_value:
+        value: RUNTIME_UNOBSERVABLE
+        evidence_kind: SOURCE_CALL_GRAPH | SPANNING_INVARIANT
+        evidence_anchor: concrete_source_or_invariant_reference
+        requires: {complete_atomicity_proof: option_1 | option_2}
+        forbidden: {evidence_kind: RUNTIME}
+    effective_apply_at_allocation:
+      OBSERVED:
+        requires: {value: false | true, evidence_kind: RUNTIME,
+                   evidence_anchor: runtime_artifact_reference}
+      SOURCE_PROVEN:
+        requires: {value: false | true, evidence_kind: SOURCE_CALL_GRAPH,
+                   evidence_anchor: pinned_SHA_file_and_line_or_symbol_range,
+                   proved_order_relations: nonempty}
+      RUNTIME_UNOBSERVABLE:
+        requires: {value: null, evidence_kind: SOURCE_CALL_GRAPH | SPANNING_INVARIANT,
+                   evidence_anchor: concrete_source_or_invariant_reference,
+                   complete_atomicity_proof: option_1 | option_2}
+      NOT_APPLICABLE_NO_ALLOCATION:
+        requires: {value: null, evidence_kind: NOT_APPLICABLE, evidence_anchor: null}
+    rule: >
+      A tagged evidence object is valid only under the row selected by its status/value.
+      Cross-product combinations not listed above are forbidden even if each scalar belongs to
+      the field's raw union type.
   why_typed_statuses_not_bare_times: >
     F4 replaced four mandatory EVENTS with seven field names, which fixed the
     "required event that must not happen" contradiction but not the underlying grammar: a
@@ -966,22 +1143,24 @@ case_M2_guard_read_to_spawn_race:
     branch_A:
       protected_boundary_decision.outcome: BLOCK
       protected_boundary_decision.effective_apply.value: true
-      native_task_execute_enter.status: OBSERVED | NOT_REACHED   # BOTH are legal — see note
+      native_task_execute_enter.status: OBSERVED | NOT_REACHED | NOT_APPLICABLE   # all three — see note
       worker_allocation_attempt.status: NOT_REACHED
       worker_spawn_count: 0
       effective_apply_at_allocation.status: NOT_APPLICABLE_NO_ALLOCATION
       effective_apply_at_allocation.value: null
       effective_apply_at_allocation.evidence_kind: NOT_APPLICABLE
+      effective_apply_at_allocation.proved_order_relations: []
     branch_B:
       protected_boundary_decision.outcome: ALLOW
+      protected_boundary_decision.effective_apply.value: false | RUNTIME_UNOBSERVABLE
       worker_allocation_attempt.status: OBSERVED
       effective_apply_at_allocation.status: OBSERVED | SOURCE_PROVEN | RUNTIME_UNOBSERVABLE
       effective_apply_at_allocation.value: false | null   # null iff RUNTIME_UNOBSERVABLE
   attack_placement_rule: >
     F6-03: `common_setup` normatively requires the harness to target the EARLIEST REACHABLE
     seam after guard_read, but the schema previously recorded only `mutation_trigger.time` —
-    a timestamp proves WHEN the harness armed something, not THAT it attacked the earliest
-    reachable interleaving point. A weak harness could arm late, satisfy common_setup
+    a timestamp proves WHEN the harness armed or requested the trigger, not THAT it attacked
+    the earliest reachable interleaving point. A weak harness could arm/request late, satisfy common_setup
     literally, and land in branch B for the wrong reason. `attack_placement` closes that gap:
     the artifact must name the targeted seam, anchor it at the pinned SHA, and argue why it is
     earliest. For option_1 the enumerated call graph may supply this proof; for option_2 the
@@ -994,7 +1173,7 @@ case_M2_guard_read_to_spawn_race:
     requires:
       - evidence_kind: SOURCE_CALL_GRAPH
       - evidence_anchor: pinned_SHA_file_and_line_or_symbol_range
-      - proved_order_relations recorded explicitly, not implied by field order
+      - proved_order_relations recorded explicitly and nonempty, not implied by field order
     forbidden:
       - SOURCE_PROVEN with no anchor
       - source-derived facts recorded as runtime timestamps
@@ -1004,7 +1183,10 @@ case_M2_guard_read_to_spawn_race:
       That is an assertion, not evidence. It matters most in branch A, whose setup requires
       the chain guard_read < override_call_enter < mutation_effect < blocked allocation: if
       guard_read is not directly OBSERVED, source anchors must establish both its existence
-      AND its order relative to the injection seam. The same rule governs
+      AND its order relative to the injection seam. In branch B, where override entry may be
+      deferred or never reached, the proof instead records guard_read before the targeted seam
+      plus nonentry through the protected interval — it must not assert an ordering to a
+      nonexistent call-entry event. The same nonempty-relation rule governs
       effective_apply_at_allocation.status: SOURCE_PROVEN in branch B.
   hidden_is_not_nonexistent: >
     F6-01: `RUNTIME_UNOBSERVABLE` means the observation point EXISTS but cannot be read
@@ -1026,27 +1208,47 @@ case_M2_guard_read_to_spawn_race:
     execute never entered" for branch A, and its mapping pins only
     worker_allocation_attempt: NOT_REACHED while leaving native_task_execute_enter unstated.
     Verified against the pinned SHA, that is too narrow: the most plausible real branch-A
-    mechanism blocks INSIDE native execute, after entry. task/index.ts:670-675 enters
-    execute() and runs repairTaskParams/validate; :681-688 then does
+    mechanism blocks INSIDE native execute, after entry. task/index.ts:659-664 declares
+    execute(); :665 runs repairTaskParams; and :670-674 runs batch/shape/spawn validation.
+    Lines :681-689 then perform
     `await Promise.all(... this.#resolveSpawnPreflight(spawn) ...)`, and that preflight is
     where task.isolation.apply is read (structured-subagent.ts:315-317 via
-    resolveEffectiveSubagentPolicy). A StructuredSubagentError thrown there is caught per
-    item and returned as createTaskModeError at :692-705 — which is BEFORE the depthCapacity /
-    asyncItems allocation decisions at :713-719 and before any executor or job manager
-    observes the batch (see the source comment at :679-680: "No executor or job manager may
-    observe a batch unless every effective policy is valid"). So a valid branch-A run may
+    resolveEffectiveSubagentPolicy). A StructuredSubagentError thrown there is caught per item
+    at task/index.ts:685-687, then the collected failure is returned as createTaskModeError in
+    :690-705 — BEFORE the post-preflight execution-mode/allocation decisions begin at :713-719
+    and before any executor or job manager observes the batch (see the source comment at
+    :679-680: "No executor or job manager may observe a batch unless every effective policy is
+    valid"). So a valid branch-A run may
     legitimately record native_task_execute_enter: OBSERVED together with
     worker_allocation_attempt: NOT_REACHED. Pinning native entry to NOT_REACHED would
     misrecord exactly the mechanism most likely to be built, and would reintroduce the
     "required event a correct run prevents" defect in mirror image — an event a correct run
     is ALLOWED to reach, forbidden by the schema. The protected event remains the SPAWN, per
     invariant_under_test; native-execute entry is not itself a violation.
-  runtime_unobservable_is_not_a_waiver: >
-    `effective_apply_at_allocation.value: RUNTIME_UNOBSERVABLE` is accepted ONLY when
-    accompanied by a COMPLETE atomicity_proof (option_1 or option_2) and an
-    `evidence_kind` of SOURCE_CALL_GRAPH or SPANNING_INVARIANT with a concrete
-    `evidence_anchor`. It is never a licence to omit evidence, and a source/invariant
-    argument must never be recorded as though it were a runtime observation.
+  native_entry_status_meanings:   # F7-03 — mutually exclusive branch-A meanings
+    OBSERVED: >
+      Native TaskTool.execute was entered before the protected-boundary block. This is the
+      truthful state for an in-execute preflight/recheck mechanism.
+    NOT_REACHED: >
+      Native TaskTool.execute belongs to the chosen mechanism's dispatch path, but the
+      protected-boundary guard blocked before native entry.
+    NOT_APPLICABLE: >
+      The chosen source-verified mechanism's dispatch/allocation path does not use native
+      TaskTool.execute. This value requires an anchored call-graph/mechanism proof; it is not
+      a substitute for missing native-entry instrumentation on a path that does use execute().
+  runtime_unobservable_is_not_a_waiver:   # F7-01 — target the typed F6 representation
+    when:
+      effective_apply_at_allocation.status: RUNTIME_UNOBSERVABLE
+    requires:
+      - effective_apply_at_allocation.value: null
+      - complete_atomicity_proof: option_1 | option_2
+      - evidence_kind: SOURCE_CALL_GRAPH | SPANNING_INVARIANT
+      - evidence_anchor: concrete_source_or_invariant_reference
+    rationale: >
+      RUNTIME_UNOBSERVABLE is an epistemic STATUS, not the allocation value. The corresponding
+      value is null because instrumentation cannot expose that existing observation point
+      without perturbing it. This status is never a licence to omit evidence, and a
+      source/invariant argument must never be recorded as though it were a runtime observation.
   forbidden_as_pass:
     - mutation placed only between the E3-L observational preflight and the guard read
     - the guard seeing `true` because the mutation happened BEFORE the guard ran
@@ -1054,8 +1256,8 @@ case_M2_guard_read_to_spawn_race:
     - worker refusal after spawn
     - "parent tree unchanged" as the only evidence
     - an effective apply=true crossing into worker spawn (the invariant itself)
-    - recording mutation_attempt WITHOUT recording mutation_effect / rejection / defer state
-      — attempt alone cannot distinguish branch A from branch B
+    - recording mutation_attempt WITHOUT recording mutation_effect / rejection / defer /
+      not-reached state — attempt alone cannot distinguish branch A from branch B
     - a finite sample in which the harness simply missed an actually interleavable interval
   rationale: >
     This is the load-bearing case and it must attack the candidate's OWN read, not an
@@ -1308,16 +1510,20 @@ m2_oracle: branch-sensitive (F4-01/F5-01) — common_setup is branch-NEUTRAL (ar
            do not require an effect). Branch A (effect landed before allocation) requires
            protected_boundary_decision.outcome BLOCK on effective_apply true, plus
            worker_spawn_count == 0. Branch B (effect could not land) permits spawn when
-           effective_apply_at_allocation was false, or RUNTIME_UNOBSERVABLE with a declared
-           evidence_kind + anchor and a COMPLETE atomicity_proof (F5-03).
+           effective_apply_at_allocation.value is observed/source-proven false, or when its
+           status is RUNTIME_UNOBSERVABLE with value null, a declared evidence_kind + anchor,
+           and a COMPLETE atomicity_proof (F5-03/F7-01).
 m2_trace: per trace_schema + normative_branch_mapping — typed statuses; NOT_REACHED legal;
           protected_boundary_decision is UNIVERSAL while effective_apply_at_allocation is
           CONDITIONAL (NOT_APPLICABLE_NO_ALLOCATION in branch A — hidden != nonexistent,
-          F6-01); native_task_execute_enter may be OBSERVED or NOT_REACHED in branch A;
+          F6-01); native_task_execute_enter may be OBSERVED, NOT_REACHED, or NOT_APPLICABLE
+          in branch A, with the three meanings fixed by native_entry_status_meanings (F7-03);
           every SOURCE_PROVEN carries a pinned anchor + proved_order_relations (F6-02);
           attack_placement records the targeted earliest seam (F6-03);
-          observer_non_interference proven; and mutation_trigger / override_call_enter /
-          mutation_effect kept distinct (F5-04)
+          trace_status_time_coherence, trace_cross_field_consistency, and
+          trace_evidence_coherence all satisfied (F8-01..F8-04); observer_non_interference
+          proven; and mutation_trigger / override_call_enter / mutation_effect kept distinct
+          (F5-04)
 ```
 
 **E3-M FAIL or not attempted consequence:**
@@ -1341,18 +1547,28 @@ path B, or one admitted by `pass_equivalence_rule`). Must record:
   field per `case_M2_guard_read_to_spawn_race.trace_schema`, with its `status`/`value`
   recorded even when the event did not occur. `NOT_REACHED` is a legal, expected value for
   `native_task_execute_enter` and `worker_allocation_attempt` when a correct boundary block
-  prevented them. The three mutation events stay **distinct** — `mutation_trigger` (armed),
+  prevented them. `NOT_APPLICABLE` is legal for `native_task_execute_enter` only when an
+  anchored mechanism/call-graph proof shows that native `TaskTool.execute` is not part of the
+  chosen dispatch/allocation path. Every status/time pair must satisfy
+  `trace_status_time_coherence`; duplicated attack-placement fields must satisfy
+  `trace_cross_field_consistency`; and every evidence tagged union must satisfy
+  `trace_evidence_coherence` (F8-01…F8-04). The three mutation events stay **distinct** —
+  `mutation_trigger` (armed),
   `override_call_enter` (call began), `mutation_effect` (value changed / rejected / deferred
-  / inert); one timestamp may never stand for more than one of them. Record which branch was
+  / inert / not reached); one timestamp may never stand for more than one of them. Record
+  `proved_event_relations` and which branch was
   exercised, per `normative_branch_mapping`: **branch A** records
   `protected_boundary_decision: {outcome: BLOCK, effective_apply.value: true}`,
   `worker_allocation_attempt: NOT_REACHED`, `worker_spawn_count == 0`, and
   `effective_apply_at_allocation.status: NOT_APPLICABLE_NO_ALLOCATION` with `value: null` —
   **not** a fabricated allocation value, and **not** `RUNTIME_UNOBSERVABLE`, since the
   allocation point is nonexistent rather than hidden (F6-01). `native_task_execute_enter` may
-  legally be `OBSERVED` **or** `NOT_REACHED` in branch A: a mechanism that blocks inside
-  native execute's per-item preflight (`task/index.ts:681-705`) enters execute but never
-  reaches allocation. **Branch B** records `outcome: ALLOW`,
+  legally be `OBSERVED`, `NOT_REACHED`, **or** `NOT_APPLICABLE` in branch A, with the mutually
+  exclusive meanings in `native_entry_status_meanings`: a mechanism that blocks inside native
+  execute's per-item preflight/failure-handling interval (`task/index.ts:681-689` and
+  `:690-705`) enters execute but never reaches allocation, while `NOT_APPLICABLE` requires
+  proof that the chosen mechanism does not use native execute at all (F7-03/F7-04).
+  **Branch B** records `outcome: ALLOW`,
   `worker_allocation_attempt: OBSERVED`, and `effective_apply_at_allocation` as `OBSERVED`,
   `SOURCE_PROVEN`, or `RUNTIME_UNOBSERVABLE` with a declared `evidence_kind` + anchor.
   Every `SOURCE_PROVEN` status — on any field — requires `evidence_kind: SOURCE_CALL_GRAPH`,
@@ -1551,7 +1767,7 @@ Manual checks:
 - [ ] DR-1 … DR-7 resolved and recorded with runtime_facts separated from normative decisions
 - [ ] **T-00.E1 artifact present** (schema precedence + provider enforcement)
 - [ ] **T-00.E2 artifact present** (model-role merge order)
-- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read via custom-tool ctx (E3-L)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record ALL FIVE cases: gating `[M1, M2, M2b, M4]` (all four must PASS — M2b, the no-preflight direct bypass, is mandatory) plus diagnostic `[M3]` (recorded for characterization only, no PASS power). PASS-eligible mechanisms are path A, path B, **or any mechanism admitted by `pass_equivalence_rule`** (source-verified, equivalent atomic / fail-closed semantics — it need not reduce to A or B). The retired `path C` label denotes no mechanism; label retirement does NOT narrow the mechanism space. If not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
+- [ ] **T-00.E3 artifacts present for ALL cases E3-A … E3-L** (isolation backend, capture-first settings control, root patch durability, branch mode, parallel capture, task-index integration order, conflict stop-preserve-report, nested-repo artifact durability, config precedence + preflight, **parent-overlay attestation gap with non-mutating canary (E3-I/CR-42)**, **async barrier + ordering with its no-`blocking` control (E3-J)**, **`task.batch: false` fallback (E3-K)**, **live-session settings read through an approved replacement surface (E3-L; the nominal project custom-tool `ctx.settings` path is unavailable on pinned v17.2.10)**). **E3-A, E3-G, E3-H, E3-I, E3-J, and E3-L are BLOCKING for phase-02 parallel implementation**; E3-J additionally blocks Standard, whose stage arrows depend on the same barrier. **E3-M (guarded dispatch) gates parallel fan-out** — if attempted, its artifact must be present and record ALL FIVE cases: gating `[M1, M2, M2b, M4]` (all four must PASS — M2b, the no-preflight direct bypass, is mandatory) plus diagnostic `[M3]` (recorded for characterization only, no PASS power). PASS-eligible mechanisms are path A, path B, **or any mechanism admitted by `pass_equivalence_rule`** (source-verified, equivalent atomic / fail-closed semantics — it need not reduce to A or B). The retired `path C` label denotes no mechanism; label retirement does NOT narrow the mechanism space. If not attempted, parallel mode remains DISABLED and sequential non-isolated is the v0 fallback.
 - [ ] **T-00.E4 artifact present** (rule sentinel propagation)
 - [ ] **T-00.E5 artifacts present for cases E5-A … E5-F** (LSP capability as a four-condition conjunction — `task.enableLsp` default-false, parent-session gate, agent allowlist, `lsp.enabled` gate (CR-41), language-server availability), each recording the tool-list contents and verbatim error so the five distinct remediations are distinguishable (CR-40/CR-41)
 

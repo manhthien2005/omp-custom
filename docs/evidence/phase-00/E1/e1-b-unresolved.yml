@@ -1,0 +1,71 @@
+schema_version: 1
+phase: "00"
+experiment: E1
+subcase: E1-B
+spec_case: 5
+scope: schemaMode strict provider-enforcement discriminator
+status: UNRESOLVED
+authority: NON_TERMINAL_HANDOFF
+recorded_at: "2026-08-11T13:24:14.2155191+07:00"
+
+decision:
+  bounded_retries_stopped: true
+  reason: >-
+    Three strict-off control attempts did not produce an authoritative causal
+    discriminator. More retries with the same design have lower expected value than an
+    expert review of how to deterministically exercise the forbidden first result.
+  strict_on_executed: false
+  strict_on_reason: The required strict-off control never reached PASS.
+
+attempts:
+  - attempt: 1
+    status: INVALID_RUN
+    reason_codes: [E1_STRICT_IDENTITY_MISMATCH, E1_FORWARDER_LIFECYCLE_INVALID]
+    control_exercised: false
+    run:
+      path: docs/evidence/phase-00/E1/raw/provider-strict-off-control/attempt-001.run.json
+      sha256: DA8C7818BDDB81CCDCB6B82E82AC33B7BD3DF70D4E505533CFBC9105F4DC3C8A
+  - attempt: 2
+    status: INVALID_RUN
+    reason_codes: [E1_FORWARDER_LIFECYCLE_INVALID]
+    control_exercised: unknown
+    run:
+      path: docs/evidence/phase-00/E1/raw/provider-strict-off-control/attempt-002.run.json
+      sha256: DD6CC66440CBF34CC75CD8D7F717C3E33599C843A45A38BC6D65F5146CA2D759
+  - attempt: 3
+    status: INVALID_RUN
+    reason_codes: [E1_STRICT_CONTROL_NOT_EXERCISED]
+    control_exercised: false
+    observation: >-
+      The strict-off arm returned the allowed final shape on its first yield, so no
+      local schema rejection or retry occurred and provider enforcement could not be
+      distinguished from voluntary model compliance.
+    run:
+      path: docs/evidence/phase-00/E1/raw/provider-strict-off-control/attempt-003.run.json
+      sha256: 13DA25DFB9F8030ACCA4D73353E9D1A8805FEF537E37B856CC6ED9B3B8023393
+
+completed_scope:
+  logical_cases_passed: [1, 2, 3, 4]
+  authoritative_records:
+    - docs/evidence/phase-00/E1/case-1-agent-jtd.yml
+    - docs/evidence/phase-00/E1/case-1-agent-json-schema.yml
+    - docs/evidence/phase-00/E1/case-2-caller-only.yml
+    - docs/evidence/phase-00/E1/case-3-caller-over-agent.yml
+    - docs/evidence/phase-00/E1/case-4-session-only.yml
+
+manifest_boundary:
+  e1_state: READY
+  t_00_4_state: NOT_STARTED
+  terminal_e1_conclusion_present: false
+  rationale: >-
+    UNRESOLVED is an accepted campaign exception, not a manifest terminal state. E1
+    therefore remains READY and grants no authority to start its dependent T-00.4 work.
+
+handoff:
+  recommended_reviewer: Opus 5
+  required_focus: >-
+    Design a non-circular strict-off discriminator that deterministically elicits the
+    forbidden first shape while preserving the pinned runtime, immutable attempt
+    history, last-hop request projection, and no-overwrite evidence rules.
+  automatic_retry_allowed: false
+  history: codex-phase00-e1-schema-precedence-provider-enforcement-changelog-for-opus5.md

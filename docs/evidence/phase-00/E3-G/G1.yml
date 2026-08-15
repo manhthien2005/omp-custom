@@ -1,0 +1,48 @@
+schema_version: 1
+phase: "00"
+experiment: E3-G
+case: G1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+
+setup:
+  fixture: docs/evidence/phase-00/E3-G/fixture/topology.yml
+  root_and_nested_mutation: true
+  isolation: {mode: rcopy, apply: false, merge: patch}
+
+execution:
+  selected_attempt: 2
+  exit_code: 0
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-G/raw/attempt-1-diagnostic.yml, sha256: 4DC58902F503F6C24398548F5029F03B70FACE7E5F11916323AEDAF304DB320F}
+    - {path: docs/evidence/phase-00/E3-G/raw/run.json, sha256: 8E66A146261DD81724D5A136C21171C031B9DA63BD4A8E1C5C7F622BCF38E148}
+    - {path: docs/evidence/phase-00/E3-G/raw/controller.projection.json, sha256: 986460552A289742EB5FE08204569270EE5641603B54AAC17CD433D7101357C7}
+    - {path: docs/evidence/phase-00/E3-G/raw/worker.projection.json, sha256: A12E4B095FB8623C1E8B403EC377DC37870665DBD354865E66891C7AEFFCE5B0}
+    - {path: docs/evidence/phase-00/E3-G/raw/durability-proof.json, sha256: 0CB31285BE9F27294A5FA288C8A50D7F47DC1E6AD9B03AAC40E4DB41343DB881}
+    - {path: docs/evidence/phase-00/E3-G/raw/root.patch, sha256: 027E935CC5263DFA690F8DC31CB424BB9967E92596A10041510B078E5809D357}
+    - {path: docs/evidence/phase-00/E3-G/raw/worker.output.txt, sha256: 967435950D7C770FB49DC1BF62CF30D86EE35D5D8201D3E9ED0EA1CC40AE29E9}
+
+observation:
+  facts:
+    - The successful worker changed the root plus two OMP-discovered nested repositories and exited 0.
+    - The root patch was durable and applied cleanly, while both valid nested diffs existed only in internal result metadata.
+    - The model-facing task summary mentioned only the root patch and did not mention any nested repository.
+    - The artifact directory contained no persisted nested patch file, AgentRegistry exposed no nested path, and the isolation worktree no longer existed after teardown.
+    - Thirty parent polls plus final checks showed root, plain nested, deep nested, node_modules nested, and tracked submodule parents all unchanged.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/worktree.ts::captureDeltaPatch
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/isolation-runner.ts::writeIsolationPatch
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/structured-subagent.ts::persistNestedPatches
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/structured-subagent.ts::runStructuredSubagent
+
+interpretation:
+  decision: SUCCESSFUL_CAPTURE_ONLY_NESTED_CHANGES_ARE_NOT_DURABLE_OR_MODEL_ADDRESSABLE
+  spec_effect: RETAIN_OPTION_A1
+  affected_requirements: [E3-G, CR-32]

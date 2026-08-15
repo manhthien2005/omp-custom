@@ -1,0 +1,8 @@
+schema_version: 1
+phase: "00"
+experiment: E3-E
+status: PASS
+decision: Controlled completion order 2-0-1 did not affect deterministic integration order 0-1-2.
+cases: {E1: PASS}
+downstream: {E3-F: ELIGIBLE}
+artifacts: [docs/evidence/phase-00/E3-E/E1.yml]

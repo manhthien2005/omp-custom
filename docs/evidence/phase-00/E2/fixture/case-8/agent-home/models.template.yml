@@ -1,0 +1,46 @@
+# Reproduction fixture. Set PHASE00_E2_GATEWAY_API_KEY in the disposable process.
+providers:
+  e2control:
+    baseUrl: http://127.0.0.1:20128/v1
+    apiKey: PHASE00_E2_GATEWAY_API_KEY
+    api: openai-responses
+    authHeader: true
+    models:
+      - id: oc/mimo-v2.5-free
+        name: E2 Control Provider Alias
+        reasoning: true
+        input: [text]
+        contextWindow: 128000
+  e2project:
+    baseUrl: http://127.0.0.1:20128/v1
+    apiKey: PHASE00_E2_GATEWAY_API_KEY
+    api: openai-responses
+    authHeader: true
+    models:
+      - id: oc/mimo-v2.5-free
+        name: E2 Project Provider Alias
+        reasoning: true
+        input: [text]
+        contextWindow: 128000
+  e2global:
+    baseUrl: http://127.0.0.1:20128/v1
+    apiKey: PHASE00_E2_GATEWAY_API_KEY
+    api: openai-responses
+    authHeader: true
+    models:
+      - id: oc/mimo-v2.5-free
+        name: E2 Global Provider Alias
+        reasoning: true
+        input: [text]
+        contextWindow: 128000
+  e2unavailable:
+    baseUrl: http://127.0.0.1:20128/v1
+    apiKey: PHASE00_E2_GATEWAY_API_KEY
+    api: openai-responses
+    authHeader: true
+    models:
+      - id: phase00/unavailable-model-7f3
+        name: E2 Deliberately Unavailable Model
+        reasoning: false
+        input: [text]
+        contextWindow: 8192

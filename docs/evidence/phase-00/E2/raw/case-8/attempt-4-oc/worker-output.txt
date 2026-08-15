@@ -1,0 +1,3 @@
+{
+  "sentinel": "E2_CUSTOM_ROLE_OK"
+}

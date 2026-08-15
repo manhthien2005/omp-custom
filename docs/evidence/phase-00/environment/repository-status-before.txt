@@ -1,0 +1,25 @@
+ M spec/phases/phase-00-foundation.md
+?? .claude/
+?? codex-phase00-execution-changelog-for-opus5.md
+?? codex-response-F7-01-F7-04-changelog-for-opus5.md
+?? codex-response-F8-01-F8-04-changelog-for-opus5.md
+?? docs/superpowers/
+?? omp-custom-F3-guard-to-spawn-audit-to-opus5.md
+?? omp-custom-F4-post-F3-closure-audit-to-opus5.md
+?? omp-custom-F5-post-F4-closure-audit-to-opus5.md
+?? omp-custom-F6-post-F5-closure-audit-to-opus5.md
+?? omp-custom-F7-post-F6-closure-audit-to-opus5.md
+?? omp-custom-PA01-PA04-followup-counter-to-opus5.md
+?? omp-custom-focused-reconciliation-cr45-e3m-to-opus5.md
+?? omp-custom-round1-post-closure-audit-counter-response-to-opus5.md
+?? omp-custom-round10-true-fail-closed-closure-to-opus5.md
+?? omp-custom-round11-final-observation-vs-enforcement-to-opus5.md
+?? omp-custom-round2-counter-review-to-opus5.md
+?? omp-custom-round3-verified-response-to-opus5.md
+?? omp-custom-round4-verified-review-to-opus5.md
+?? omp-custom-round5-deep-verification-to-opus5.md
+?? omp-custom-round6-ultradeep-adversarial-review-to-opus5.md
+?? omp-custom-round8-safety-closure-to-opus5.md
+?? omp-custom-round9-final-canary-closure-to-opus5.md
+?? omp-custom-static-review-closure-phase00-handoff.md
+

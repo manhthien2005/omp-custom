@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "record_type": "topic06_current_product_manifest",
+  "generated_at_utc": "2026-08-14T07:36:32.5192122Z",
+  "repository": {
+    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "topic06_present_in_head": false,
+    "working_tree_clean": false,
+    "dirty_paths_sha256": "01918751b13bccf324f80fe10f189a0ee2148c765b63c6470791f8a79d4349b4",
+    "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
+  },
+  "pinned_omp": {
+    "commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+    "version": "17.2.10",
+    "clean": true
+  },
+  "environment": {
+    "os": "Microsoft Windows 10.0.26100",
+    "architecture": "X64",
+    "pwsh_version": "7.6.4",
+    "node_version": "v24.16.0",
+    "git_version": "git version 2.54.0.windows.1",
+    "installed_omp_version": "omp/17.2.12"
+  },
+  "files": [
+    {
+      "path": "docs/evidence/current-product/topic-06/deterministic.json",
+      "role": "evidence",
+      "sha256": "b4b730cf838cd7a761398945c79a59e1721e3d64717236279d3b20d37596eb7f"
+    },
+    {
+      "path": "docs/agent-boundaries.md",
+      "role": "authority_or_guide",
+      "sha256": "74f54e481feb2a6ab95b2f0909ab071bb127ffbaf45c61619a81b1ca068bdac6"
+    },
+    {
+      "path": "docs/architecture.md",
+      "role": "authority_or_guide",
+      "sha256": "f523338cfebf7f5ee7b25a0f6131044763067d839bda4c465cad9b7d78956eff"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-13-topic-06-agent-boundary-contracts-design.md",
+      "role": "authority_or_guide",
+      "sha256": "414ed71411ff8479e94b803a84fab47075b4173b84026181744d3dc5c8280a53"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-13-topic-06-agent-boundary-contracts-plan.md",
+      "role": "authority_or_guide",
+      "sha256": "b11de1a1e7a175c10c7a38caac52f3cd4d97f3c153a8e7bb92171bd22800ff0b"
+    },
+    {
+      "path": "spec/key/04-decision-log.md",
+      "role": "authority_or_guide",
+      "sha256": "c2b69a6a02c72cc0213b23e0b864371a58262341b765b7de7c60fda2c0f5687d"
+    },
+    {
+      "path": "spec/key/01-dna.md",
+      "role": "authority_or_guide",
+      "sha256": "8d93fa1987fff0db7475dd44a076df551e12d6fc6edf51bf7eb9ce4d405170b5"
+    },
+    {
+      "path": "spec/03-agent-topology.md",
+      "role": "authority_or_guide",
+      "sha256": "f3f510353b7dccdedaae89b1a95f3e56748c71afe6cc59e4678a6bfb62d2dfc2"
+    },
+    {
+      "path": "spec/06-structured-output.md",
+      "role": "authority_or_guide",
+      "sha256": "17b1a1ff4a825e3f7a20b12504ae16d40d55dd7315e5f85043f0c980afe98093"
+    },
+    {
+      "path": "spec/13-validation-and-evaluation.md",
+      "role": "authority_or_guide",
+      "sha256": "f6c1cf944729200ea7cf1ef8a373b7b165f291a770125268f3e5b8da4be7a378"
+    },
+    {
+      "path": "template/.omp/contracts/agent-boundary-schema.mjs",
+      "role": "implementation",
+      "sha256": "c97c6a9f2c2f42fa14a47da7721b03bd97bb7e322b5ec5a2bb0db34a2dbefa5a"
+    },
+    {
+      "path": "template/.omp/contracts/agent-boundary-core.mjs",
+      "role": "implementation",
+      "sha256": "7ced6f22fa176cf8e0746288db736cc095d417d4f7ef2b20c3570509ebbadc1a"
+    },
+    {
+      "path": "template/.omp/contracts/agent-boundary-cli.mjs",
+      "role": "implementation",
+      "sha256": "dcc5b6615c7295f47810874c5df462a584f7e848ce42547acfcf2d601a9e0bef"
+    },
+    {
+      "path": "template/.omp/contracts/managed-runtime.yml",
+      "role": "implementation",
+      "sha256": "62fea53740dd24e1fcde047651f7b58e5dfa8b249bc506f82c3adefdb95f6690"
+    },
+    {
+      "path": "template/.omp/contracts/component-manifest.json",
+      "role": "implementation",
+      "sha256": "f818dab27443aaecd2654570e587e6cbf2cef4c9ae4e2a6bcc77d3d10a8c5bfc"
+    },
+    {
+      "path": "template/.omp/extensions/agent-task-boundary.js",
+      "role": "implementation",
+      "sha256": "6ff3e6b04f933c89b78c3191f2cdb9f94752fa40dba8d18496c8bbe969c67f5a"
+    },
+    {
+      "path": "template/.omp/bin/omp-managed.ps1",
+      "role": "implementation",
+      "sha256": "b664b5e1047988622af2de30695af1be85b4aa0d679178f4eccdf3a999f0d4bc"
+    },
+    {
+      "path": "template/.omp/state/agent-tasks.ps1",
+      "role": "implementation",
+      "sha256": "2a89215b3b26ce23c11473d1ebea33d98e27a3e1e8c358e1795704163ce6091f"
+    },
+    {
+      "path": "template/.omp/state/lib/AgentTasks.Projection.ps1",
+      "role": "implementation",
+      "sha256": "f27633611f54689af3ea4c192fd46c754f0f751c957118783d378cb288d88a06"
+    },
+    {
+      "path": "template/.omp/agents/cheap-scout.md",
+      "role": "implementation",
+      "sha256": "d2a75279c8c0b271e8c4dc2e581d314d018c9101bb0234d12f07db0a795a28e4"
+    },
+    {
+      "path": "template/.omp/agents/worker.md",
+      "role": "implementation",
+      "sha256": "51ff4442c1e8f262cdcf6b2b423b72e06335292e3fd7799a14aee9c690c9895c"
+    },
+    {
+      "path": "template/.omp/agents/reviewer.md",
+      "role": "implementation",
+      "sha256": "08cbb0112202f9cd33c150762e502c7c4bdace2c7703cf5a372e9189b20bd537"
+    },
+    {
+      "path": "scripts/install-template.ps1",
+      "role": "implementation",
+      "sha256": "1283cc5fcdd5e8f909ebb7f5320802cac1d6f25dbb8d188214d588f814c8d29b"
+    },
+    {
+      "path": "scripts/uninstall-template.ps1",
+      "role": "implementation",
+      "sha256": "33a7a49d600b5df6b052b8526b8d22dd71febada2696f4b06d41d3a78d94015c"
+    },
+    {
+      "path": "scripts/lib/topic06-agent-boundary.ps1",
+      "role": "implementation",
+      "sha256": "e56f18a8f70c46781325e88d2eefa12331f14ba7a53710b6ed4269e79d13907f"
+    },
+    {
+      "path": "scripts/validate-topic06-agent-boundary.ps1",
+      "role": "implementation",
+      "sha256": "7d84184ccdbaabc0595e9bdc94e6be56222c6a149ad4882d780c48a135efee6c"
+    },
+    {
+      "path": "scripts/capture-topic06-evidence.ps1",
+      "role": "implementation",
+      "sha256": "0a4f6792dcedc357f57d97d8328ad7232534e94e52b49a6fa0322807552cde76"
+    },
+    {
+      "path": "scripts/validate-template.ps1",
+      "role": "implementation",
+      "sha256": "b0d2c9d9f88c5e6883619591883df70420d4772e50168006d6fbc8ec80c644ed"
+    },
+    {
+      "path": "scripts/tests/topic06-contract-core.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "41752baeef04172387d3d43836da94da094bd908605550f0bdbb88e91bb3bf5a"
+    },
+    {
+      "path": "scripts/tests/topic06-agent-contracts.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "82a92692e67f9177299ca6b3a80540ee846e4abea365a69d67a7fbb3e74b78f3"
+    },
+    {
+      "path": "scripts/tests/topic06-result-receipt.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "e1d5fe12d2ee46e2e8c9c7758d0a3f364f408bb0333a0dbcb94e7fa0510d1188"
+    },
+    {
+      "path": "scripts/tests/topic06-omp-wrapper.Tests.mjs",
+      "role": "test_or_fixture",
+      "sha256": "9155fc0422a6270b840167f057f27b082fab23b1663f2652e421003657b64bf4"
+    },
+    {
+      "path": "scripts/tests/topic06-state-projection.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "d260cb571cb5a5ab77f41df1e64d9a3cdb750b5700112a0bd1c1ddb71544d165"
+    },
+    {
+      "path": "scripts/tests/topic06-installer.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "6a97f42c6c0f0c9c5d87801fcfd1b680fd8578233c247659946281920439bcfa"
+    },
+    {
+      "path": "scripts/tests/topic06-managed-runtime.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "6bb816e873b776dcf7be57cbc8c5ad5cb9bef8efb46047980ad51f84b60d04bf"
+    },
+    {
+      "path": "scripts/tests/topic06-agent-boundary.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "15e40fd305d6ac2efe83b9708120693d1214ce02242de8d886ab94260e331093"
+    },
+    {
+      "path": "scripts/tests/topic06-validator-mutations.Tests.ps1",
+      "role": "test_or_fixture",
+      "sha256": "54693df6f1f841e28da39445b506b7d205efa61c2ca14b02e863280d348bfbd9"
+    },
+    {
+      "path": "scripts/tests/fixtures/topic06-boundary-e2e.mjs",
+      "role": "test_or_fixture",
+      "sha256": "2be915ec321ec6311eae655660aad8db43b0274e9e15a7e19fdcd7cc23fedb8a"
+    }
+  ],
+  "commands": [
+    {
+      "id": "contract_core_roles_receipts_wrapper",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "state_projection",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "installer_transaction",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "installed_managed_runtime",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "adversarial_lifecycle_e2e",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "focused_contract_bootstrap",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "full_validator_bootstrap",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "pinned_omp_source",
+      "exit_code": 0,
+      "status": "PASS"
+    }
+  ]
+}

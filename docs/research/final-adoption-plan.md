@@ -1,5 +1,15 @@
 # Final Adoption Plan
+
+> Authority boundary: This research file is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
 <!-- Generated: 2026-08-07 — Phase 2 -->
+
+> Historical Phase 2 snapshot only; no current design or implementation authority.
+> Current behavior derives from the accepted design, key decisions, active specs, and Topic 03-selected manifest.
 
 ## Status: Research complete — ready for Phase 3 Architecture
 
@@ -82,7 +92,7 @@ No unresolved conflicts remain. Proceed to implementing Workflow v0.
 | ECC full orchestration runtime | ECC | Second runtime violation |
 | Full spec-kit CLI | spec-kit | External Python dependency; concepts adopted natively |
 | Full OpenSpec CLI | OpenSpec | External Node dependency; concepts adopted natively |
-| Serena (v0) | serena | OMP LSP sufficient for v0; evaluate later |
+| Serena (v0) | serena | Excluded as a second runtime; any selected OMP retrieval path remains conditional on its effective capability contract |
 | Repomix (default) | repomix | Context flood risk; conditional use only |
 | Context7 (default) | context7 | Retrieval-order last resort; conditional use only |
 | Verbatim anthropics/skills content | anthropics/skills | No license file; only format is authoritative |

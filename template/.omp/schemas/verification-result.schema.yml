@@ -1,5 +1,7 @@
 # Verification Result Schema
-# Returned by the Verifier agent. Evidence-first, no assumptions.
+# <!-- topic08-projection:behavior-core -->
+# Returned by whichever selected non-author verification producer owns this contract.
+# Evidence-first, no assumptions; no permanent Verifier role is implied.
 
 schema: verification-result
 version: "1.0"

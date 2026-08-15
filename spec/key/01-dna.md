@@ -1,5 +1,17 @@
 # 01 — The DNA
 
+<!-- topic08-projection:behavior-core -->
+> **Topic 08 behavior gene:** the manifest currently selects three skills and may be extended by
+> reviewed evidence rather than a fixed-count rule. Worker alone autoloads the ≤500-token
+> completion-evidence body. Exact project discovery/path/hash reconciliation happens before
+> managed dispatch; explicit main-session `agent_tasks` is the only lifecycle bootstrap, and
+> read-only diagnosis remains available while generic mutation fails closed.
+
+<!-- topic05-projection:dna -->
+> **KD-029 retrieval invariant:** native retrieval is always available as the baseline; optional
+> CodeGraph is default-off, worktree-local, and produces hypotheses. Actor selection is independent
+> of capability selection, and neither Cheap Scout nor graph output gains acceptance authority.
+
 > **What this file is.** A per-layer structural blueprint. The workflow is decomposed into
 > eleven layers. For each layer: the *shape* that applies (the gene), the OMP primitive it
 > attaches to, where the shape came from, what it costs, and what breaks if it is wrong.
@@ -11,6 +23,12 @@
 >
 > Grades (`A`/`B`/`C`/`D`) are defined in `00-method.md §3`. `A` = source-verified in OMP.
 > Upstream attributions marked *(provisional)* await the corresponding file in `dossiers/`.
+>
+> **KD-027 topology gene:** the main-session Tech Lead defaults to inline ownership. The only
+> spawnable agents are read-only Cheap Scout, bounded-writing Worker, and risk-gated General
+> Reviewer. Spawn requires a concrete benefit; verification remains a Tech Lead contract
+> obligation. Worker defaults `high`, hard Worker and Reviewer use `xhigh`, and only Scout may
+> use the explicit Flash→Pro availability chain.
 
 ---
 
@@ -28,7 +46,7 @@
                         ├─────────────────────────────────────────────┤
  PAID PER ACTION        │ L4  RETRIEVAL     lsp · grep · read ranges  │  per query
                         │ L6  ISOLATION     isolated: true + capture  │  per write fan-out
-                        │ L7  JUDGEMENT     verifier · diff-reviewer  │  per gate
+                        │ L7  JUDGEMENT     verification · review     │  per gate
                         ├─────────────────────────────────────────────┤
  STRUCTURAL             │ L8  GOVERNOR      compaction · spill        │  continuous
                         │ L9  EVIDENCE      result telemetry · evals  │  per run
@@ -86,27 +104,35 @@ need them.
 
 ## L1 — Entry and sizing
 
-**The gene.** Three fixed sizes, user-selected, with one-way escalation.
+**The gene.** One normal plain-language entry, one explicit Quick choice, and
+Tech-Lead-selected Standard versus Orchestrated. Workflow classification is independent of
+agent count and may change internally without restarting a slash command.
 
-| Size | Subagents | Attaches to | When |
-|---|---|---|---|
-| `/quick` | 0 — inline | SlashCommand — `builtin.ts:345` | 1 file, root cause known |
-| `/standard` | 2–4 sequential | SlashCommand | 2+ files, or root cause unknown |
-| `/orchestrated` | 4+, some parallel | SlashCommand | ≥2 genuinely independent workstreams |
+| Entry | Authority | Effect |
+|---|---|---|
+| Plain request | main-session Tech Lead | normal entry; clarify the task contract, then select Standard or Orchestrated |
+| `/quick` | explicit user choice, validated by Tech Lead | reduced ceremony for a clear bounded task; may escalate when unsuitable |
+| `/standard`, `/orchestrated` | compatibility/advanced hint | validate against actual structure before mutation |
+| `quick`, `standard`, `orchestrated` without `/` | natural-language hint | interpret in context; a missing slash is not an error |
 
 **Shape rules.**
 
-1. **The user picks the size; the command validates the pick.** A router that triages every
-   task pays a classification turn on "fix the typo on line 12". Rejected — `spec/04 §B`.
-2. **The Standard→Orchestrated boundary is independence, not size.** A large sequential task
-   is Standard with more steps. Four agents doing four dependent things in sequence is
-   strictly worse than one agent doing them: every handoff loses context and costs a spawn.
-   This is the single most-violated sizing rule in multi-agent templates.
-3. **Escalation restarts; it does not continue.** A `/quick` that escalates discards its
-   partial transcript and re-enters Standard with what it learned as input. Continuing in
-   place keeps the accumulated context the size change existed to shed.
-4. **De-escalation is forbidden.** An over-sized run finishes over-sized. The tokens are
-   already spent; abandoning mid-flight risks unmerged isolated worktrees.
+1. **A plain request enters the main-session Tech Lead.** No classification turn or prefix is
+   required from the user; clarification is paid only when the task contract actually needs it.
+2. **Quick is explicit.** The user's explicit Quick choice receives a short preflight. If the
+   task is unsuitable, the Tech Lead reclassifies it and reports why.
+3. **Standard is one integrated implementation lane.** It may be large or high-risk and may
+   use optional specialists without changing classification.
+4. **Orchestrated is structural.** It requires at least two independently verifiable work
+   units, explicit unit contracts, one integration contract, and cross-boundary verification.
+   Parallel execution and multiple writers are optional.
+5. **Reclassification preserves valid work.** It neither reinvokes a slash command nor
+   automatically resets, discards, or reverts discovery and workspace changes.
+6. **Lifecycle identity is explicit.** A task begins when objective, scope/authority, mandatory
+   acceptance criteria, and required verification and review obligations are locked in its
+   accepted contract. Acceptance evidence binds to a frozen candidate snapshot. A session
+   serves one task and one non-competing candidate lineage; safe compaction preserves that identity,
+   while handoff creates a reconciled successor session.
 
 **⚠ Wire-format correction — `task.batch` defaults to `true`** (`settings-schema.ts:4570`,
 independently confirmed). The model-facing shape is **not** `{agent, task}`. It is:
@@ -116,24 +142,32 @@ independently confirmed). The model-facing shape is **not** `{agent, task}`. It 
   tasks: [ { name?, agent?, task, effort?, outputSchema?, schemaMode?, isolated? } ] }
 ```
 
-Every dispatch example in `commands/*.md` must use this shape. The flat form still works for
-internal callers but is **rejected model-side** when batch is on (`task/index.ts:192-202`).
-This is a live defect in the current command files — `04-decision-log.md` KD-006.
+If Topic 03 later selects a batch dispatch path, every model-facing batch example must use
+this shape. The flat form still works for internal callers but is **rejected model-side** when
+batch is on (`task/index.ts:192-202`). KD-006 records the runtime fact; it does not require a
+particular topology.
 
 **`context` is a genuine token lever, not overhead.** It is stated once and prepended to
 every item, so shared scope, conventions, and acceptance criteria belong there rather than
 copy-pasted into N packets. For a 4-way fan-out this is a ~3× reduction on the shared
 portion of the packet.
 
-**Fails as.** Commands documenting the flat wire → dispatch rejected at runtime, workflow
-silently degrades to inline. Router-based sizing → triage tax on every trivial task.
+**Fails as.** Prefix-required entry → needless user friction. Size/risk/agent-count routing →
+false Orchestrated classification. Restart/discard escalation → lost evidence or user work.
+Batch commands documenting the flat wire → dispatch rejected at runtime.
 
 ---
 
 ## L2 — Topology
 
-**The gene.** Flat. One coordinator that is the main session, four workers at depth 1, no
-worker spawns anything.
+**The gene.** The main-session Tech Lead owns classification, integration, acceptance, and the
+final answer. Worker dispatch is optional. Topic 03 owns the final worker graph, specialist
+roster, depth policy, and dispatch conditions; a workflow stage name never forces a spawn.
+
+**Pre-Topic-03 roster hypothesis — non-authoritative.** The former candidate below is retained
+as migration input and source-analysis history only. Topic 03 may keep, merge, rename, or remove
+these roles. The diagram does not define Standard or Orchestrated, require a worker count, or
+make review/parallelism mandatory.
 
 ```
 depth 0   main session ── IS the Tech Lead (no agent file)
@@ -161,15 +195,18 @@ depth 2   available headroom — deliberately unused
    `.md` in that directory into a live spawnable `AgentDefinition` — there is no
    documentation-only category (`task/discovery.ts:42-58`, re-confirmed). A file there is a
    second, mechanically spawnable Tech Lead. Re-homed to `docs/roles/tech-lead.md`.
-3. **Verifier is separate from Implementer, permanently.** An agent that just wrote code
-   reads its own output charitably. The Verifier's value is not that it runs commands — it is
-   that it runs them *without having written the code*, so it has no intention to protect.
-   Collapsing the two saves ~1 spawn and removes the entire defense.
-4. **Observation-phase agents are never isolated.** Explorer, Verifier, and Reviewer must see
-   the real merged tree. An isolated Verifier verifies a copy nobody ships.
-5. **`reviewer` is renamed `diff-reviewer`.** OMP bundles an agent named `reviewer`; project
-   agents win by first-name-wins precedence (`task/discovery.ts:87-133`), so the current
-   name silently shadows a built-in. Shadowing may be intended, but it must be *chosen*.
+3. **Independent evidence is contract-gated, not roster-gated.** When the accepted task
+   contract requires independent verification, the selected Topic 03 mechanism must obtain it
+   from a non-author of the candidate; an author's self-report alone is insufficient. Topic 03
+   decides whether that mechanism is a separate worker, the main-session Tech Lead, or another
+   independently justified path.
+4. **A selected observation role sees the acceptance target.** When verification or review
+   judges the integrated tree, that role must observe the real integrated candidate rather than
+   an isolated copy nobody ships. This constraint applies only when such a role/path is selected.
+5. **Any selected project adapter avoids accidental bundled-name collision.** OMP bundles an
+   agent named `reviewer`; project agents win by first-name-wins precedence
+   (`task/discovery.ts:87-133`), so the former candidate name silently shadows a built-in.
+   Shadowing may be intended, but it must be *chosen*.
 
 **⚠ Two allowlist corrections — allowlists are floors, not ceilings.**
 
@@ -194,44 +231,48 @@ default agent for calls that omit `agent` (`task/spawn-policy.ts:52-59`). Undocu
 the spec; matters if a coordinator agent is ever reintroduced.
 
 **Fails as.** Coordinator as agent → context duplication, split answer ownership.
-`tech-lead.md` left in `agents/` → two topologies, divergent routing. Verifier merged into
-Implementer → self-verification, the primary failure mode returns.
+`tech-lead.md` left in `agents/` → two topologies, divergent routing. A contract requiring
+independent evidence satisfied only by the candidate author → self-confirmation returns.
 
 ---
 
 ## L3 — Contract
 
-**The gene.** Each worker declares its own result schema in its own frontmatter. The call
-site overrides only for one-off narrowing.
+**The gene.** Each selected spawned worker with a structured result contract declares its
+canonical result schema in its own frontmatter. An inline or main-session responsibility uses
+an equivalent contract at the boundary Topic 03 selects. The call site overrides only for
+one-off narrowing.
 
-| Producer | Contract | Attaches to | Grade |
+| Selected responsibility | Contract when consumed | Attaches to | Grade |
 |---|---|---|---|
-| `explorer` | ranked evidence, no `files_changed` | `output:` — `helpers.ts:289` | A |
-| `implementer` | `agent-result` | `output:` | A |
-| `verifier` | `verification-result` | `output:` | A |
-| `diff-reviewer` | `review-result` | `output:` | A |
+| discovery-result producer | ranked evidence, no change claim | selected worker `output:` or equivalent selected boundary | A |
+| change-result producer | change result plus required evidence | selected worker `output:` or equivalent selected boundary | A |
+| verification-result producer | exact verification result | selected worker `output:` or equivalent selected boundary | A |
+| review-result producer | review decision and findings | selected worker `output:` or equivalent selected boundary | A |
 | main session → worker | task packet | **plain string** — no input schema exists | A |
 
 **Shape rules.**
 
-1. **Schema travels with the agent, not the call site.** Frontmatter cannot be forgotten at
-   a dispatch; an inline `outputSchema` repeated at every dispatch can, and drifts.
+1. **For a selected spawned worker, schema travels with the worker contract, not the call
+   site.** Frontmatter cannot be forgotten at a dispatch; an inline `outputSchema` repeated at
+   every dispatch can, and drifts. Inline schemas remain valid explicit overrides or the
+   enforcement boundary for a selected non-worker producer.
 2. **The task packet is a string.** OMP offers no input-schema enforcement. `task-packet.yml`
    is a *composition checklist* for the session, not a validated contract. Say so.
 3. **Flat, closed objects. No `$ref`.** The validator dereferences and throws if a `$ref`
    survives, degrading to an unconstrained object. Flat closed shapes also enable
-   incremental section yields (`withSectionVariants`), which suit the Reviewer's
-   finding-at-a-time output.
+   incremental section yields (`withSectionVariants`), which suit any selected
+   finding-at-a-time review producer.
 4. **Minimal required fields.** Each required field the model struggles with burns retry
    budget. Require only what the coordinator cannot proceed without.
-5. **`maxLength` on evidence strings.** The only structural lever against a Verifier that
-   pastes an entire test log into `evidence`.
+5. **`maxLength` on evidence strings.** The only structural lever against a selected
+   exact-output verification responsibility that pastes an entire test log into `evidence`.
 6. **No chain-of-thought fields.** A schema field that invites narration works against the
    packet/result prohibitions in L8.
 
-**⚠ Enforcement is stronger than the spec claims.** `spec/01 §4` and `spec/06 §B` state
-that after 3 retries OMP "accepts the payload anyway — a strong nudge, not a hard gate."
-The actual rule in `finalizeSubprocessOutput` (`executor.ts:598-700`):
+**⚠ Enforcement is stronger than the superseded pre-KD-003 draft claimed.** The current
+`spec/01 §4` and `spec/06 §B` now carry this correction. The actual rule in
+`finalizeSubprocessOutput` (`executor.ts:598-700`):
 
 ```
 mustReject = failure !== undefined
@@ -248,6 +289,8 @@ tries". Strict rejects even that.
 degrades silently to unvalidated output** and sets `structuredOutput.status: "unavailable"`.
 It does not fail the spawn. So schema *lint* is a required validation check, not a nicety —
 a typo in a schema silently removes all enforcement. `04-decision-log.md` KD-003 and KD-004.
+Acceptance requires structuredOutput.status valid; unavailable, invalid, and overridden results
+are unvalidated.
 
 **⚠ But enforcement is of *shape*, not *provenance* (CR-35).** `buildOutputValidator()` is
 pure JSON Schema validation with no correlation to the session's tool events. A worker that
@@ -274,7 +317,8 @@ in the coordinator's acceptance check. A JSON-Schema conditional would likely fa
 strict-representability and silently drop the whole agent to non-strict — trading real
 enforcement for schema elegance.
 
-**Fails as.** Schema at call site only → forgotten on one dispatch, that worker unvalidated.
+**Fails as.** A selected spawned worker's schema at call site only → forgotten on one
+dispatch, that worker unvalidated.
 `$ref` present → silent unconstrained object. Malformed schema → silent total loss of
 enforcement with a clean-looking result. Schema mistaken for attestation → a fabricated
 `PASS` is read as verified, and the layer built to prevent false completion certifies one.
@@ -301,12 +345,19 @@ preference.
    text; `lsp` finds meaning. `grep getProfile` returns comments, strings, and unrelated
    same-named methods; `lsp references` returns actual call sites. When both work, prefer
    `lsp`, because its result needs no filtering.
-2. **`lsp` must be in the allowlist or `task.enableLsp: true` is inert.** Both gates apply
-   (`lsp/index.ts:1639` + allowlist). The current Explorer is instructed to use LSP and
-   cannot call it — the one place the template pays for a baseline deviation and receives
-   nothing.
-3. **No persistent repository map.** Aider's repo-map is adopted as a *principle*: the
-   Explorer builds the map for the task at hand and discards it. A materialized map goes
+2. **Effective LSP requires all four independent gates.** The conjunction is: `lsp` in the
+   selected worker allowlist; `task.enableLsp == true`; parent session LSP not disabled and not
+   plan mode; and `lsp.enabled == true` (`task/structured-subagent.ts:318-320`,
+   `tools/index.ts:593`, `task/executor.ts:2675-2678`). A selected LSP-consuming path fails
+   closed when any gate is unmet; `grep` cannot satisfy that same semantic contract.
+   Continuation requires remediation or an explicit non-LSP replacement contract,
+   reconciliation against the locked criteria, and validation of the replacement path.
+   The four registration gates do not prove that an applicable language server exists or that an
+   LSP call succeeded. Every required call must return `details.success: true`; no matching or
+   configured server and any `details.success: false` outcome fail the selected contract before
+   acceptance (`lsp/index.ts:2145-2160`).
+3. **No persistent repository map.** Aider's repo-map is adopted as a *principle*: a selected
+   transient discovery responsibility builds the map for the task at hand and discards it. A materialized map goes
    stale on the next commit, costs tokens whether or not the task needs it, and duplicates
    what `lsp symbols` computes lazily and accurately. *(provisional — aider dossier pending)*
 4. **Retrieval order is guidance with a bounded budget, not exhaustion gates.** Local code
@@ -315,14 +366,17 @@ preference.
    site already answered. But "exhaust level N first" is wrong too — use the most
    authoritative source for the question type, within a budget, then escalate.
 5. **Context7 is optional, never assumed.** It requires an MCP server wired into the session.
-   Agents must fall back to level 3 silently when it is absent.
+   When Context7 is unavailable, record `context7_unavailable` and disclose the skipped level
+   and reason. Continue with the next fitting accessible source under the bounded-escalation
+   rule; never skip or backtrack silently.
 
 **⚠ Read-summarization has a floor the spec does not record.**
 `read.summarize.minTotalLines` is **100** (`settings-schema.ts:3331`) — files shorter than
-that are read verbatim regardless. So `read-summarize: false` on the Explorer costs nothing
-on small files and everything on large ones, which is precisely backwards from its intent.
-`unfoldUntil: 50` / `unfoldLimit: 100` govern BFS unfolding of elided spans, giving the
-model a cheap way to expand exactly the region it needs. Remove the Explorer override.
+that are read verbatim regardless. So `read-summarize: false` on a selected read-heavy
+responsibility costs nothing on small files and everything on large ones, which is precisely
+backwards from its intent. `unfoldUntil: 50` / `unfoldLimit: 100` govern BFS unfolding of
+elided spans, giving the model a cheap way to expand exactly the region it needs. Remove the
+role-specific override.
 
 **Fails as.** `lsp` instructed but not allowlisted → burnt turn or silent grep fallback.
 Summarization disabled on read-heavy roles → the largest single token regression available.
@@ -348,9 +402,9 @@ silently does not apply.
    and it is what the model uses to decide whether to pay for the body. A missing
    `description` **silently drops the skill entirely** — every native scan passes
    `requireDescription: true` (`helpers.ts:390-392`). That is a validation FAIL, not a warning.
-2. **`autoloadSkills` for invariants that govern a specific role.** Assigned to
-   `implementer`, `verifier`, `diff-reviewer` — the three that make completion claims.
-   Explorer never claims completion and does not pay.
+2. **`autoloadSkills` for invariants that govern selected completion-claiming responsibilities.**
+   The current manifest assigns completion evidence only to Worker. Cheap Scout and Reviewer do
+   not pay this body; future consumers require an explicit reviewed manifest change.
 3. **Parent rules *do* propagate to subagents.** `structured-subagent.ts:438` passes
    `rules: session.rules` to the child. The earlier claim that `RULES.md` never reaches
    workers was wrong. `autoloadSkills` is still preferred, on different grounds: forwarding
@@ -358,14 +412,14 @@ silently does not apply.
    one intended body at a known price — and a buried rule in a large forwarded rulebook is
    deprioritized in practice.
 4. **Autoloaded bodies must stay small.** `evidence-before-completion` ≤ 500 tokens, because
-   it is now paid per Implementer *and* per Verifier spawn. Overflow goes into a reference
-   file read on demand.
+   it is paid for every selected consumer spawn. Overflow goes into a reference file read on
+   demand.
 5. **The one correct duplication.** "Never claim complete without verification" lives in both
    `RULES.md` (for the main session) and the autoloaded skill (for workers). Disjoint
    audiences, so document it as intentional or a future dedup pass deletes the worker copy.
 6. **Quality gates are selected by the session at packet-build time and passed as data.** A
-   Reviewer that invents its own gates produces unbounded scope — the false-positive failure
-   mode its own contract guards against.
+   selected gate-applier or review responsibility that invents its own gates produces
+   unbounded scope — the false-positive failure mode its contract guards against.
 
 **⚠ Rules are a far richer surface than the spec uses.** `buildRuleFromMarkdown`
 (`helpers.ts:182-221`) parses `globs` (path-scoped activation), `condition`, `astCondition`
@@ -377,30 +431,31 @@ template currently uses none of it. Flagged as the highest-value unexplored leve
 `04-decision-log.md` KD-022 holds it for post-v0 pending an evaluated baseline.
 
 **Fails as.** `alwaysApply` on a skill expecting subagent reach → inert, looks configured.
-Dangling `autoloadSkills` name → `resolveAutoloadSkills` filters it silently, discipline
-just stops. Missing skill `description` → skill vanishes with no error.
+Native OMP filters a dangling `autoloadSkills` name silently, so the managed Topic 08 adapter
+reconciles the effective catalog and refuses dispatch instead. Missing skill `description` also
+removes it from native discovery and therefore fails the same preflight.
 
 ---
 
 ## L6 — Isolation and integration
 
-**The gene.** Isolation is requested per call, only for concurrent writers. Parallel results
+**The gene.** Isolation is requested per call, only for selected parallel writers. Parallel results
 are captured, then integrated serially by the coordinator in a fixed order.
 
-| Agent | `isolated` | Why |
+| Selected responsibility | `isolated` | Why |
 |---|---|---|
-| `explorer` | `false` | read-only; isolation buys nothing, costs a materialization |
-| `verifier` | `false` | must observe the real merged tree |
-| `diff-reviewer` | `false` | must review the real diff |
-| `implementer` (single, Standard) | `false` | sole writer; change lands where Verifier and user can see it |
-| `implementer` (parallel, Orchestrated) | **`true`** | concurrent writers corrupt each other |
+| read-only discovery | `false` | isolation buys nothing, costs a materialization |
+| integrated-tree verification | `false` | must observe the real merged tree |
+| real-diff review | `false` | must review the real diff |
+| sole writer | `false` | no competing writer; change lands where acceptance observes it |
+| parallel writer | **`true`** | concurrent writers corrupt each other |
 
 **Shape rules.**
 
 1. **`mode: auto` selects a *backend*, never *whether* to isolate.** It answers "which
-   filesystem mechanism", not "which agents". An Implementer spawned without `isolated: true`
-   writes directly to the shared tree regardless of `mode`. This misreading is the single
-   most consequential one available in this layer.
+   filesystem mechanism", not "which responsibilities". A selected parallel writer spawned
+   without `isolated: true` writes directly to the shared tree regardless of `mode`. This
+   misreading is the single most consequential one available in this layer.
 2. **Isolation requires git.** `prepareIsolationContext` throws outside a repository — a hard
    precondition, not a degradation. Preflight `git rev-parse --show-toplevel`; on failure
    fall back to sequential non-isolated and **say so in the report**.
@@ -419,7 +474,7 @@ are captured, then integrated serially by the coordinator in a fixed order.
    irreproducible between identical runs.
 6. **Conflict semantics: stop, preserve, report.** On conflict at artifact *i*, do not
    attempt *i+1…n*; every unapplied artifact stays on disk and is reported by path; the
-   Verifier does **not** run on a partially integrated tree. There is no atomic batch-merge
+   selected verification mechanism does **not** run on a partially integrated tree. There is no atomic batch-merge
    primitive, so automatic rollback of already-applied artifacts is not available.
 7. **No topological ordering.** If two units have a real dependency they were not
    independent and must not have been parallelized. Dependency ordering at integration time
@@ -470,9 +525,9 @@ conflicts.
 is a function of the findings.
 
 ```
-implement → verify → [review, risk-gated] → report
-                ↑
-          FAIL short-circuits back to Implementer; review is skipped
+produce candidate → verify → [review, risk-gated] → report
+                       ↑
+          FAIL short-circuits back to the selected remediation owner; review is skipped
 ```
 
 **Shape rules.**
@@ -481,14 +536,14 @@ implement → verify → [review, risk-gated] → report
    fails its own tests spends judgement on defects the suite already found.
 2. **Failure classification is mandatory: `impl | env | flaky | preexisting`.** Nothing else
    in the system captures it, and it determines the next action. Conflating `env` with `impl`
-   sends an Implementer to "fix" working code, which usually means changing things until the
-   symptom moves.
+   sends the selected remediation owner to "fix" working code, which usually means changing
+   things until the symptom moves.
 
    `preexisting` is a required fourth category, not a variant (CR-36). A deterministic
    failure that was already failing on the baseline is none of the other three — it is not
    `flaky` (it reproduces), not `env` (the environment is fine), and not `impl` (this change
-   did not cause it). A three-way enum forces it to `impl`, which dispatches the Implementer
-   at code outside the change's scope. Route instead: record baseline evidence, exclude from
+   did not cause it). A three-way enum forces it to `impl`, which dispatches the selected
+   remediation owner at code outside the change's scope. Route instead: record baseline evidence, exclude from
    this change's attribution, surface as a project risk. The label carries a **mandatory
    baseline-evidence obligation** — an unsubstantiated `preexisting` is the label's own abuse
    case and is treated as `impl`.
@@ -507,38 +562,44 @@ implement → verify → [review, risk-gated] → report
 6. **Decision follows findings mechanically.** `APPROVED` ⇒ `blocking_findings` empty;
    `CHANGES_REQUESTED` ⇒ at least one. This prevents the two standard pathologies: approving
    while listing blockers, and requesting changes without naming one.
-7. **Review is risk-gated.** Never in Quick. In Standard: public API change, security-touching
-   code, new interface, or a diff whose scope discipline is in question. Always in
-   Orchestrated. The signal is not diff size — it is *whether the change creates a contract
-   someone else depends on*, which is what review catches and tests do not.
+7. **Review is contract/risk-gated.** Quick does not add a separate reviewer. Standard and
+   Orchestrated require independent review only when the accepted task contract, selected
+   quality gates, integration risk, or cross-boundary evidence demands it. Orchestrated
+   classification alone does not force review. The signal is not diff size — it is *whether
+   the change creates a contract someone else depends on*, which is what review catches and
+   tests do not.
 8. **The coordinator does not re-derive verification from prose.** "All tests pass" with an
    empty `verification_results` is a contract violation, not a summary to be trusted.
 
 **Fails as.** Review before verify → judgement spent on test-visible defects. `env`
-misclassified as `impl` → Implementer chases a phantom bug. `preexisting` collapsed into
-`impl` → Implementer edits out-of-scope code to fix something this change did not break.
-Reviewer inventing gates → unbounded scope, noise, reader learns to skim.
+misclassified as `impl` → the selected remediation owner chases a phantom bug. `preexisting`
+collapsed into `impl` → the selected remediation owner edits out-of-scope code to fix
+something this change did not break. A review responsibility inventing gates → unbounded
+scope, noise, reader learns to skim.
 
 ---
 
 ## L8 — Token governor
 
-**The gene.** OMP owns compaction. The template configures it and never implements its own.
+**The gene.** Managed sessions disable automatic semantic compaction and expose one explicit,
+authority-bound native transaction. The template does not implement a summarizer; `/safe-compact`
+authorizes OMP's native soft context-full path exactly once.
 
 | Lever | Value | Attaches to |
 |---|---|---|
-| `compaction.strategy` | **`snapcompact` by default**; `shake` must be chosen | `settings-schema.ts:2164-2198` |
-| `compaction.supersedeReads` | `true` — older reads of the same file pruned | `:2346-2355` |
-| `compaction.dropUseless` | `true` — no-match/timeout results pruned once consumed | `:2357-2367` |
-| `compaction.keepRecentTokens` | `20000` | `:2285` |
+| automatic compaction | `enabled: false`, `strategy: off`, thresholds `-1`, idle/mid-turn/auto-continue off | Topic 07 managed overlay |
+| remote paths | `remoteEnabled: false`, `remoteStreamingV2Enabled: false` | Topic 07 managed overlay |
+| `/safe-compact` | one native `mode: "soft"` transaction; no arguments | trusted continuity extension |
+| `compaction.supersedeReads` / `dropUseless` | `true` | managed overlay and native pruning |
+| `compaction.keepRecentTokens` | `20000` | native soft transaction |
 | `read.summarize.enabled` | `true`, floor `minTotalLines: 100` | `:3287`, `:3331` |
 | `tools.artifactSpillThreshold` | large tool output → artifact URL, out of context | `:710-800` |
 | `task.agentIdleTtlMs` | `420000` — idle agents parked to disk | `:4664-4674` |
 
 **Shape rules.**
 
-1. **Never implement template-side compaction.** No summarize-the-conversation step in any
-   command. OMP owns this; a second compactor produces conflicting decisions.
+1. **Use only `/safe-compact` after Topic 04 task arming.** It accepts no focus text, writes and
+   verifies local recovery bytes first, then calls native soft compaction once.
 2. **`supersedeReads` makes re-read-after-edit cheap** and removes any incentive to cache
    file contents in the conversation. Depend on it rather than working around it.
 3. **Packets carry no parent transcript.** The single most important token rule: a packet
@@ -550,20 +611,22 @@ Reviewer inventing gates → unbounded scope, noise, reader learns to skim.
    verification output >500. **But `.task/<id>/` is only safe for non-isolated workers** — an
    isolated worker's scratch file is destroyed with its worktree and the path is invalid in
    the parent. Isolated workers use the OMP artifact manager.
-6. **`snapcompact` vs `shake` is a real choice.** `snapcompact` archives history as dense
-   images with **no LLM call**; `shake` drops heavy content in place and recovers via
-   artifact. `spec/05` assumes `shake` throughout while OMP defaults to `snapcompact` —
-   so the assumed strategy must be deployed explicitly. Which is *better* for this workflow
-   is unmeasured; `04-decision-log.md` KD-009 routes it to evaluation rather than asserting.
+6. **A continuity kernel is context, not authority.** It is projected from Topic 04, hashed,
+   bound to the current session/revision/lease, and injected once on the next normal prompt.
+7. **Pressure stops before provider dispatch.** The main session receives `/safe-compact` or
+   explicit handoff guidance. A bounded child aborts into a failed/partial Topic 06 result and is
+   never automatically retried.
+8. **Native alternatives are unsupported for protected work.** Built-in `/compact`, `shake`,
+   `snapcompact`, automatic/remote compaction, and automatic handoff cannot claim continuity.
 
 **⚠ Artifact spill is an unexploited lever.** `tools.artifactSpillThreshold` /
 `artifactHeadBytes` / `artifactTailBytes` keep large tool output behind a URL automatically.
 The template's manual offload thresholds partly duplicate a native mechanism. Worth
 reconciling before implementing manual offload.
 
-**Fails as.** Assuming `shake` while `snapcompact` runs → measured behavior does not match
-the documented model. `.task/` inside an isolated worktree → result carries a dead path.
-Template-side compaction → conflicting decisions with OMP's.
+**Fails as.** Automatic compaction races task authority; focus text changes a locked decision;
+summary becomes authority; provider work proceeds at pressure; a child returns plausible success
+after pressure abort; or a second attempt/continuation occurs without explicit user action.
 
 ---
 
@@ -588,29 +651,42 @@ aggregate number is forbidden.
 2. **L1 is the highest value per unit effort.** Install to a scratch dir, then ask OMP what
    it discovered. This tier alone would have caught the installer defect on day one.
 3. **Tiers report independently.** No aggregate may conceal a tier failure.
-4. **The primary metric is tokens per accepted outcome.** A cheap wrong run costs more than
-   an expensive right one, because the retry is real cost moved to an unmeasured column.
-5. **False-completion rate is the headline quality metric**, and it is fully deterministic:
-   the agent reported success and the fixture's own acceptance check failed. No grader needed.
-6. **Model-graded scores are advisory, never evidence of correctness.**
-7. **Every run is recorded, including crashes.** Results immutable; a re-run creates a new
+4. **The primary quality measure is validated accepted-outcome rate.** Acceptance requires
+   complete objective/criteria evidence, clear required gates, no blocker, and Tech Lead
+   acceptance; waiver, partial, blocked, cancelled, and decision-needed states are excluded.
+5. **The primary efficiency metric is core workflow tokens per validated accepted outcome.**
+   Failed cycles stay in the numerator. Cheap Scout tokens are unweighted telemetry, with raw
+   total tokens reported separately (`03-token-quality-model.md §A`; `spec/13 §C`).
+6. **False completion is a deterministic hard safety gate**, not a weighted score: the agent
+   reported success and the fixture's own acceptance check failed. No grader needed.
+7. **Model-graded scores are advisory, never evidence of correctness.**
+8. **Every run is recorded, including crashes.** Results immutable; a re-run creates a new
    record. Where a metric was not measured, say "not measured" rather than omitting it.
-8. **A/B isolates exactly one variable, with fresh state and counterbalanced ordering.**
+9. **A/B isolates exactly one variable, with fresh state and counterbalanced ordering.**
    ≥3 runs/arm is a *pilot* threshold — enough to catch an obvious regression, not enough for
-   a "quality neutral-or-better" claim. Report per-fixture paired deltas, not arm means.
+   promotion. Final evidence follows the predeclared 95% two-path gate in `spec/13 §C`.
+10. **Two frozen baselines answer different questions.** The last promoted template gates
+    candidates; pinned plain OMP gates releases and major architecture checkpoints.
 
-**⚠ OMP already emits the accounting surface.** Every spawn returns `tokens`
-(input+output+cacheWrite, excluding cacheRead), `requests`, `contextTokens`, `contextWindow`,
-`cost`, `usage`, `durationMs`, `structuredOutput`, plus `modelRole` / `resolvedModel` /
+**⚠ OMP already emits the accounting surface.** Main-session state exposes aggregate usage,
+and every spawn returns `tokens`, `requests`, `contextTokens`, `contextWindow`, `cost`,
+`usage`, `durationMs`, `structuredOutput`, plus `modelRole` / `resolvedModel` /
 `resolvedModelIsFallback` (`task/types.ts:471-539`, `:428-434`). Live equivalents stream on
-`task:subagent:{event,progress,lifecycle}`. The benchmark harness should read these rather
-than re-deriving token counts — and `resolvedModelIsFallback` makes model misrouting
-**observable at the result**, turning `spec/15` D-6 from a silent failure into a detectable
-one. This is the single most useful unexploited finding in the runtime dossier.
+`task:subagent:{event,progress,lifecycle}`; session totals are computed at
+`session/session-stats.ts:52-110` and JSON print mode preserves message usage
+(`modes/print-mode.ts:58-83,191-194`). The benchmark harness should reconcile these fields
+without double counting rather than re-deriving token counts. For promotion it uses the
+explicit `usage` breakdown: the display-oriented `tokens` fallback can include cacheRead when
+a provider exposes only `totalTokens` (`task/executor.ts:759-782`). And
+retry fallback is marked by `resolvedModelIsFallback`, while credential fallback to the parent
+model is not. Returned modelRole and resolvedModel identity comparison catches credential
+fallback that resolvedModelIsFallback does not mark. The expected identity is reconciled with
+`task.agentModelOverrides` before dispatch. This result-level comparison turns `spec/15` D-6
+from a silent failure into a detectable one.
 
 **Fails as.** Aggregate score hiding a tier failure → false confidence, exactly the current
 state. Raw token counts without an acceptance denominator → optimizing toward cheap wrong
-answers.
+answers. SingleResult-only accounting → silently dropping the Tech Lead's expensive tokens.
 
 ---
 
@@ -662,6 +738,50 @@ T-04.8 produces the claim; only then does the path backing it become watchable.
 boundary of discovery → a behavior change in a caller passes review. Mechanism with no named
 attachment point → the `policies/` class of error recurs.
 
+## L11 — Durable local task authority
+
+**Gene.** After an accepted contract and before mutation, every workflow creates task authority
+through the same deterministic core. Git projects use `<absolute-git-common-dir>/agent-tasks`;
+non-Git projects use `<project-root>/.agent-tasks`. One task has one authority/integration writer
+lease. Concurrent mutating tasks require a distinct authoritative worktree plus scope reservation.
+
+Candidates are baseline-relative identity manifests, not source backups. Evidence is typed,
+immutable, and bound to exact contract/candidate/input bytes. Handoff is two-phase; crash takeover
+is explicitly user-authorized. Raw `.task/` and runtime artifacts remain transient, while only
+sanitized compact evidence is promoted. Cleanup defaults to dry-run and recoverable trash;
+permanent purge is separate and exact-target. Topic 04 selects the shared manual core; Topic 08
+owns any installed automatic adapter. Authority: KD-028 and specs 01/02/04/05/08/10/12–16.
+
+**Fails as.** Transcript or compaction becomes authority; a model supplies candidate scope;
+heartbeat timeout transfers ownership; evidence crosses candidate drift; or installer/rollback
+touches operational state.
+
+---
+
+## L12 — Managed agent boundary
+
+**Gene.** A template-managed agent call crosses one executable boundary: the trusted same-name
+`task` wrapper launched through `.omp/bin/omp-managed.ps1`. It composes a bounded projection from
+Topic 04 authority, delegates to native OMP, validates the completed result and exact selected
+identity, and records only a provisional work-unit outcome plus an `agent_boundary_receipt`.
+Receipts describe observed checks; they never accept the parent task.
+
+The role manifest is responsibility-based: optional Cheap Scout retrieval, benefit-gated Worker,
+and risk-gated Reviewer. Scout is Flash `xhigh` with disclosed Pro `xhigh` availability fallback;
+Worker is `high` unless the Tech Lead selects `xhigh` for hard work; Reviewer is `xhigh` and sees
+ARTIFACT + CONTRACT, never Worker CLAIM. Managed v1 rejects async and nested dispatch. When the
+boundary is unavailable, the Tech Lead works inline without fabricating a managed packet, review,
+or receipt. Bare OMP, Vibe, and `eval` are outside this managed evidence boundary.
+
+Historical `.omp/schemas` files are evidence, not installed authority. Topic 06 owns
+`task.softRequestBudget: 200`; Topic 07 adds the exact disabled automatic-compaction profile and
+one protected `/safe-compact` path. A forced partial at 300 requests is nonterminal. The unresolved
+universal interception seam is `OPEN-T06-RUNTIME-01` and is nonblocking.
+
+**Fails as.** Raw native output is promoted as a receipt; receipt becomes acceptance; selected
+model/effort silently changes; Reviewer inherits the Worker's claim; async/nested work looks
+complete; inline fallback manufactures independence; or another runtime/state ledger appears.
+
 ---
 
 ## Cross-layer invariants
@@ -677,11 +797,19 @@ These hold across every layer, and a violation in any one of them invalidates th
    `pr://`, `issue://`, `conflict://`, `xd://`. `policy:` and `schema:` resolve to nothing.
 5. **Result shapes are declared where OMP enforces them**, not only described in prose.
 6. **Isolation is requested explicitly for concurrent writers, never inferred.**
-7. **Optimize tokens per accepted outcome.** Never trade correctness for token count.
+7. **Optimize core workflow tokens per validated accepted outcome, after quality gates.**
+   Failed cycles remain charged; Cheap Scout and raw totals remain visible telemetry.
 8. **Fail loudly.** Silent degradation is worse than an error — and every ⚠ in this file is
    a silent-degradation mode.
-9. **Static validation passing must imply runtime discovery succeeded**, or the number is a
-   lie.
+9. **Keep evidence tiers distinct.** Static validation proves only L0 filesystem and text
+   properties; runtime discovery requires a separate L1 OMP discovery check. A static PASS must
+   not claim that OMP discovered or enforced the component.
+10. **Keep durable authority outside runtime memory.** Transcript, handoff prose, compaction,
+    `.task/`, and `artifact://` references cannot replace the KD-028 state core.
+11. **Managed evidence crosses the Topic 06 wrapper.** Unwrapped OMP/Vibe/`eval` output is useful
+    context only and cannot impersonate an `agent_boundary_receipt` or parent acceptance.
+12. **Managed continuity is explicit.** Automatic semantic compaction and continuation stay off;
+    only an armed `/safe-compact` transaction may inject one Topic 04-derived kernel.
 
 ---
 
@@ -693,15 +821,17 @@ Which phase implements which layer, so the DNA is executable rather than descrip
 |---|---|---|
 | L0 Identity | phase-03 | T-03.6 right-size persistent context |
 | L1 Entry | phase-01, phase-02 | fix installer component map; T-02.4 dispatch contracts (**+ batch wire**) |
-| L2 Topology | phase-01, phase-02 | T-01.8 re-home `tech-lead.md`; rename `diff-reviewer` |
+| L2 Topology | phase-01, phase-02 | T-01.8 re-home `tech-lead.md`; resolve bundled-name collisions for selected adapters |
 | L3 Contract | phase-01, phase-02 | T-01.7 `output:` frontmatter; **+ schema lint** |
 | L4 Retrieval | phase-01, phase-03 | T-01.3 `lsp` allowlists; T-03.4 retrieval order |
 | L5 Discipline | phase-02 | T-02.1 `autoloadSkills`; **+ skill `description` FAIL check** |
 | L6 Isolation | phase-00, phase-02 | T-00.E3/E3-G; T-02.2/2.3/2.3b preflight, integration order, **nested-repo disable (not scope exclusion)** |
-| L7 Judgement | phase-04 | verifier/reviewer contracts, risk gating; **+ `preexisting` failure class**; **+ T-04.8 provenance measurement** |
-| L8 Governor | phase-03 | T-03.1 compaction (**+ deploy `shake` explicitly**) |
+| L7 Judgement | phase-04 | selected verification/review contracts, risk gating; **+ `preexisting` failure class**; **+ T-04.8 provenance measurement** |
+| L8 Governor | phase-03 | T-03.1 managed disabled profile, `/safe-compact`, pressure stop, explicit handoff |
 | L9 Evidence | phase-06 | L0–L4 tiers; **+ read native result telemetry** |
 | L10 Provenance | phase-00, phase-07 | T-00.1 pin SHA; **+ 6 new watched paths**; **+ 2 license-record corrections (KD-023)** |
+| L11 Durable authority | phase-02, phase-03, phase-05, phase-06, phase-07 | task/candidate/work-unit authority; checkpoint/handoff/offload; install/retention; fixtures; release reconciliation |
+| L12 Managed boundary | phase-01, phase-02, phase-05, phase-06, phase-07 | executable packet/result contract; trusted native delegation; install/rollback; adversarial receipt validation; release evidence |
 
 Bold entries are additions this DNA makes to the existing phase plans. They are logged as
 decisions in `04-decision-log.md` and must be reflected in `spec/phases/*` before

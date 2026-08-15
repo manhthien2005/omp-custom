@@ -1,0 +1,41 @@
+schema_version: 1
+phase: "00"
+experiment: E2
+status: PASS
+
+case_status:
+  "1": PASS
+  "2": PASS
+  "3": PASS
+  "4": PASS
+  "5": PASS
+  "6": PASS
+  "7": PASS
+  "8": PASS
+
+verified_runtime_facts:
+  configured_builtin_role: configured value selected with no fallback flag
+  configured_custom_role: required @implementer value selected exactly
+  missing_custom_role: hard error before session creation; no fallback
+  arbitrary_unknown_role: hard error before session creation; no fallback
+  unavailable_model: alias resolves first, then downstream error surfaces; no fallback
+  global_project_precedence: project value wins
+  builtin_custom_collision: configured modelRoles.default wins
+  main_worker_path: both paths resolve their configured role values without fallback
+
+unresolved: []
+
+phase_effect:
+  e2_gate_closed: true
+  reason: All eight canonical cases have valid runtime artifacts.
+  downstream_policy: fail loudly on unresolved roles or downstream model failure; project role values override global values
+
+artifacts:
+  - docs/evidence/phase-00/E2/case-1-built-in-role.yml
+  - docs/evidence/phase-00/E2/case-2-custom-role.yml
+  - docs/evidence/phase-00/E2/case-3-missing-custom-role.yml
+  - docs/evidence/phase-00/E2/case-4-arbitrary-unknown-role.yml
+  - docs/evidence/phase-00/E2/case-5-unavailable-model.yml
+  - docs/evidence/phase-00/E2/case-6-user-project-precedence.yml
+  - docs/evidence/phase-00/E2/case-7-built-in-collision.yml
+  - docs/evidence/phase-00/E2/case-8-main-vs-worker.yml

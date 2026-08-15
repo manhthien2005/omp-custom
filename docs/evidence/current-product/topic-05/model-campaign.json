@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "record_type": "topic05_model_campaign_disposition",
+  "status": "NOT_RUN",
+  "reason": "explicit_model_spend_not_authorized_for_this_campaign",
+  "captured_at_utc": "2026-08-13T09:22:30.4735618Z",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "lead_identity": "required_at_run_time",
+  "cheap_scout_routes": {
+    "primary": "omniroute/ds/deepseek-v4-flash:xhigh",
+    "fallback": "omniroute/ds/deepseek-v4-pro:xhigh",
+    "additional_fallbacks": []
+  },
+  "planned_arms": [
+    "A_lead_native",
+    "B_lead_codegraph",
+    "C_scout_native_lead",
+    "D_scout_codegraph_lead"
+  ],
+  "planned_cache_conditions": [
+    "absent",
+    "cold",
+    "warm"
+  ],
+  "harness": {
+    "runner_sha256": "a4715674cde65803e61560de8d3215344e2801cb0748460bddf17a35098f9882",
+    "library_sha256": "f9084639163b5a23e3605f6074f8541531eaa32abd2d90516432201671101256",
+    "fixture_registry_sha256": "74b8d42779eb0ce1732b14a7c6ca2f61e2cdafc8fcd5754b202a166e1c3537c3"
+  },
+  "environment_probe": "NOT_RUN",
+  "usage": "not_measured",
+  "recommendation": null,
+  "promotion": false,
+  "universal_default": false
+}

@@ -1,0 +1,197 @@
+schema_version: 1
+phase: "00"
+task: T-00.3
+status: PASS
+provider_calls: 0
+parallel_mode: DISABLED
+
+legacy_sources:
+  - id: context-budget
+    path: template/.omp/policies/context-budget.yml
+    lines: 89
+    sha256: A3FE19A6C131F3A9F43EF2AC5156993437CDC07B0ABE6AF284FE6E966C2F03EE
+    git_blob: f5591a7b7cd3e06efbd5431536ebd2391bdedd6d
+  - id: escalation
+    path: template/.omp/policies/escalation.yml
+    lines: 52
+    sha256: 49CB215BEEC2424C9274BBA285E2AD28B651A124AF1BF07102A925FDAEA5FD1F
+    git_blob: c8e51d31baed0b2ce7ee000bd0be5deb3858e691
+  - id: model-routing
+    path: template/.omp/policies/model-routing.yml
+    lines: 61
+    sha256: 67E7F80534AB66C57B13EF91AD88CABAE5518F8828E89C496B78AB9C4209F4A2
+    git_blob: c73070c1e73737a6947b48eb84338b583e4aa663
+  - id: quality-gates
+    path: template/.omp/policies/quality-gates.yml
+    lines: 105
+    sha256: 69A8635F66C118D5BC12612E7D7B6F498E1886B7213F15613BE5A37B6370A1E2
+    git_blob: 47f6d06191a9e7b68f07da1903d96b931024fa30
+  - id: workflow-sizing
+    path: template/.omp/policies/workflow-sizing.yml
+    lines: 56
+    sha256: 603112590C993F9DEC61D17C32387C040C775C384B1D8656756170971703671B
+    git_blob: 195c1f836bfd62381099cd9633073db4a37c88bc
+
+dispositions:
+  - source_section: context.components
+    status: REHOMED
+    destinations: [docs/policies/context-budget.md]
+    authority: spec/05-context-and-token-model.md
+  - source_section: context.retrieval-order
+    status: REHOMED
+    destinations: [docs/policies/context-budget.md]
+    authority: spec/05-context-and-token-model.md
+  - source_section: context.degradation-prevention
+    status: REHOMED
+    destinations: [docs/policies/context-budget.md]
+    authority: spec/05-context-and-token-model.md
+  - source_section: context.offload-candidates
+    status: REHOMED
+    destinations: [docs/policies/context-budget.md, template/.omp/AGENTS.md]
+    authority: spec/05-context-and-token-model.md
+  - source_section: context.offload-universal
+    status: SUPERSEDED
+    destinations: [docs/policies/context-budget.md, template/.omp/AGENTS.md]
+    authority: spec/05-context-and-token-model.md
+  - source_section: escalation.worker-to-main
+    status: REHOMED
+    destinations: [template/.omp/agents/explorer.md, template/.omp/agents/implementer.md, template/.omp/agents/verifier.md, template/.omp/agents/reviewer.md]
+    authority: spec/15-security-and-failure-recovery.md
+  - source_section: escalation.main-to-user
+    status: REHOMED
+    destinations: [template/.omp/AGENTS.md]
+    authority: spec/15-security-and-failure-recovery.md
+  - source_section: escalation.do-not-escalate
+    status: REHOMED
+    destinations: [template/.omp/agents/explorer.md, template/.omp/agents/implementer.md, template/.omp/agents/verifier.md, template/.omp/agents/reviewer.md]
+    authority: spec/15-security-and-failure-recovery.md
+  - source_section: escalation.spawned-tech-lead-audience
+    status: SUPERSEDED
+    destinations: [template/.omp/AGENTS.md]
+    authority: spec/03-agent-topology.md
+  - source_section: model-routing.authority
+    status: REHOMED
+    destinations: [docs/policies/model-routing.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/09-model-routing.md
+  - source_section: model-routing.five-required-roles
+    status: SUPERSEDED
+    destinations: [docs/policies/model-routing.md]
+    authority: spec/03-agent-topology.md
+  - source_section: model-routing.portable-concrete-model
+    status: SUPERSEDED
+    destinations: [docs/policies/model-routing.md]
+    authority: spec/09-model-routing.md
+  - source_section: model-routing.constraints
+    status: REHOMED
+    destinations: [docs/policies/model-routing.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/09-model-routing.md
+  - source_section: model-routing.effort-mapping
+    status: REHOMED
+    destinations: [docs/policies/model-routing.md]
+    authority: spec/09-model-routing.md
+  - source_section: model-routing.customization
+    status: REHOMED
+    destinations: [docs/policies/model-routing.md]
+    authority: spec/09-model-routing.md
+  - source_section: quality-gates.six-gates
+    status: REHOMED
+    destinations: [docs/policies/quality-gates.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/11-skills-rules-and-quality-gates.md
+  - source_section: quality-gates.default-matrix
+    status: REHOMED
+    destinations: [docs/policies/quality-gates.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/11-skills-rules-and-quality-gates.md
+  - source_section: quality-gates.override-rule
+    status: REHOMED
+    destinations: [docs/policies/quality-gates.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/11-skills-rules-and-quality-gates.md
+  - source_section: quality-gates.selection-owner
+    status: REHOMED
+    destinations: [docs/policies/quality-gates.md, template/.omp/AGENTS.md]
+    authority: spec/03-agent-topology.md
+  - source_section: quality-gates.reviewer-self-selection
+    status: SUPERSEDED
+    destinations: [docs/policies/quality-gates.md, template/.omp/AGENTS.md, template/.omp/agents/reviewer.md]
+    authority: spec/03-agent-topology.md
+  - source_section: workflow-sizing.quick
+    status: REHOMED
+    destinations: [template/.omp/commands/quick.md]
+    authority: spec/04-workflow-sizing.md
+  - source_section: workflow-sizing.standard
+    status: REHOMED
+    destinations: [template/.omp/commands/standard.md]
+    authority: spec/04-workflow-sizing.md
+  - source_section: workflow-sizing.orchestrated
+    status: REHOMED
+    destinations: [template/.omp/commands/orchestrated.md]
+    authority: spec/04-workflow-sizing.md
+  - source_section: workflow-sizing.larger-when-in-doubt
+    status: SUPERSEDED
+    destinations: [template/.omp/AGENTS.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/04-workflow-sizing.md
+  - source_section: workflow-sizing.risk-levels
+    status: REHOMED
+    destinations: [docs/policies/quality-gates.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/04-workflow-sizing.md
+  - source_section: workflow-sizing.overrides
+    status: REHOMED
+    destinations: [docs/policies/quality-gates.md, template/.omp/commands/standard.md, template/.omp/commands/orchestrated.md]
+    authority: spec/04-workflow-sizing.md
+
+destinations:
+  - path: docs/policies/README.md
+    sha256: 14BF081DC148463C4D670DC53FAD70F33BAAD540C88411B191E4F1AC555894BB
+  - path: docs/policies/context-budget.md
+    sha256: B3FB28CFE1ABC3C7D8C0EBED874F079E9F4271E1D47F9AF1CD4372DCC5776400
+  - path: docs/policies/model-routing.md
+    sha256: 9E348E097D6CD65B102C97BDE160E30C4ECADCB7A74FB405FBC274B4E8ABD8A1
+  - path: docs/policies/quality-gates.md
+    sha256: 28E693652A34304DC85117C578F23017E2863E68F104AFF05849EA2A9D9F32B5
+  - path: template/.omp/AGENTS.md
+    sha256: 3F194D81208872B6CDE4A51265156D06A8016810CAA9D24BF37B545E60848BBC
+  - path: template/.omp/commands/quick.md
+    sha256: F4E9081846368DA140923C8D51C7BAB079DA4B75577019A412735DBAC4A21731
+  - path: template/.omp/commands/standard.md
+    sha256: F849485369F0E8EE6D7D816752D7CAD263DA5381EF8216C319B19091FCBB626B
+  - path: template/.omp/commands/orchestrated.md
+    sha256: D88179FA0C27B9EEDF9EE59B5CD6A59B75FC426BCDAD18061209942C36012D12
+  - path: template/.omp/agents/tech-lead.md
+    sha256: 47B3060A725F9C41EA832E2CE8E7CBAEFCAFACB4137A9B4153C2819732016AD2
+  - path: template/.omp/agents/explorer.md
+    sha256: EFF925B0CF199144F306AE8F40226F8087ECF45297B0CEB270E07C3E9DF3CAE6
+  - path: template/.omp/agents/implementer.md
+    sha256: 6090C229C4A6B9132B99F4540EA9788A2520BB358846C6ADC5482DD911E72A22
+  - path: template/.omp/agents/verifier.md
+    sha256: A3F49E18266587929D05B2DE28AD59D7B31E3832C20DAD5C201AB03348C449E0
+  - path: template/.omp/agents/reviewer.md
+    sha256: 7960C0C595A2B11AD5DFDC9C9F2A591C34F5CCFC2C0ADF43D5EA70F94E3C3DE3
+  - path: scripts/install-template.ps1
+    sha256: 45DC5D0B71905A2734F98821A9CF424A045EC09148CE941E24CE5446022E1D23
+  - path: scripts/validate-template.ps1
+    sha256: D78594BA7DD28C843BDCCEC6F532FBBB491C9E380FD91B686B2AA70850D61701
+
+checks:
+  repository_branch: main
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  legacy_surface_deleted: PASS
+  dangling_runtime_references: 0
+  installer_retirement: PASS
+  registry_resolution: PASS
+  direct_product_doc_scan: PASS
+  focused_pwsh: PASS
+  focused_windows_powershell: PASS
+  validator_pwsh: PASS
+  validator_windows_powershell: PASS
+  staged_paths: 0
+  implementation_timestamp: "2026-08-09T21:42:34.8405160+07:00"
+  destination_revalidation_timestamp: "2026-08-10T01:33:35.4242802+07:00"
+  destination_revalidation_reason: E1_VALIDATOR_REGISTRATION
+
+non_claims:
+  - no-provider-call
+  - no-attempt-6
+  - no-session-b-replay
+  - no-e3-m-execution
+  - parallel-mode-disabled
+  - approximate-token-counting-only
+  - peer-review-not-closed

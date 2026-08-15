@@ -1,37 +1,66 @@
 # Project Context
-<!-- Install to: .omp/AGENTS.md in your project -->
 <!-- Target: 600–1,200 tokens. Hard warning above 1,500 tokens. -->
-<!-- Customize the Project section for your specific project. -->
 
 ## Coding Constitution
 
-**Think before coding.** State assumptions explicitly. Surface ambiguity before implementing, not after making mistakes. When multiple interpretations exist, name them — do not pick silently. When something is unclear, stop and ask.
+**Think before coding.** State assumptions and ambiguity. Name competing interpretations; when intent is unclear, stop and ask.
 
-**Simplicity first.** Write the minimum code that solves the stated problem. No abstractions for single-use code. No "flexibility" that was not requested. If a solution exceeds its necessary complexity, rewrite it.
+**Simplicity first.** Write the minimum code that solves the problem. Avoid single-use abstractions and unrequested flexibility.
 
-**Surgical changes.** Touch only what the task requires. Do not improve adjacent code, comments, or formatting unless it is within scope. Match existing style. Every changed line must trace directly to the user's request.
+**Surgical changes.** Touch only the task's scope and match existing style. Every changed line must trace to the request.
 
-**Goal-driven execution.** Before implementing, name the verifiable success criteria. Transform vague tasks into testable goals. For multi-step tasks, state a brief plan and loop until each step is verified.
+**Goal-driven execution.** Name verifiable success criteria. For multi-step work, state a brief plan and verify each step.
 
-**Root-cause fixes.** Do not patch symptoms. Trace the failure to its origin. Fix at the source, not at the observation site. After two failed attempts at the same problem, stop and re-analyze from first principles before attempting again.
+**Root-cause fixes.** Trace failures to their origin. After two failed attempts, stop and re-analyze before trying again.
 
 **No false completion.** Do not claim a task is done without running the relevant verification command in the same turn and reading its output. Evidence before assertions, always.
-
-**No drive-by refactoring.** If unrelated dead code or style issues are noticed, mention them — do not silently change them.
-
-**No speculative abstractions.** Do not add extensibility, configurability, or generalization that the current task does not require.
 
 ---
 
 ## Workflow Architecture
 
-This project uses an OMP-native workflow with three sizes:
+After accepting the objective, authority, mandatory criteria, and verification/review duties,
+create task state through `state/agent-tasks.ps1` and `state/PROTOCOL.md` before mutation. Reuse
+that core at lifecycle boundaries; never edit authority JSON. If it is unavailable, mutation fails
+closed; disclosed read-only diagnosis may continue.
 
-- **Quick** — triage → inspect → implement → verify → report. Use for narrow, low-risk, single-file tasks.
-- **Standard** — triage → explore → mini-spec → plan → implement → verify → focused-review → summary. Use for multi-file or behavior-changing tasks.
-- **Orchestrated** — parallel exploration → architecture review → dependency-aware task graph → isolated implementation → verification → independent review → integration validation. Use for cross-module, architecture-changing, or high-risk tasks.
+Plain natural-language requests enter the main-session Tech Lead. The user explicitly selects
+Quick with `/quick`; `/standard` and `/orchestrated` are compatibility/advanced hints that the Tech
+Lead validates. Standard is one integrated lane. Orchestrated requires at least two independently
+verifiable work units, an integration contract, and cross-boundary verification; it does not
+require parallelism or a fixed agent count.
 
-Size is selected by the Tech Lead after triage. All agents use OMP task isolation. No parent transcript is forwarded to subagents. Results are compact structured artifacts.
+The Tech Lead is the default writer, verification owner, integrator, and final owner. Default to
+no subagent spawn. Spawn only after naming a concrete benefit, bounded objective/scope, output
+consumer, stop condition, fallback, and effective capability prerequisites. Keep one writer by
+default. Parallel Workers require disjoint ownership, proven isolation/capture, and sequential
+integration; otherwise use one sequential writer and disclose that choice.
+
+### Context boundary
+
+Task packets contain only objective, scope, criteria, constraints, relevant files, and verification
+commands—not transcripts, terminal history, repository dumps, or unrelated docs. Results contain
+only the compact decision and decisive evidence, never chain-of-thought or full transcripts.
+
+Choose actor and retrieval capability independently. CodeGraph is optional/default-off and its
+output is a hypothesis. On failure use native fallback. Corroborate critical/absence claims in
+current source; never index by default.
+
+### Context continuity
+
+Every `create-task` records exact `workflow_class` and complete initial `locked_decisions`; an
+owned legacy task must initialize them through `set-continuity-contract` with current CAS. Only an
+armed, persisted, idle main session may run argument-free `/safe-compact`. It saves local recovery
+bytes first, authorizes one native soft transaction, and injects one Topic 04-derived kernel on the
+next normal prompt. It never auto-continues or retries. At pressure, use `/safe-compact` or explicit
+Topic 04 handoff; a bounded child aborts as failed/partial. Built-in `/compact`, `/shake`,
+snapcompact, remote/automatic compaction, and automatic handoff are unmanaged.
+
+## Escalation boundary
+
+Stop and request user authority before credentials, destructive action, or critical risk acceptance.
+Do the same for a required architecture violation or unresolved licensing conflict. State need, impact, and reversibility;
+established minor syntax/formatting choices need no escalation.
 
 ---
 
@@ -39,11 +68,19 @@ Size is selected by the Tech Lead after triage. All agents use OMP task isolatio
 
 | Agent | Core job |
 |-------|---------|
-| `tech-lead` | Classify, select workflow, create task packets, coordinate workers, validate evidence, own final result |
-| `explorer` | Map relevant files and symbols; return ranked evidence; do not implement |
-| `implementer` | inspect → edit → verify → compact result; fix root cause; stay within scope |
-| `verifier` | Run fresh verification independently; report evidence; do not trust implementer's summary |
-| `reviewer` | Review actual diff; check spec compliance; control false positives; evidence-backed findings only |
+| Main-session Tech Lead | Classify, accept the contract, work inline by default, select any spawn, verify/integrate, own final result |
+| `cheap-scout` | Read-only retrieval and repository mapping; advisory evidence only; no verdict or acceptance |
+| `worker` | Implement one bounded owned work unit; default `high`, Tech-Lead-selected `xhigh` for hard work |
+| `reviewer` | General independent review with dynamic concern profile; risk-gated and fixed `xhigh` |
+
+Review is mandatory for security, authentication, durable data, database migration, concurrency,
+public API, and destructive change concerns. Reviewer preference is a suitable different family,
+another suitable strong model, then the same model in a separate session with disclosure. Opus is
+a preference, not a gate. Cheap Scout cannot replace fresh verification or Reviewer judgment.
+
+Accept a spawned result only when its structured output is valid and not overridden. For Worker
+and Reviewer, compare returned model and effort identity with the reconciled expected identity.
+Disclose availability fallback; quality failure opens rework, never a silent model change.
 
 ---
 

@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "phase": "00",
+  "experiment": "E4",
+  "status": "PASS",
+  "selected_attempt": 4,
+  "runtime": {
+    "version": "omp/17.2.10",
+    "executable_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "source_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+  },
+  "rule_arm": {
+    "source_run_status": "FAIL",
+    "corrected_status": "PASS",
+    "correction": {
+      "superseded_oracle": "required the visible compliance phrase exactly once across assistant content",
+      "spec_requirement": "observe worker behavior after the sentinel reaches the worker",
+      "reason": "the worker emitted the phrase in explanatory text and in its single terminal yield; repetition is not prohibited",
+      "immutable_source_preserved": true
+    },
+    "propagation_class": "A_PROMPT_VISIBLE",
+    "system_prompt_sentinel_count": 1,
+    "system_prompt_marker_count": 1,
+    "behavior_phrase_count": 2,
+    "tool_surface": ["read", "yield", "hub"],
+    "read_call_count": 6,
+    "yield_call_count": 1,
+    "forbidden_tool_call_count": 0,
+    "first_model_turn": {
+      "input_tokens": 5159,
+      "cache_read_tokens": 2048,
+      "prompt_tokens": 7207
+    },
+    "final_total_tokens": 8288,
+    "evidence": [
+      {
+        "path": "docs/evidence/phase-00/E4/raw/rule-attempt-004.run.json",
+        "sha256": "BF34A833BC133862C011F9436647EE612E72D76731B95A4A4D2C695E4AABA12E"
+      },
+      {
+        "path": "docs/evidence/phase-00/E4/raw/rule-attempt-004.projection.json",
+        "sha256": "78D004343455CB7502117F0FA5EFF0D17234B16315630D9A274413B12091B0A2"
+      },
+      {
+        "path": "docs/evidence/phase-00/E4/raw/rule-attempt-004.child.jsonl",
+        "sha256": "E6104D36AC45F262515103767E0D492A6ECAAA314A7841A00A2DC7732A32B715"
+      }
+    ]
+  },
+  "autoload_arm": {
+    "source_run_status": "PASS",
+    "corrected_status": "PASS",
+    "propagation_class": "AUTOLOAD_HIDDEN_MESSAGE",
+    "system_prompt_sentinel_count": 0,
+    "autoload_message_count": 1,
+    "behavior_phrase_count": 2,
+    "tool_surface": ["read", "yield", "hub"],
+    "read_call_count": 6,
+    "yield_call_count": 1,
+    "forbidden_tool_call_count": 0,
+    "first_model_turn": {
+      "input_tokens": 7352,
+      "cache_read_tokens": 0,
+      "prompt_tokens": 7352
+    },
+    "final_total_tokens": 8388,
+    "evidence": [
+      {
+        "path": "docs/evidence/phase-00/E4/raw/autoload-attempt-004.run.json",
+        "sha256": "115F5AB74342C291DADDF822EABECE0B2F439EBE7DAE978661CF90351C73A052"
+      },
+      {
+        "path": "docs/evidence/phase-00/E4/raw/autoload-attempt-004.projection.json",
+        "sha256": "1B2D756BB34E6D2B9AB93676CD7325D5C7BFB60500051751684506E762732532"
+      },
+      {
+        "path": "docs/evidence/phase-00/E4/raw/autoload-attempt-004.child.jsonl",
+        "sha256": "1C9028A3C5D1B0E94B8A2578069F2CA831AE55FB62070C260FF4F495B748343F"
+      }
+    ]
+  },
+  "token_comparison": {
+    "metric": "first model-turn input plus cache-read tokens",
+    "autoload_minus_rule_tokens": 145,
+    "final_total_token_delta": 100,
+    "sample_count_per_arm": 1,
+    "benchmark_claimed": false
+  },
+  "attempt_history": [
+    {"attempt": 1, "status": "INVALID_RUN", "reason": "E4_PATH_SEPARATOR_HARNESS_FAILURE"},
+    {"attempt": 2, "status": "INVALID_RUN", "reason": "E4_OBSOLETE_READ_BAN_AND_PROJECTION_FAILURE"},
+    {"attempt": 3, "status": "INVALID_RUN", "reason": "E4_OBSOLETE_CONTEXT_SNAPSHOT_COUNT"},
+    {"attempt": 4, "status": "PASS", "reason": "E4_CORRECTED_RULE_PLUS_AUTOLOAD_PAIR"}
+  ],
+  "non_claims": [
+    "The single token sample is a characterization, not a performance benchmark.",
+    "E4 does not show that every possible rule-discovery layout behaves identically.",
+    "The corrected adjudication does not overwrite or hide the original failed run record."
+  ]
+}

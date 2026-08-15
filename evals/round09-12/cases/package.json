@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_fixture_cases",
+  "category": "package",
+  "cases": [
+    {
+      "id": "R-SCRATCH-PACKAGE",
+      "kind": "package_expectation",
+      "input": {
+        "target": "disposable_git_project",
+        "component_version": "2.1.0",
+        "runtime": {
+          "name": "omp",
+          "status": "IMPLEMENTED_NOT_PROMOTED",
+          "installable": true
+        },
+        "secondary_runtime": {
+          "name": "claude",
+          "status": "DESIGNED_NOT_VERIFIED",
+          "installable": false
+        },
+        "requires": [
+          "install",
+          "discovery",
+          "repair",
+          "uninstall",
+          "rollback",
+          "user_state_retention"
+        ]
+      },
+      "expected": {
+        "deferred_to_package_proof": true
+      }
+    }
+  ]
+}

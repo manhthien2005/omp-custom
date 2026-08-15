@@ -1,0 +1,52 @@
+schema_version: 1
+phase: "00"
+experiment: E3-D
+case: D1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+
+setup:
+  working_directory: disposable committed git fixture
+  fixture: docs/evidence/phase-00/E3-D/fixture
+  effective_settings: {async.enabled: true, task.batch: true, task.isolation.mode: rcopy, task.isolation.apply: false, task.isolation.merge: patch}
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model omniroute/oc/mimo-v2.5-free --tools task --max-time 150 <SYNTHETIC_BATCH_PROMPT>
+  exit_code: 0
+  started_at: "2026-08-11T10:50:31.6584780+07:00"
+  completed_at: "2026-08-11T10:50:54.5411633+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-D/raw/run.json, sha256: 717B25368EE0AF7418707BB6D170776A672C8170724CAF6C4BFF64FA4E226703}
+    - {path: docs/evidence/phase-00/E3-D/raw/controller.projection.json, sha256: 83287385C1762264BD278557B21F92626AD40EEE5325D090C0F28637EBD3B713}
+    - {path: docs/evidence/phase-00/E3-D/raw/parallel-proof.json, sha256: EB9D7ED7A41F0D10CD7EA6FEBE05EBB98D6993969DE9F8F01D37AAAAEEC0F569}
+    - {path: docs/evidence/phase-00/E3-D/raw/e3d-0.worker.projection.json, sha256: BFCAB18458FC8FD12CCCEA7259876D20EC8356D8B0E945A307A771583BD09048}
+    - {path: docs/evidence/phase-00/E3-D/raw/e3d-1.worker.projection.json, sha256: 54D57BC9298427FAEAA00FE31E76EE77F3FABEA8B9E6B7E716D7B30E8813F46E}
+    - {path: docs/evidence/phase-00/E3-D/raw/e3d-0.patch, sha256: 8174E4998230D7DF6707C47D2568603ADB85143A453274090F8D6690572BD336}
+    - {path: docs/evidence/phase-00/E3-D/raw/e3d-1.patch, sha256: 0AE3531BDE60AD0AE9F353A85057173A2ADC810959FF9192090C3B55E441CEC9}
+    - {path: docs/evidence/phase-00/E3-D/raw/e3d-0.output.txt, sha256: 0D648EA0438A1F107B39356ABA4AE6463C282538A1CF6942E1D7EFCFE51C1E67}
+    - {path: docs/evidence/phase-00/E3-D/raw/e3d-1.output.txt, sha256: C0AF720D55DF48E1C561595F18F08C1244438BF6D58D152E6AEBE0B9449FE688}
+    - {path: docs/evidence/phase-00/E3-D/raw/stderr.txt, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+
+observation:
+  facts:
+    - Both workers started at the same recorded millisecond and their execution intervals overlapped.
+    - Both exited 0 and produced distinct durable patches in original task-index order.
+    - Fifty-six parent polls observed no HEAD/status change and no target file during the entire run.
+    - Both patches passed git apply --check and applied independently to a fresh clone with exact sentinel content.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/executor.ts::executeTaskBatch
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/isolation-runner.ts::captureDeltaPatch
+  limitations:
+    - This case proves capture concurrency and parent non-visibility; E3-E owns integration order.
+
+interpretation:
+  decision: PARALLEL_WORKERS_CAPTURE_INDEPENDENT_PATCHES_WITHOUT_PARENT_VISIBILITY
+  spec_effect: RETAIN
+  affected_requirements: [E3-D, CR-27, CR-29]

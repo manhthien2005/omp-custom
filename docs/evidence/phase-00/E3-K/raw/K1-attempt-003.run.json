@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "case": "K1",
+  "attempt": 3,
+  "experiment": "E3-K",
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>"
+  },
+  "model_catalog_sha256": "56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779",
+  "fixture_commit": "d329a972164bb50528bd78f1c7aeed3859ea71e4",
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_ROOT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--config",
+    "<DISPOSABLE_ROOT>/config.yml",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "8m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:K1-flat-wire-fallback.md>"
+  ],
+  "exit_code": 0,
+  "started_at": "2026-08-09T00:12:18.5451638+07:00",
+  "completed_at": "2026-08-09T00:15:28.3469428+07:00",
+  "duration_ms": 189802,
+  "cleanup_succeeded": true,
+  "cleanup_failure_count": 0,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "after_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "changed_count": 0,
+    "changed_paths": [],
+    "boundary_result": "PASS_LIVE_HOME_READ_ONLY"
+  },
+  "analysis": {
+    "Status": "PASS",
+    "Reasons": [
+      "K1_FLAT_WIRE_SEQUENTIAL_FALLBACK"
+    ],
+    "TopLevelKeys": [
+      "agent",
+      "i",
+      "name",
+      "outputSchema",
+      "schemaMode",
+      "task"
+    ],
+    "SequentialFallback": true,
+    "PreflightBeforeDispatch": true,
+    "TaskCallCount": 2
+  }
+}

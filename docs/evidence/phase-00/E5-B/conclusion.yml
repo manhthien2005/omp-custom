@@ -1,0 +1,73 @@
+schema_version: 1
+phase: "00"
+experiment: E5-B
+status: PASS
+authority: CHARACTERIZATION_ONLY
+
+fixture:
+  task_enable_lsp: true
+  parent_session_lsp: true
+  lsp_enabled: true
+  language_server: phase00-fake
+  expected_reference: "probe.ts:1:17"
+
+roles:
+  - role: explorer
+    selected_attempt: 2
+    tools: [lsp, yield, hub]
+    lsp_present: true
+    lsp_call_count: 1
+    lsp_result_success: true
+    reference_count: 1
+    remediation: NONE
+    evidence:
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-explorer-attempt-002.run.json, sha256: 4478D1CCDC0116E4D0D8443AC7BD3FC87FE21B6536E3429B71AA3C624BE43860}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-explorer-attempt-002.projection.json, sha256: 3A76679B07A2E2FF18BB575945D2FC8F0CBD2FC95CDBA1AE07AF518F7FAB26DC}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-explorer-attempt-002.child.jsonl, sha256: D4F03529CC98E3BBEC5666854ADC4025BA6B6D3AAF2966614CD80E5D7BA72D70}
+  - role: implementer
+    selected_attempt: 1
+    tools: [lsp, yield, hub]
+    lsp_present: true
+    lsp_call_count: 1
+    lsp_result_success: true
+    reference_count: 1
+    remediation: NONE
+    evidence:
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-implementer-attempt-001.run.json, sha256: 384637B75BC758C13A466FB9DCE7EEB50C3CA9BDD41CE6CBE23D0A382B06B389}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-implementer-attempt-001.projection.json, sha256: 3D68850C315F1C80CC6A55F2721780E10D9269E5FFE7AD54F7FA2A632C34CFC8}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-implementer-attempt-001.child.jsonl, sha256: 3352E47D94210D900CDCFEA6C9DA70E1B25581EF1C9562164E8F09EAF73EF8AE}
+  - role: reviewer
+    selected_attempt: 1
+    tools: [lsp, yield, hub]
+    lsp_present: true
+    lsp_call_count: 1
+    lsp_result_success: true
+    reference_count: 1
+    remediation: NONE
+    evidence:
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-reviewer-attempt-001.run.json, sha256: FB3E6EF141A068CB7168BFB71AB490B08A0C8E9024BC6D7D74E72ED503A8CDD3}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-reviewer-attempt-001.projection.json, sha256: 9A7D0B7FDA865D05D910F1947C91634A88D10AE8744212152D4B2572FCCC7FBC}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-reviewer-attempt-001.child.jsonl, sha256: 045DC5D98C9447671B0B78CCF0443A40842D3D48D038E4241EE0296D17879F83}
+  - role: verifier
+    selected_attempt: 1
+    tools: [read, yield, hub]
+    lsp_present: false
+    lsp_call_count: 0
+    cause: AGENT_ALLOWLIST_MISSING_CONTROL
+    remediation: CONTROL_NO_REMEDIATION
+    evidence:
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-verifier-attempt-001.run.json, sha256: 783723C1FC311D7C410FAD17A76C84C8DE45CBCB7B42B036BECC201EA74721D9}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-verifier-attempt-001.projection.json, sha256: C96E26B1D0E1751CE65BADFC4ECE9631415B56E1BC132FBDA8282D893AB104AD}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-verifier-attempt-001.child.jsonl, sha256: 376CF5F6F3ED04CEC55ADFB6671B10247B89ED55F0D0E07287C30B54859CABE6}
+
+superseded_attempts:
+  - attempt: 1
+    role: explorer
+    status: BLOCKED_ENVIRONMENT
+    reason: OMNIROUTE_LISTENER_ABSENT_BEFORE_CHILD_SPAWN
+    operator_abort_after_repeated_zero_token_connection_errors: true
+    evidence:
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-explorer-attempt-001.run.json, sha256: 53D1E74F68068B554FB780CB98260939FBF4DC446C89A9656FD29A9ED3CD452E}
+      - {path: docs/evidence/phase-00/E5/raw/e5-b-explorer-attempt-001.parent.stdout.jsonl, sha256: E1F64A40A43980DCCA34E5C3A3875D1C41ED1048B4A40C99E9A89AA90D052DDB}
+
+safety: {repository_unchanged: true, live_home_changed_count: 0, cleanup_succeeded: true, fake_server_processes_after: 0}

@@ -1,0 +1,24 @@
+schema_version: 1
+phase: "00"
+experiment: E3-H
+case: H6
+status: PASS
+
+execution:
+  runtime_call: false
+  evidence_kind: SYNTHETIC_ANALYZER_CONTROL
+  test_file: scripts/tests/phase00-e3a-e3h.Tests.ps1
+
+observation:
+  nonzero_exit_code: 9
+  nonzero_reason: CONFIG_READ_NONZERO
+  invalid_json_exit_code: 0
+  invalid_json_stdout: not-json
+  invalid_json_reason: CONFIG_JSON_INVALID
+  both_decisions: REFUSE
+  fallback: SEQUENTIAL_NON_ISOLATED_DISCLOSED
+
+interpretation:
+  reason: H6_DISTINCT_FAIL_CLOSED_CONTROLS
+  decision: Generic process failure and zero-exit malformed output remain distinct fail-closed paths.
+

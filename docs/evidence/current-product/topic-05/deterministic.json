@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "record_type": "topic05_deterministic_evidence",
+  "status": "PASS",
+  "captured_at_utc": "2026-08-13T09:22:30.4735618Z",
+  "scope": "model_free_progressive_retrieval_and_real_codegraph_smoke",
+  "provider_calls": 0,
+  "model_processes_started": 0,
+  "environment": {
+    "os": "Microsoft Windows 10.0.26100",
+    "architecture": "X64",
+    "pwsh_version": "7.6.4",
+    "node_version": "24.16.0",
+    "git_version": "2.54.0.windows.1",
+    "installed_omp_version": "17.2.12",
+    "pinned_omp_source_version": "17.2.10",
+    "pinned_omp_source_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+    "pinned_omp_source_clean": true
+  },
+  "real_binary_smoke": {
+    "status": "PASS",
+    "disposable_root": true,
+    "normal_user_cache_untouched": true,
+    "accepted_adapter_runs_disable_telemetry_and_updates": true,
+    "repository_head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "main_fixture_commit": "551c747db8d7c412d66d1b92165de122bd49cad7",
+    "linked_fixture_commit": "18732128732a4f9e7691c28a73979af993488f35",
+    "artifact": {
+      "upstream": "colbymchenry/codegraph",
+      "version": "1.5.0",
+      "tag": "v1.5.0",
+      "commit": "ea72e1b190921232aa7bd02e96bef5bbe4fe0ab6",
+      "platform": "win32-x64",
+      "name": "codegraph-win32-x64.zip",
+      "size_bytes": 52398062,
+      "sha256": "d6798622b4f44ee6757c94335f437ee27a9ff7d3537b554cb6a2b3baf11bc4a1",
+      "receipt_sha256": "d2405479019bbccc72310a0351c092c40c813b94a3e898c5971be0da5be6432c",
+      "bundle_tree_sha256": "6a5be0f6af7573d212028fb9fa285aa51b20df02a4bd61c42d9a0e70520cb123",
+      "provisioned_at_utc": "2026-08-13T08:55:43.9862283Z",
+      "requested_host": "github.com",
+      "final_host": "release-assets.githubusercontent.com",
+      "final_host_allowed": true,
+      "http_status": 200
+    },
+    "cases": {
+      "main_lazy_index": {
+        "status": "PASS",
+        "index_absent_before": true,
+        "index_state": "complete",
+        "synced": true,
+        "lazy_initialized": true,
+        "initial_files_errored": 0,
+        "init_ms": 1307,
+        "sync_ms": 1004,
+        "query_ms": 274,
+        "output_bytes": 1403,
+        "cited_sources": [
+          "src/handler.ts",
+          "src/service.ts",
+          "src/store.ts"
+        ],
+        "git_clean": true
+      },
+      "linked_worktree_index": {
+        "status": "PASS",
+        "index_absent_before": true,
+        "distinct_physical_index": true,
+        "expected_symbol_found": "linkedOnly",
+        "git_clean": true
+      },
+      "shared_index_refusal": {
+        "status": "PASS",
+        "reason_code": "worktree_mismatch",
+        "fallback": "native",
+        "main_index_unchanged": true,
+        "git_clean": true
+      },
+      "absence_corroboration": {
+        "status": "PASS",
+        "question_symbol": "DefinitelyMissingTopic05Symbol",
+        "graph_reported_no_relevant_code": true,
+        "native_rg_matches": 0,
+        "graph_only_acceptance": false,
+        "git_clean": true
+      },
+      "source_mutation_invalidation": {
+        "status": "PASS",
+        "lock_observed_before_mutation": true,
+        "reason_code": "source_changed",
+        "fallback": "native",
+        "source_restored_exactly": true,
+        "git_clean": true
+      },
+      "frozen_candidate_without_index": {
+        "status": "PASS",
+        "candidate_id": "C1",
+        "index_absent_before": true,
+        "reason_code": "candidate_index_missing",
+        "fallback": "native",
+        "index_absent_after": true,
+        "task_closed": true,
+        "git_clean": true
+      },
+      "tool_discovery": {
+        "status": "PASS",
+        "live_rpc_only": true,
+        "model_prompt_sent": false,
+        "ordinary_session_xdev_discovery": true,
+        "restricted_child_exclusion_method": "pinned_source_contract",
+        "restricted_child_preloaded_custom_tool_paths_empty": true,
+        "restricted_child_custom_tools_empty_without_explicit_override": true,
+        "root_cli_tools_flag_treated_as_restricted_child": false
+      },
+      "uninstall_retention": {
+        "status": "PASS",
+        "strict_single_file_regression_assertions": 78,
+        "preinstall_bytes_restored": true,
+        "installed_component_removed": true,
+        "installed_tool_removed": true,
+        "bundle_retained_and_reported": true,
+        "bundle_unchanged": true,
+        "receipt_unchanged": true,
+        "index_retained_and_reported": true,
+        "index_unchanged": true,
+        "git_clean": true
+      }
+    },
+    "implementation_corrections_from_live_smoke": [
+      "network_stream_copy_output_silenced",
+      "named_CodeGraph_module_export_supported",
+      "codegraph_db_filename_reconciled",
+      "strict_single_file_uninstall_collection_fixed"
+    ]
+  },
+  "deterministic_campaign": {
+    "status": "PASS",
+    "campaign_id": "topic05-20260813-p1-6be4c451630f",
+    "seed": 20260813,
+    "pairs": 1,
+    "record_count": 54,
+    "record_hashes_sha256": "f96e02dc5f3800b853d8987d89a318ded2645ce5efd95ee38d32e02cd47e09d3",
+    "fixture_count": 9,
+    "fixture_classes": [
+      "blast_radius_affected_tests",
+      "deterministic_absence_claim",
+      "dynamic_or_heuristic_graph_gap",
+      "exact_text_config_native_fit",
+      "linked_worktree_index_mismatch",
+      "multi_file_call_path",
+      "source_or_candidate_mutation",
+      "stale_partial_pending_index",
+      "unfamiliar_symbol_localization"
+    ],
+    "arm_counts": {
+      "A_lead_native": 9,
+      "B_lead_codegraph": 18,
+      "C_scout_native_lead": 9,
+      "D_scout_codegraph_lead": 18
+    },
+    "cache_condition_counts": {
+      "absent": 18,
+      "cold": 18,
+      "warm": 18
+    },
+    "all_records_completed": true,
+    "all_records_model_free": true,
+    "all_usage_fields_not_measured": true,
+    "comparison": {
+      "paired_group_count": 9,
+      "excluded_group_count": 0,
+      "hard_gates_pass": true,
+      "cold_warm_separate": true,
+      "paired_snapshot_only": true,
+      "efficiency_measured": false,
+      "all_routes_observed": false,
+      "recommendation": "inconclusive",
+      "scope": "route_and_task_class_only",
+      "universal_default": false,
+      "codegraph_percentage_threshold": null,
+      "promotion": false
+    }
+  },
+  "disposition": {
+    "codegraph_component": "experimental_default_off",
+    "native_retrieval_default": true,
+    "model_campaign_required_for_route_promotion": true,
+    "promotion": false,
+    "recommendation": "inconclusive"
+  }
+}

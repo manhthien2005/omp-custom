@@ -1,5 +1,12 @@
 # Repo Report — context7
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/context7`
 > **SHA:** `8d52608e4e27557e6c1e807c8241cffb5544a9a3` (`git -C context7 rev-parse HEAD`)
 > **License:** **MIT** — `LICENSE` at root: *"The MIT License (MIT) / Copyright (c) 2021
@@ -69,7 +76,7 @@ Its verdict was `Conditional` / `D-conditional` with `adopted_mechanisms: []`. T
 
 | Mechanism | OMP attachment point | Cost tier | Verdict | Why |
 |---|---|---|---|---|
-| **C13** | `explorer.md`; `spec/07 §B` level-5 disclosure rule | per-spawn | **ADOPT** | `spec/07:164` already requires disclosure for level 5 (web). C13 is the same rule one level earlier and stated as a **prohibition on silent degradation**, which is cross-layer invariant #8 in `01-dna.md` ("fail loudly"). Cheapest correctness item here |
+| **C13** | `explorer.md`; `spec/07 §B-1` named-skip disclosure rule | per-spawn | **ADOPT** | `spec/07 §B-1` requires named, disclosed skips for unavailable retrieval levels. C13 applies that prohibition on silent degradation to Context7, which is cross-layer invariant #8 in `01-dna.md` ("fail loudly"). Cheapest correctness item here |
 | **C10 C11** | `explorer.md` query-formation guidance | per-spawn | **ADOPT** | One-concept-per-query with a *reason* ("multi-topic queries dilute ranking"), plus a negative-example table. Applies to our `grep`/`lsp` queries, not just Context7 — the failure mode is identical |
 | **C5 C6** | `.omp/skills/*/SKILL.md` `description` fields | zero (already paid) | **ADOPT as description craft** | A description that names both **when to use** and **when not to** is the shape `agent-skills` and `Agent-Skills-for-Context-Engineering` argue for; this is a third independent instance. C6's anti-overconfidence framing is the specific wording worth copying for `evidence-before-completion` |
 | **C7 C8** | worker `output:` frontmatter; Explorer result formatting | per-spawn | **ADOPT as a result-shape rule** | Two rules: map raw scores to labels the model can act on, and **omit** invalid fields rather than emitting `-1`. Our SD-11 Explorer result ("name what you excluded") gains a companion: *do not emit placeholder values for what you could not determine.* Prevents a model reasoning over `-1` as if it were a score |
@@ -131,7 +138,7 @@ local_components:
 KD-001 removes `.omp/policies/` from the installed surface. This is the **third** of the four
 stale entries already catalogued in `02-repo-synthesis.md §G` ("Registry corrections beyond
 SD-1 and SD-10"), and this read confirms it independently. Correct destination: `docs/` plus
-the retrieval-order text now living at `spec/07 §B:151-165`. **No new finding — confirmation.**
+the retrieval-order text now living at `spec/07 §B-1`. **No new finding — confirmation.**
 
 ### 5-2. `registry/upstreams.yml:503-504` — watched path is too narrow to be useful
 
@@ -154,7 +161,7 @@ enough to stop treating them as individual corrections: **`spec/14` needs a chec
 mechanism the entry claims authority for. Proposed as part of the SD-1 cluster rather than a
 new delta.
 
-### 5-3. `spec/07 §B:158` — "via MCP" is now an over-specification
+### 5-3. `spec/07 §B-1` — "via MCP" is now an over-specification
 
 ```
 4. Context7 (version-specific library docs via MCP)

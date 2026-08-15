@@ -1,0 +1,19 @@
+diff --git a/nested-presence.json b/nested-presence.json
+index 0967ef4..2b65373 100644
+--- a/nested-presence.json
++++ b/nested-presence.json
+@@ -1 +1,6 @@
+-{}
++{
++  "nested-plain": true,
++  "deep/level/two": true,
++  "node_modules/pkg": true,
++  "tracked-submodule": true
++}
+diff --git a/root.txt b/root.txt
+index 7a577d4..8404c52 100644
+--- a/root.txt
++++ b/root.txt
+@@ -1 +1 @@
+-E3_G_ROOT_BASE
++E3_G_ROOT_WORKER

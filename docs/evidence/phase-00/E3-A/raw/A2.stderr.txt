@@ -1,0 +1,4 @@
+[unknown_key]
+Unknown setting: task.isolation.__phase00_unknown
+
+Run 'omp config list' to see available keys

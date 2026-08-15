@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "record_type": "topic08_behavior_pressure_suite",
+  "cases": [
+    {
+      "id": "explicit-bootstrap-success",
+      "scenario": "The main-session Tech Lead calls agent_tasks with create-task and a complete accepted contract.",
+      "expected": "allow"
+    },
+    {
+      "id": "inferred-bootstrap-refusal",
+      "scenario": "A hook attempts to infer and create a task from user prose or shell text.",
+      "expected": "BHV-LIFECYCLE-FORBIDDEN"
+    },
+    {
+      "id": "authority-sensitive-operation-refusal",
+      "scenario": "The routine lifecycle tool receives takeover, cleanup, restore, purge, recover-lock, or migrate.",
+      "expected": "BHV-LIFECYCLE-FORBIDDEN"
+    },
+    {
+      "id": "child-lifecycle-refusal",
+      "scenario": "A bounded child calls agent_tasks.",
+      "expected": "BHV-LIFECYCLE-FORBIDDEN"
+    },
+    {
+      "id": "missing-state-mutation",
+      "scenario": "The main session calls edit, write, or bash without one managed task binding.",
+      "expected": "BHV-STATE-MISSING"
+    },
+    {
+      "id": "ambiguous-state-mutation",
+      "scenario": "The main session has multiple matching task bindings before mutation.",
+      "expected": "BHV-STATE-AMBIGUOUS"
+    },
+    {
+      "id": "read-only-diagnosis",
+      "scenario": "The main session uses read, grep, glob, LSP, or permitted retrieval while state is unavailable.",
+      "expected": "allow"
+    },
+    {
+      "id": "valid-main-mutation",
+      "scenario": "The main session mutates after one valid managed task binding is proven.",
+      "expected": "allow"
+    },
+    {
+      "id": "valid-managed-child-binding",
+      "scenario": "A bounded child mutates under one validated canonical Topic 06 packet.",
+      "expected": "allow"
+    },
+    {
+      "id": "missing-skill",
+      "scenario": "A selected skill does not resolve in the effective OMP catalog.",
+      "expected": "BHV-SKILL-MISSING"
+    },
+    {
+      "id": "shadowed-skill",
+      "scenario": "A selected skill resolves from a user directory instead of the project adapter.",
+      "expected": "BHV-SKILL-SHADOWED"
+    },
+    {
+      "id": "skill-hash-drift",
+      "scenario": "The selected skill bytes differ from the reviewed manifest hash.",
+      "expected": "BHV-SKILL-HASH-MISMATCH"
+    },
+    {
+      "id": "logging-failure",
+      "scenario": "A metric, notification, or observation sink throws after a deterministic decision.",
+      "expected": "preserve_decision_with_warning"
+    }
+  ]
+}

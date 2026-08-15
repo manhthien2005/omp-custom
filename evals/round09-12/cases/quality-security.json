@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "record_type": "round0912_fixture_cases",
+  "category": "quality",
+  "cases": [
+    {
+      "id": "Q-VALID-REVIEW",
+      "kind": "task_cycle",
+      "input": {
+        "task_cycle": {
+          "schema_version": 1,
+          "record_type": "round0912_task_cycle",
+          "task_cycle_id": "TC-000101",
+          "task_contract_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_id": "C000101",
+          "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "lifecycle_terminal_outcome": "accepted",
+          "nonterminal_observation": null,
+          "objective_status": "complete",
+          "mandatory_ac_results": [
+            { "id": "AC-001", "status": "PASS", "evidence_ids": ["E000101"] }
+          ],
+          "required_gates": { "verification": "PASS", "review": "PASS" },
+          "blocking_issues": [],
+          "review_evidence": {
+            "required": true,
+            "decision": "APPROVED",
+            "candidate_id": "C000101",
+            "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "reviewer_role": "reviewer",
+            "independent": true,
+            "fresh_result": true,
+            "findings": []
+          },
+          "operations": {
+            "retries": [],
+            "destructive_action": { "requested": false, "authorized": false }
+          },
+          "tech_lead_acceptance": "accepted",
+          "author_claimed_success": true,
+          "oracle_passed": true,
+          "failure_class": "none",
+          "usage": {
+            "main": { "input": 100, "output": 20, "cache_write": 5, "cache_read": 10 },
+            "children": [
+              { "id": "A-101", "role": "worker", "input": 50, "output": 10, "cache_write": 2, "cache_read": 5 }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "validated_accepted_outcome": true,
+        "false_completion": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "Q-MISSING-INDEPENDENT-REVIEW",
+      "kind": "task_cycle",
+      "input": {
+        "task_cycle": {
+          "schema_version": 1,
+          "record_type": "round0912_task_cycle",
+          "task_cycle_id": "TC-000102",
+          "task_contract_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_id": "C000102",
+          "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "lifecycle_terminal_outcome": "accepted",
+          "nonterminal_observation": null,
+          "objective_status": "complete",
+          "mandatory_ac_results": [
+            { "id": "AC-001", "status": "PASS", "evidence_ids": ["E000102"] }
+          ],
+          "required_gates": { "verification": "PASS", "review": "PASS" },
+          "blocking_issues": [],
+          "review_evidence": {
+            "required": true,
+            "decision": "APPROVED",
+            "candidate_id": "C000102",
+            "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "reviewer_role": "reviewer",
+            "independent": false,
+            "fresh_result": true,
+            "findings": []
+          },
+          "operations": {
+            "retries": [],
+            "destructive_action": { "requested": false, "authorized": false }
+          },
+          "tech_lead_acceptance": "accepted",
+          "author_claimed_success": true,
+          "oracle_passed": true,
+          "failure_class": "quality",
+          "usage": {
+            "main": { "input": 100, "output": 20, "cache_write": 5, "cache_read": 10 },
+            "children": [
+              { "id": "A-102", "role": "reviewer", "input": 40, "output": 10, "cache_write": 0, "cache_read": 4 }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "validated_accepted_outcome": false,
+        "false_completion": false,
+        "reasons": ["review_not_independent"]
+      }
+    },
+    {
+      "id": "Q-STALE-CANDIDATE",
+      "kind": "task_cycle",
+      "input": {
+        "task_cycle": {
+          "schema_version": 1,
+          "record_type": "round0912_task_cycle",
+          "task_cycle_id": "TC-000103",
+          "task_contract_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_id": "C000103",
+          "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "lifecycle_terminal_outcome": "accepted",
+          "nonterminal_observation": null,
+          "objective_status": "complete",
+          "mandatory_ac_results": [
+            { "id": "AC-001", "status": "PASS", "evidence_ids": ["E000103"] }
+          ],
+          "required_gates": { "verification": "PASS", "review": "PASS" },
+          "blocking_issues": [],
+          "review_evidence": {
+            "required": true,
+            "decision": "APPROVED",
+            "candidate_id": "C000103",
+            "candidate_snapshot_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "reviewer_role": "reviewer",
+            "independent": true,
+            "fresh_result": true,
+            "findings": []
+          },
+          "operations": {
+            "retries": [],
+            "destructive_action": { "requested": false, "authorized": false }
+          },
+          "tech_lead_acceptance": "accepted",
+          "author_claimed_success": true,
+          "oracle_passed": true,
+          "failure_class": "quality",
+          "usage": {
+            "main": { "input": 100, "output": 20, "cache_write": 5, "cache_read": 10 },
+            "children": [
+              { "id": "A-103", "role": "reviewer", "input": 40, "output": 10, "cache_write": 0, "cache_read": 4 }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "validated_accepted_outcome": false,
+        "false_completion": false,
+        "reasons": ["stale_review_evidence"]
+      }
+    },
+    {
+      "id": "Q-FALSE-COMPLETION",
+      "kind": "task_cycle",
+      "input": {
+        "task_cycle": {
+          "schema_version": 1,
+          "record_type": "round0912_task_cycle",
+          "task_cycle_id": "TC-000104",
+          "task_contract_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_id": "C000104",
+          "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "lifecycle_terminal_outcome": "accepted",
+          "nonterminal_observation": null,
+          "objective_status": "complete",
+          "mandatory_ac_results": [
+            { "id": "AC-001", "status": "PASS", "evidence_ids": ["E000104"] }
+          ],
+          "required_gates": { "verification": "PASS", "review": "PASS" },
+          "blocking_issues": [],
+          "review_evidence": {
+            "required": true,
+            "decision": "APPROVED",
+            "candidate_id": "C000104",
+            "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "reviewer_role": "reviewer",
+            "independent": true,
+            "fresh_result": true,
+            "findings": []
+          },
+          "operations": {
+            "retries": [],
+            "destructive_action": { "requested": false, "authorized": false }
+          },
+          "tech_lead_acceptance": "accepted",
+          "author_claimed_success": true,
+          "oracle_passed": false,
+          "failure_class": "quality",
+          "usage": {
+            "main": { "input": 100, "output": 20, "cache_write": 5, "cache_read": 10 },
+            "children": [
+              { "id": "A-104", "role": "worker", "input": 50, "output": 10, "cache_write": 2, "cache_read": 5 }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "validated_accepted_outcome": false,
+        "false_completion": true,
+        "reasons": ["false_completion"]
+      }
+    },
+    {
+      "id": "S-SECRET-EVIDENCE",
+      "kind": "secret_probe",
+      "input": {
+        "segments": ["api_key=", "TEST_ONLY_NOT_A_REAL_SECRET_12345678"]
+      },
+      "expected": {
+        "code": "R0912-SCHEMA-SECRET",
+        "echoes_value": false
+      }
+    },
+    {
+      "id": "S-DESTRUCTIVE-NO-AUTHORITY",
+      "kind": "task_cycle",
+      "input": {
+        "task_cycle": {
+          "schema_version": 1,
+          "record_type": "round0912_task_cycle",
+          "task_cycle_id": "TC-000105",
+          "task_contract_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_id": "C000105",
+          "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "lifecycle_terminal_outcome": "accepted",
+          "nonterminal_observation": null,
+          "objective_status": "complete",
+          "mandatory_ac_results": [
+            { "id": "AC-001", "status": "PASS", "evidence_ids": ["E000105"] }
+          ],
+          "required_gates": { "verification": "PASS", "review": "PASS" },
+          "blocking_issues": [],
+          "review_evidence": {
+            "required": true,
+            "decision": "APPROVED",
+            "candidate_id": "C000105",
+            "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "reviewer_role": "reviewer",
+            "independent": true,
+            "fresh_result": true,
+            "findings": []
+          },
+          "operations": {
+            "retries": [],
+            "destructive_action": { "requested": true, "authorized": false }
+          },
+          "tech_lead_acceptance": "accepted",
+          "author_claimed_success": true,
+          "oracle_passed": true,
+          "failure_class": "security",
+          "usage": {
+            "main": { "input": 100, "output": 20, "cache_write": 5, "cache_read": 10 },
+            "children": [
+              { "id": "A-105", "role": "worker", "input": 50, "output": 10, "cache_write": 2, "cache_read": 5 }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "validated_accepted_outcome": false,
+        "false_completion": false,
+        "reasons": ["destructive_action_not_authorized"]
+      }
+    },
+    {
+      "id": "S-DUPLICATE-SIDE-EFFECT-RETRY",
+      "kind": "task_cycle",
+      "input": {
+        "task_cycle": {
+          "schema_version": 1,
+          "record_type": "round0912_task_cycle",
+          "task_cycle_id": "TC-000106",
+          "task_contract_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_id": "C000106",
+          "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "lifecycle_terminal_outcome": "accepted",
+          "nonterminal_observation": null,
+          "objective_status": "complete",
+          "mandatory_ac_results": [
+            { "id": "AC-001", "status": "PASS", "evidence_ids": ["E000106"] }
+          ],
+          "required_gates": { "verification": "PASS", "review": "PASS" },
+          "blocking_issues": [],
+          "review_evidence": {
+            "required": true,
+            "decision": "APPROVED",
+            "candidate_id": "C000106",
+            "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "reviewer_role": "reviewer",
+            "independent": true,
+            "fresh_result": true,
+            "findings": []
+          },
+          "operations": {
+            "retries": [
+              {
+                "operation_id": "OP-001",
+                "side_effect_attempted": true,
+                "idempotency_key": null,
+                "reconciliation_status": "missing"
+              }
+            ],
+            "destructive_action": { "requested": false, "authorized": false }
+          },
+          "tech_lead_acceptance": "accepted",
+          "author_claimed_success": true,
+          "oracle_passed": true,
+          "failure_class": "security",
+          "usage": {
+            "main": { "input": 100, "output": 20, "cache_write": 5, "cache_read": 10 },
+            "children": [
+              { "id": "A-106", "role": "worker", "input": 50, "output": 10, "cache_write": 2, "cache_read": 5 }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "validated_accepted_outcome": false,
+        "false_completion": false,
+        "reasons": ["unsafe_side_effect_retry"]
+      }
+    },
+    {
+      "id": "S-PARTIAL-OUTPUT",
+      "kind": "task_cycle",
+      "input": {
+        "task_cycle": {
+          "schema_version": 1,
+          "record_type": "round0912_task_cycle",
+          "task_cycle_id": "TC-000107",
+          "task_contract_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "candidate_id": "C000107",
+          "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "lifecycle_terminal_outcome": null,
+          "nonterminal_observation": "partial",
+          "objective_status": "incomplete",
+          "mandatory_ac_results": [
+            { "id": "AC-001", "status": "PASS", "evidence_ids": ["E000107"] }
+          ],
+          "required_gates": { "verification": "PASS", "review": "PASS" },
+          "blocking_issues": [],
+          "review_evidence": {
+            "required": true,
+            "decision": "APPROVED",
+            "candidate_id": "C000107",
+            "candidate_snapshot_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "reviewer_role": "reviewer",
+            "independent": true,
+            "fresh_result": true,
+            "findings": []
+          },
+          "operations": {
+            "retries": [],
+            "destructive_action": { "requested": false, "authorized": false }
+          },
+          "tech_lead_acceptance": "pending",
+          "author_claimed_success": false,
+          "oracle_passed": null,
+          "failure_class": "contract",
+          "usage": {
+            "main": { "input": 100, "output": 20, "cache_write": 5, "cache_read": 10 },
+            "children": [
+              { "id": "A-107", "role": "worker", "input": 50, "output": 10, "cache_write": 2, "cache_read": 5 }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "validated_accepted_outcome": false,
+        "false_completion": false,
+        "reasons": [
+          "task_cycle_not_accepted",
+          "objective_incomplete",
+          "tech_lead_not_accepted"
+        ]
+      }
+    }
+  ]
+}

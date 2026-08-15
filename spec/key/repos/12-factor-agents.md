@@ -1,5 +1,12 @@
 # Repo Report — 12-factor-agents
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/12-factor-agents`
 > **SHA:** `d20c728368bf9c189d6d7aab704744decb6ec0cc` (`git -C 12-factor-agents rev-parse HEAD`)
 > **License:** Split grant, stated in two places and consistent. `LICENSE` is Apache-2.0
@@ -245,4 +252,3 @@ cheapest possible class of adoption and the reason it survives rule 4 at all.
   It is the single external claim most load-bearing for our 4-worker topology, and it is
   grade-A-as-text but grade-D-as-evidence. Our topology should not be justified *primarily*
   by this sentence.
-

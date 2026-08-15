@@ -1,0 +1,36 @@
+schema_version: 1
+phase: "00"
+experiment: E3-A
+case: A3
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+
+execution:
+  selected_attempt: 1
+  provider_call: false
+  direct_process_count: 4
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-A/raw/A3.stdout.json, sha256: 5E3ADA9A5AD04266AAF7ADEDE7C1D032ED8933E5BE0EF3FF15E21EEF5C29A881}
+    - {path: docs/evidence/phase-00/E3-A/raw/A3.stderr.txt, sha256: 96E07D08B645A8217F38241F8AE053A6D56DBC1DD62B1BF4F9E22311E7F1DF4D}
+    - {path: docs/evidence/phase-00/E3-A/raw/A3.run.json, sha256: 84E39DE7FEFA94BAD62AD04C51F4E9FE18D4C935CEFD9F2FDDBD7C0E76498953}
+
+observation:
+  project_root: {mode: rcopy, apply: false}
+  nested_cwd: {mode: none, apply: true}
+  nested_decision: REFUSE
+  refusal_reason: CWD_PROJECT_CONFIG_NOT_DISCOVERED
+  fallback: SEQUENTIAL_NON_ISOLATED_DISCLOSED
+
+interpretation:
+  reason: A3_CWD_PROJECT_CONFIG_NOT_DISCOVERED
+  decision: >-
+    OMP 17.2.10 does not walk from packages/foo to the ancestor project .omp directory;
+    the effective values fall back to the disposable global layer and require refusal.
+  affected_requirements: [CR-31, E3-A, E3-H]
+

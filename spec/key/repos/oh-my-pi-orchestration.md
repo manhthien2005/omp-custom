@@ -1,5 +1,12 @@
 # Repo Report — oh-my-pi (orchestration: `task` vs `eval`)
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/oh-my-pi`
 > **SHA:** `3a8591a8af5b6d200088d12ca75a5517cb064fa8` (`git -C _research/upstreams/oh-my-pi rev-parse HEAD`)
 > **License:** MIT. `LICENSE` reads `MIT License / Copyright (c) 2025 Mario Zechner / Copyright (c) 2025-2026 Can Bölük`. Two copyright holders, one MIT grant. No in-file grant headers found in the files read this pass.
@@ -251,4 +258,3 @@ One experiment settles it, because it exercises every asymmetry that matters at 
 - That §5.1 is an OMP bug rather than deliberate. The `budget-bridge.ts:1-7` header and the `agent-bridge.ts:126-131` refusal both read as though eval subagent tokens *are* counted, and `test/core/turn-budget.test.ts` asserts the accumulator works. The producer call is simply absent. That reads as an unfinished wiring, but I did not check the issue tracker or git history to confirm intent. The *behavior* (§5.1) is grade A; the *characterization as a bug* is grade C.
 - Whether any surface outside `src/` (ACP, SDK consumers, the collab host) calls `recordEvalSubagentUsage`. My grep covered the repo excluding `node_modules`, so I believe not, but a runtime injection through the `ToolSession` interface from an external embedder would not appear in this repo.
 - Whether `mergeCallAndResult` / renderer behavior changes what the *model* sees versus the TUI on the task path. I verified `details` never reaches the provider (`anthropic.ts:3672`) for Anthropic specifically; I did not check the other ~10 providers in `packages/ai/src/providers/`.
-

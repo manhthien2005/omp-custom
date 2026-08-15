@@ -1,0 +1,7 @@
+schema_version: 1
+phase: "00"
+experiment: E3-C
+status: PASS
+decision: Branch mode retains a named task branch with the worker change while leaving the parent checkout unchanged.
+cases: {C1: PASS}
+artifacts: [docs/evidence/phase-00/E3-C/C1.yml]

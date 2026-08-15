@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "fixture_head": "e8ad2febfc2b8505de052486f701d4554e3d86a6",
+  "attempted_indices": [0, 1],
+  "stopped_before_index": 2,
+  "task0_apply_exit": 0,
+  "task1_apply_exit": 1,
+  "task1_error": "error: patch failed: conflict.txt:1; error: conflict.txt: patch does not apply",
+  "task2_attempted": false,
+  "conflict_content_after": "E3_F_TASK_0",
+  "task2_target_exists_after": false,
+  "parent_status": [" M conflict.txt"],
+  "task1_artifact_readable": true,
+  "task2_artifact_readable": true,
+  "task1_artifact_unchanged": true,
+  "task2_artifact_unchanged": true,
+  "task1_sha256_after": "EE5EEBACEEBDA35FB18D4236CC71AD1BB9A0462AB1340C26E8AC6E136F97F45D",
+  "task2_sha256_after": "824662991E98168B5CAA956ADFDDBEBF68D1B75A27005067D7812D277D3638DF"
+}

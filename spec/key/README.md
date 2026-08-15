@@ -81,7 +81,9 @@ Not negotiable within this layer; they come from `plan.md` and `spec/01`:
 1. **OMP is the only runtime.** No second orchestrator, scheduler, or worktree manager.
 2. **OmniRoute is the only gateway.** No direct provider calls.
 3. **Every file in `template/.omp/` is discovered by OMP, or it does not live there.**
-4. **Optimize tokens per accepted outcome** — never tokens alone.
+4. **Clear quality gates, then optimize core workflow tokens per validated accepted outcome.**
+   Failed cycles remain charged; Cheap Scout and raw totals are unweighted telemetry
+   (`03-token-quality-model.md §A`, KD-024).
 5. **No mechanism without a named OMP attachment point.** A mechanism that cannot name
    one is documentation, or it is a defect.
 

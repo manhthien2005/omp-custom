@@ -1,0 +1,23 @@
+schema_version: 1
+phase: "00"
+experiment: E3-G
+case: G3
+status: PASS_DIAGNOSTIC_ONLY
+
+execution:
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-G/raw/a2-run.json, sha256: 64783779B63DE36AAB6DDB3D7A102AA936BDF8CE14895E2D4EB517A75B24A954}
+    - {path: docs/evidence/phase-00/E3-G/raw/a2.patch, sha256: 4737E31448AC18B576A60107282B7F22EF19F3C256E9D2B2F90E99F7269875BC}
+    - {path: docs/evidence/phase-00/E3-G/raw/a2.output.txt, sha256: 3A47D83470010A3CCF80BCE11B49D5C08A1CD3D8AA3E86E8717E10A869B0C55D}
+
+observation:
+  facts:
+    - A project extension was rediscovered inside the isolated worktree and intercepted a real write tool call before execution.
+    - The write returned an extension block error, the target never materialized, and a durable audit-only root patch proved the hook fired inside isolation.
+    - The worker recovered and exited 0 after a valid terminal yield; the parent remained unchanged throughout 106 polls.
+
+interpretation:
+  decision: OPTION_A2_TOOL_CALL_GUARD_IS_TECHNICALLY_REACHABLE
+  spec_effect: FUTURE_LIFT_PATH_ONLY
+  normative_policy_change: none
+  rationale: A2 remains unadopted for v0 pending production-grade path normalization, bash coverage, installation ownership, and independent enforcement tests.

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "case": "J3",
+  "attempt": 1,
+  "experiment": "E3-J",
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>"
+  },
+  "model_catalog_sha256": "56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779",
+  "fixture_commit": "132be53c911a7d1baf5365bc6850d4fa1ca0f9f3",
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_ROOT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--config",
+    "<DISPOSABLE_ROOT>/config.yml",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "8m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:J3-stage-barriers.md>"
+  ],
+  "exit_code": 0,
+  "started_at": "2026-08-09T00:00:44.8372634+07:00",
+  "completed_at": "2026-08-09T00:01:34.6800751+07:00",
+  "duration_ms": 49843,
+  "cleanup_succeeded": true,
+  "cleanup_failure_count": 0,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "after_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "changed_count": 0,
+    "changed_paths": [],
+    "boundary_result": "PASS_LIVE_HOME_READ_ONLY"
+  },
+  "analysis": {
+    "Status": "INVALID_RUN",
+    "Reasons": [
+      "J3_INVALID: Verifier or Reviewer task call is missing."
+    ]
+  }
+}

@@ -1,5 +1,11 @@
 # Repo Report — serena
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
 > **Path:** `_research/upstreams/serena`
 > **SHA:** `c7af2c09ef45faa4367c0e2a9f770fb73a62a612` (`git -C serena rev-parse HEAD`)
 > **License:** MIT. `LICENSE:1-5` — "MIT License / Copyright (c) 2025 Oraios AI". Confirmed a
@@ -128,10 +134,10 @@ argument than the one we have been making, and it is the honest one.
 
 **Refuse rather than degrade when LSP is unavailable.** `get_symbol_overview` raises and names the
 active language servers (`symbol_tools.py:108-111`). Coherent for Serena — the symbolic tools are
-the product, and silently returning regex results would be a lie about precision. Wrong for us:
-our worker agents must finish the task on whatever the repo is, so a degraded path has to exist.
-Serena keeps the regex path as a *separate* tool (`search_for_pattern`, `file_tools.py:544`) and
-`claude-code.yml` excludes it. We take the opposite branch deliberately.
+the product, and silently returning regex results would be a lie about precision. The transferable
+lesson is contract separation, not same-contract degradation: Serena keeps regex as a *separate*
+tool (`search_for_pattern`, `file_tools.py:544`). If LSP is unavailable, continuation requires an
+explicit different contract that does not consume LSP, followed by reconciliation and validation.
 
 **Prompt against the host's own tools.** `claude-code.yml:22-34` marks `Read` "FORBIDDEN for
 discovery", `Edit` "FORBIDDEN", and enumerates three arguments the agent may not use to justify

@@ -1,5 +1,12 @@
 # Repo Report — promptfoo
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/promptfoo`
 > **SHA:** `1c30e183c4a464d953898398399dc6aa69786471` (`git -C _research/upstreams/promptfoo rev-parse HEAD`, tip dated 2026-08-06)
 > **License:** MIT, verbatim. `LICENSE:1` reads `Copyright (c) Promptfoo 2025` followed by the

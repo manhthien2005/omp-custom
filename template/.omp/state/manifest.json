@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "record_type": "agent_tasks_component_manifest",
+  "minimum_pwsh_version": "7.4.0",
+  "files": [
+    {
+      "path": "agent-tasks.ps1",
+      "sha256": "2A89215B3B26CE23C11473D1EBEA33D98E27A3E1E8C358E1795704163CE6091F"
+    },
+    {
+      "path": "lib/AgentTasks.Candidate.ps1",
+      "sha256": "30F9AD824B86E1CFF0D12C12FF213B194C4D480407044E0EF740DB71E512C359"
+    },
+    {
+      "path": "lib/AgentTasks.Common.ps1",
+      "sha256": "24ABAA6A05A2D45D513179B2CFA8EE4054D0F9D2386ECEC623BD02DAF2659FBD"
+    },
+    {
+      "path": "lib/AgentTasks.Evidence.ps1",
+      "sha256": "DB657D54AB61F1E98B862D7A782D3B6D3664B70F7A7FFD5E87B788057AA1CD38"
+    },
+    {
+      "path": "lib/AgentTasks.Git.ps1",
+      "sha256": "329B0702CFE796025D0919AA9EE33CE747DEC2132CC88EC42F45FB2DBE6CB7E1"
+    },
+    {
+      "path": "lib/AgentTasks.Lifecycle.ps1",
+      "sha256": "19A96AE59935BB977897893C26D59FB0CE5EEBAA77FE308142838B841AC41145"
+    },
+    {
+      "path": "lib/AgentTasks.Projection.ps1",
+      "sha256": "F27633611F54689AF3EA4C192FD46C754F0F751C957118783D378CB288D88A06"
+    },
+    {
+      "path": "lib/AgentTasks.Retention.ps1",
+      "sha256": "AE7E17C68C864F7E4BE832DF9F7ED8D8C206FEAEB0B69EEB6371C0B804862154"
+    },
+    {
+      "path": "lib/AgentTasks.Store.ps1",
+      "sha256": "F095BDD2BC0F769B1158238BC25019C630EBB4E76638B6D8A76C6B50C4BCC44B"
+    },
+    {
+      "path": "lib/AgentTasks.Transfer.ps1",
+      "sha256": "78F2775DE64B87A3C9FCD396C00EAB2994468121265D07772682677300F7EAAA"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "D4A11D9F0A4958AE4D6D591AC61A30734F2598BE20645EB5C5E75AF85CEF622C"
+    },
+    {
+      "path": "schemas/agent-tasks-v1.schema.json",
+      "sha256": "D7D0F5FEED220C4B22AA6FC3BFF22EEA0FD2A4ED90F0980D7DC8441007921353"
+    }
+  ]
+}

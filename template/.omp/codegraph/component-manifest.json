@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "record_type": "codegraph_component_manifest",
+  "component": "codegraph",
+  "component_version": "1.0.0",
+  "minimum_pwsh_version": "7.4.0",
+  "requires": [
+    {
+      "component": "state",
+      "path": ".omp/state/manifest.json",
+      "schema_version": 1,
+      "record_type": "agent_tasks_component_manifest",
+      "sha256": "4898ddfbea5f8b14b0bcd41745daa0ab950c8f1ec4fe461f40f51fb1e8fc9d1f"
+    }
+  ],
+  "upstream_lock": {
+    "path": ".omp/codegraph/upstream-lock.json",
+    "sha256": "9d41e53b2545782c8c01d65897f185f1898ca8b3da28dc183cd773331c84d5b4",
+    "version": "1.5.0",
+    "tag": "v1.5.0",
+    "commit": "ea72e1b190921232aa7bd02e96bef5bbe4fe0ab6"
+  },
+  "files": [
+    {
+      "path": ".omp/codegraph/CODEGRAPH-LICENSE.txt",
+      "sha256": "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809"
+    },
+    {
+      "path": ".omp/codegraph/COMPONENT.md",
+      "sha256": "1e0ad87be70913739a4c9a7a94290dd25690c02b764501686a855199e44a5f18"
+    },
+    {
+      "path": ".omp/codegraph/codegraph-process.ps1",
+      "sha256": "08b908709c7d15e149e73c57732c90c05473911c228c25a28c02649cf7a154b7"
+    },
+    {
+      "path": ".omp/codegraph/safe-init.mjs",
+      "sha256": "46334b96e0a192c4fa790db9189825bb0df930a54643f2a2bae73d2faacadc2c"
+    },
+    {
+      "path": ".omp/codegraph/upstream-lock.json",
+      "sha256": "9d41e53b2545782c8c01d65897f185f1898ca8b3da28dc183cd773331c84d5b4"
+    },
+    {
+      "path": ".omp/tools/codegraph-retrieve.js",
+      "sha256": "71a70f404b3b33a4f4491b82960bcc1cf561d8c66b65e30ee665a14bea1e9d37"
+    }
+  ],
+  "generated_target_files": [
+    ".omp/codegraph/runtime.json",
+    ".omp/codegraph/install-record.json"
+  ]
+}

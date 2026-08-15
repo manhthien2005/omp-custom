@@ -9,6 +9,9 @@
 >
 > Grades per `00-method.md §B`. OMP citations are `packages/coding-agent/src/<path>:<line>`
 > @ `3a8591a`.
+>
+> Former fixed-role routing examples are historical hypotheses; selected model responsibilities
+> come only from the Topic 03 manifest.
 
 ---
 
@@ -40,14 +43,16 @@ whether to wire memory. Six gates, and a candidate must pass **all** of them:
 
 ### Gate 2 is where almost everything dies
 
-This is the finding that should govern the whole roadmap. **We have no measured baseline.**
-`spec/13` L3/L4 has never run; `benchmark.ps1` executes nothing. So for every candidate in
-this file, the honest answer to *"what failure does this solve?"* is currently **"unknown"**.
+This is the finding that should govern the whole roadmap. **We have no measured, frozen
+baseline pair.** `spec/13` L3/L4 has never run; `benchmark.ps1` executes nothing. So for
+every candidate in this file, the honest answer to *"what failure does this solve?"* is
+currently **"unknown"**.
 
-That has a sharp consequence: **the baseline is not a prerequisite for the roadmap, it is
-the first item on it.** Until it exists, every investment decision is a guess dressed as
-architecture, and `03-token-quality-model.md §A`'s objective function has no denominator to
-divide by.
+That has a sharp consequence: **the baseline pair is not a prerequisite for the roadmap, it
+is the first item on it.** The last promoted template must be frozen for candidate decisions;
+pinned plain OMP must be frozen for release-value decisions. Until both exist, every
+investment decision is a guess dressed as architecture, and
+`03-token-quality-model.md §A`'s objective function has no validated denominator.
 
 The failure mode this gate prevents is specific and this project has already committed it
 once: `.omp/policies/` was 581 lines built to solve a problem nobody had recorded.
@@ -64,10 +69,11 @@ were not using.
 
 ### The denominator test, stated plainly
 
-Every candidate must answer: **does this improve tokens per accepted outcome, or does it
-only add capability?** These are different, and the second is a cost with no recorded
-benefit. A mechanism that makes the system *able to do more* while making each accepted
-outcome *more expensive* is a regression the objective function is designed to catch.
+Every candidate must first clear the quality gates, then answer: **does this improve validated
+accepted-outcome rate, or core workflow tokens per validated accepted outcome, relative to the
+last promoted template?** Capability without a validated outcome is a cost with no recorded
+benefit. Release checkpoints separately ask whether the promoted template adds value over
+pinned plain OMP. Exact promotion semantics live in `spec/13 §C`.
 
 ---
 
@@ -113,29 +119,35 @@ modelRoles:
   default: omniroute/codex/gpt-5.6-sol-high
 ```
 
-**One role. Not five.** The template's `config.yml` defines `tech-lead`, `explorer`,
-`implementer`, `verifier`, `reviewer` — all pointing at the same model — but the *installed*
-user config defines only `default`. So today:
+The frozen five-role baseline pointed every project alias at one model, while the *installed*
+user config defined only `default`. That is historical measurement input, not a selected
+topology. After reconciling the Phase-00 experiment:
 
-- Every `@role` in every agent file resolves through a single destination, or falls through.
-- `spec/09 §C`'s honest note — "five aliases, one destination; the routing layer provides
-  zero differentiation" — is true, and stronger than written: the seam has **never been
-  exercised even once**.
-- `resolvedModelIsFallback` (returned per spawn, `task/types.ts:500-505`) would show this on
-  any run. Nobody has read it.
+- E2 supersedes the earlier fall-through hypothesis: missing and unknown aliases hard-fail before
+  session creation, and unavailable models surface an error with no fallback.
+- Project role values override global values.
+- The former `spec/09 §C` note — "five aliases, one destination; the routing layer provides
+  zero differentiation" — accurately describes that frozen baseline. Current aliases come
+  only from the Topic 03-selected manifest.
+- `resolvedModelIsFallback` detects retry fallback only; resolvedModelIsFallback does not mark
+  credential fallback to the parent model. Acceptance compares returned modelRole and resolvedModel with the expected
+  identity after reconciling `task.agentModelOverrides`; the flag is an additional gate, not the
+  whole detector.
 
 ### The single highest-value OmniRoute investment
 
-Make **two roles differ**, and measure. Concretely: point `explorer` and `verifier` at a
-cheaper/faster model, keep `implementer` and `diff-reviewer` strong, and run the A/B.
+Differentiate two selected responsibility classes and measure. When the Topic 03 manifest
+contains them, retrieval and deterministic command verification are candidates for the
+cheaper/faster tier, while mutation, integration, and non-author judgement remain candidates
+for the strong tier. The experiment compares selected contracts, not former role names.
 
-Why this specific pair, grade **C**: the Explorer's contract is ranked retrieval (mechanical,
-volume-bound) and the Verifier's is running commands and reading output (determinism comes
-from the commands, not the model). Both are the natural cheap tier. The Implementer and
-Reviewer carry the reasoning load where errors are expensive to recover.
+Why this split, grade **C**: ranked retrieval is mechanical and volume-bound, while command
+verification derives much of its determinism from the commands rather than the model. Those
+responsibilities are natural cheap-tier candidates. Mutation, integration, and judgement
+carry reasoning load where errors are expensive to recover.
 
-Why it matters beyond cost: `spec/09 §C` notes that a Reviewer on a **different model family**
-than the Implementer catches what the author rationalized. Same-model review inherits
+Why it matters beyond cost: a selected non-author judge on a **different model family** than
+the candidate author may catch what the author rationalized. Same-model review can inherit
 same-model blind spots. That is a *quality* argument for differentiation, not a cost one —
 and it is the only argument in this file where the cheaper option might also be the better one.
 
@@ -158,15 +170,15 @@ not reachable this pass (`127.0.0.1:20128` refused on `/v1/models`, `/models`, `
 
 Reading `~/.omp/agent/config.yml` this pass settled two things the spec had wrong or open.
 
-**D-1 — `compaction.strategy: shake` IS deployed.** KD-009 corrected `spec/05 §H` on the
-grounds that `snapcompact` is the *default* and `shake` must be selected explicitly. That
-correction is right about the default and **wrong about this installation**: the live config
-sets `strategy: shake`. So `spec/05 §H`'s reasoning about shake semantics applies as written
-here. KD-009's rule survives — deploy explicitly rather than assume — and it is in fact
-satisfied. OQ-C (measure `snapcompact` vs `shake`) remains open and is now a comparison
-against a deployed value rather than a hypothetical.
+**D-1 — historical live baseline, superseded for managed continuity.** This pass observed
+`compaction.strategy: shake` in the user-owned live config and correctly established that native
+OMP defaults to `snapcompact`. KD-031 later supersedes both as a managed product choice: the final
+runtime overlay reasserts `strategy: off`, disables automatic/remote/auto-continue paths, and
+permits only armed argument-free `/safe-compact` for one native soft transaction. The old live
+observation remains evidence, not current authority; OQ-C is evaluation-only and blocks nothing.
 
-**D-2 — `task.isolation.apply: true` is the live value.** This is the CR-31 hazard, present
+**D-2 — historical live settings observation.** `task.isolation.apply: true` was the live value.
+This is the CR-31 hazard, present
 in the actual environment. The Orchestrated parallel path is **unsafe as currently
 configured**, exactly as `spec/08 §E-9` predicted, and the mandatory preflight would refuse
 today. Also live: `softRequestBudget: 120` (not the documented default 200, so KD-011's
@@ -175,8 +187,8 @@ forced-partial-yield threshold is *lower* here — 180 requests, not 300), `enab
 `memory.backend: "off"`, `autolearn.enabled: false`.
 
 The last three are worth noting: the three biggest "should we build this?" candidates in
-§F are all **already off** in the live baseline. Turning one on is a deliberate act, not a
-default to be inherited.
+§F were all **off** in that captured live baseline. Current effective managed values come from the
+manifest-coupled overlay and runtime preflight, not this historical snapshot.
 
 ---
 
@@ -188,7 +200,7 @@ Ordered by return, with the gate that justifies the position.
 
 | # | Item | Why first |
 |---|---|---|
-| 0.1 | **L3 baseline** — fixtures + real harness reading `SingleResult` telemetry | Gate 2 has no answer for any candidate until this exists. This is the whole reason v0's deliverable is "a measured baseline" |
+| 0.1 | **Frozen baseline pair** — fixtures + real harness reconciling main-session and unique per-spawn telemetry | Gate 2 has no answer until the stable-product candidate baseline and pinned plain-OMP release baseline exist without double counting |
 | 0.2 | **OQ-A** — which forms `output:` accepts | KD-002 + KD-004 both rest on it; one spawn per candidate form |
 | 0.3 | **OQ-H** — `task` vs `eval` for `/orchestrated` | May delete most of `spec/08`'s CR-29/30/31/32 machinery. Deciding *after* building it wastes the build |
 | 0.4 | **OmniRoute reachability + catalog + strict-schema check** | Gates the contract layer (OQ-1) and all of §C |
@@ -201,7 +213,10 @@ Ordered by return, with the gate that justifies the position.
 | 1.2 | **Two model roles differ + A/B** (§C) | 3 + 4 | One config edit; converts the routing seam from unexercised to proven |
 | 1.3 | **Silent-failure lint set — 11 entries** (`05 §J.2`) | 2 — each is an observed runtime behavior | L0 checks; catches the defect class that has bitten this project most |
 | 1.4 | **Turn budget** (`+Nk!`) (G-6) | 3 — owned, unused | Zero; the runtime fan-out ceiling `spec/05 C-4` said didn't exist |
-| 1.5 | **Read `resolvedModelIsFallback`** in the acceptance check | 3 — already returned per spawn | One condition; closes a "silent" misroute that was never silent |
+| 1.5 | **Read `resolvedModelIsFallback` and compare exact returned identity** in the acceptance check | 3 — all fields are already returned per spawn | The flag rejects retry fallback; returned `modelRole` + `resolvedModel` comparison closes override and credential misroutes the flag does not mark |
+
+Read resolvedModelIsFallback and compare exact returned identity in the acceptance check. The
+table shorthand above names both required gates; neither one substitutes for the other.
 
 Every Tier-1 item is a **gate-3 pass**: capability the runtime already provides. None
 requires a removal procedure, none can drift from upstream, none adds a per-turn cost.
@@ -341,5 +356,5 @@ so nothing can be priced. MCP fails gate 2 and 3. Semantic search passes gate 1 
 fails gate 2 pending OQ-G — and the deterministic alternative is better anyway. Memory fails
 gate 2 and is the only candidate that genuinely threatens gate 5.
 
-**Therefore the highest-return investment is the baseline itself** — the one thing that
-converts every other item on this list from a guess into a decision.
+**Therefore the highest-return investment is the frozen baseline pair itself** — the one
+thing that converts every other item on this list from a guess into a decision.

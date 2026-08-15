@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "case": "J1",
+  "attempt": 1,
+  "experiment": "E3-J",
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "INHERITED_DEFAULT_LIVE_HOME"
+  },
+  "fixture_commit": "8bf3d72531d971e4a969cef1e3b3957eb1d79c4a",
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_ROOT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--config",
+    "<DISPOSABLE_ROOT>/config.yml",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "8m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:J1-blocking-batch.md>"
+  ],
+  "exit_code": 0,
+  "started_at": "2026-08-08T23:02:08.8263135+07:00",
+  "completed_at": "2026-08-08T23:03:16.6304408+07:00",
+  "duration_ms": 67804,
+  "cleanup_succeeded": true,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "6ae0a29e8f0d0b65a9091f44c7c0a98f54cbebdb8f457d70d51dfd79f4f1a239",
+    "after_sha256": "055baaeec30560a5cb006fd2bff6eb80989006c20d14af53aadb7b0935211ec3",
+    "changed_count": 3,
+    "changed_paths": [
+      "agent.db-shm",
+      "agent.db-wal",
+      "models.db"
+    ],
+    "boundary_result": "FAILED_LIVE_HOME_READ_ONLY"
+  },
+  "analysis": {
+    "Status": "BLOCKED_ENVIRONMENT",
+    "Reasons": [
+      "P00-RUNTIME-PROVIDER-CONNECTION",
+      "P00-RUNTIME-LIVE-HOME-WRITE"
+    ],
+    "Provider": "omniroute",
+    "Model": "codex/gpt-5.6-sol-high",
+    "ErrorMessage": "Unable to connect. Is the computer able to access the url?"
+  }
+}

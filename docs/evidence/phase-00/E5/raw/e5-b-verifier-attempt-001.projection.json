@@ -1,0 +1,39 @@
+{
+    "schema_version":  1,
+    "experiment":  "E5-B",
+    "role":  "verifier",
+    "attempt":  1,
+    "status":  "PASS",
+    "reasons":  [
+                    "E5_CONDITION_DISCRIMINATED"
+                ],
+    "tools":  [
+                  "read",
+                  "yield",
+                  "hub"
+              ],
+    "lsp_present":  false,
+    "lsp_call_count":  0,
+    "lsp_result_count":  0,
+    "lsp_result_success":  null,
+    "lsp_result_text":  null,
+    "lsp_server_name":  null,
+    "yield_call_count":  1,
+    "marker":  "E5_B_VERIFIER_LSP_ABSENT",
+    "marker_count":  1,
+    "cause":  "AGENT_ALLOWLIST_MISSING_CONTROL",
+    "remediation":  "CONTROL_NO_REMEDIATION",
+    "first_turn_prompt_tokens":  7185,
+    "final_total_tokens":  7286,
+    "fixture":  {
+                    "task_enable_lsp":  true,
+                    "parent_session_lsp":  true,
+                    "lsp_enabled":  true,
+                    "agent_allowlist_includes_lsp":  false,
+                    "language_server_configured":  true
+                },
+    "child_transcript":  {
+                             "path":  "docs/evidence/phase-00/E5/raw/e5-b-verifier-attempt-001.child.jsonl",
+                             "sha256":  "376CF5F6F3ED04CEC55ADFB6671B10247B89ED55F0D0E07287C30B54859CABE6"
+                         }
+}

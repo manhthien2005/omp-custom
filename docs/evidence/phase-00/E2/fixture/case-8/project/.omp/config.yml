@@ -1,0 +1,19 @@
+plan:
+  defaultOnStartup: false
+async:
+  enabled: false
+task:
+  batch: false
+  enableEffort: false
+  maxConcurrency: 1
+  maxRecursionDepth: 2
+  maxRuntimeMs: 180000
+  isolation:
+    mode: none
+    apply: false
+modelRoles:
+  smol: e2project/oc/mimo-v2.5-free
+  implementer: e2project/oc/mimo-v2.5-free
+  broken: e2unavailable/phase00/unavailable-model-7f3
+  conflict: e2project/oc/mimo-v2.5-free
+  default: e2project/oc/mimo-v2.5-free

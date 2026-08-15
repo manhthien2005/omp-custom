@@ -1,5 +1,12 @@
 # Repo Report — superpowers (obra / Jesse Vincent)
 
+> Authority boundary: This repository report is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
+
 > **Path:** `_research/upstreams/superpowers`
 > **SHA:** `44c9b2d6e889982ac18c27d05a19fefe335194e1`
 > **License:** MIT. `LICENSE:1-3` — "MIT License / Copyright (c) 2025 Jesse Vincent". Root file

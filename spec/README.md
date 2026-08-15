@@ -1,6 +1,53 @@
 # OPUS PROPOSED SPEC v1 — omp-custom Architecture Review
 
-> **Status: AWAITING JOINT SPEC REVIEW — NOT FINAL**
+<!-- topic08-projection:behavior-core -->
+> **Topic 08:** `behavior-manifest.json` selects three current skills, with
+> `evidence-before-completion` autoloaded only by Worker. The OMP adapter is
+> `IMPLEMENTED_NOT_PROMOTED`; Claude is non-installable `DESIGNED_NOT_VERIFIED`. Explicit
+> main-session `agent_tasks` bootstraps state, while generic mutation remains fail-closed.
+
+<!-- topic05-projection:spec-index -->
+> **KD-029:** progressive retrieval retains native `read`/`grep`/`glob` as the baseline and adds
+> optional/default-off CodeGraph through a bounded worktree-local adapter. See `spec/07` for
+> retrieval semantics, `spec/12` for installation, `spec/13` for evidence, and
+> `docs/retrieval.md` for operations.
+
+## Topic 04 selected durable authority
+
+KD-028 selects local immutable JSON plus one deterministic PowerShell core. Git authority is
+`<absolute-git-common-dir>/agent-tasks` (plural); non-Git authority is
+`<project-root>/.agent-tasks`. One task owns one writer lease and one authoritative worktree;
+separate mutating tasks use distinct worktrees/scope reservations. Candidate/evidence/handoff and
+safe retention rules are projected in specs 01/02/04/05/08/10/12–16. Explicit manual use is
+current; automatic lifecycle attachment remains Topic 08.
+
+## Topic 06 selected managed boundary
+
+KD-030 selects a trusted same-name OMP `task` wrapper over the native executor. The supported
+entry point is `.omp/bin/omp-managed.ps1`; it validates a Topic 04 work-unit projection before
+dispatch and a completed role result afterwards, then records only a provisional outcome. Bare
+OMP, Vibe, `eval`, and unrelated internal-agent facilities are explicitly unmanaged.
+
+Cheap Scout is Flash `xhigh` with Pro `xhigh` availability fallback, Worker is `high` or
+Tech-Lead-selected `xhigh`, and Reviewer is `xhigh` with ARTIFACT + CONTRACT input and no Worker
+CLAIM. Managed v1 rejects async/nested dispatch. Inline Tech Lead work is the normal fallback when
+the boundary is unavailable and produces no fabricated receipt. Historical `.omp/schemas` files
+are evidence only. `OPEN-T06-RUNTIME-01` is a nonblocking upstream universal-hook question.
+
+## Topic 07 selected continuity boundary
+
+KD-031 disables automatic semantic/context-promotion, idle, mid-turn, remote, and auto-continue
+paths in managed sessions. After a Topic 04 task is armed, argument-free `/safe-compact` may run
+one native local soft context-full transaction. It persists verified recovery bytes first,
+settles one hash-bound kernel, and injects it once on the next normal prompt without hidden
+continuation or retry. Pressure aborts ordinary provider dispatch; a bounded child fails rather
+than compacting. Built-in `/compact`, direct `shake`, `snapcompact`, automatic handoff, bare OMP,
+and remote compaction are outside the managed guarantee. The current status is
+`IMPLEMENTED_NOT_PROMOTED` only because the required local OMP 17.2.10 canary is unavailable
+(`OPEN-T07-RUNTIME-02`); installed 17.2.12 passes and Opus is not required.
+
+> **Status:** Topic 03 topology/routing accepted in KD-027; remaining topics retain their own
+> review and implementation status.
 > Independent analysis by Claude Opus 5, verified against OMP source at
 > `_research/upstreams/oh-my-pi` (packages/coding-agent). Subject to ChatGPT counter-review.
 
@@ -8,8 +55,15 @@
 
 ## 1. Executive Summary
 
-`omp-custom` is a Workflow v0 template for OMP that establishes a Tech Lead →
-Explorer → Implementer → Verifier → Reviewer pattern over OMP-native primitives.
+`omp-custom` is a Workflow v0 template for OMP with a main-session Tech Lead and
+runtime-specific adapters over OMP-native primitives. The earlier
+Explorer→Implementer→Verifier→Reviewer chain is a pre-Topic-03 topology hypothesis, not a
+workflow invariant.
+
+KD-027 selects a main-session Tech Lead with default inline execution and exactly three
+spawnable agents: read-only Cheap Scout, bounded-writing Worker, and risk-gated General Reviewer.
+Worker defaults `high`, hard Worker and Reviewer use `xhigh`, Scout uses Flash→Pro availability
+fallback, and Opus is never implicitly mandatory.
 
 **The verdict: the intent is sound, the abstractions are ~60% correct, and the
 runtime wiring is broken in ways static validation cannot see.**
@@ -100,9 +154,11 @@ are genuinely good and mostly need re-homing, not rewriting.
 
 5. **Explorer instructs LSP use without LSP access.** `explorer.md` body: "Use LSP
    hover, references, and grep before reading full files." Its allowlist is
-   `read, grep, glob`. `LspTool` is gated on `session.enableLsp` (`lsp/index.ts:1639`)
-   **and** tool-allowlist membership. The instruction is unfollowable; the agent will
-   either fabricate LSP calls or fall back to grep silently.
+   `read, grep, glob`. Effective `lsp` access requires all four independent gates:
+   allowlist membership (`task/executor.ts:2675-2678`), `task.enableLsp` plus a parent
+   session that is not disabled and not in plan mode (`task/structured-subagent.ts:318-320`),
+   and `lsp.enabled` (`tools/index.ts:593`). The instruction is unfollowable; the agent
+   will either fabricate LSP calls or fall back to grep silently.
 
 ### P1 — blocks production use
 
@@ -128,50 +184,44 @@ are genuinely good and mostly need re-homing, not rewriting.
    as the human-authored source that *generates* those, never as a runtime lookup.
 6. **Policy is prose in the prompt that consumes it.** A policy with no reader is dead.
 7. **Isolation is explicit per task call.** Never rely on `auto` for correctness.
-8. **Optimize tokens per accepted outcome.** Never trade correctness for token count.
+8. **Clear quality gates, then optimize core workflow tokens per validated accepted outcome.**
+   Failed cycles stay charged; Scout/raw totals are telemetry, never weighted substitutes.
 9. **A validator that cannot fail on a real defect is worse than no validator** — it
    manufactures false confidence.
 
 ---
 
-## 5. Final Proposed Topology
+## 5. Workflow and Lifecycle Architecture
 
-**Chosen: Option A — main session is the Tech Lead.** Full reasoning in `03-agent-topology.md`.
+A plain request is the normal workflow entry. The user may make an explicit `/quick`
+selection; slash forms for Standard and Orchestrated remain compatibility hints. The
+main-session Tech Lead validates entry hints and selects Standard or Orchestrated from the
+task's actual structure.
 
-```
-User
-  │
-  ▼
-Main OMP session  ── IS the Tech Lead
-  ├── AGENTS.md   — coding constitution + role map (persistent)
-  ├── RULES.md    — sticky invariants (short)
-  ├── config.yml  — modelRoles: explorer/implementer/verifier/reviewer  (4 worker roles;
-  │                 tech-lead is an OPTIONAL user alias, not installer-owned — CR-34)
-  │                 task.isolation.apply: false / mode: auto  (project target — CR-31)
-  │
-  ├── /quick         → inline. inspect → implement → verify. 0 subagents.
-  ├── /standard      → task: explorer → implementer → verifier → [reviewer if risk]
-  └── /orchestrated  → task batch: explorers ∥ → implementers ∥ (isolated) → verifier → reviewer
-                                                                             → integration check
-
-Worker agents (.omp/agents/*.md, spawned via `task`):
-  ├── explorer.md     tools: read, grep, glob, lsp   output: <exploration schema>   isolated: false
-  ├── implementer.md  tools: read, grep, glob, edit, write, bash, lsp
-  │                                                   output: <agent-result schema>  isolated: false (Standard) / true (Orchestrated; see §08 §B)
-  ├── verifier.md     tools: read, grep, glob, bash   output: <verification schema>  isolated: false
-  └── reviewer.md     tools: read, grep, glob, bash, lsp   output: <review schema>     isolated: false
-
-Skills (.omp/skills/<name>/SKILL.md):
-  ├── task-triage/              lazy — triggered on ambiguity
-  ├── systematic-debugging/     lazy — triggered on debugging
-  └── evidence-before-completion/  autoloadSkills on worker agents (see 11-)
-
-REMOVED: .omp/policies/  (→ prose in commands + agent prompts)
-REMOVED: .omp/schemas/   (→ output: frontmatter; YAML retained under docs/ as source)
-MOVED:   .omp/agents/tech-lead.md → docs/roles/tech-lead.md  (CR-33; see below)
+```text
+clarify contract
+  → active task
+  → freeze candidate
+  → verify/review that snapshot
+  → accept, rework, cancel, or terminally block
 ```
 
-**`tech-lead.md` is MOVED OUT of agent discovery (CR-33).** OMP's `loadAgentsFromDir()`
+Standard is one integrated implementation lane. Orchestrated requires at least two
+independently verifiable work units, explicit unit contracts, a task-level integration
+contract, and cross-boundary verification. Agent count, parallelism, file count, and risk do
+not define the workflow.
+
+A session serves one task and one non-competing candidate lineage. Compaction preserves that
+identity. Handoff creates a reconciled successor session. Mutation after candidate freeze
+invalidates acceptance-bearing evidence for the old snapshot.
+
+Topic 03 owns topology and model/provider routing, Topic 04 owns durable lifecycle state, and
+Topic 08 owns deeper triage behavior. Runtime projection is scheduled in Phase 02; the
+hash-locked Phase 00 prompt/evidence snapshot remains historical and unchanged until that
+migration produces new current-product evidence.
+
+**Pre-Topic-03 migration hypothesis:** move `tech-lead.md` out of agent discovery (CR-33).
+OMP's `loadAgentsFromDir()`
 parses **every** `.md` file under `.omp/agents/` (and `~/.omp/agent/agents/`) into an
 active `AgentDefinition` — there is no "documentation-only file inside `agents/`"
 category (`task/discovery.ts:42-45`). Calling the file documentation while installing
@@ -268,15 +318,23 @@ by this graph.
 - Repo-map / semantic retrieval (Serena, repomix) — deferred pending evidence
 - Second orchestration engine of any kind
 - Automatic install into live `~/.omp/agent/` without explicit approval
-- Any settings change to the frozen baseline before phase-06 provides evidence
+- Settings changes outside an explicit phase-owned selected-contract prerequisite, or promotion
+  of provisional settings before Phase 06 evaluation
+
+Phase 01, Phase 03, and Phase 05 may implement settings they explicitly own as selected-contract
+prerequisites. Those settings remain provisional candidates until Phase 06 evaluates them;
+unowned or speculative settings changes remain frozen. This preserves evidence-gated promotion
+without making the Phase 06 prerequisites depend circularly on Phase 06 itself.
 
 ---
 
 ## 9. Current Open Questions
 
-Questions OQ-1, OQ-2 and OQ-4 from my first pass are **now resolved by source
-reading** and moved into `02-runtime-semantics.md` as verified facts. What remains
-genuinely open — requiring live experiment, not more reading:
+Questions OQ-1, OQ-2, OQ-4 and the former model-role OQ-5 from my first pass are now
+resolved by source reading or Phase-00 evidence. E2 closed the model-role question: missing
+or unknown aliases and unavailable models hard-fail without fallback, project values win,
+and configured built-in collisions use the configured value. What remains genuinely open —
+requiring live experiment, not more reading:
 
 | # | Question | Why source reading is insufficient | Impact |
 |---|---|---|---|
@@ -284,7 +342,6 @@ genuinely open — requiring live experiment, not more reading:
 | OQ-2 | Does `task.isolation.mode=auto` on Windows/ProjFS actually isolate, and does `merge: patch` apply cleanly? | `pi-iso` backend selection is runtime/filesystem-dependent | High |
 | OQ-3 | What is the real token delta of `read-summarize: false` on Explorer? | Requires measured A/B | Medium |
 | OQ-4 | Does `autoloadSkills` inject into subagent context at spawn, and at what token cost? | Parsed field confirmed; injection point and cost need measurement | Medium |
-| OQ-5 | Do custom `modelRoles` (tech-lead, explorer, …) resolve when declared in **project** `.omp/config.yml`, or only user-level? | `getModelRoleAlias` accepts any role present in settings; merge order for project config needs verification | High |
 
 ---
 
@@ -322,27 +379,34 @@ genuinely open — requiring live experiment, not more reading:
 
 ---
 
-**DR-6 — Explorer isolation**
+**DR-6 — Explorer isolation (pre-Topic-03 candidate)**
 
 *Source facts:*
 - `isolated: true` requires a git repository (`task/isolation-runner.ts: prepareIsolationContext` throws otherwise)
 - Isolation materializes a worktree copy — real setup cost on every invocation
 - Explorer only reads; it does not write to disk
 
-*Design choice (normative):* No isolation for Explorer. Read-only agents gain nothing from isolation; the git-repo requirement and materialization cost add overhead with zero benefit.
+*Candidate choice (non-authoritative until Topic 03):* Do not isolate a selected read-only
+discovery role. A read-only role gains nothing from isolation; the git-repo requirement and
+materialization cost add overhead with zero benefit. Topic 03 decides whether that role exists.
 
 *Alternative not rejected (legitimate):* Isolate Explorer for strict reproducibility. Rejected on cost/benefit grounds, not because source proves it wrong.
 
 ---
 
-**DR-7 — LSP in worker allowlists**
+**DR-7 — LSP in worker allowlists (pre-Topic-03 candidate)**
 
 *Source facts:*
-- `lsp` tool is gated on BOTH `session.enableLsp` (baseline: `true`) AND per-agent `tools:` allowlist membership (`lsp/index.ts:1639`)
+- Effective subagent LSP requires all four independent LSP gates: per-agent allowlist,
+  `task.enableLsp == true`, parent session not disabled and not plan mode, and
+  `lsp.enabled == true` (`task/structured-subagent.ts:318-320`, `tools/index.ts:593`,
+  `task/executor.ts:2675-2678`)
 - No agent currently lists `lsp` — the session-level permission is inert for all agents
 - Explorer's own instructions reference `lsp references` and `lsp hover` — unfollowable with current allowlist
 
-*Design choice (normative):* Add `lsp` to Explorer, Implementer, and Reviewer. Reviewer needs `lsp references` for blast-radius checks (callers of a modified symbol). Verifier is excluded (command runner; symbol nav is outside its contract).
+*Candidate choice (non-authoritative until Topic 03):* Give `lsp` only to selected roles whose
+contracts require symbol navigation. The former Explorer/Implementer/Reviewer allowlist and
+Verifier exclusion are retained as research input, not as a fixed roster or capability map.
 
 *Alternative not rejected (legitimate):* Disable `task.enableLsp` and remove LSP language from Explorer. Rejected because LSP provides genuine token savings (targeted symbol lookup vs whole-file reads) that the Explorer's symbol-first contract depends on.
 
@@ -350,12 +414,16 @@ genuinely open — requiring live experiment, not more reading:
 
 These positions are well-reasoned but involve trade-offs where a legitimate counter-position exists. ChatGPT review adds genuine value here.
 
+**Topic 02 supersession boundary:** the source facts remain evidence, but all role-specific choices below are non-authoritative pre-Topic-03 migration hypotheses. Topic 03 re-adjudicates
+the worker roster, capabilities, dispatch graph, and independence mechanism before Phase 02
+changes runtime files.
+
 | # | Decision | Opus Position | Confidence |
 |---|---|---|---|
 | DR-1 | Tech Lead: main session vs spawned agent | **Main session; main-session model is user-controlled (Option B, CR-06 resolved).** Spawning costs a recursion level, duplicates context, and orphans ownership of the final answer. The template does NOT guarantee `@tech-lead` routing or a fixed thinking level for the main Tech Lead session — those settings belong to the user's launched session. Role-based `model:` and `thinking-level:` frontmatter are deterministic only for spawned worker agents. `AGENTS.md` documents this contract explicitly. | High |
 | DR-4 | `evidence-before-completion` delivery | **`autoloadSkills` on worker agents**, not `alwaysApply`, not lazy | Medium |
-| DR-5 | `read-summarize: false` on Explorer/Verifier | **Remove from Explorer** (contradicts token goals); **keep on Verifier** (needs exact output bytes) | Medium |
-| DR-8 | Keep 5 agents, or collapse Verifier into Implementer? | **Keep separate.** Independence is the entire value; self-verification is the failure mode being defended against | Medium |
+| DR-5 | `read-summarize: false` on observation roles | **Reopened by Topic 03.** Exact-output needs belong to the selected responsibility and capability contract, not to permanent Explorer/Verifier names. | Medium |
+| DR-8 | Separate Verifier, inline verification, or another independent mechanism? | **Reopened by KD-026 and Topic 03.** When the accepted contract requires independent verification, a candidate author's self-report is insufficient; Topic 03 selects how a non-author supplies that evidence. | Medium |
 
 ---
 
@@ -368,7 +436,9 @@ Each verified by direct source reading, with the file and line recorded in
 - Installer never installs commands — `"workflows"` alias vs `commands/` folder
 - README/docs install args do not match script parameters — `-TargetDir` vs `-ProjectDir`
 - `output:` frontmatter is the native schema mechanism and is unused — `discovery/helpers.ts:289`, `tools/yield.ts`
-- Explorer's LSP instruction is unfollowable — allowlist vs `lsp/index.ts:1639`
+- Explorer's LSP instruction is unfollowable — its allowlist omits `lsp`; the other
+  independent gates are projected by `task/structured-subagent.ts:318-320` and
+  `tools/index.ts:593`
 - `benchmark.ps1` executes no sessions — whole-script read
 - `$Force` is dead — whole-script read
 - `task.enableLsp` default is `false`; baseline overrides to `true` — `settings-schema.ts:4617`
@@ -413,7 +483,8 @@ Each verified by direct source reading, with the file and line recorded in
 - Every artifact maps to a source-verified OMP primitive, or lives outside `.omp/`
 - Structured output enforced natively via `output:` frontmatter, validated at yield
 - Policy content inlined into its consumers; `policies/` and `schemas/` gone from `.omp/`
-- Explicit per-task isolation; implementers isolated, readers not
+- Responsibility-based isolation: concurrent writers are isolated only when selected; tasks
+  that must observe the integrated tree remain non-isolated
 - Logical model roles throughout; no hardcoded model IDs in agents or commands
 - Installer with real merge, dry-run, diff, backup, manifest, idempotency, rollback
 - Validation in five separable tiers; a single number can no longer imply all five
@@ -437,7 +508,7 @@ drifted into `phase-07` and contradicted this section; ID references cannot drif
 | **PR-4** | Structured output demonstrably enforced: a deliberately malformed worker result is rejected and retried. |
 | **PR-5** | Installer: dry-run, diff, backup, manifest, rollback, idempotent re-run, config merged not clobbered. |
 | **PR-6** | Validation tiers report independently, and **L0–L3 operational gates are green**. No aggregate score conceals a tier failure. |
-| **PR-7** | **L4 comparative criterion** meets its threshold: quality neutral-or-better at equal-or-lower tokens per accepted outcome. |
+| **PR-7** | **L4 comparative contract in `13-validation-and-evaluation.md §C` clears:** every candidate promotion beats the frozen stable-product baseline through the efficiency or quality path; a release additionally clears the pinned plain-OMP comparison. Pilot-only evidence and `accepted_with_waiver` do not satisfy this gate. |
 | **PR-8** | Every remaining abstraction has a named runtime consumer, or is documented as non-runtime. |
 
 **Never state a validation-level count.** The taxonomy is **L0 Static, L1 Discovery,
@@ -490,6 +561,7 @@ spec/phases/phase-07-stabilization.md
 
 ---
 
-**IMPLEMENTATION STATUS: STOPPED — AWAITING JOINT SPEC REVIEW**
-
-This is **OPUS PROPOSED SPEC v1**, not a final plan.
+**CURRENT STATUS:** KD-027 through KD-031 are accepted implementation authority. Historical
+review findings remain useful source evidence only where later decisions explicitly supersede
+them. Topic readiness is established by the focused/current-product validators and evidence, not
+by the original “OPUS PROPOSED” label.

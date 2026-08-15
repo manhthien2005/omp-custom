@@ -1,0 +1,20 @@
+schema_version: 1
+phase: "00"
+experiment: E3-K
+status: PASS
+decision: >-
+  Runtime evidence proves that OMP 17.2.10 exposes the flat task wire when batching
+  is disabled and realizes two logical work items as sequential flat task calls.
+cases:
+  K1: PASS
+downstream:
+  parallel_mode: DISABLED
+limitations:
+  - E3-K closes only the tested flat-wire and sequential-fallback semantics.
+  - E3-K does not prove E3-L guarded dispatch or authorize E3-M parallel execution.
+  - Parallel v0 remains disabled until every independent manifest gate passes.
+artifacts:
+  - docs/evidence/phase-00/E3-K/K1.yml
+  - docs/evidence/phase-00/E3-K/raw/K1.run.json
+  - docs/evidence/phase-00/E3-K/raw/K1-attempt-002.run.json
+  - docs/evidence/phase-00/E3-K/raw/K1-attempt-003.run.json

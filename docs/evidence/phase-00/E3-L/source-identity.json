@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-L",
+  "status": "PASS",
+  "runtime_version": "omp/17.2.10",
+  "runtime_executable_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+  "pinned_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+  "official_origin": "https://github.com/can1357/oh-my-pi.git",
+  "supported_host": "OMP-owned default main-CLI root-session construction class",
+  "reader_operation": "pi.pi.settings.get(\"task.isolation.apply\")",
+  "positive_links": [
+    {
+      "id": "EXPORT",
+      "path": "packages/coding-agent/src/index.ts",
+      "expected_line_range": [
+        17,
+        17
+      ],
+      "actual_lines": [
+        17
+      ],
+      "file_sha256": "3EFC237498D428C3D9C8C3523ACB3CD7090DCCCF4369E433792912471E389377"
+    },
+    {
+      "id": "GLOBAL_INIT",
+      "path": "packages/coding-agent/src/config/settings.ts",
+      "expected_line_range": [
+        404,
+        416
+      ],
+      "actual_lines": [
+        404,
+        407,
+        409,
+        413,
+        415,
+        416
+      ],
+      "file_sha256": "B2CD4FB72159A200FB32ECB0F7ED5983573C16942425D5929034872631524F49"
+    },
+    {
+      "id": "MAIN_INIT",
+      "path": "packages/coding-agent/src/main.ts",
+      "expected_line_range": [
+        1282,
+        1283
+      ],
+      "actual_lines": [
+        1282,
+        1283
+      ],
+      "file_sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5"
+    },
+    {
+      "id": "SESSION_OPTIONS",
+      "path": "packages/coding-agent/src/main.ts",
+      "expected_line_range": [
+        1533,
+        1545
+      ],
+      "actual_lines": [
+        1533,
+        1540,
+        1545
+      ],
+      "file_sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5"
+    },
+    {
+      "id": "SDK_EXPLICIT_SETTINGS",
+      "path": "packages/coding-agent/src/sdk.ts",
+      "expected_line_range": [
+        1271,
+        1274
+      ],
+      "actual_lines": [
+        1271,
+        1272,
+        1273,
+        1274
+      ],
+      "file_sha256": "EEE5412D1847E6BC274DF4E29A25188C8831A27957BFCFCC93EBBD0DFD94D3F4"
+    },
+    {
+      "id": "TASK_DISPATCH",
+      "path": "packages/coding-agent/src/task/structured-subagent.ts",
+      "expected_line_range": [
+        315,
+        317
+      ],
+      "actual_lines": [
+        315,
+        316,
+        317
+      ],
+      "file_sha256": "7404F4619262706E75ACB8B5F06F96B089A409F6CB5B58DE2F700D5645CC9AB7"
+    },
+    {
+      "id": "GLOBAL_PROXY",
+      "path": "packages/coding-agent/src/config/settings.ts",
+      "expected_line_range": [
+        2371,
+        2388
+      ],
+      "actual_lines": [
+        2371,
+        2373,
+        2378,
+        2380,
+        2384,
+        2388
+      ],
+      "file_sha256": "B2CD4FB72159A200FB32ECB0F7ED5983573C16942425D5929034872631524F49"
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "ACP_SESSION_NEW",
+      "path": "packages/coding-agent/src/main.ts",
+      "expected_line_range": [
+        397,
+        424
+      ],
+      "actual_lines": [
+        397,
+        399,
+        423
+      ],
+      "file_sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5"
+    },
+    {
+      "id": "CLONE_FOR_CWD",
+      "path": "packages/coding-agent/src/config/settings.ts",
+      "expected_line_range": [
+        603,
+        620
+      ],
+      "actual_lines": [
+        603,
+        604,
+        611,
+        620
+      ],
+      "file_sha256": "B2CD4FB72159A200FB32ECB0F7ED5983573C16942425D5929034872631524F49"
+    },
+    {
+      "id": "SDK_SETTINGS_INJECTION",
+      "path": "packages/coding-agent/src/sdk.ts",
+      "expected_line_range": [
+        1271,
+        1273
+      ],
+      "actual_lines": [
+        1271,
+        1272
+      ],
+      "file_sha256": "EEE5412D1847E6BC274DF4E29A25188C8831A27957BFCFCC93EBBD0DFD94D3F4"
+    },
+    {
+      "id": "MAIN_DEPENDENCY_INJECTION",
+      "path": "packages/coding-agent/src/main.ts",
+      "expected_line_range": [
+        1282,
+        1283
+      ],
+      "actual_lines": [
+        1283
+      ],
+      "file_sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5"
+    },
+    {
+      "id": "RPC_PROTOCOL",
+      "path": "packages/coding-agent/src/main.ts",
+      "expected_line_range": [
+        1269,
+        1269
+      ],
+      "actual_lines": [
+        1269
+      ],
+      "file_sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5"
+    },
+    {
+      "id": "RPC_UI_PROTOCOL",
+      "path": "packages/coding-agent/src/main.ts",
+      "expected_line_range": [
+        1269,
+        1269
+      ],
+      "actual_lines": [
+        1269
+      ],
+      "file_sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5"
+    }
+  ],
+  "files": [
+    {
+      "path": "packages/coding-agent/src/config/settings.ts",
+      "sha256": "B2CD4FB72159A200FB32ECB0F7ED5983573C16942425D5929034872631524F49"
+    },
+    {
+      "path": "packages/coding-agent/src/index.ts",
+      "sha256": "3EFC237498D428C3D9C8C3523ACB3CD7090DCCCF4369E433792912471E389377"
+    },
+    {
+      "path": "packages/coding-agent/src/main.ts",
+      "sha256": "87BBB6985089C9BC1CFD9D5B71EAF102760BCFC0E6607E7BA51FFB980C790AB5"
+    },
+    {
+      "path": "packages/coding-agent/src/sdk.ts",
+      "sha256": "EEE5412D1847E6BC274DF4E29A25188C8831A27957BFCFCC93EBBD0DFD94D3F4"
+    },
+    {
+      "path": "packages/coding-agent/src/task/structured-subagent.ts",
+      "sha256": "7404F4619262706E75ACB8B5F06F96B089A409F6CB5B58DE2F700D5645CC9AB7"
+    }
+  ],
+  "non_claims": [
+    "ACP-created sessions are outside this claim.",
+    "Cloned settings instances are outside this claim.",
+    "Injected SDK or dependency settings are outside this claim.",
+    "RPC and RPC-UI lifecycle coverage is outside this claim.",
+    "Parallel behavior remains disabled and is governed by E3-M."
+  ],
+  "runtime_observation_substitutes_source": false
+}

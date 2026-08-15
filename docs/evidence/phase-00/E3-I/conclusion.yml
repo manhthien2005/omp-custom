@@ -1,0 +1,51 @@
+schema_version: 3
+phase: "00"
+experiment: E3-I
+status: PASS
+selected_attempt: 7
+runtime_version: "omp/17.2.10"
+runtime_executable_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+supported_host: OMP-owned default main-CLI root-session construction class
+session_a_status: PASS
+session_b_status: PASS
+authority: CHARACTERIZATION_ONLY
+
+selected_joint_transaction:
+  path: docs/evidence/phase-00/E3-L/raw/joint-attempt-007.json
+  sha256: CF8D5AD4BF8A9D75D62CE967B901D2E03C13FCB6B5988C1D695F601DAA34DFCA
+
+cases:
+  - {name: I1, status: PASS, path: docs/evidence/phase-00/E3-I/I1.yml, sha256: 93E02D22E1E3F3558A6BF6AB00170DABEACB27EE4677B8A924097F706929128E}
+  - {name: I2, status: PASS, path: docs/evidence/phase-00/E3-I/I2.yml, sha256: 4DDA7EF80BDB49D4023E6AE13F75696A0FF9D8CECCF89AC48D559DFE3A02CC43}
+  - {name: I3, status: PASS, path: docs/evidence/phase-00/E3-I/I3.yml, sha256: F8506696D4073EEA789966BB9A9FD794C04735C9B241BB5FFACADAB6528FA747}
+  - {name: I4, status: PASS, path: docs/evidence/phase-00/E3-I/I4.yml, sha256: 317580C5BE795FC8950CC2C7377076767782227A9A1EAB3408C773FE71C1EBC2}
+
+findings:
+  subprocess_config_get_trusted_as_parent_gate: false
+  apply_false_discrimination_stable: true
+  cli_overlay_divergence_confirmed: true
+  runtime_override_divergence_confirmed: true
+  controlled_tool_surface: [read, yield, hub]
+  exact_terminal_yield_only: true
+  non_mutation_contract: PASS
+  positive_cost_sample_count: 9
+
+parallel_authorized: false
+parallel_mode_after: DISABLED
+e3_l_conclusion_consumed: false
+e3_l_replaced: false
+e3_m_replaced: false
+
+attempt_history:
+  - {attempt: 1, status: INVALID_RUN, selected: false}
+  - {attempt: 2, status: INVALID_RUN, selected: false}
+  - {attempt: 3, status: INVALID_RUN, selected: false}
+  - {attempt: 4, status: INVALID_RUN, selected: false, reason: E3I_PARENT_SEQUENCE_MISMATCH}
+  - {attempt: 5, status: INVALID_RUN, selected: false, reason: E3I_NESTED_PROVIDER_RECOVERY}
+  - {attempt: 6, status: INVALID_RUN, selected: false, reason: OBSOLETE_TYPED_YIELD_ORACLE}
+  - {attempt: 7, status: PASS, selected: true, reason: E3I_I1_I2_I3_I4_EXACT}
+
+non_claims:
+  - E3-I is a behavioral characterization and does not authorize parallel dispatch.
+  - E3-I does not consume the E3-L conclusion; both oracles read the same raw transaction independently.
+  - E3-I does not replace E3-L or the atomic guarded-dispatch requirement in E3-M.

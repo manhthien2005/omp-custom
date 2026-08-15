@@ -1,0 +1,50 @@
+schema_version: 1
+phase: "00"
+experiment: E3-J
+case: J3
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  shell: PowerShell 7.6.4
+
+execution:
+  selected_attempt: 2
+  fixture_commit: 8b06375e17767b0ee88673662108d23326a43db8
+  process_exit_code: 0
+  started_at: "2026-08-09T00:03:10.2574677+07:00"
+  completed_at: "2026-08-09T00:03:59.7543892+07:00"
+  duration_ms: 49497
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - docs/evidence/phase-00/E3-J/raw/J3.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J3.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J3.run.json
+    - docs/evidence/phase-00/E3-J/raw/J3-attempt-002.stdout.jsonl
+    - docs/evidence/phase-00/E3-J/raw/J3-attempt-002.stderr.txt
+    - docs/evidence/phase-00/E3-J/raw/J3-attempt-002.run.json
+
+observation:
+  task_call_count: 2
+  barrier_order: [verifier_end, reviewer_start, reviewer_end, final_message]
+  verifier_end_event_index: 165
+  reviewer_start_event_index: 294
+  reviewer_end_event_index: 326
+  final_message_event_index: 331
+  verifier_delay_nonzero: true
+  reviewer_delay_nonzero: true
+
+interpretation:
+  reason: J3_BOTH_STAGE_BARRIERS
+  decision: >-
+    The Reviewer dispatch begins only after the Verifier task returns, and the parent
+    final response begins only after the Reviewer task returns.
+  affected_requirements: [CR-39, T-02.3b]
+
+history:
+  - Attempt 1 contained valid runtime behavior but the analyzer expected a flat task name instead of the observed batch wire.
+  - A batch-wire synthetic RED test reproduced the analyzer defect; attempt 1 then re-adjudicated PASS after the minimal fix.
+  - Attempt 2 independently reproduced PASS and is the selected evidence.

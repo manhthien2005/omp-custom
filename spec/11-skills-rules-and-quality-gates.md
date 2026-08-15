@@ -1,7 +1,20 @@
 # 11 — Skills, Rules, and Quality Gates
 
+<!-- topic08-projection:behavior-core -->
+> **Topic 08 selected contract:** `behavior-manifest.json` selects exactly the current three-skill
+> roster without imposing a permanent cap. `task-triage` and `systematic-debugging` are lazy;
+> `evidence-before-completion` autoloads only on Worker. Missing, shadowed, or hash-drifted selected
+> skills refuse managed dispatch. Static trigger fixtures are deterministic; semantic trigger
+> promotion belongs to Topic 11.
+
 > OPUS PROPOSED SPEC v1 | Source-verified against `capability/skill.ts`,
 > `capability/rule-buckets.ts`, `task/executor.ts:3235`, `discovery/builtin.ts:387-418`.
+>
+> **Topic 02 supersession boundary:** Topic 03 selects responsibilities and dispatch. Skill
+> autoload and gate-delivery requirements attach to selected contracts, not permanent agent
+> names. The former role table is non-authoritative migration input. The skill set selected by the runtime manifest
+> is authoritative for discovery and trigger coverage; the inventory below
+> is candidate input, not a fixed count.
 
 ---
 
@@ -36,7 +49,8 @@ Parent-discovered rules, including `RULES.md`, do propagate through subagent cre
 ### Why autoloadSkills remains the recommended mechanism despite propagation
 
 Rule forwarding is real but not a replacement for `autoloadSkills` for quality-gate
-delivery. The reasons this spec retains `autoloadSkills: evidence-before-completion`:
+delivery. The reasons this spec retains `autoloadSkills: evidence-before-completion` when a
+selected contract consumes that discipline:
 
 1. **Forwarded rules include the entire parent rulebook.** Workers receive all parent
    rules — not just the quality gate. The token cost is the full rule set, not just
@@ -50,7 +64,7 @@ delivery. The reasons this spec retains `autoloadSkills: evidence-before-complet
    forwarding works, a worker that receives an overwhelming rulebook may deprioritize a
    buried quality gate. Autoload makes it prominent.
 
-DR-4 resolution stands: use `autoloadSkills: evidence-before-completion`. The
+DR-4 resolution stands for selected consumers: use `autoloadSkills: evidence-before-completion`. The
 **justification** changes from "RULES.md doesn't propagate" to "explicit autoload is
 preferable over implicit forwarding for quality-gate delivery."
 
@@ -65,37 +79,40 @@ options are wrong**, so the decision is resolved on evidence rather than prefere
 |---|---|
 | Leave as a lazy skill | Rejected — subagent must *choose* to read it; the failure mode is precisely a model that doesn't think to check |
 | `alwaysApply: true` on the skill | Rejected — no subagent wiring exists; would silently do nothing |
-| **`autoloadSkills: evidence-before-completion` on the agent** | **Adopted** — verified deterministic injection at subagent startup |
+| **`autoloadSkills: evidence-before-completion` on a selected consuming agent** | **Adopted when consumed** — verified deterministic injection at subagent startup |
 
-### Assignment
+### Assignment by selected responsibility
 
-| Agent | autoloadSkills | Rationale |
+| Current role | autoloadSkills | Rationale |
 |---|---|---|
-| `implementer` | `evidence-before-completion` | Claims completion; primary false-completion risk |
-| `verifier` | `evidence-before-completion` | Its entire contract is evidence discipline |
-| `explorer` | *(none)* | Returns findings, never claims completion |
-| `reviewer` | *(none)* | Judges evidence rather than producing completion claims |
+| `worker` | `evidence-before-completion` | Produces the candidate and may claim its bounded work complete |
+| `cheap-scout` | *(none)* | Returns read-only findings and never accepts or completes work |
+| `reviewer` | *(none)* | Judges candidate evidence; it does not inherit the Worker's claim |
 
-Autoload is not free — it costs the skill body in every spawn of that agent. Restrict
-it to agents whose contract it actually governs. Adding it to all four would spend
-tokens on Explorer, which has no completion claim to guard.
+Autoload is not free — it costs the skill body in every Worker spawn. The selected manifest is
+the authority for consumers and validates both sides of the binding. Missing names are not
+silently tolerated by the managed adapter: reconciliation fails before dispatch.
 
 ### Cost
 
-`evidence-before-completion` must stay small because it is now paid per Implementer and
-Verifier spawn, not once per session.
+`evidence-before-completion` must stay small because it is paid per selected autoloading spawn,
+not once per task.
 
 | Item | Budget |
 |---|---|
 | Skill body | ≤ 500 tokens |
-| Cost per Standard workflow | ≤ 1,000 tokens (one Implementer + one Verifier) |
+| Cost per selected autoloading spawn | ≤ 500 tokens per injected skill body |
 
 If the skill grows past 500 tokens, move detail into a reference file the agent may
 read on demand and keep the autoloaded body to the rule itself.
 
 ---
 
-## C. Skill Inventory
+## C. Selected Skill Inventory
+
+The manifest currently selects the following three contracts. This is the minimum approved
+roster, not a permanent cap; an addition must declare its consumer, injection owner, token budget,
+provenance, license, release hash, and positive/negative fixtures.
 
 ### C.1 `evidence-before-completion` (autoloaded)
 
@@ -116,9 +133,9 @@ subagents and misleads the next maintainer into thinking coverage exists.
 
 ### C.2 `systematic-debugging` (lazy, correct as-is)
 
-Triggered when the root cause is unclear. Lazy loading is right here: most tasks do not
-need it, and the Implementer can read it via `skill://systematic-debugging` when a fix
-fails twice. Keep the existing four-phase structure.
+Triggered when the root cause is unclear. Lazy loading is right here: most tasks do not need
+it, and a selected debugging responsibility can read it via `skill://systematic-debugging`
+when a fix fails twice. Keep the existing four-phase structure if this skill is selected.
 
 ### C.3 `task-triage` (lazy, main session only)
 
@@ -129,9 +146,10 @@ the correct mechanism. No autoload needed — no subagent performs triage.
 
 ## D. Trigger Testing
 
-The plan requires positive and negative trigger cases per skill. Because OMP triggers
-skills by model judgment over the `description` field, trigger quality is a property of
-that description, and it is testable without running a workflow.
+The plan requires positive and negative trigger cases per selected skill. Static validation proves
+the selected pair exists, is unique, and matches its manifest binding. OMP ultimately chooses a
+lazy skill from its `description`, so semantic trigger quality still needs the Topic 11 model
+evaluation before promotion.
 
 | Skill | Positive trigger | Negative trigger |
 |---|---|---|
@@ -139,9 +157,9 @@ that description, and it is testable without running a workflow.
 | `systematic-debugging` | "Test fails intermittently, cause unclear" | "Rename this variable" (no diagnosis needed) |
 | `task-triage` | "Make the API better" (ambiguous) | "Fix the typo on line 12" (unambiguous) |
 
-Store as `evals/triggers/<skill>.yml` with `should_trigger` / `should_not_trigger`
-prompt lists. This is an L3 (Behavioral) check (see spec 13) — it needs a model in the loop, so
-it cannot run in static validation.
+Store exact pairs as `evals/triggers/topic08/<skill>-positive.yml` and
+`evals/triggers/topic08/<skill>-negative.yml` with `should_trigger` / `should_not_trigger` cases.
+Fixture shape and coverage are L0 deterministic checks; semantic activation remains L3/Topic 11.
 
 ---
 
@@ -161,22 +179,22 @@ The `default_matrix` is the load-bearing part and is small enough to inline:
 | HIGH | api-compatibility, security, performance, release-readiness, rollback-readiness |
 | CRITICAL | all of HIGH + adr-documentation |
 
-Inline this table into `commands/standard.md` and `commands/orchestrated.md`, where the
-main session picks gates while building the task packet. The Tech Lead then passes the
-selected gate names in the packet's `quality_gates` field, and the Reviewer receives
-them as data rather than resolving a `policy:` reference it cannot follow.
+Inline this table into `commands/standard.md` and `commands/orchestrated.md`, where the main
+session picks gates while building the task packet. The Tech Lead then passes the selected gate
+names in the packet's `quality_gates` field. Any selected gate-applier or review responsibility
+receives them as data rather than resolving a `policy:` reference it cannot follow.
 
-Keep `quality-gates.yml` as the human-readable expansion of what each gate *checks* —
-the trigger conditions and check questions are too long to inline and are only needed
-when a reviewer is actively applying a gate. Reclassify it under `docs/policies/` so
-its non-runtime status is structural rather than a comment.
+Keep the gate definitions as the human-readable expansion in
+`docs/policies/quality-gates.md` — the trigger conditions and check questions are too long to
+inline and are only needed when a selected gate-applier is actively applying a gate. Its location
+outside `.omp/` makes the non-runtime status structural rather than a comment.
 
 ### Gate application rule
 
-Gates are selected by the main session at packet-build time, never by the Reviewer
-unilaterally. A Reviewer that invents gates produces unbounded review scope, which is
-the false-positive failure mode the reviewer contract already guards against. If the
-Reviewer believes a gate is missing, it reports that as a non-blocking finding.
+Gates are selected by the main session at packet-build time, never by a selected gate-applier
+unilaterally. A gate-applier that invents gates produces unbounded scope, the false-positive
+failure mode the review contract guards against. If it believes a gate is missing, it reports
+that as a non-blocking finding.
 
 ---
 
@@ -197,8 +215,8 @@ and independent of the full parent rule set that forwarding carries.
 | Never commit/push unless asked | RULES.md — main session owns git |
 | Never modify `~/.omp/agent/` without approval | RULES.md — main session runs the installer |
 | Never forward parent transcript to a subagent | RULES.md — main session builds packets |
-| Never claim complete without verification | **Also** autoloaded into Implementer/Verifier |
-| Report failure with evidence, don't retry silently | **Also** autoloaded into Implementer/Verifier |
+| Never claim complete without verification | **Also** autoloaded into selected completion-claiming roles |
+| Report failure with evidence, don't retry silently | **Also** autoloaded into selected evidence-producing roles |
 
 The last two must be duplicated by design: once in `RULES.md` for the main session, once
 in the autoloaded skill for workers. This is the one place where duplication is correct,
@@ -212,11 +230,13 @@ every turn, so growth is paid repeatedly.
 
 ## G. Acceptance Criteria
 
-1. `implementer.md` and `verifier.md` carry `autoloadSkills: evidence-before-completion`.
+1. Every selected spawned role whose contract consumes `evidence-before-completion` carries
+   that exact `autoloadSkills` entry; no unselected or non-consuming role is required.
 2. `evidence-before-completion` body is ≤ 500 tokens.
 3. No skill relies on `alwaysApply` to reach a subagent.
 4. `default_matrix` risk→gates table is inlined into `standard.md` and `orchestrated.md`.
-5. `quality-gates.yml` is relocated under `docs/policies/` with a non-runtime header.
+5. `docs/policies/quality-gates.md` contains the expanded definitions with a non-runtime header.
 6. Task packets carry resolved gate names, never `policy:` references.
-7. Trigger fixtures exist for all three skills.
+7. Trigger fixtures exist for every skill selected by the runtime manifest; no fixed skill
+   count is inferred from the candidate inventory.
 8. `RULES.md` ≤ 700 tokens; the intentional worker/main-session duplication is documented.

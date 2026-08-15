@@ -1,10 +1,8 @@
 ---
 name: systematic-debugging
 description: >
-  Use when encountering any bug, test failure, unexpected behavior, or build failure,
-  before proposing any fix. Requires completing root-cause investigation before implementation.
-  Do NOT activate for: adding new features with no existing failure, clarifying requirements,
-  or tasks where no defect is present.
+  Use for a reproducible bug, failing test or build, unexpected behavior, or a failed fix whose
+  root cause is unknown. Do not use for new features, planned refactors, typos, or review-only work.
 ---
 
 # Systematic Debugging

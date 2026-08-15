@@ -1,0 +1,48 @@
+schema_version: 1
+phase: "00"
+experiment: E3-C
+case: C1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+
+setup:
+  working_directory: disposable committed git fixture
+  fixture: docs/evidence/phase-00/E3-C/fixture
+  effective_settings: {task.isolation.mode: rcopy, task.isolation.apply: false, task.isolation.merge: branch}
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model omniroute/oc/mimo-v2.5-free --tools task --max-time 120 <SYNTHETIC_PROMPT>
+  exit_code: 0
+  started_at: "2026-08-11T10:47:29.9287580+07:00"
+  completed_at: "2026-08-11T10:47:46.4787237+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-C/raw/run.json, sha256: 93293D4F56764F4DA34C9168DA56B5276C7F38BBF608531F84AD0420281B88A3}
+    - {path: docs/evidence/phase-00/E3-C/raw/controller.projection.json, sha256: EF2C32DB0E58A4DA11049707A4808C2489EA19AF5415636706AB39E5BD8476AD}
+    - {path: docs/evidence/phase-00/E3-C/raw/worker.projection.json, sha256: 25C2836ED43E5FF1CF84E444B38E5ABB0829027FD15011E901FA121D6004B2F6}
+    - {path: docs/evidence/phase-00/E3-C/raw/worker-output.txt, sha256: ED77B0DD51337ADEEFBA91FB273D7E68C0699BE1992212E5A245C9ADD953161C}
+    - {path: docs/evidence/phase-00/E3-C/raw/branch-proof.json, sha256: 6A0A0334C1F621ABD6A5F70ECCC1427ABB4CE91AA0AF2B2D44C3AE132A9D1196}
+    - {path: docs/evidence/phase-00/E3-C/raw/stderr.txt, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+
+observation:
+  facts:
+    - Worker exited 0 and yielded E3_C_BRANCH_OK.
+    - Parent HEAD/status stayed unchanged and e3c-branch.txt was absent from the parent checkout.
+    - OMP returned branchName omp/task/e3c-branch and no patchPath.
+    - The branch ref survived teardown, contains E3_C_BRANCH, and is not an ancestor of the parent HEAD.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/isolation-runner.ts::commitIsolationToBranch
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/structured-subagent.ts::runStructuredSubagent
+  limitations:
+    - Branch existence and content were verified in the disposable repository; no real user branch was created.
+
+interpretation:
+  decision: BRANCH_RETAINED_AND_NOT_MERGED
+  spec_effect: RETAIN
+  affected_requirements: [E3-C, CR-27]

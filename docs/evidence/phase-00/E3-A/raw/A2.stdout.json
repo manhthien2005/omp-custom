@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "case": "A2",
+  "attempt": 1,
+  "operations": [
+    {
+      "name": "unknown_key",
+      "key": "task.isolation.__phase00_unknown",
+      "context": "DirectRead",
+      "overlay_position": "None",
+      "exit_code": 1,
+      "started_at": "2026-08-09T01:07:46.6180887+07:00",
+      "completed_at": "2026-08-09T01:07:47.6610654+07:00",
+      "stdout": "",
+      "classification": {
+        "Status": "REFUSE",
+        "Reasons": [
+          "CONFIG_KEY_UNKNOWN"
+        ],
+        "Observation": null,
+        "Fallback": "SEQUENTIAL_NON_ISOLATED_DISCLOSED",
+        "Context": "DirectRead"
+      }
+    }
+  ]
+}

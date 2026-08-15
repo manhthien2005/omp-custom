@@ -1,0 +1,58 @@
+schema_version: 1
+phase: "00"
+experiment: E3-E
+case: E1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  runtime_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  platform: Windows x64
+  shell: PowerShell 7.6.4
+
+setup:
+  working_directory: disposable committed git fixture
+  fixture: docs/evidence/phase-00/E3-E/fixture
+  effective_settings: {async.enabled: true, task.batch: true, task.isolation.mode: rcopy, task.isolation.apply: false, task.isolation.merge: patch, task.maxRuntimeMs: 300000}
+  controlled_delays_ms: [9000, 16000, 0]
+
+execution:
+  command: <PINNED_RUNTIME>/omp.exe -p --mode json --model omniroute/oc/mimo-v2.5-free --tools task --max-time 300 <SYNTHETIC_BATCH_PROMPT>
+  selected_attempt: 2
+  exit_code: 0
+  started_at: "2026-08-11T11:01:21.1259536+07:00"
+  completed_at: "2026-08-11T11:01:56.3319088+07:00"
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-E/raw/attempt-1-diagnostic.yml, sha256: A91539721E01941AF3E6B7F9AA4E2F23C5D73E450D40F90EDC8BF72484661E7A}
+    - {path: docs/evidence/phase-00/E3-E/raw/run.json, sha256: 8220B6F174739623C1447764D39831D25A4F50CA8F10033A5AC83D7D4B127E73}
+    - {path: docs/evidence/phase-00/E3-E/raw/controller.projection.json, sha256: 812E17FBEDD3208D966BBC997BBE6C84C0CE43BFC279632143E3B514992613D4}
+    - {path: docs/evidence/phase-00/E3-E/raw/integration-proof.json, sha256: 595C0DECF4EDF92E148862730DCC83F119905D9ECA9D0DC916033F570CB43147}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-0.worker.projection.json, sha256: 6EC52CA2F1E99718CC5AAE9E33CEB5ED2736194026483B2241FE033172AC42B8}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-1.worker.projection.json, sha256: CDC8FEDF13EC7B38E3E15473522D9BEE11F880861112A987AF0CD9C0B36D9467}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-2.worker.projection.json, sha256: E3F770CC12EAE0F7F573F98608A2E82FF80508105C86C12C2AAAF9E1FB240268}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-0.patch, sha256: 56037ECA8B0802EB485D10B4A9E43241589394F46D7880E1932AB4792852B2D0}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-1.patch, sha256: A1DB6B896CED19332328C7AF8E42D4AD1B9F828CE43EE20DF6940AF0AB0CA821}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-2.patch, sha256: 942C15D379DB7D9D8AD7A783ACCD546D1B05214A5BFD5130B7F4FCC9474A74DB}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-0.output.txt, sha256: 33595FAF095FF41E5F97AC3E18E4B9A6C26A48CDC12C868C4B3E75A5C119B8E6}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-1.output.txt, sha256: 60CB7029DB65B7299C73F7647D2D5CDA64A96C7DA6935D109F4ED83D9CC46177}
+    - {path: docs/evidence/phase-00/E3-E/raw/e3e-2.output.txt, sha256: E62FF1241CAEAD9B32BC57EA8D40BC2950F80B4CD4176D07808D16C87D494B4E}
+
+observation:
+  facts:
+    - All three isolated workers started within a 32 ms window, exited 0, yielded their exact sentinels, and produced durable root patches.
+    - Controlled delays made task[2] finish first; observed completion order was 2, 0, 1.
+    - A fresh clone applied the durable artifacts strictly by original task-list index 0, 1, 2, with exact expected content after every step.
+    - Eighty-six parent polls observed no HEAD/status change and no target file before integration began.
+    - Attempt 1 was selection-ineligible because its 180-second parent deadline aborted worker 1 after terminal yield; one bounded timeout-only retry resolved that diagnosed boundary.
+  source_anchors:
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/executor.ts::executeTaskBatch
+    - _research/upstreams/oh-my-pi/packages/coding-agent/src/task/isolation-runner.ts::captureDeltaPatch
+  limitations:
+    - E3-E establishes deterministic successful integration order; E3-F separately owns stop-on-conflict semantics.
+
+interpretation:
+  decision: INTEGRATE_CAPTURED_ARTIFACTS_BY_ORIGINAL_TASK_INDEX_NOT_COMPLETION_ORDER
+  spec_effect: RETAIN
+  affected_requirements: [E3-E, CR-29]

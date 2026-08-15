@@ -1,0 +1,8 @@
+schema_version: 1
+record_type: topic08_skill_trigger_fixture
+skill: systematic-debugging
+expectation: should_trigger
+cases:
+  - "The same unit test fails reproducibly; trace the root cause before fixing it."
+  - "This behavior fails intermittently and the cause is not known."
+  - "The second attempted fix failed; return to evidence and test one hypothesis."

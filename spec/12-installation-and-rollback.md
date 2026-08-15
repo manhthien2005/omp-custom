@@ -1,6 +1,57 @@
 # 12 — Installation and Rollback
 
+<!-- round09-12-projection:release -->
+## Round 09–12 scratch proof and release boundary (KD-032)
+
+Repository implementation proves install, discovery, repair/update, uninstall, rollback, and
+user-state retention only inside a verified disposable Git project under the system temp root.
+The proof may invoke the already installed supported OMP executable for model-free discovery, but
+it never installs into the user's live project or user OMP directory and never copies evaluation
+tooling or `evals/` into installed `.omp`.
+
+Scratch proof is necessary package evidence, not live-install authority and not promotion evidence.
+A future live install, credential change, runtime download/downgrade, provider campaign, Git stage,
+commit, push, or release action requires separate explicit authority. Current truthful adapter
+status remains OMP `IMPLEMENTED_NOT_PROMOTED / installable true` and Claude
+`DESIGNED_NOT_VERIFIED / installable false`.
+
+<!-- topic08-projection:behavior-core -->
+## Topic 08 behavior component boundary
+
+The manifest-coupled `agent-boundary` component owns the behavior schema, core, manifest, OMP
+extension, and managed launcher, while depending on exact selected agent, skill, state, and config
+bytes. Install/update checks generated locks before staging. Rollback restores attributable
+component bytes and retains operational `agent-tasks`/`.agent-tasks` state. Claude is not an
+installable target.
+
+<!-- topic05-projection:installation -->
+## Topic 05 optional component contract (KD-029)
+
+`codegraph` is absent from installer defaults and requires the `state` component. Selection is
+explicit; acquisition is either a caller-supplied pinned offline artifact or a separately enabled
+pinned download, never both. Installation validates the component manifest, upstream lock,
+artifact, receipt, platform, and runtime record before target mutation and activates the tool last.
+Rollback restores exact template-owned bytes but retains the known managed bundle and per-worktree
+indexes; cleanup is a separate exact-path dry-run/apply action. Generated runtime/install records,
+the binary, and indexes are target state—not checked-in validation prerequisites.
+
+## State component boundary (KD-028)
+
+`state` is a default installer component mapped to `template/.omp/state`. Selection requires
+`pwsh` 7.4+ and an exact source-manifest hash check before copy; the installer remains Windows
+PowerShell 5.1 parseable. Backup/reinstall/rollback affect installed `.omp/state` executable bytes
+but preserve protected model/credential/session files and never read, write, migrate, or delete
+operational `agent-tasks`/`.agent-tasks` authority.
+
 > OPUS PROPOSED SPEC v1 | Source-verified against `scripts/install-template.ps1`.
+>
+> **Topic 02 supersession boundary:** installer ownership is derived from the Topic
+> 03-selected topology manifest. Former role keys remain baseline examples, not a fixed roster.
+> Optional capability settings are owned only when the selected runtime path consumes them.
+>
+> **KD-027 selected set:** install exactly `cheap-scout.md`, `worker.md`, and `reviewer.md`.
+> After the destination backup succeeds, retire only stale `explorer.md`, `implementer.md`,
+> `tech-lead.md`, and `verifier.md`; dry-run reports but never performs retirement.
 
 ---
 
@@ -39,8 +90,9 @@ baseline (`tools.approvalMode`, `retry.*`, `task.*`, `edit.*`, `compaction.*`,
 
 The template's `config.yml` contains **only** a `modelRoles:` block. `Copy-Item -Force`
 replaces the file wholesale, so every baseline setting is erased and silently reverts to
-OMP defaults — including `approvalMode` dropping from `yolo` and `compaction.strategy`
-losing `shake`.
+OMP defaults — including `approvalMode` dropping from `yolo` and the historical user-owned
+`compaction.strategy: shake` value being lost. This paragraph records the pre-Topic-07 defect; it
+does not select current managed continuity, which reasserts `strategy: off` through KD-031.
 
 A timestamped backup is taken first, so this is recoverable, but only if the user
 notices. The plan explicitly requires "preserves models.yml and credentials"; the same
@@ -145,17 +197,15 @@ Protected paths, never written: `models.yml`, `config.yml` (merge only), `agent.
 **CR-31 — Ownership is now two-class and target-aware.** An earlier draft said "the template
 owns exactly one key: `modelRoles`." That was correct before capture-first isolation became a
 correctness precondition. It is now insufficient: `08-isolation-and-concurrency.md §E-9`
-establishes that `task.isolation.apply: false` must be *effective at runtime* or the parallel
-Orchestrated path is unsafe, and OMP's default is `true`.
+establishes that `task.isolation.apply: false` must be *effective at runtime* or a selected
+conditional parallel-writer path is unsafe, and OMP's default is `true`.
 
 ### C-1. Ownership classes
 
 ```yaml
-owned_model_roles:              # both targets — REQUIRED: one per spawnable worker agent
-  modelRoles.explorer
-  modelRoles.implementer
-  modelRoles.verifier
-  modelRoles.reviewer
+owned_model_roles:              # both targets; derived, not a static list
+  source: Topic 03-selected topology manifest
+  include: every custom modelRoles.<alias> referenced by a selected spawned worker
 
 optional_model_roles:           # CR-34 — convenience alias, NOT installer-owned
   modelRoles.tech-lead:
@@ -163,14 +213,35 @@ optional_model_roles:           # CR-34 — convenience alias, NOT installer-own
     required_for_workflow: false
 
 owned_required_settings:        # PROJECT target only — see C-2
-  task.isolation.apply: false   # correctness precondition for parallel capture-first
-  task.isolation.mode: auto     # backend selector; must not be "none"
-  task.enableLsp: true          # CR-40/CR-41 — default is FALSE; three worker roles need it (four conditions required — see §07 §A-1)
+  when_conditional_parallel_writer_path_selected:
+    task.isolation.apply: false # correctness precondition for parallel capture-first
+    task.isolation.mode: auto   # backend selector; must not be "none"
+  when_selected_roles_consume_lsp:
+    task.enableLsp: true        # CR-40/CR-41; four-condition capability — see §07 §A-1
+  when_selected_dispatch_uses_effort:
+    task.enableEffort: true     # KD-010; otherwise effort is stripped from the task schema
+    task.maxEffort: selected_required_ceiling
+  when_selected_topology_uses_nested_delegation:
+    task.maxRecursionDepth: selected_required_depth
+  when_selected_contract_consumes_retrieval_tools:
+    glob.enabled: true          # only if glob is selected
+    grep.enabled: true          # only if grep is selected
+    astGrep.enabled: true       # only if ast_grep is selected; default false
+    web_search.enabled: true    # only if web_search is selected
+  when_selected_model_identity_is_acceptance_bearing:
+    retry.modelFallback: false
+    retry.usageAwareFallback: false
 
 opt_in_only_settings:           # CR-40 — user/global target requires an explicit flag
   task.enableLsp:
     flag: -EnableSubagentLsp
     blast_radius: LSP servers spawn for unrelated subagents in every repository
+  task.enableEffort:
+    flag: -EnablePerSpawnEffort
+    blast_radius: exposes the effort field to unrelated subagent dispatches
+  retry.modelFallback_and_retry.usageAwareFallback:
+    flag: -EnforceSelectedModelIdentity
+    blast_radius: disables fallback recovery for unrelated sessions
 
 user_preserved:
   everything_else               # never read, never written, never reordered
@@ -189,7 +260,8 @@ jointly removed its mandatory runtime consumer:
 A model role only has an effect when something resolves it — either spawn-time agent
 frontmatter, or a user explicitly selecting the alias. After CR-06 and CR-33, neither is
 required by any workflow path, so `@tech-lead` has **zero mandatory runtime consumers**.
-Only the four spawnable worker roles remain required.
+Owned model-role keys are derived from the Topic 03-selected topology manifest: only aliases
+actually referenced by selected spawned workers are required.
 
 Keeping it installer-owned would violate architecture principle 3 ("every artifact maps to
 a verified OMP primitive, or is explicitly labelled documentation / build input / dead"):
@@ -212,35 +284,74 @@ for manual model selection in their main session can add it. The template docume
 **CR-40 — `task.enableLsp` is owned for the same reason `task.isolation.apply` is.** Its
 default is `false` (`config/settings-schema.ts:4615-4617`), and subagent LSP requires it to be
 `true` at the settings layer — there is no per-call override on the model-facing task wire.
-Three worker roles (Explorer, Implementer, Reviewer) have retrieval contracts that depend on
-`lsp`, so a template that adds `lsp` to their allowlists without deploying the setting ships a
-capability that is granted and then withheld. That was the round-1 defect inverted: the
-allowlist fixed, the gate still shut.
+When selected LSP-consuming roles depend on `lsp`, a template that adds it to their allowlists
+without deploying the setting ships a capability that is granted and then withheld. If no
+selected contract consumes LSP, the installer does not own this key. That was the round-1
+defect inverted: the allowlist fixed, the gate still shut.
 
 Conflict handling differs from the isolation keys in one respect worth stating: an existing
 `task.enableLsp: false` is a **deliberate user cost decision** (the setting's own description
-is *"Off by default to keep subagents cheap"*). Report the conflict, do not overwrite, and let
-the workflow enter the disclosed reduced-capability mode (`07-retrieval-and-code-understanding.md §A-1`).
-Unlike `task.isolation.apply: true`, a `false` here is not a correctness hazard — it is a
-quality reduction, so it degrades rather than refuses.
+is *"Off by default to keep subagents cheap"*). Report the conflict and do not overwrite. That
+preserves the user's configuration choice, but it does not make the selected contract runnable:
+the selected LSP-consuming path remains disabled while any required gate is unmet. Continue
+only after remediation or after the Tech Lead selects a different contract that does not consume
+LSP, reconciles the manifest and accepted task contract, and validates the replacement path.
+If locked criteria or verification/review obligations change, the material-change rule applies.
+
+Selected LSP installation acceptance probes applicable language-server routing and treats
+details.success false as a failed capability result. Four effective registration gates are not
+enough: representative selected file types must route to an applicable server, and every
+acceptance-bearing LSP call must report `details.success: true` (`lsp/index.ts:2145-2160`). The
+installer reports missing server provisioning/configuration without replacing the selected
+semantic contract with text retrieval.
+
+**KD-010/KD-012/KD-027 — effort and model identity are selected-path settings, not assumed
+baselines.** Selected per-spawn effort makes `task.enableEffort: true` and
+`task.maxEffort: xhigh` owned project prerequisites and fails preflight when either is not
+effective. KD-027 owns `retry.modelFallback: true`, `retry.usageAwareFallback: false`, one
+Cheap-Scout-only Pro chain, and explicit empty default/Worker/Reviewer chains. The installer
+validates that closed shape rather than globally forcing fallback off.
+
+Validator contract: Selected per-spawn effort makes task.enableEffort true and task.maxEffort
+xhigh owned prerequisites and fails preflight when either is not effective. KD-027 selected
+routing owns retry.modelFallback true, retry.usageAwareFallback false, one Cheap-Scout-only Pro
+chain, and empty default/Worker/Reviewer chains.
+
+Selected-model preflight reconciles task.agentModelOverrides and rejects an unselected effective
+override. Because missing model credentials can silently choose the parent model
+without setting `resolvedModelIsFallback`, Worker/Reviewer result acceptance also compares
+returned `modelRole` and `resolvedModel` with the reconciled expected identity. The explicit
+fallback flag remains diagnostic evidence; only the selected Scout availability path may consume
+the named Pro fallback.
+
+Selected grep, glob, ast_grep, and web_search consumers own matching project settings and fail
+preflight when ineffective. At user scope these remain opt-in and conflict-preserving; a conflict
+disables only the selected consumer path and requires an explicit different contract plus
+reconciliation/revalidation.
+
+Selected exact-effort consumers own a sufficient task.maxEffort ceiling, and selected nested
+delegation preflights task.maxRecursionDepth. A lower effort ceiling or exhausted recursion depth
+does not silently downgrade the selected contract. The installer records the manifest-derived
+minimum/ceiling, while L1 verifies the effective value after precedence.
 
 `task.isolation.merge` is **not** owned. The integration procedure in
 `08-isolation-and-concurrency.md §E-10` handles both `patch` and `branch`; T-00.E3-C records
 the observed behavior of whichever value is effective.
 
 `task.batch` and `async.enabled` are **not** owned either, for opposite reasons.
-`task.batch: true` is an Orchestrated *precondition* checked at runtime with a documented
-fallback (§08 §C-1.4) — owning it would write a key whose default is already correct and whose
-override the user may want for other work. `async.enabled` is deliberately left alone: the
-template achieves its stage barriers with per-agent `blocking: true` frontmatter (§08 §C-1.3),
-which is strictly narrower than suppressing a user-global execution mode.
+`task.batch: true` is a conditional parallel-batch path precondition checked at runtime with a
+documented sequential fallback (§08 §C-1.4); it does not define Orchestrated classification.
+Owning it would write a key whose default is already correct and whose override the user may
+want for other work. `async.enabled` is deliberately left alone: selected stage barriers use
+per-agent `blocking: true` frontmatter (§08 §C-1.3), which is strictly narrower than suppressing
+a user-global execution mode.
 
 ### C-2. Target-aware policy for `owned_required_settings`
 
 | Target | Destination | Policy |
 |---|---|---|
 | **project** | `<repo>/.omp/config.yml` | Installer writes `owned_required_settings`. Blast radius is the one repository that opted in by installing the template. |
-| **user** | `~/.omp/agent/config.yml` | Installer **MUST NOT** write `task.isolation.*` unless `-EnableCaptureFirstIsolation` is passed explicitly. Without the flag: skip these keys, print a notice naming the runtime preflight requirement, and continue. With the flag: write them and print a warning that **every isolated task in every repository** on the machine becomes capture-only. **Likewise `task.enableLsp` requires `-EnableSubagentLsp` (CR-40)** — writing it globally spawns LSP servers for unrelated subagents in every repository. Without the flag: skip it, print a notice that workers will run in reduced-capability mode unless the project config or the launched session enables it. |
+| **user** | `~/.omp/agent/config.yml` | Installer **MUST NOT** write conditional settings without their explicit opt-in: `-EnableCaptureFirstIsolation`, `-EnableSubagentLsp`, `-EnablePerSpawnEffort`, or `-EnforceSelectedModelIdentity`. Without the relevant flag, skip that key set and state that its selected path remains disabled. With it, write the values and disclose their global blast radius. The LSP path may continue only under an explicitly selected and validated non-LSP replacement contract; other selected paths follow the same fail-closed/reconciliation rule. |
 
 Rationale for the asymmetry: a project-scoped setting affects only the project that installed
 the template. A user-global setting silently changes unrelated OMP work across all
@@ -257,7 +368,7 @@ repositories — a blast radius the template has no mandate to take.
 
   ```
   CONFIG CONFLICT: task.isolation.apply is set to true at <path>.
-  The Orchestrated workflow requires false for safe parallel capture-first integration.
+  The selected parallel capture-first path requires false for safe integration.
   Parallel isolated Implementers will not launch until this is resolved
   (/orchestrated preflight will refuse and fall back to sequential).
   Resolve manually, or re-run with -Force-CaptureFirstIsolation to overwrite.
@@ -357,3 +468,24 @@ approval. The installer must therefore:
 | AC-7 | Dry-run is the default in both install and uninstall, and writes nothing |
 | AC-8 | `-Target user` requires an explicit acceptance flag |
 | AC-9 | Post-install validation confirms OMP discovery of commands, agents, and skills |
+
+---
+
+## G. Topic 06 component transaction
+
+`agent-boundary` is a manifest-verified installed component containing the portable core/schema/
+CLI, trusted extension, managed overlay, and launcher. Its dependencies are the selected agents,
+compatible config, and Topic 04 state component. Installation validates all source hashes,
+supported OMP version, PowerShell 7.4+, dependency manifests, target config, and wrapper load
+before reporting success. Apply is backup-first and rollback restores exact prior bytes.
+
+Topic 06 owns `task.softRequestBudget: 200`; Topic 07 adds the exact disabled automatic-compaction
+profile, continuity schema/core/client, and final trusted adapter. The launcher is
+`.omp/bin/omp-managed.ps1` and preserves the caller's project working directory while placing the
+managed overlay last. Uninstall removes only manifest-owned/generated boundary files whose bytes
+are still attributable, preserves user modifications as conflicts, and never touches operational
+`agent-tasks` authority. Historical `.omp/schemas` files are not installed requirements.
+
+The combined component supports OMP 17.2.10 and 17.2.12. Installation does not promote Topic 07
+until the stop-before-provider canary passes on both versions; a missing local runtime is reported
+as `OPEN-T07-RUNTIME-02` / `IMPLEMENTED_NOT_PROMOTED` without download or downgrade.

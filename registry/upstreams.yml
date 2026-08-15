@@ -1,6 +1,7 @@
 # Upstream registry — all external research repositories
 # Do not edit commit hashes manually; run scripts/update-upstreams.ps1 to refresh.
 # clone_date: 2026-08-07
+# Source-provenance registry only; derived_into paths and former role names do not select current topology, dispatch, review, routing, or capability behavior.
 
 upstreams:
 
@@ -9,8 +10,9 @@ upstreams:
     url: https://github.com/can1357/oh-my-pi
     default_branch: main
     pinned_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+    clone_date: "2026-08-07"
     license: MIT
-    tier: A-runtime
+    tier: runtime-authority
     authority_for:
       - OMP native configuration model
       - agent definition format and discovery
@@ -22,12 +24,19 @@ upstreams:
       - LSP integration
       - hashline edit mode
     watched_paths:
-      - docs/config-usage.md
-      - docs/context-files.md
-      - docs/skills.md
-      - docs/task-agent-discovery.md
-      - docs/compaction.md
-      - docs/settings.md
+      - packages/coding-agent/src/discovery/helpers.ts
+      - packages/coding-agent/src/discovery/builtin.ts
+      - packages/coding-agent/src/task/discovery.ts
+      - packages/coding-agent/src/task/agents.ts
+      - packages/coding-agent/src/task/index.ts
+      - packages/coding-agent/src/task/executor.ts
+      - packages/coding-agent/src/task/structured-subagent.ts
+      - packages/coding-agent/src/task/isolation-runner.ts
+      - packages/coding-agent/src/tools/yield.ts
+      - packages/coding-agent/src/config/model-resolver.ts
+      - packages/coding-agent/src/config/model-roles.ts
+      - packages/coding-agent/src/config/settings-schema.ts
+      - packages/utils/src/frontmatter.ts
     adopted_mechanisms:
       - AGENTS.md / RULES.md context injection model
       - .omp/agents/*.md agent definition frontmatter
@@ -43,8 +52,9 @@ upstreams:
       - template/.omp/agents/*.md
       - template/.omp/skills/*/SKILL.md
     local_modifications: []
-    last_reviewed: "2026-08-07"
-    update_policy: watch-docs-only
+    last_reviewed: "2026-08-08"
+    update_policy: manual-review-only
+    evaluation_suite: evals/
 
   - id: superpowers
     repository: obra/superpowers
@@ -510,11 +520,44 @@ upstreams:
       - README.md
     adopted_mechanisms: []  # Evaluate only; not integrated in v0
     rejected_mechanisms:
-      - default integration (OMP LSP + native search is sufficient for v0)
+      - Serena default integration is excluded as a second runtime; selected OMP retrieval capabilities remain conditional on their effective tool and settings conjunction
     local_components: []
     local_modifications: []
     last_reviewed: "2026-08-07"
     update_policy: evaluate-when-needed
+
+  - id: codegraph
+    repository: colbymchenry/codegraph
+    url: https://github.com/colbymchenry/codegraph
+    release_url: https://github.com/colbymchenry/codegraph/releases/tag/v1.5.0
+    default_branch: main
+    pinned_tag: v1.5.0
+    pinned_commit: ea72e1b190921232aa7bd02e96bef5bbe4fe0ab6
+    license: MIT
+    tier: D-conditional
+    authority_for:
+      - optional worktree-local relationship retrieval capability
+    watched_paths:
+      - lib/dist/index.js
+      - bin/codegraph.js
+      - LICENSE
+    artifact_sha256:
+      darwin-arm64: cf5ee435a6e44d097b2f98f2b7b8b9422bb1094844404efed82519c5da1af2cf
+      darwin-x64: 0a0ccc29bf7da9d10be1458d89d7e15c55927ae24cd95e9fa3de4bdfea059dde
+      linux-arm64: 9f17750aedf45d51f68caae39ed21d6e2a7290b2326e5c53f95a165918ebd1d8
+      linux-x64: 2ba65e87a1210b706bb1e67d5e48b5fc4a1935e43dbb3fb5f31c5597840d2e58
+      win32-arm64: de125e792b5eed7dee8def2ab9bd7e762f372012f75f595e59d3b0c8714b0d55
+      win32-x64: d6798622b4f44ee6757c94335f437ee27a9ff7d3537b554cb6a2b3baf11bc4a1
+    adopted_mechanisms:
+      - adopt-017
+    rejected_mechanisms:
+      - reject-018
+      - reject-019
+    local_components:
+      - template/.omp/codegraph
+      - template/.omp/tools/codegraph-retrieve.js
+    last_reviewed: "2026-08-13"
+    update_policy: pinned-manual-review
 
   - id: repomix
     repository: yamadashy/repomix

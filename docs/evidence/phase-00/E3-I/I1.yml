@@ -1,0 +1,39 @@
+schema_version: 1
+phase: "00"
+experiment: E3-I
+case: I1
+status: PASS
+selected_attempt: 7
+reason: E3I_PROJECT_CONTROL_CONFIRMED
+
+runtime:
+  version: "omp/17.2.10"
+  executable_sha256: 1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6
+  model: omniroute/oc/mimo-v2.5-free
+
+raw_inputs:
+  - {path: docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.run.json, sha256: 9C89C85A0EA7C6CABFE37A7594B740DB73AFBC15F82C259A8494DE12B257B9E2}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.stdout.jsonl, sha256: 1F585ED5EAE164A3B6FBFEC8C6457A5EC1FFABF257B6830BF55916AFE8B2181A}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-project-1.jsonl, sha256: 6358F84E0C1DEA4FF90D569CDFE046253A611A7859671F2DFEC920FECA61F745}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-project-2.jsonl, sha256: 52936592D30903B68ED23E588412FDBECD59AE50934F345D4403CE9D241CEB55}
+  - {path: docs/evidence/phase-00/E3-I/raw/session-a-attempt-007.canary.e3i-project-3.jsonl, sha256: C4A732275B20983AA21BBEF169E6DA601504205D0EB5D6C8F6BFA07C21D3C9F5}
+
+observation:
+  project_config_apply: false
+  child_config_values: [false]
+  task_branches: [APPLY_FALSE_CAPTURE_ONLY, APPLY_FALSE_CAPTURE_ONLY, APPLY_FALSE_CAPTURE_ONLY]
+  effective_tool_surface: [read, yield, hub]
+  terminal_yield_count: 3
+  forbidden_tool_call_count: 0
+  stable_repetitions: 3
+  required_repetitions: 3
+  samples:
+    - {id: e3i-project-1, duration_ms: 5964, tokens: 5449, requests: 1}
+    - {id: e3i-project-2, duration_ms: 4613, tokens: 5515, requests: 1}
+    - {id: e3i-project-3, duration_ms: 5488, tokens: 5448, requests: 1}
+
+interpretation:
+  decision: APPLY_FALSE_IS_RELIABLY_DISCRIMINATED
+  authority: CHARACTERIZATION_ONLY
+  parallel_authorized: false
+

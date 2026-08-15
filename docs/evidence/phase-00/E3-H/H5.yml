@@ -1,0 +1,49 @@
+schema_version: 1
+phase: "00"
+experiment: E3-H
+case: H5
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  shell: PowerShell 7.6.4
+  provider_gateway: omniroute loopback http://127.0.0.1:20128/v1
+  runtime_model_catalog_sha256: 56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779
+
+execution:
+  selected_attempt: 2
+  process_exit_code: 0
+  started_at: "2026-08-09T01:17:41.3677207+07:00"
+  completed_at: "2026-08-09T01:17:49.0229094+07:00"
+  duration_ms: 7655
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-H/raw/H5-attempt-002.stdout.jsonl, sha256: BBA95B952F863399C3C51919C62D8F37A14991BA7CA4D2EE5E4BC182601D0CE8}
+    - {path: docs/evidence/phase-00/E3-H/raw/H5-attempt-002.stderr.txt, sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855}
+    - {path: docs/evidence/phase-00/E3-H/raw/H5-attempt-002.run.json, sha256: 37E2DD64FE7E77089E6081AFB342E9A6D09E543DE8DC24ECCE501D6156BB17EE}
+
+observation:
+  bash_call_count: 1
+  command: omp config get task.isolation.mode --json
+  structured_bash_error: true
+  command_exit_code: 127
+  task_dispatch_count: 0
+  reason: CONFIG_COMMAND_UNAVAILABLE
+  fallback: SEQUENTIAL_NON_ISOLATED_DISCLOSED
+
+interpretation:
+  reason: H5_CONFIG_COMMAND_UNAVAILABLE
+  decision: >-
+    With the OMP installation directory removed from the parent PATH, the exact bash
+    diagnostic failed structurally before task dispatch. Model prose supplied no gate evidence.
+
+history:
+  - attempt: 1
+    adjudication: INVALID_RUN_PROVENANCE_INCOMPLETE
+    cause: Runtime predicates passed but the run record lacked process exit and timing provenance.
+    raw_run_sha256: 09F77B3DA8B7F662A29FF4FD22F7ED5A28E6E14F5EB7E3C5BFCEDDF77AF1E6AF
+    gate_power: NONE
+

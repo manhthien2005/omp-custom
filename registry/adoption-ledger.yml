@@ -1,5 +1,7 @@
 # Adoption Ledger — records every mechanism adopted from upstream sources
 # Each entry explains what was adopted, from where, and why.
+# Historical adoption-provenance ledger only; adopted_to paths, role names, and rationales do not select current topology, dispatch, review, or capability behavior.
+# Current authority lives in the accepted design, key decisions, active specs, phase plans, and Topic 03-selected manifest.
 
 ledger:
 
@@ -8,13 +10,11 @@ ledger:
     source: can1357/oh-my-pi
     source_commit: 3a8591a
     adopted_to:
-      - template/.omp/agents/tech-lead.md
-      - template/.omp/agents/explorer.md
-      - template/.omp/agents/implementer.md
-      - template/.omp/agents/verifier.md
+      - template/.omp/agents/cheap-scout.md
+      - template/.omp/agents/worker.md
       - template/.omp/agents/reviewer.md
     adoption_type: conceptual-inspiration  # OMP-native format; configuration not code
-    rationale: "Native OMP agent discovery requires this exact frontmatter schema. Five custom agents define roles, model aliases, tools, and spawn policies."
+    rationale: "Native OMP agent discovery provides the selected three-role adapter format; the portable manifest, not this provenance row, selects current behavior."
     date: "2026-08-07"
 
   - id: adopt-002
@@ -74,9 +74,9 @@ ledger:
     license_check: MIT
     adopted_to:
       - template/.omp/skills/evidence-before-completion/SKILL.md
-      - template/.omp/agents/verifier.md
+      - template/.omp/agents/worker.md
     adoption_type: paraphrased-implementation
-    rationale: "Prevents false completion claims — one of the highest-cost failure modes in agentic coding. The Verifier agent contract and the skill both enforce this principle."
+    rationale: "Prevents false completion claims at the Worker boundary; Reviewer verification remains explicit in its role prompt rather than using a permanent Verifier role."
     date: "2026-08-07"
 
   - id: adopt-007
@@ -231,3 +231,22 @@ ledger:
     adoption_type: conceptual-inspiration
     rationale: "These four principles address the most common LLM coding failure modes: over-engineering, scope creep, assumption-driven code, and false completion."
     date: "2026-08-07"
+
+  - id: adopt-017
+    mechanism: "Optional default-off worktree-local CodeGraph retrieval capability adapter"
+    source: colbymchenry/codegraph
+    source_commit: ea72e1b190921232aa7bd02e96bef5bbe4fe0ab6
+    license_check: MIT
+    adopted_to:
+      - template/.omp/codegraph
+      - template/.omp/tools/codegraph-retrieve.js
+      - evals/retrieval/topic05
+    adoption_type: bounded-adapter
+    rationale: >
+      Relationship and blast-radius questions may benefit from graph retrieval. Native retrieval
+      remains the baseline; graph output is a hypothesis and failures return explicitly to native.
+    decision: KD-029
+    rejected_boundaries:
+      - reject-018
+      - reject-019
+    date: "2026-08-13"

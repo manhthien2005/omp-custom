@@ -1,66 +1,75 @@
 # Standard Workflow
-<!-- Use when: multiple files involved, behavior changes, root cause unclear, tests need attention -->
-<!-- Flow: triage → exploration → mini-spec → plan → implementation → verification → focused-review → summary -->
 
-## When to use
+Standard is one integrated implementation lane owned by the main-session Tech Lead. A plain
+request may be classified Standard; `/standard` is a compatibility/advanced hint that must be
+validated before mutation.
 
-- Multiple files or modules may be affected
-- Behavior change or new feature
-- Root cause is not immediately clear (requires investigation)
-- Tests or API compatibility need attention
+## Contract
 
-## When NOT to use
+Accept objective, scope/authority, mandatory criteria, verification/review obligations, risk, and
+one integrated candidate lineage. Standard may be large or high-risk; Orchestrated is selected
+only when at least two independently verifiable work units and an integration contract exist.
 
-- Narrow, low-risk, single-file change (use Quick)
-- Architecture change, cross-module impact, or high security/migration risk (use Orchestrated)
+After the contract is accepted, create the task through `state/agent-tasks.ps1` as described by
+`state/PROTOCOL.md` before mutation. At lifecycle boundaries call that same core; never edit
+authority JSON directly. If the core or authority root is unavailable, mutating work fails closed,
+while read-only diagnosis may continue with the limitation disclosed. The same `create-task`
+request must include exact `workflow_class: standard` and the complete initial `locked_decisions`
+array; an empty array is valid, but no decision is inferred from prompt text. A legacy active task
+uses `set-continuity-contract` with `workflow_class: standard`, complete `locked_decisions`,
+non-empty authority/reason, and the exact current revision/hash/lease compare-and-swap.
 
 ## Flow
 
-```
-triage → exploration → mini-spec → plan → implementation → verification → focused-review → summary
-```
+1. Triage and reconcile the accepted task contract.
+2. Gather only the evidence needed for a mini-spec and plan.
+3. Implement inline or delegate one bounded work unit when the spawn-benefit gate passes.
+4. Integrate, freeze the candidate, and run fresh Tech Lead verification.
+5. Apply the review risk gate, resolve blocking findings through rework, and report.
 
-**Step 1 — Triage**
-Invoke `task-triage` skill. Confirm scope, risk, and whether Standard is the right size.
-Identify open ambiguities and resolve before proceeding.
+## Benefit-gated agents
 
-**Step 2 — Exploration (Explorer agent)**
-Dispatch Explorer with task packet. Explorer returns:
-- Relevant files and symbols
-- Existing tests and conventions
-- Architecture constraints
-- Ranked evidence for planning
+- **Cheap Scout (optional):** one bounded read-only retrieval/mapping question. Validate its cited
+  evidence before use. Missing Scout availability returns retrieval to the Tech Lead.
+- **Worker (optional):** one explicitly owned implementation scope with acceptance criteria and
+  verification commands. Omit per-spawn `effort` for normal `high`; use `effort: hi` only when the
+  Tech Lead classifies the work difficult and expects effective `xhigh`.
+- **General Reviewer (risk-gated):** exact `xhigh`, with the dynamic concern profile already
+  selected. Security, authentication, durable data, database migration, concurrency, public API,
+  and destructive change concerns require review.
 
-**Step 3 — Mini-spec**
-Write a compact mini-spec (inline, not a full document):
-- What will change (behavior contract, not implementation)
-- 2–5 acceptance criteria in Given/When/Then format
-- Out-of-scope declaration
-- Risk level
+Retrieval routing has the same truth authority in every workflow; only workflow depth differs.
+The Tech Lead independently selects Lead/native, Lead/CodeGraph, Scout/native then Lead, or
+Scout/CodeGraph then Lead according to source fitness. CodeGraph is optional/default-off. An
+absent/unhealthy graph takes a named native fallback; Scout unavailability is
+`ENVIRONMENT_BLOCKED`, after which the Tech Lead continues the required retrieval.
 
-**Step 4 — Plan**
-List implementation steps with verification checkpoints. No more than 5–7 steps for Standard workflow.
+Default to no subagent spawn and one writer. While Worker writes the retained workspace, the Tech
+Lead does not compete with it. Accept only valid, non-overridden structured output and verify the
+returned Worker/Reviewer identity and effort. A quality failure opens rework; it does not silently
+change model.
 
-**Step 5 — Implementation (Implementer agent)**
-Dispatch Implementer with task packet derived from exploration results and mini-spec.
-Implementer runs inspect → edit → verify → compact loop.
+## Verification and review
 
-**Step 6 — Verification (Verifier agent)**
-Dispatch Verifier with task packet. Verifier runs fresh, independent verification.
-If FAIL: return result to Implementer or report unresolvable issue.
+The Tech Lead owns fresh verification after all accepted writes are integrated. A permanent
+Verifier is not part of the topology. Reviewer preference is a suitable different family, another
+suitable strong model, then a same-model separate session with disclosure. Opus is a preference,
+not a gate.
 
-**Step 7 — Focused Review (Reviewer agent, optional)**
-Enable when: API change, security-touching code, new public interface, or high-complexity diff.
-Skip for: internal-only changes with no API surface, passing all criteria with low risk.
+## Escalation and lifecycle
 
-**Step 8 — Summary**
-Report: objective, files changed, acceptance criteria results, verification evidence, unresolved items.
+If exploration proves the structural Orchestrated boundary, preserve valid work, create work-unit
+contracts and an integration contract, then change internal classification. New objective/scope/
+mandatory criteria/locked obligations open a linked task. Mutation after verification creates a
+new candidate and invalidates old evidence.
 
-## Agent dispatch
+## Context continuity
 
-| Step | Agent | Required |
-|------|-------|---------|
-| Exploration | Explorer | Yes |
-| Implementation | Implementer | Yes |
-| Verification | Verifier | Yes |
-| Review | Reviewer | Risk-based |
+Run argument-free `/safe-compact` only after exactly one active task is owned by the current
+persisted OMP session and the continuity gate is armed. Standard requires complete applicable
+secondary checkpoint/work-unit/next-action/blocker/risk/candidate/evidence state; named Quick
+degradation is invalid here. The command writes verified local recovery bytes, runs one native
+soft transaction, and injects one kernel on the next normal prompt without hidden continuation.
+If it is unavailable/refused or one attempt leaves pressure unresolved, checkpoint and use the
+explicit Topic 04 `begin-handoff`/`accept-handoff` path. Never fall back to built-in `/compact`,
+`/shake`, snapcompact, automatic retry, or automatic handoff.

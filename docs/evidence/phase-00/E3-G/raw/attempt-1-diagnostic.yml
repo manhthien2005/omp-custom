@@ -1,0 +1,13 @@
+schema_version: 1
+experiment: E3-G
+attempt: 1
+selection_status: INVALID_FIXTURE_BACKEND_GAP
+fixture_head: 32239a76f83f4a8beeeaf19ca5754e23cc87f663
+process_exit_code: 0
+root_patch_materialized: true
+nested_patch_count: 0
+diagnosis: Windows rcopy did not materialize ignored nested repositories in the isolation worktree, so the worker-created nested paths had no .git metadata and could not exercise captureDeltaPatch nested walking.
+retry:
+  authorized: true
+  limit: one
+  changed_variable: materialize independent isolation-local clones before mutation

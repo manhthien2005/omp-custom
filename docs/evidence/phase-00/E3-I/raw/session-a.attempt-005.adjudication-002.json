@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 5,
+  "selected": false,
+  "adjudicated_at": "2026-08-09",
+  "correction_of": {
+    "path": "docs/evidence/phase-00/E3-I/raw/session-a.attempt-005.adjudication.json",
+    "sha256": "BB7F7395441B1ED7C6E4DF3B56433BD9C50A633F4CE943005D8B8E814239626C"
+  },
+  "correction_reason": "E3I_PARENT_TERMINAL_PRECEDENCE_SUPERSESSION",
+  "original_adjudication": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "reasons": [
+      "P00-RUNTIME-PROVIDER-OVERLOAD"
+    ],
+    "failure_scope": "parent-terminal"
+  },
+  "corrected_adjudication": {
+    "status": "INVALID_RUN",
+    "reasons": [
+      "E3I_NESTED_PROVIDER_RECOVERY"
+    ],
+    "selection_eligible": false,
+    "semantic_fail": false,
+    "reasoning": "The assistant error at event line 715 was superseded by auto_retry_start at line 717, successful E3I_SESSION_A_DONE at line 733, and terminal agent_end stop at line 735. The complete parent sequence is therefore not terminally blocked, but canary e3i-runtime-3 contains an explicit recovered provider retry and makes the attempt invalid."
+  },
+  "authoritative_outcome": {
+    "source": "terminal-agent-end",
+    "event_line": 735,
+    "stop_reason": "stop",
+    "completion_text": "E3I_SESSION_A_DONE",
+    "parent_exit_code": 0
+  },
+  "parent_retry_recovery": {
+    "observed": true,
+    "count": 8,
+    "start_event_lines": [
+      28,
+      238,
+      248,
+      491,
+      501,
+      511,
+      612,
+      717
+    ],
+    "auto_retry_end_success_count": 4,
+    "final_outcome_event_line": 735,
+    "final_stop_reason": "stop"
+  },
+  "nested_provider_recovery": {
+    "observed": true,
+    "canary_id": "e3i-runtime-3",
+    "event_line": 7,
+    "count": 1,
+    "provider": "omniroute",
+    "model": "codex/gpt-5.6-sol-high",
+    "kind": "auto-retry",
+    "status": "recovered",
+    "attempt": 1,
+    "superseding_event_line": 8,
+    "affects_corrected_status": true
+  },
+  "provider_execution": {
+    "new_provider_call": false,
+    "session_a_launches_in_original_attempt": 1,
+    "session_a_replay_launched": false,
+    "session_b_launched": false,
+    "attempt_6_launched": false,
+    "parallel_authorized": false
+  },
+  "raw_artifacts": [
+    {
+      "file": "session-a-attempt-005.stdout.jsonl",
+      "sha256": "5F8DF445A52D54E6C48D11D35D75706E435D67B51D2CEB518B4C89F1804F44F0"
+    },
+    {
+      "file": "session-a-attempt-005.stderr.txt",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "file": "session-a-attempt-005.run.json",
+      "sha256": "8A2EAFC45F771268FCB872F7ED0D6A278AD1F4217CDC625F0F431FF55CF3230B"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-project-1.jsonl",
+      "sha256": "97B8B7C06A57159C9865A06D179C2CE77B7EBA01869C10E4ABD13B328C2B3325"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-project-2.jsonl",
+      "sha256": "6A96C0C1A6DCBE0CA37F4A7C6EEBDF0FFE2DC7E786D9BC1F2A1BAC56D2BCE65A"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-project-3.jsonl",
+      "sha256": "0CDCAC4964F479BDEC49179A9EB6BEE045208C08FDCD5D0194E22BB7D4E47D16"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-runtime-1.jsonl",
+      "sha256": "D80867A0744FF62B846170D9CD9E3A28B23F5A2C73BA1B719BE3311A575EE4A1"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-runtime-2.jsonl",
+      "sha256": "5940D7F9C9AF277439F5D3F9D213FC7F06115117BBFB32137DF08E5F2268AB21"
+    },
+    {
+      "file": "session-a-attempt-005.canary.e3i-runtime-3.jsonl",
+      "sha256": "76CD96E3D797C290A2B92358F8800605BF609024E7F6B89C6BF8A13C9D08432B"
+    }
+  ],
+  "non_claims": [
+    "Attempt 5 is not selected and supplies no I1-I4 authority.",
+    "The local replay made no provider call and did not launch Session B or Attempt 6.",
+    "Successful parent recovery does not cure the nested recovered provider retry.",
+    "This correction grants no parallel authority and does not execute E3-M."
+  ]
+}

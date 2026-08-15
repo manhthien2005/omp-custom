@@ -1,0 +1,66 @@
+schema_version: 1
+phase: "00"
+experiment: E3-K
+case: K1
+status: PASS
+
+provenance:
+  repository_head: 62fecf277dc9d5e47d06319387eac747462214c1
+  omp_version: "17.2.10"
+  omp_commit: 3a8591a8af5b6d200088d12ca75a5517cb064fa8
+  shell: PowerShell 7.6.4
+  provider_gateway: omniroute loopback http://127.0.0.1:20128/v1
+  runtime_model_catalog: docs/evidence/phase-00/environment/runtime-models.yml
+  runtime_model_catalog_sha256: 56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779
+
+execution:
+  selected_attempt: 3
+  fixture_commit: d329a972164bb50528bd78f1c7aeed3859ea71e4
+  process_exit_code: 0
+  started_at: "2026-08-09T00:12:18.5451638+07:00"
+  completed_at: "2026-08-09T00:15:28.3469428+07:00"
+  duration_ms: 189802
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - docs/evidence/phase-00/E3-K/raw/K1.stdout.jsonl
+    - docs/evidence/phase-00/E3-K/raw/K1.stderr.txt
+    - docs/evidence/phase-00/E3-K/raw/K1.run.json
+    - docs/evidence/phase-00/E3-K/raw/K1-attempt-002.stdout.jsonl
+    - docs/evidence/phase-00/E3-K/raw/K1-attempt-002.stderr.txt
+    - docs/evidence/phase-00/E3-K/raw/K1-attempt-002.run.json
+    - docs/evidence/phase-00/E3-K/raw/K1-attempt-003.stdout.jsonl
+    - docs/evidence/phase-00/E3-K/raw/K1-attempt-003.stderr.txt
+    - docs/evidence/phase-00/E3-K/raw/K1-attempt-003.run.json
+
+observation:
+  task_call_count: 2
+  attestation_event_index: 177
+  first_task_start_event_index: 294
+  first_task_end_event_index: 328
+  second_task_start_event_index: 441
+  second_task_end_event_index: 465
+  preflight_before_dispatch: true
+  sequential_fallback: true
+  attested_top_level_keys: [agent, i, name, outputSchema, schemaMode, task]
+  attested_has_task: true
+  attested_has_tasks: false
+  attested_has_context: false
+  attested_decision: SEQUENTIAL_FALLBACK
+  actual_task_calls_use_flat_task: true
+  actual_task_calls_use_tasks: false
+  actual_task_calls_use_context: false
+
+interpretation:
+  reason: K1_FLAT_WIRE_SEQUENTIAL_FALLBACK
+  decision: >-
+    With task.batch disabled, the model-visible schema exposed only the flat task
+    argument and the parent dispatched two logical work items as two ordered calls;
+    call 2 began only after call 1 ended.
+  affected_requirements: [CR-39, T-02.3b]
+
+history:
+  - Attempt 1 contained valid runtime behavior but the analyzer tried to parse a bash result containing both the JSON attestation and a wall-time suffix as one JSON document.
+  - A realistic synthetic RED test reproduced the parser defect; attempt 1 then re-adjudicated PASS after line-bounded discriminator parsing was added.
+  - Attempt 2 was INVALID_RUN because the provider returned server_is_overloaded; it has no gate power and remains preserved.
+  - Attempt 3 independently reproduced PASS and is the selected evidence.

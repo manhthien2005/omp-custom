@@ -1,0 +1,28 @@
+schema_version: 1
+phase: "00"
+experiment: E3-H
+case: H2
+status: PASS
+
+execution:
+  selected_attempt: 1
+  provider_call: false
+  direct_process_count: 2
+  cleanup_succeeded: true
+  live_home_changed_count: 0
+  raw_artifacts:
+    - {path: docs/evidence/phase-00/E3-H/raw/H2.stdout.json, sha256: 9E6DF19A62DD8352FAE141AFC445206378B34A19EE7FAFF08C779D9227B882BA}
+    - {path: docs/evidence/phase-00/E3-H/raw/H2.stderr.txt, sha256: B1F8F1CE02BC315FA4299739C962788AE06D81DFD8A1FDFD42A0E35B262BE7FD}
+    - {path: docs/evidence/phase-00/E3-H/raw/H2.run.json, sha256: 7FD6A6EB61AEE11BD691C70DE600B461CB196576D4D0B65F0A930833C438A588}
+
+observation:
+  mode: none
+  apply: true
+  decision: REFUSE
+  reasons: [ISOLATION_MODE_NONE, ISOLATION_APPLY_TRUE]
+  fallback: SEQUENTIAL_NON_ISOLATED_DISCLOSED
+
+interpretation:
+  reason: H2_DEFAULTS_REFUSED
+  decision: Missing project settings fail closed and disclose sequential non-isolated fallback.
+

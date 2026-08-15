@@ -1,0 +1,17 @@
+task:
+  softRequestBudget: 200
+contextPromotion:
+  enabled: false
+compaction:
+  enabled: false
+  strategy: off
+  midTurnEnabled: false
+  thresholdPercent: -1
+  thresholdTokens: -1
+  keepRecentTokens: 20000
+  autoContinue: false
+  idleEnabled: false
+  remoteEnabled: false
+  remoteStreamingV2Enabled: false
+  supersedeReads: true
+  dropUseless: true

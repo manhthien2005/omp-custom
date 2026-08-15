@@ -1,5 +1,16 @@
 # Mechanism Matrix
+
+> Authority boundary: This research file is source/research evidence.
+> Former role names, counts, verdicts, and ADOPT or ADAPT labels do not select current topology,
+> dispatch, review mechanism, or capability behavior.
+> Current design and execution authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+
 <!-- Generated: 2026-08-07 — Phase 2 -->
+
+Historical research input only; no current design, execution, routing, fallback, topology, or capability authority.
+ADOPT and ADAPT labels below record an earlier research pass and do not select current runtime behavior.
+Current decisions live in the accepted design, key decision log, active specs, and Topic 03-selected manifest.
 
 ## Legend
 - **Token impact**: + = adds tokens, - = reduces tokens, 0 = neutral, ? = unclear

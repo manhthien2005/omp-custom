@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "record_type": "topic04_adapter_gate",
+  "pinned_source_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8",
+  "pinned_source_version": "17.2.10",
+  "observed_installed_omp_version": "17.2.12",
+  "manual_core_adapter": "SELECTED",
+  "automatic_lifecycle_adapter": "NOT_INSTALLED",
+  "reason_code": "TOPIC08_INSTALLED_RUNTIME_PROBE_REQUIRED",
+  "candidate_events": [
+    "session_start",
+    "session_before_switch",
+    "session_switch",
+    "session_before_compact",
+    "session_stop"
+  ]
+}

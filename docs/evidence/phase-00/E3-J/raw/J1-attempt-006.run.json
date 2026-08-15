@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "case": "J1",
+  "attempt": 6,
+  "experiment": "E3-J",
+  "omp_version": "omp/17.2.10",
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>"
+  },
+  "model_catalog_sha256": "56782B3FE9F3555C863062F5C92F398A3D147E3D6D4F39408BADD99751A5F779",
+  "fixture_commit": "364af4152b30f8cdbde74226a50b32af5acf82d2",
+  "command": [
+    "omp",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_ROOT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--config",
+    "<DISPOSABLE_ROOT>/config.yml",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "8m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:J1-blocking-batch.md>"
+  ],
+  "exit_code": 0,
+  "started_at": "2026-08-08T23:58:37.6014808+07:00",
+  "completed_at": "2026-08-08T23:59:33.2383019+07:00",
+  "duration_ms": 55637,
+  "cleanup_succeeded": true,
+  "cleanup_failure_count": 0,
+  "live_home_metadata": {
+    "before_file_count": 14,
+    "after_file_count": 14,
+    "before_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "after_sha256": "2fc05c087d7baa8ef5d95fd1905e4917e05301688e6d22fb683e2328c210a6ca",
+    "changed_count": 0,
+    "changed_paths": [],
+    "boundary_result": "PASS_LIVE_HOME_READ_ONLY"
+  },
+  "analysis": {
+    "Status": "PASS",
+    "Reasons": [
+      "J1_ALL_PREDICATES"
+    ],
+    "ResultOrder": [
+      0,
+      1,
+      2
+    ],
+    "Timings": [
+      {
+        "Index": 0,
+        "ResultIndex": 0,
+        "Id": "worker-0",
+        "StartedAtMs": 1786208335685,
+        "EndedAtMs": 1786208353685,
+        "DurationMs": 18000
+      },
+      {
+        "Index": 1,
+        "ResultIndex": 1,
+        "Id": "worker-1",
+        "StartedAtMs": 1786208335870,
+        "EndedAtMs": 1786208365871,
+        "DurationMs": 30001
+      },
+      {
+        "Index": 2,
+        "ResultIndex": 2,
+        "Id": "worker-2",
+        "StartedAtMs": 1786208335997,
+        "EndedAtMs": 1786208341998,
+        "DurationMs": 6001
+      }
+    ],
+    "CompletionOrder": [
+      2,
+      0,
+      1
+    ],
+    "OverlapPairs": [
+      "0-1",
+      "0-2",
+      "1-2"
+    ],
+    "TaskCallReturnsAfterAll": true
+  }
+}

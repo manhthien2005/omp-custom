@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-I",
+  "session": "A",
+  "attempt": 2,
+  "selected": false,
+  "omp_version": "omp/17.2.10",
+  "omp_runtime": {
+    "selection": "EXPLICIT_SOURCE",
+    "launch_path": "<DISPOSABLE_RUNTIME>/omp.exe",
+    "source_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "copied_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+    "nested_path_prepended": true
+  },
+  "model": "omniroute/codex/gpt-5.6-sol-high",
+  "process_environment": {
+    "PI_CODING_AGENT_DIR": "<DISPOSABLE_AGENT_DIR>",
+    "OMP_PHASE00_E3I_PARENT_CWD": "<DISPOSABLE_PROJECT>"
+  },
+  "command": [
+    "<DISPOSABLE_RUNTIME>/omp.exe",
+    "-p",
+    "--mode",
+    "json",
+    "--cwd",
+    "<DISPOSABLE_PROJECT>",
+    "--session-dir",
+    "<DISPOSABLE_SESSION_DIR>",
+    "--model",
+    "omniroute/codex/gpt-5.6-sol-high",
+    "--tools",
+    "task,bash",
+    "--approval-mode",
+    "yolo",
+    "--max-time",
+    "12m",
+    "--no-extensions",
+    "--no-skills",
+    "--no-rules",
+    "--no-lsp",
+    "--no-title",
+    "<PROMPT:session-a.md>"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "started_at": "2026-08-09T12:10:25.6105969+07:00",
+  "completed_at": "2026-08-09T12:13:46.5975580+07:00",
+  "duration_ms": 200987,
+  "parent_stdout_sha256": "ABA4E5BA691A5FA872674E427813B01212533138CF507DB5FDB80EBA4049674A",
+  "parent_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+  "canary_artifacts": [
+    {
+      "id": "e3i-project-1",
+      "sha256": "205C374B3D9C75E831EA95AA9CB0850FF665F026F2EF9C402203BA4588137D92",
+      "file": "session-a-attempt-002.canary.e3i-project-1.jsonl"
+    },
+    {
+      "id": "e3i-project-2",
+      "sha256": "C0CB53998F4C8172CE62DC32D8735F1305D2340B66654459F62F27B912E10707",
+      "file": "session-a-attempt-002.canary.e3i-project-2.jsonl"
+    },
+    {
+      "id": "e3i-project-3",
+      "sha256": "AD4545FFD79AB50FBB463218F91FB4637C1A7B94494A5F8F1B1516D6DCE2A341",
+      "file": "session-a-attempt-002.canary.e3i-project-3.jsonl"
+    },
+    {
+      "id": "e3i-runtime-1",
+      "sha256": "3B9006339F0BCB96A113E1A122335C1F8CDE019181AFC7ED38776BDF260A8E24",
+      "file": "session-a-attempt-002.canary.e3i-runtime-1.jsonl"
+    },
+    {
+      "id": "e3i-runtime-2",
+      "sha256": "D651EDE773277BE326EC0C7BB8F73CF148B830B890119175C7E88436C64A9A29",
+      "file": "session-a-attempt-002.canary.e3i-runtime-2.jsonl"
+    },
+    {
+      "id": "e3i-runtime-3",
+      "sha256": "2CB7A176651B594F2C3323EF31258CE7FAE552718A64EFE6F07614B7EB80DC26",
+      "file": "session-a-attempt-002.canary.e3i-runtime-3.jsonl"
+    }
+  ],
+  "boundary": {
+    "ParentContentUnchanged": true,
+    "ParentHeadUnchanged": true,
+    "ParentStatusUnchanged": true,
+    "FixtureHashesUnchanged": true,
+    "LiveHomeUnchanged": true,
+    "CleanupSucceeded": true
+  },
+  "live_home_metadata": {
+    "BeforeFileCount": 14,
+    "AfterFileCount": 14,
+    "BeforeSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "AfterSha256": "A2CDAAE6F4C503143E09E826A0B6C44704386A7781E6D12660188407FE526DB4",
+    "ChangedPaths": [],
+    "ChangedCount": 0,
+    "BoundaryResult": "PASS",
+    "MutationAttributableToExperiment": false,
+    "AttributionBasis": "NO_CHANGE"
+  },
+  "cleanup_error": null,
+  "analysis": {
+    "Status": "BLOCKED_ENVIRONMENT",
+    "Reasons": [
+      "P00-RUNTIME-PROVIDER-ENVIRONMENT"
+    ],
+    "Error": "The property 'Name' cannot be found on this object. Verify that the property exists."
+  }
+}

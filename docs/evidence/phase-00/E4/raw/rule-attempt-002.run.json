@@ -1,0 +1,35 @@
+{
+    "schema_version":  1,
+    "experiment":  "E4",
+    "arm":  "RULE",
+    "attempt":  2,
+    "selected":  false,
+    "status":  "INVALID_RUN",
+    "model":  "omniroute/oc/mimo-v2.5-free",
+    "runtime":  {
+                    "version":  "omp/17.2.10",
+                    "sha256":  "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6"
+                },
+    "started_at":  "2026-08-11T11:55:02.8035226+07:00",
+    "completed_at":  "2026-08-11T11:55:54.1777642+07:00",
+    "duration_ms":  51374,
+    "exit_code":  0,
+    "timed_out":  false,
+    "analysis":  {
+                     "Status":  "INVALID_RUN",
+                     "Reasons":  [
+                                     "E4_HARNESS_FAILURE"
+                                 ],
+                     "Error":  "The property \u0027PropagationClass\u0027 cannot be found on this object. Verify that the property exists."
+                 },
+    "repository_unchanged":  false,
+    "live_home_changed_count":  0,
+    "cleanup_succeeded":  true,
+    "cleanup_error":  null,
+    "artifacts":  {
+                      "parent_stdout":  "2855424CA2F49C24A718C124DAA845EEDB6AAC5875189E620E9FD32C04D2FC82",
+                      "parent_stderr":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+                      "child":  "323150A04EE6ADA35834C1C89A19CDB05911F4A7CB15C157750F49548DBAADEE",
+                      "projection":  null
+                  }
+}

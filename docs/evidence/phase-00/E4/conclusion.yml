@@ -1,0 +1,39 @@
+schema_version: 1
+phase: "00"
+experiment: E4
+status: PASS
+selected_attempt: 4
+discriminator: A
+classification: A_PROMPT_VISIBLE
+authority: CHARACTERIZATION_ONLY
+
+selected_transaction:
+  path: docs/evidence/phase-00/E4/selected-transaction.json
+  sha256: 3C71192A056CEC345C114BC26EB0A55F8B22F0CA6F79187F4A3CF080CE77AC61
+
+finding:
+  rules_md_reaches_child_system_prompt: true
+  exact_sentinel_count_in_child_system_prompt: 1
+  worker_behavior_observed: true
+  terminal_yield_count_per_arm: 1
+  autoload_delivery_observed: true
+  autoload_minus_rule_first_turn_prompt_tokens: 145
+  token_sample_count_per_arm: 1
+
+decision:
+  dr_4: >-
+    Retain autoloadSkills for explicit per-agent policy packaging and predictable scope;
+    do not justify it by claiming that parent RULES.md is absent from child prompts.
+  phase_02_worker_initialization: UNBLOCKED
+
+oracle_correction:
+  source_run_preserved: true
+  corrected_rule_status: PASS
+  rationale: >-
+    The spec requires behavioral observation, not exactly one textual occurrence. The
+    worker used one terminal yield and repeated the required phrase only in visible
+    explanatory text plus that yield.
+
+non_claims:
+  - The token delta is not a benchmark.
+  - This result characterizes the pinned runtime and tested discovery layout.

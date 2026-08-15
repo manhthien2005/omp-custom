@@ -1,6 +1,7 @@
 # Rejected Mechanisms
 # Records mechanisms that were considered and explicitly rejected.
 # Purpose: prevent re-proposing the same bad ideas in future phases.
+# Independent review is selected by the accepted task contract and risk; Orchestrated classification alone does not mandate a Reviewer or worker dispatch.
 
 rejected:
 
@@ -71,7 +72,7 @@ rejected:
     mechanism: "Serena semantic retrieval (v0)"
     source: oraios/serena
     rejection_date: "2026-08-07"
-    reason: "OMP LSP + native search is sufficient for v0. Serena adds MCP dependency and setup complexity. Evaluate only when OMP LSP cannot resolve a real retrieval problem."
+    reason: "Serena remains excluded as a second runtime. A selected OMP LSP or native-search contract runs only when its effective tool and settings conjunction passes; otherwise it fails closed or selects and revalidates a different contract. Serena adds MCP dependency and setup complexity."
     condition_to_revisit: "Post-v0 when a specific retrieval failure case is documented."
 
   - id: reject-011
@@ -152,3 +153,19 @@ rejected:
     rejection_date: "2026-08-07"
     reason: "Promptfoo is external evaluation infrastructure, not part of OMP runtime. Adding it as a dependency would require Node.js, npm, and promptfoo installation in every project. Local deterministic scripts are the primary evaluation tool."
     condition_to_revisit: "Promptfoo is approved for optional model-graded evaluation runs."
+
+  - id: reject-018
+    mechanism: "Default-on or universal CodeGraph retrieval"
+    source: colbymchenry/codegraph
+    rejection_date: "2026-08-13"
+    reason: "Native retrieval is simpler for exact-text and configuration tasks; Topic 05 evidence can recommend only source-fit task classes and cannot promote a universal default."
+    adopted_counterpart: adopt-017
+    condition_to_revisit: "A new recorded decision after paired, uncontaminated provider-truthful evidence."
+
+  - id: reject-019
+    mechanism: "CodeGraph MCP, interactive installer, hooks, daemon, auto-update, or arbitrary shell exposure"
+    source: colbymchenry/codegraph
+    rejection_date: "2026-08-13"
+    reason: "The selected adapter uses a pinned managed bundle, closed inputs, absolute process paths, shell=false, and worktree-local indexes; extra runtime surfaces add authority and supply-chain risk without demonstrated need."
+    adopted_counterpart: adopt-017
+    condition_to_revisit: "Only after an independently reviewed design proves a required capability unavailable through the bounded adapter."

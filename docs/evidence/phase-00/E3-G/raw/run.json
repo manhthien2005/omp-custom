@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "experiment": "E3-G",
+  "selected_attempt": 2,
+  "status": "PASS",
+  "command": ["<PINNED_RUNTIME>/omp.exe", "-p", "--mode", "json", "--cwd", "<DISPOSABLE_PROJECT>", "--session-dir", "<DISPOSABLE_SESSIONS>", "--model", "omniroute/oc/mimo-v2.5-free", "--tools", "task", "--approval-mode", "yolo", "--max-time", "180", "<SYNTHETIC_PROMPT>"],
+  "started_at": "2026-08-11T11:14:45.3190950+07:00",
+  "completed_at": "2026-08-11T11:15:00.4440280+07:00",
+  "duration_ms": 15125,
+  "process_exit_code": 0,
+  "fixture_head": "fba368a8aebd7ec0050125975123c019dae101cc",
+  "parent_poll_count": 30,
+  "parent_poll_violation_count": 0,
+  "worker": {"id": "e3g-nested", "exit_code": 0, "duration_ms": 5884, "patch_path": "<DURABLE_ARTIFACT>/e3g-nested.patch", "nested_patch_count": 2, "nested_paths": ["deep/level/two", "nested-plain"]},
+  "summary_mentions_nested_repository": false,
+  "persisted_nested_patch_file_count": 0,
+  "isolation_worktree_exists_after_teardown": false,
+  "private_content_projection": "System prompts, reasoning, signatures, and private context omitted.",
+  "runtime_sha256": "1525122BC49A6E5F79FB1C58B6B1916CECFCFFAF2E82080769F7F0FA296BC8A6",
+  "omp_version": "17.2.10",
+  "omp_commit": "3a8591a8af5b6d200088d12ca75a5517cb064fa8"
+}

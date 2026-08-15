@@ -1,5 +1,10 @@
 # Báo cáo Thiết kế: OMP Custom Workflow Template
 
+> Historical Workflow v0 snapshot only; no current topology, dispatch, review, routing, or
+> lifecycle authority. Current authority lives in the accepted design, key decisions, active
+> specs, phase plans, and Topic 03-selected manifest.
+> See `docs/architecture.md` and `docs/policies/model-routing.md` for current behavior.
+
 **Dự án:** omp-custom  
 **Phiên bản:** Workflow v0  
 **Ngày hoàn thành:** 2026-08-07  
@@ -97,15 +102,18 @@ Tất cả agent output đều có kiểu rõ ràng:
 | `verification-result` | Output của verifier |
 | `review-result` | Output của reviewer |
 
-### 4.5 Policies (5 policies)
+### 4.5 Policy-derived contracts
 
-| Policy | Nội dung |
-|---|---|
-| `context-budget` | AGENTS.md ≤1200 token; RULES.md ≤700; agent files ≤1200 |
-| `model-routing` | Map vai → model role; model role → model thực trong config.yml |
-| `workflow-sizing` | Rule chọn quick/standard/orchestrated theo độ phức tạp |
-| `quality-gates` | Checklist bắt buộc trước khi trả kết quả cho người dùng |
-| `escalation` | Khi nào agent được tự xử lý, khi nào phải hỏi người dùng |
+Không có policy runtime riêng. Điều khoản thực thi được đặt ngay tại consumer có thể áp dụng;
+`docs/policies/` chỉ là tài liệu tham chiếu cho con người.
+
+| Contract | Nơi thực thi | Tài liệu tham chiếu |
+|---|---|---|
+| Context budget | `AGENTS.md`, agent prompts, advisory validator | `docs/policies/context-budget.md` |
+| Model routing | agent frontmatter, `config.yml`, Standard/Orchestrated | `docs/policies/model-routing.md` |
+| Workflow sizing | Quick/Standard/Orchestrated commands | `spec/04-workflow-sizing.md` |
+| Quality gates | task packet construction + Reviewer | `docs/policies/quality-gates.md` |
+| Escalation | agent stop clauses + main-session instructions | `spec/04`, `spec/15` |
 
 ---
 
@@ -232,7 +240,7 @@ git clone https://github.com/manhthien2005/omp-custom.git
 | `registry/adoption-ledger.yml` | 16 cơ chế được adopt với lý do |
 | `registry/rejected-mechanisms.yml` | 17 cơ chế bị reject với lý do |
 | `docs/architecture.md` | Kiến trúc chi tiết |
-| `docs/token-strategy.md` | Chiến lược token và shake compaction |
+| `docs/token-strategy.md` | Chiến lược token và explicit safe context continuity |
 | `docs/security.md` | Security constraints |
 
 ---

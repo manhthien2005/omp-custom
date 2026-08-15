@@ -1,6 +1,21 @@
 # 07 — Retrieval and Code Understanding
 
+<!-- topic05-projection:retrieval -->
+## Topic 05 optional graph capability (KD-029)
+
+Progressive retrieval is source-fit guidance, not an exhaustion ritual. CodeGraph v1.5.0 is an
+optional/default-off capability adapter for relationship and blast-radius questions. The four
+legal routes are Lead/native, Lead/CodeGraph, Scout/native then Lead, and Scout/CodeGraph then
+Lead. Graph results are hypotheses; no absence passes without current native-source
+corroboration. Any unavailable, partial, stale, unhealthy, failed, or timed-out graph call returns
+an explicit native `read`/`grep`/`glob` fallback instead of an opaque retry. Operational details
+live in `docs/retrieval.md`.
+
 > OPUS PROPOSED SPEC v1 | Runtime mechanics verified against OMP source in `_research/upstreams/oh-my-pi`; environment-specific availability claims (Context7) explicitly marked.
+>
+> **Topic 02 supersession boundary:** Topic 03 assigns retrieval capabilities to selected
+> roles. The named table below describes the frozen baseline and a pre-Topic-03 candidate;
+> it does not require those roles or LSP when no selected contract consumes LSP.
 
 ---
 
@@ -12,7 +27,7 @@ The frozen baseline used during spec construction enabled LSP inside subagents:
 task.enableLsp = true
 ```
 
-**That was a property of the development environment, not of OMP or of any install (CR-40).** The setting's default is `false`; §A-1 below makes deploying it the template's responsibility.
+**That was a property of the development environment, not of OMP or of any install (CR-40).** The setting's default is `false`; §A-1 below makes deployment the template's responsibility only when the selected topology consumes LSP.
 
 `config/settings-schema.ts:4615-4624` confirms this setting exists, defaults to `false`, and is described as: *"Allow subagents spawned via the task tool to use the lsp tool. Off by default to keep subagents cheap; enable when LSP-aware delegation is worth the extra tokens."* So the baseline deliberately turns on a non-default capability.
 
@@ -36,7 +51,8 @@ The Explorer's own instructions say *"Symbol first. Use LSP hover, references, a
 
 ### Resolution
 
-Add `lsp` to the allowlist of the agents whose retrieval quality depends on it:
+Add `lsp` to the allowlist of selected LSP-consuming roles whose contracts depend on it. The
+former role table is non-authoritative migration input:
 
 | Agent | Add `lsp`? | Reasoning |
 |---|---|---|
@@ -46,7 +62,9 @@ Add `lsp` to the allowlist of the agents whose retrieval quality depends on it:
 | `verifier` | No | Runs commands and reads output. Symbol navigation is not part of its contract; adding it invites scope creep into review territory. |
 | orchestrator (main session) | N/A | Not governed by an agent allowlist. |
 
-The alternative — flipping `task.enableLsp` back to `false` and removing the LSP language from the Explorer prompt — is worse. It gives up genuinely token-efficient retrieval to preserve a setting nobody benefits from.
+For a selected contract that depends on symbol-aware retrieval, silently removing LSP is a
+real quality reduction. When no selected contract consumes LSP, however, Topic 03 need not
+invent an LSP consumer or enable the setting.
 
 ### A-1. CR-40 — The allowlist is necessary but NOT sufficient
 
@@ -55,7 +73,7 @@ The alternative — flipping `task.enableLsp` back to `false` and removing the L
 author's development environment*, which had the setting enabled, and mistook that local fact
 for a property of every install. `task.enableLsp` defaults to **`false`**
 (`config/settings-schema.ts:4615-4617`) — the same paragraph above says so — so on a default
-machine the template ships four agents whose LSP access is granted at the allowlist and then
+machine the frozen baseline's candidate agents have LSP access granted at the allowlist and then
 withheld at the settings gate. That is the CR-31 defect class exactly: **the spec assumes a
 required runtime setting the installer never establishes.**
 
@@ -79,6 +97,13 @@ if (name === "lsp") return enableLsp && session.settings.get("lsp.enabled");
 | 3 | parent `session.enableLsp` not disabled, and not plan mode | enabled | **User's session** — template cannot control |
 | 4 | `lsp.enabled == true` | **`true`** | **User/session** — independent built-in tool registration gate (CR-41) |
 
+The four gates establish tool registration only; selected symbol-aware retrieval additionally
+requires an applicable working language server and successful required calls. In the pinned
+runtime, `getLspServersForFile()` can find no matching server after all four gates pass; the tool
+then returns `No language server found for this file` with `details.success: false`
+(`lsp/index.ts:2145-2150`). No configured server follows the same ordinary-result path at
+`:2155-2160`.
+
 Condition 1 alone was the round-1 finding. Condition 2 is CR-40. Condition 3 is why T-00.E5
 remains a genuine runtime gate rather than a formality: a parent session with LSP disabled
 disables it for every child regardless of what the project config says.
@@ -95,10 +120,10 @@ task wire (`docs/tools/task.md` lists `{name?, agent?, task, effort?, outputSche
 schemaMode?, isolated?}`), so a command cannot request LSP per dispatch. The settings layer is
 the only control point — the same structural situation as `task.isolation.apply` (§08 §E-9).
 
-**Deployment contract (project target owns the key):**
+**Deployment contract (project target owns the key only for selected LSP consumers):**
 
 ```yaml
-owned_required_settings:            # spec/12 §C-1 — project target
+owned_required_settings:            # spec/12 §C-1 — project target, conditional
   task.enableLsp: true
 conflict_policy:
   on_existing_false: report CONFLICT, do NOT overwrite
@@ -112,29 +137,39 @@ user_global_target:
     every repository — the same blast-radius argument as task.isolation.apply
 ```
 
-**Reduced-capability mode, stated honestly.** If any of conditions 2, 3, or 4 is unmet, LSP is
-unavailable and the workflow does not silently pretend otherwise:
+**Selected-path failure, stated honestly.** If a selected contract consumes symbol-aware
+retrieval and any of the four conditions is unmet, the selected LSP-consuming path must stop before dispatch or acceptance. Preflight reports the exact failed condition because each has a different remediation:
 
-- Explorer, Implementer, and Reviewer fall back to `grep` + ranged `read` for symbol
-  questions. This is a **real degradation**, not an equivalent path: `grep` answers "what
-  text exists", not "who calls this" (§C). Blast-radius review in particular gets weaker.
-- The degradation MUST be disclosed in the final report, naming **which of the four conditions
-  failed** — they have different fixes:
-  - condition 1 (allowlist absent): edit the agent file
-  - condition 2 (`task.enableLsp` unset): merge the project setting via installer
-  - condition 3 (parent session disabled): relaunch the session with LSP enabled
-  - condition 4 (`lsp.enabled` false): enable the `lsp.enabled` setting
-- DR-7 is therefore refined: LSP is **required for full-quality retrieval and blast-radius
-  review**, and its absence is a disclosed capability limit — not a silent substitution. A
-  run without LSP is a valid run with a stated weakness; calling it equivalent would be the
-  overclaiming pattern CR-35 corrected elsewhere.
+- condition 1 (allowlist absent): repair the selected worker contract
+- condition 2 (`task.enableLsp` unset): merge the project setting via installer
+- condition 3 (parent session disabled): relaunch the session with LSP enabled
+- condition 4 (`lsp.enabled` false): enable the `lsp.enabled` setting
+- registered tool but no applicable/configured server: install or configure the server required
+  by the selected file type, then rerun the probe
+- required call returns `details.success: false`: treat the call as failed capability evidence;
+  it cannot satisfy symbol-aware acceptance
+
+No language server found for this file and any details.success false result fail the selected
+LSP contract. Because these failures arrive as ordinary tool content, registration checks alone
+cannot prevent a plausible schema-valid yield from masking them.
+
+Preserve a user's explicit setting; reporting the conflict never authorizes a weaker execution
+of the same contract. `grep` + ranged `read` may serve a separately selected text-retrieval
+contract, but cannot substitute for symbol-aware retrieval after that path was selected.
+Continuation therefore requires either remediation of the failed condition or an explicit
+Tech-Lead choice of a different contract that does not consume LSP, followed by manifest/task
+contract reconciliation and validation of the replacement path. If that choice changes a
+locked mandatory criterion or verification/review obligation, the material-change rule creates
+a linked task/session. A run whose selected contract never consumed LSP remains valid.
 
 T-00.E5 must separate the four conditions as distinct failure causes, because they are
 diagnosed and fixed differently. See `spec/phases/phase-00-foundation.md` T-00.E5.
 
-### CR-17 — Authoritative LSP Allowlist (DR-7 decision record)
+### CR-17 — Candidate LSP Allowlist (DR-7 research record)
 
-The table below is the **required final state** after phase-01/phase-02 work, not the current state. It is the authoritative specification that validation must assert.
+The table below is the former candidate final state, not current Topic 03 authority. Validation
+must derive the actual allowlist requirements from the Topic 03-selected topology manifest and
+the capabilities consumed by each selected contract.
 
 | Agent | `lsp` in allowlist (required) | Rationale |
 |---|---|---|
@@ -144,7 +179,11 @@ The table below is the **required final state** after phase-01/phase-02 work, no
 | `verifier` | **No** | Runs commands, reads output. Symbol navigation is outside its contract and invites scope creep. |
 | `tech-lead` (main session) | N/A | Main session, not governed by agent allowlist. |
 
-DR-7 status: **DECIDED** — add `lsp` to explorer, implementer, reviewer. Phase-01 T-01.3 implements this; **T-00.E5** (see `spec/phases/phase-00-foundation.md`) validates that `task.enableLsp = true` propagates and the `lsp` tool is callable within subagents before committing. (T-00.E4 is the RULES.md sentinel experiment and is unrelated to LSP.)
+DR-7 role assignment status: **REOPENED FOR TOPIC 03**. Phase-01 T-01.3 must apply `lsp`
+only to selected LSP-consuming roles. **T-00.E5** (see
+`spec/phases/phase-00-foundation.md`) remains source evidence for the four-condition capability
+conjunction whenever that path is selected. (T-00.E4 is the RULES.md sentinel experiment and
+is unrelated to LSP.)
 
 ---
 
@@ -178,7 +217,8 @@ always more authoritative" is false as a general rule.
 
 **Cost is not monotonic either.** One targeted official-doc lookup can be cheaper than
 grep + LSP + local-doc reads + excavating a dependency's source. Mandatory exhaustion can
-*increase* tokens per accepted outcome — the metric §05 §A optimizes.
+*increase* core workflow tokens per validated accepted outcome — the post-quality metric
+§05 §A optimizes. Cheap Scout retrieval remains separate unweighted telemetry under KD-024.
 
 **"Exhausted" has no falsifiable definition.** An agent cannot prove it exhausted local
 sources. A gate that can be satisfied by asserting "I exhausted local sources" is not a
@@ -206,11 +246,30 @@ permitted_skips:            # each MUST be named in the result's retrieval note
   - question is about a guaranteed public contract, not observed implementation
   - security advisory or freshness is the actual subject
   - user explicitly asked for the authoritative or latest source
+  - context7_unavailable (Context7 MCP is not connected or usable in the current session)
 ```
 
 Skipping is legitimate **and must be disclosed**: the result names the level skipped and
 which permitted reason applied. That is checkable — a skip with no named reason is a
 contract violation — whereas "exhaustion" was not.
+
+### B-2. Selected retrieval capabilities are effective-setting conjunctions
+
+An allowlist entry is not enough. `tools/index.ts:599-605` independently filters `glob`,
+`grep`, `ast_grep`, and `web_search` through `glob.enabled`, `grep.enabled`,
+`astGrep.enabled`, and `web_search.enabled`; notably, `astGrep.enabled` defaults to `false`
+(`settings-schema.ts:3769-3788,3828-3836,4066-4074`). Every selected grep, glob, ast_grep,
+or web_search consumer requires its matching effective setting true.
+
+An unmet selected retrieval capability stops before dispatch or acceptance unless a different
+contract is reconciled and revalidated. Do not let a worker with a stripped tool return a
+plausible result under the stronger contract. These checks activate only for consumers named by
+the Topic 03 manifest; they do not globally require every retrieval tool.
+
+web_unavailable is the named disclosed reason for an unavailable level 5; a
+freshness-specific contract remains unresolved without authoritative evidence. Because level 5
+has no higher fallback in this order, disclosure is not permission to guess or accept: return an
+unresolved/nonterminal result or change the accepted contract explicitly.
 
 Source fitness by question type:
 
@@ -226,7 +285,7 @@ The failure this ordering exists to prevent is unchanged: a web search for somet
 type definition next to the callsite already answered. That remains the common error, and
 the default order still guards against it.
 
-**ENVIRONMENT ASSUMPTION (CR-18):** Context7 availability depends on an MCP server being wired into the session. This is true for the development environment used during spec construction, but is NOT guaranteed for every OMP session. Level 4 is aspirational unless the runtime confirms the Context7 MCP server is connected. Agents MUST NOT assume Context7 is available; they should treat it as optional and fall back to level 3 if unavailable. It remains **off the default path** regardless: reaching for versioned external docs before reading the local `node_modules` types is the exact inversion this ordering exists to prevent.
+**ENVIRONMENT ASSUMPTION (CR-18):** Context7 availability depends on an MCP server being wired into the session. This is true for the development environment used during spec construction, but is NOT guaranteed for every OMP session. Level 4 is aspirational unless runtime confirms the Context7 MCP server is connected. Agents MUST NOT assume Context7 is available. When level 4 is reached but unavailable, `context7_unavailable` is a permitted skip reason and must be disclosed with the skipped level. Continue with the next fitting accessible source — usually direct official versioned docs or web when freshness is the subject — without silently looping back. Context7 remains **off the default path** regardless: reaching for versioned external docs before reading local `node_modules` types is the exact inversion this ordering exists to prevent.
 
 ---
 
@@ -251,7 +310,11 @@ The rule, stated as an ordering over tools rather than a preference:
 
 A full unsummarized read is justified when: the file is short, the agent must reason about its overall structure, or the task is to rewrite it. Otherwise, read a range.
 
-**`read-summarize: false` is a real field** (`parseAgentFields` reads `readSummarize`), and the Explorer and Verifier both currently set it. For the Verifier this is defensible — verification evidence must be exact output lines, not a paraphrase. For the Explorer it is counterproductive: an agent whose job is ranked, compact evidence should be the *primary beneficiary* of summarization. See `05-context-and-token-model.md` for the disposition.
+**`read-summarize: false` is a real field** (`parseAgentFields` reads `readSummarize`), and
+the frozen Explorer and Verifier adapters both currently set it. For a selected exact-output
+verification responsibility that can be defensible; for a selected ranked-evidence discovery
+responsibility it is counterproductive because summarized reads are the better bounded input.
+See `05-context-and-token-model.md` for the disposition.
 
 ---
 
@@ -265,7 +328,9 @@ OMP already provides the underlying capability through `lsp symbols` and `ast_gr
 - cost tokens on every load whether or not the task needs it,
 - duplicate what `lsp symbols` computes accurately and lazily.
 
-The adopted behavior: **the Explorer builds the map for the task at hand and discards it.** Its ranked-evidence output *is* the repository map, scoped to one task and sized to one packet. Nothing persists.
+The adopted responsibility-level behavior: **a selected discovery responsibility builds the
+map for the task at hand and discards it.** Its ranked-evidence output is the repository map,
+scoped to one task and sized to one packet. Nothing persists.
 
 If a future project genuinely needs a durable architecture overview, that belongs in the project's own `AGENTS.md` as prose written by a human — not in a generated cache the agent must keep synchronized.
 
@@ -273,8 +338,18 @@ If a future project genuinely needs a durable architecture overview, that belong
 
 ## E. Contract Summary
 
-1. `lsp` MUST be added to `explorer`, `implementer`, and `reviewer` allowlists — otherwise `task.enableLsp` is inert. **And the allowlist alone is not sufficient (CR-40):** subagent LSP requires the conjunction of allowlist membership, `task.enableLsp == true` (default **`false`** — project install owns it), and a parent session that has not disabled LSP. Absence is a disclosed reduced-capability mode, never a silent `grep` substitution. See §A-1.
-2. Retrieval levels are a **default priority with bounded escalation**, not exhaustion gates (CR-20, §B-1). Skipping a level is permitted for a named reason from the `permitted_skips` list and MUST be disclosed in the result; an undisclosed skip is a contract violation. "I exhausted local sources" is not a checkable claim and is not required.
+1. For each selected contract that consumes symbol-aware retrieval, every selected worker
+   assigned that contract MUST list `lsp`; otherwise `task.enableLsp` is inert. **The allowlist
+   alone is not sufficient (CR-40/CR-41).** The four-gate conjunction is allowlist membership,
+   `task.enableLsp == true` (default **`false`** — project install owns it), parent session LSP
+   enabled and not plan mode, and `lsp.enabled == true`. If no selected contract consumes LSP,
+   no worker or setting is required. If a selected consumer lacks any gate, that selected path
+   fails closed; no `grep` substitution can satisfy it. Continuation requires an explicit
+   different contract that does not consume LSP, reconciliation, and validation as specified in
+   §A-1. The four gates establish registration only: an applicable working language server and
+   `details.success: true` on every required LSP call are also acceptance conditions.
+2. Retrieval levels are a **default priority with bounded escalation**, not exhaustion gates (CR-20, §B-1). Skipping a level is permitted for a named reason from the `permitted_skips` list and MUST be disclosed in the result; an undisclosed skip is a contract violation. `context7_unavailable` is the named reason for an absent or unusable level-4 MCP path. "I exhausted local sources" is not a checkable claim and is not required.
 3. Symbol lookup answers "who/where/what exports"; `grep` answers "what text exists". They are not interchangeable.
 4. Prefer ranged reads; reserve whole-file reads for short files, structural reasoning, or rewrites.
-5. No persistent repository-map artifact. The Explorer's ranked evidence is the map.
+5. No persistent repository-map artifact. The selected discovery responsibility's ranked
+   evidence is the task-scoped map.

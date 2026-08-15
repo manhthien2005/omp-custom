@@ -1,0 +1,27 @@
+schema_version: 1
+phase: "00"
+experiment: E5-F
+status: PASS
+selected_attempt: 1
+authority: CHARACTERIZATION_ONLY
+
+fixture:
+  task_enable_lsp: true
+  parent_session_lsp: true
+  lsp_enabled: false
+  agent_allowlist_includes_lsp: true
+
+observation:
+  tools: [yield, hub]
+  lsp_present: false
+  lsp_call_count: 0
+  terminal_yield_count: 1
+  cause: LSP_ENABLED_FALSE
+  remediation: ENABLE_PROJECT_LSP_ENABLED
+
+evidence:
+  - {path: docs/evidence/phase-00/E5/raw/e5-f-attempt-001.run.json, sha256: ECBD8AD8AAA765886B09F7BBCF6DEC13CD166A08A4C2022707ABD7162C755344}
+  - {path: docs/evidence/phase-00/E5/raw/e5-f-attempt-001.projection.json, sha256: E40118CADBBFCD33E0BE9040F6A6C9DBE08CFF1E32630B2EC8CB272764A740D3}
+  - {path: docs/evidence/phase-00/E5/raw/e5-f-attempt-001.child.jsonl, sha256: 3E9B3F0F882DB9D631468FB01EE50F5ABB7E3C1A30D79662669017C1A98F253A}
+
+safety: {repository_unchanged: true, live_home_changed_count: 0, cleanup_succeeded: true}
