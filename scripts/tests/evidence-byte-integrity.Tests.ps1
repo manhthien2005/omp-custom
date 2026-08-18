@@ -20,14 +20,14 @@ function Assert-ByteIntegrity {
 }
 
 function Get-TestSha256 {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][byte[]]$Bytes)
     return [Convert]::ToHexString(
         [Security.Cryptography.SHA256]::HashData($Bytes)
     ).ToLowerInvariant()
 }
 
 function Write-TestBytes {
-    param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][byte[]]$Bytes)
+    param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][AllowEmptyCollection()][byte[]]$Bytes)
     $parent = Split-Path -Parent $Path
     if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
         [void](New-Item -ItemType Directory -Path $parent -Force)
@@ -44,6 +44,19 @@ function New-TestSnapshotEntry {
         current_exists = $true
         current_bytes = $ExpectedBytes.Length
         current_sha256 = Get-TestSha256 -Bytes $ExpectedBytes
+        baseline_sha256 = $null
+    }
+}
+
+function New-TestRetiredSnapshotEntry {
+    param([string]$Path)
+    return [ordered]@{
+        record_type = 'candidate_snapshot_entry'
+        status = 'D '
+        path = $Path
+        current_exists = $false
+        current_bytes = $null
+        current_sha256 = $null
         baseline_sha256 = $null
     }
 }
@@ -189,6 +202,25 @@ try {
     Write-TestSnapshot $limitationSnapshot @((New-TestSnapshotEntry $limitationPath $utf8.GetBytes("expected`n")))
     $limitationPlan = New-EvidenceByteIntegrityPlan -RepositoryRoot $fixtureRoot -SnapshotPath $limitationSnapshot -Source WorkingTree
     Assert-ByteIntegrity ($limitationPlan.Counts.Invalid -eq 1 -and $limitationPlan.Counts.Unrecoverable -eq 0) 'Mutated closed-limitation path was not rejected.'
+
+    $emptyBytes = [byte[]]::new(0)
+    Write-TestBytes (Join-Path $fixtureRoot 'empty.txt') $emptyBytes
+    $emptySnapshot = Join-Path $fixtureRoot 'empty.jsonl'
+    Write-TestSnapshot $emptySnapshot @((New-TestSnapshotEntry 'empty.txt' $emptyBytes))
+    $emptyPlan = New-EvidenceByteIntegrityPlan -RepositoryRoot $fixtureRoot -SnapshotPath $emptySnapshot -Source WorkingTree
+    Assert-ByteIntegrity ($emptyPlan.Status -eq 'PASS' -and $emptyPlan.Counts.Exact -eq 1 -and $emptyPlan.Counts.Missing -eq 0) 'A zero-byte working-tree file was not classified as exact.'
+
+    & git -C $fixtureRoot add empty.txt
+    $emptyIndexPlan = New-EvidenceByteIntegrityPlan -RepositoryRoot $fixtureRoot -SnapshotPath $emptySnapshot -Source Index
+    Assert-ByteIntegrity ($emptyIndexPlan.Status -eq 'PASS' -and $emptyIndexPlan.Counts.Exact -eq 1 -and $emptyIndexPlan.Counts.Missing -eq 0) 'A zero-byte staged blob was not classified as exact.'
+
+    $retiredSnapshot = Join-Path $fixtureRoot 'retired.jsonl'
+    Write-TestSnapshot $retiredSnapshot @(
+        (New-TestSnapshotEntry 'exact.txt' $exactBytes),
+        (New-TestRetiredSnapshotEntry 'retired-away.txt')
+    )
+    $retiredPlan = New-EvidenceByteIntegrityPlan -RepositoryRoot $fixtureRoot -SnapshotPath $retiredSnapshot -Source WorkingTree
+    Assert-ByteIntegrity ($retiredPlan.Status -eq 'PASS' -and $retiredPlan.Entries.Count -eq 1 -and $retiredPlan.Counts.Missing -eq 0) 'A current_exists=false snapshot entry was not skipped.'
 
     $cleanupRefused = $false
     try { Remove-TestRoot $tempBase } catch { $cleanupRefused = $true }

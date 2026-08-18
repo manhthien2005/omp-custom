@@ -69,7 +69,8 @@ function Get-GitObjectBytes([string]$Root, [string]$ObjectExpression) {
         if ($process.ExitCode -ne 0) {
             throw "git show failed for ${ObjectExpression}: $stderr"
         }
-        return $bytes.ToArray()
+        # Comma-wrap so an empty blob returns a zero-length byte[] instead of unrolling to $null.
+        return , $bytes.ToArray()
     }
     finally {
         $bytes.Dispose()
@@ -84,10 +85,11 @@ function Get-ByteIntegritySourceBytes(
         'WorkingTree' {
             $path = Resolve-ByteIntegrityChildPath -Root $Root -RelativePath $RelativePath
             if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { return $null }
-            return [IO.File]::ReadAllBytes($path)
+            # Comma-wrap so a zero-byte file returns an empty byte[] instead of unrolling to $null.
+            return , [IO.File]::ReadAllBytes($path)
         }
-        'Index' { return Get-GitObjectBytes -Root $Root -ObjectExpression ":$RelativePath" }
-        'Head' { return Get-GitObjectBytes -Root $Root -ObjectExpression "HEAD:$RelativePath" }
+        'Index' { return , (Get-GitObjectBytes -Root $Root -ObjectExpression ":$RelativePath") }
+        'Head' { return , (Get-GitObjectBytes -Root $Root -ObjectExpression "HEAD:$RelativePath") }
         default { throw "Unsupported source: $Source" }
     }
 }
@@ -141,6 +143,10 @@ function New-EvidenceByteIntegrityPlan(
     $errors = [Collections.Generic.List[object]]::new()
 
     foreach ($snapshotEntry in (Read-ByteIntegritySnapshot -SnapshotLiteralPath $resolvedSnapshot)) {
+        # The snapshot also records paths that were deleted or renamed away at capture time. Those
+        # carry no current_sha256, so they are out of scope for byte restoration.
+        $existsFlag = $snapshotEntry.PSObject.Properties['current_exists']
+        if ($null -ne $existsFlag -and -not $existsFlag.Value) { continue }
         $relativePath = [string]$snapshotEntry.path
         $expectedSha256 = [string]$snapshotEntry.current_sha256
         $entry = [ordered]@{ Path = $relativePath; ExpectedSha256 = $expectedSha256; Classification = $null; ActualSha256 = $null; FullPath = $null; OriginalBytes = $null; CandidateBytes = $null; Message = $null }
