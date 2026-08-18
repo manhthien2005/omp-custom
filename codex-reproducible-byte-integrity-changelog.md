@@ -135,7 +135,70 @@ resolves to a file in this repository now matches its pinned value exactly.
 
 ## Fresh-clone evidence
 
-Status: NOT_RUN — Task 3 owns this proof.
+Status: PASS. Verified commit `4eb379f2c288bc04d7bc10665f9c19849ca39e53`
+(`fix: preserve historical evidence bytes`), which is the `main` HEAD the clone was taken from.
+
+Before cloning, `main` reported:
+
+```text
+pwsh -File scripts/repair-evidence-byte-integrity.ps1 -Source Head
+  PASS: Exact=970 Recoverable=0 Unrecoverable=5 Missing=0 Invalid=0
+        Ambiguous=0 Written=0                                                       exit 0
+git status --short --branch
+  ## main...origin/main [ahead 18]                                                  (clean)
+```
+
+A disposable clone was created under the guarded system-temp prefix
+`omp-byte-integrity-clone-` with `git clone --no-hardlinks --local . <cloneRoot>`. Its HEAD matched
+`main` exactly. Results inside the clone:
+
+```text
+pwsh -File scripts/repair-evidence-byte-integrity.ps1
+  PASS: Exact=970 Recoverable=0 Unrecoverable=5 Missing=0 Invalid=0
+        Ambiguous=0 Written=0                                                       exit 0
+
+pwsh -File scripts/repair-evidence-byte-integrity.ps1 -Source Head
+  PASS: Exact=970 Recoverable=0 Unrecoverable=5 Missing=0 Invalid=0
+        Ambiguous=0 Written=0                                                       exit 0
+
+pwsh -File scripts/tests/evidence-byte-integrity.Tests.ps1
+  PASS: evidence byte integrity (21 assertions).                                    exit 0
+
+pwsh -File docs/audit/claude-preflight-2026-08-14/capture-candidate-snapshot.Tests.ps1
+  Audit snapshot tests: 22 PASS                                                     exit 0
+
+git diff --check                                                                    exit 0
+git status --porcelain=v1 -uall                                                     (empty)
+```
+
+Both working-tree and HEAD sources reporting `970 / 0 / 5` in a clone that never held the original
+CRLF working-tree bytes is the proof that the committed blobs themselves now reproduce the accepted
+byte sequences. `git diff --check` exits `0` inside the clone — unlike on the repair worktree,
+where the CR-at-EOL restoration was still an unstaged diff — because in the clone the restored
+bytes are the committed baseline and there is nothing to diff.
+
+The first clone validator run reported `353 passed, 1 warnings, 3 failed`
+(`P00-REG-WATCHED-MISSING`, `T07-SOURCE-ATTACHMENTS`, `T08-SOURCE-ATTACHED`). All three are
+environment provisioning, not byte integrity: they require the pinned upstream OMP checkout at
+`_research/upstreams/oh-my-pi` (commit `3a8591a8af5b6d200088d12ca75a5517cb064fa8`), which
+`.gitignore:2` deliberately excludes from source control, so a clone never carries it. After
+copying the existing local pinned checkout into the clone — HEAD `3a8591a`, origin
+`https://github.com/can1357/oh-my-pi.git`, zero dirty entries, no network fetch — the clone
+reported:
+
+```text
+pwsh -File scripts/validate-template.ps1
+  Results: 356 passed, 1 warnings, 0 failed
+```
+
+Audit-packet gate: 11 of 12 `PACKET-SHA256.txt` rows matched, with the single mismatch being
+`capture-candidate-snapshot.ps1` — exactly the documented minimal fix from `63b578d`. No other row
+drifted, so the packet's historical provenance hashes are intact.
+
+Cleanup: the clone directory was removed after its parent was proved to be the system temp base and
+its leaf proved to start with `omp-byte-integrity-clone-` and be longer than that prefix. Removal
+confirmed; the source repository's own `_research/upstreams/oh-my-pi` checkout was verified intact
+afterward.
 
 ## Limitations
 
@@ -149,6 +212,10 @@ Status: NOT_RUN — Task 3 owns this proof.
   (`647dbb7`), so it is prior evidence, not a value produced to make validation pass.
 - No snapshot, manifest, packet hash, selected runtime file, or product behaviour was edited.
 - No provider call, live install, remote push, or external backup was involved in this task.
+- A fresh clone alone is not sufficient to reach a green validator: the pinned upstream OMP
+  checkout at `_research/upstreams/oh-my-pi` is intentionally untracked, so three source-attachment
+  checks fail until it is provisioned. That is a documented environment prerequisite, not a
+  regression, and it is unrelated to evidence byte integrity.
 - `CLAUDE-F-001` remains `FIXED_PENDING_CODEX_REVERIFICATION`. Nothing here is independently
   reverified by Codex, merged, released, promoted, or production-ready.
 
