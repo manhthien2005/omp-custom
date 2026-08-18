@@ -1,0 +1,4 @@
+# Hash-bound evidence and historical audit records must retain repository bytes.
+/docs/evidence/** -text
+/docs/audit/** -text
+/docs/archive/reviews/** -text
