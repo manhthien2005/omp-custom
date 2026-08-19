@@ -2,14 +2,14 @@
   "schema_version": 1,
   "record_type": "topic07_context_continuity_evidence",
   "status": "IMPLEMENTED_NOT_PROMOTED",
-  "captured_at_utc": "2026-08-15T10:15:37.2912136Z",
+  "captured_at_utc": "2026-08-19T11:49:12.9508058Z",
   "provider_calls": 0,
   "model_processes_started": 0,
   "source_attachment_count": 15,
   "repository": {
-    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "head": "9d9131841e9687d2346bc315a5e5f9b43299c33c",
     "working_tree_clean": false,
-    "dirty_paths_sha256": "87fd4efb511f662f5581f7cd986b52f984a189e2e4cef88b0b13e507433297d6",
+    "dirty_paths_sha256": "8e451ca682ea9af90b31ac0f5666aabb035eb8f7da2c5561474b49ec00c198e3",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "environment": {
@@ -46,7 +46,7 @@
       "status": "PASS",
       "exit_code": 0,
       "scope": "Model-free closed-schema, continuity-core, adapter, transaction, and pressure checks.",
-      "stdout_sha256": "c00b98027771fe19e95d7fb167186fb3b58ba96bf856c14b7f7d925a9a1557d9",
+      "stdout_sha256": "4c8a0ab452c91ae629759722444aafcd09bd08e5fdeb42742667c49e75e30412",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0
@@ -73,8 +73,8 @@
       "status": "FAIL",
       "exit_code": 1,
       "scope": "Model-free managed runtime profile.",
-      "stdout_sha256": "24a9b476c06364b28a4df7ef2f2deb0911aae583f3d0f481442512769f936fa4",
-      "stderr_sha256": "3e70c23868599734765b13df78cf5daf670247b1d75cb2644de7437b770998d3",
+      "stdout_sha256": "da9ee8486b3231deda9babad4cea74e0e141a5eeaeffc253a548603a8d253b3f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0
     },
@@ -106,10 +106,10 @@
       "model_processes_started": 0
     },
     "full_validator_bootstrap": {
-      "status": "FAIL",
-      "exit_code": 1,
+      "status": "PASS",
+      "exit_code": 0,
       "scope": "Full repository validator with only the Topic 07 evidence self-check skipped during capture.",
-      "stdout_sha256": "b296fa895dc307ece16fcc983222854e802243a0c25f9c854b39c8f4d9cec654",
+      "stdout_sha256": "627310e8a0074fb454b6291434f07ff412b2fe9ed6c9ed01119e406c5b41d899",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0

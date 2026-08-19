@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "record_type": "topic07_current_product_manifest",
-  "generated_at_utc": "2026-08-15T10:15:37.4073588Z",
+  "generated_at_utc": "2026-08-19T11:49:13.0699447Z",
   "repository": {
-    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
+    "head": "9d9131841e9687d2346bc315a5e5f9b43299c33c",
     "working_tree_clean": false,
-    "dirty_paths_sha256": "87fd4efb511f662f5581f7cd986b52f984a189e2e4cef88b0b13e507433297d6",
+    "dirty_paths_sha256": "8e451ca682ea9af90b31ac0f5666aabb035eb8f7da2c5561474b49ec00c198e3",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "pinned_omp": {
@@ -41,7 +41,7 @@
     {
       "path": "docs/evidence/current-product/topic-07/deterministic.json",
       "role": "evidence",
-      "sha256": "e4bd5cd36d49686950112306d41d63cefde9661e4f1ba8f7f3834508bd05e315"
+      "sha256": "640197e5d793a94b3f29cd557f693f192ede1a0ddc390a4cd9204eadd304c337"
     },
     {
       "path": "docs/final-report.md",
@@ -96,7 +96,7 @@
     {
       "path": "README.md",
       "role": "authority_or_guide",
-      "sha256": "15e6e9bf2f4f42b74b97ad34ae964417421a7cce59765961cd1ddcddc225f25f"
+      "sha256": "38253d9e7c37c0527edf02c6dab13bdddb9626f5731e20641d4dbf899280e6fc"
     },
     {
       "path": "registry/omp-compatibility.yml",
@@ -417,8 +417,8 @@
     },
     {
       "id": "full_validator_bootstrap",
-      "exit_code": 1,
-      "status": "FAIL"
+      "exit_code": 0,
+      "status": "PASS"
     }
   ]
 }
