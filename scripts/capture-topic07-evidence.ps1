@@ -194,7 +194,14 @@ try {
         }
         cases = $cases
         limitations = [ordered]@{
-            promotion = 'BLOCKED_UNTIL_BOTH_SUPPORTED_RUNTIME_CANARIES_PASS'
+            # A passing two-runtime canary satisfies the canary prerequisite; promotion itself is a
+            # separate owner decision, so record which of the two the environment has reached rather
+            # than claiming the stronger one.
+            promotion = if ($matrix.Code -ceq 'T07-RUNTIME-MATRIX-READY') {
+                'RUNTIME_CANARIES_PASS_PENDING_OWNER_PROMOTION'
+            } else {
+                'BLOCKED_UNTIL_BOTH_SUPPORTED_RUNTIME_CANARIES_PASS'
+            }
             open_blocker = [string]$matrix.Code
             provider_smoke = 'NOT_RUN_MODEL_FREE_CAMPAIGN'
             operational_state = 'LOCAL_OUTSIDE_GIT'

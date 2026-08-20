@@ -5,8 +5,16 @@
 - Decision authority: KD-031 accepted.
 - Implementation: complete in the local workspace.
 - Promotion: `IMPLEMENTED_NOT_PROMOTED`.
-- Open item: `OPEN-T07-RUNTIME-02` — no verified local OMP 17.2.10 executable was available for
-  the second required stop-before-provider canary. No download or downgrade was attempted.
+- Open item: `OPEN-T07-RUNTIME-02` — recorded because no verified local OMP 17.2.10 executable was
+  available for the second required stop-before-provider canary.
+  No download or downgrade was attempted.
+  **2026-08-20 update:** the owner provisioned their own already-installed 17.2.10
+  binary into the untracked local cache `tools/runtime-cache/omp/17.2.10/omp.exe` (SHA-256
+  `1525122bc49a6e5f79fb1c58b6b1916cecfcffaf2e82080769f7f0fa296bc8a6`, `omp --version` reports
+  `omp/17.2.10`). Both canaries now pass from a durable path and the runtime matrix reports
+  `READY_FOR_PROMOTION_CANARY` / `T07-RUNTIME-MATRIX-READY`. The canary prerequisite is therefore
+  satisfied; promotion itself remains ungranted, so the status above is unchanged and this open item
+  stays recorded rather than closed. Nothing was downloaded and the installed OMP was not modified.
 - External provider calls: `0`. The pressure canary uses a local in-process sentinel; its control
   counter is not a network/model-provider call.
 - Git policy: local workspace only. No branch, worktree, stage, commit, push, or pull request was
@@ -51,8 +59,10 @@
 - Pinned OMP commit: `3a8591a8af5b6d200088d12ca75a5517cb064fa8`.
 - Bounded source attachments: 15, each with normalized-LF SHA-256 and ordered structural needles.
 - Supported runtime matrix: OMP 17.2.10 and 17.2.12.
-- Available local canary runtime: 17.2.12.
-- Missing local canary runtime: 17.2.10 (`OPEN-T07-RUNTIME-02`).
+- Available local canary runtime: 17.2.12 (installed).
+- Available local canary runtime: 17.2.10 (untracked local cache, provisioned by the owner on
+  2026-08-20). `OPEN-T07-RUNTIME-02` remains recorded above because promotion was never granted;
+  the runtime availability that originally blocked the canary is resolved.
 
 ## Verification record
 
@@ -64,7 +74,7 @@ the implemented boundary; they do not override the two-version promotion blocker
 | Pinned source attachment | PASS — 15 bounded attachments; helper source-only report emitted 3 assertions |
 | Installed 17.2.12 pressure/control canary | PASS — 15 assertions; pressure provider counter 0, below-threshold control counter 1 |
 | External provider/network use | PASS — 0 |
-| Local 17.2.10 canary | BLOCKED — `OPEN-T07-RUNTIME-02` |
+| Local 17.2.10 canary | PASS (2026-08-20) — 26 assertions across 2 available runtimes from the durable local cache; was BLOCKED `OPEN-T07-RUNTIME-02` at capture time |
 | Portable Node contract/adapter suite | PASS — 56 tests, 0 failed |
 | State contract/projection suites | PASS — 30 + 37 assertions |
 | Managed runtime suite | PASS — 49 assertions |

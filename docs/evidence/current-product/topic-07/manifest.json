@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "record_type": "topic07_current_product_manifest",
-  "generated_at_utc": "2026-08-20T00:38:48.2067964Z",
+  "generated_at_utc": "2026-08-20T04:13:53.9685885Z",
   "repository": {
-    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
+    "head": "cd43e0953329cd752563d3db9ecd155f97746238",
     "working_tree_clean": false,
-    "dirty_paths_sha256": "d58eab9281f83492b0dddc289e3192b4d3be2d3a36c6cfcdfbaf478db0a3c5ba",
+    "dirty_paths_sha256": "ab4e7477e91ea1585b870ac67c98a3be148d2201deb0ce3b9d0405bb2b8468db",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "pinned_omp": {
@@ -41,7 +41,7 @@
     {
       "path": "docs/evidence/current-product/topic-07/deterministic.json",
       "role": "evidence",
-      "sha256": "f01fe4dacecf8094348a154b3a548b9c1ccf45e800d720dddfbb31363ff16f28"
+      "sha256": "067aac7ce69faa1e42304f9aee72c8e5c1ddbd94db51ae7746be01952c2531ba"
     },
     {
       "path": "docs/final-report.md",
@@ -106,7 +106,7 @@
     {
       "path": "scripts/capture-topic07-evidence.ps1",
       "role": "implementation",
-      "sha256": "8b09ba35955bfedc7b46de72334255bb63ada49e1827749233110b4531460434"
+      "sha256": "1238103abc1b78df6e380594f8fd317bb7413dc7fc6a2d9763491051ff74c296"
     },
     {
       "path": "scripts/install-template.ps1",
@@ -116,7 +116,7 @@
     {
       "path": "scripts/lib/topic07-context-continuity.ps1",
       "role": "implementation",
-      "sha256": "e123c4923d0e52562aa2dc882c66595e65685f87a1b2e6c0b97de519b596f527"
+      "sha256": "e11aa9e71add46a541d523955b3f280979528945e6c17733b1c6ae20e83df762"
     },
     {
       "path": "scripts/tests/fixtures/topic07-provider-sentinel.mjs",

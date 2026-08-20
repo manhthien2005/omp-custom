@@ -94,7 +94,7 @@
       "command": "pwsh -NoLogo -NoProfile -File scripts/validate-topic07-context-continuity.ps1 -RepositoryRoot .",
       "exit_code": 0,
       "status": "PASS",
-      "stdout_sha256": "c6b8f17ba21820511e090a25f7ad5e308aa38aa4856199307a0be5c6a34cb1a2",
+      "stdout_sha256": "ca0b49b98aeb2144b5c2da333f87cae2cc60f7e6a7f07db463797e377a59ead7",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {

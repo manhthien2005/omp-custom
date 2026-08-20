@@ -30,3 +30,8 @@ evals/results/
 
 # Phase 00 experiment copies (disposable; authoritative evidence in docs/evidence/phase-00/)
 /.tmp-phase00-*/
+
+# Locally provisioned OMP runtimes for the Topic 07 two-version canary. The binary is the user's
+# own installed artifact, verified by SHA-256, never downloaded by this repository and never
+# committed.
+/tools/runtime-cache/

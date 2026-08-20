@@ -631,12 +631,21 @@ function Test-Topic07ContextContinuityContract {
 
     if (-not $SkipEvidence) {
         $evidence = Get-Topic07ContextContinuityJson $root 'docs/evidence/current-product/topic-07/deterministic.json'
+        # The runtime matrix reports what the local environment provides; promotion remains a
+        # separate owner decision. Both consistent pairs are therefore truthful, but the pair must
+        # match exactly - a READY code beside an unpromoted matrix status, or the reverse, is a
+        # contradiction and still fails. `status` stays IMPLEMENTED_NOT_PROMOTED regardless: a
+        # passing canary is a prerequisite for promotion, never the grant of it.
+        $matrixPairTruthful = $null -ne $evidence -and (
+            ([string]$evidence.runtime_matrix.status -ceq 'IMPLEMENTED_NOT_PROMOTED' -and
+                [string]$evidence.runtime_matrix.code -ceq 'OPEN-T07-RUNTIME-02') -or
+            ([string]$evidence.runtime_matrix.status -ceq 'READY_FOR_PROMOTION_CANARY' -and
+                [string]$evidence.runtime_matrix.code -ceq 'T07-RUNTIME-MATRIX-READY'))
         $evidenceValid = $null -ne $evidence -and [int]$evidence.schema_version -eq 1 -and
             [string]$evidence.record_type -ceq 'topic07_context_continuity_evidence' -and
             [string]$evidence.status -ceq 'IMPLEMENTED_NOT_PROMOTED' -and
             [int]$evidence.provider_calls -eq 0 -and [int]$evidence.model_processes_started -eq 0 -and
-            [string]$evidence.runtime_matrix.status -ceq 'IMPLEMENTED_NOT_PROMOTED' -and
-            [string]$evidence.runtime_matrix.code -ceq 'OPEN-T07-RUNTIME-02' -and
+            $matrixPairTruthful -and
             [int]$evidence.source_attachment_count -eq 15 -and
             @($evidence.cases.PSObject.Properties).Count -ge 8 -and
             @($evidence.cases.PSObject.Properties.Value | Where-Object status -ne PASS).Count -eq 0

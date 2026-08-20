@@ -3,7 +3,7 @@
   "record_type": "topic08_evidence_manifest",
   "component": "behavior-core",
   "component_version": "1.0.0",
-  "generated_at_utc": "2026-08-14T05:04:39.0628313Z",
+  "generated_at_utc": "2026-08-20T04:16:02.0953716Z",
   "files": [
     {
       "path": "behavior-manifest.json",
@@ -11,7 +11,7 @@
     },
     {
       "path": "deterministic.json",
-      "sha256": "1f861f9940a46ad9dbd9669d4aa74b0eaf6b8e412026e877273e8235f44afc81"
+      "sha256": "04dd52ad083db421493388feb5357957817c11b871d15ae7fe84031ce71dc86c"
     }
   ]
 }

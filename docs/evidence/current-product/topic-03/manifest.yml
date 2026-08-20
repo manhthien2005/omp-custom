@@ -90,12 +90,12 @@
     },
     {
       "path": "docs/evidence/current-product/topic-03/deepseek-smoke.yml",
-      "sha256": "112F4CCC147F51CA88C42AC9E30011588002F8876111A37231CAE1B4CD994BA1"
+      "sha256": "DF8449D3F8003B3F58AFBD8D529534EE51C7B6C5F07D0799DA8FB271B1D8550C"
     },
     {
       "path": "docs/evidence/current-product/topic-03/e2e.yml",
       "sha256": "128AF2B353381D26C62EBEF73D5BD951755AC6893CE9F226AC122C7EB5464186"
     }
   ],
-  "deepseek_environment": "ENVIRONMENT_BLOCKED"
+  "deepseek_environment": "PASS"
 }

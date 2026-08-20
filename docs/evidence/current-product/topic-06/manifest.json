@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "record_type": "topic06_current_product_manifest",
-  "generated_at_utc": "2026-08-19T15:18:46.5920896Z",
+  "generated_at_utc": "2026-08-20T04:15:38.3157203Z",
   "repository": {
-    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
+    "head": "cd43e0953329cd752563d3db9ecd155f97746238",
     "topic06_present_in_head": true,
     "working_tree_clean": false,
-    "dirty_paths_sha256": "b06d7d15363e959f2c351d1f0adf4cd1aa448caafdc4b4d2b9fdf50f4c23398b",
+    "dirty_paths_sha256": "ab4e7477e91ea1585b870ac67c98a3be148d2201deb0ce3b9d0405bb2b8468db",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "pinned_omp": {
@@ -26,7 +26,7 @@
     {
       "path": "docs/evidence/current-product/topic-06/deterministic.json",
       "role": "evidence",
-      "sha256": "4144b6b701f3650db4a89f9feff2fa28b0364848432561ab29d19091a262ff58"
+      "sha256": "7bb4018eebbb0f4adbd812ad176cc0b6255ae795359a94f0dd0e7ab8aba97f19"
     },
     {
       "path": "docs/agent-boundaries.md",

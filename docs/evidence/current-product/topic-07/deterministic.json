@@ -2,14 +2,14 @@
   "schema_version": 1,
   "record_type": "topic07_context_continuity_evidence",
   "status": "IMPLEMENTED_NOT_PROMOTED",
-  "captured_at_utc": "2026-08-20T00:38:48.1473138Z",
+  "captured_at_utc": "2026-08-20T04:13:53.9041607Z",
   "provider_calls": 0,
   "model_processes_started": 0,
   "source_attachment_count": 15,
   "repository": {
-    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
+    "head": "cd43e0953329cd752563d3db9ecd155f97746238",
     "working_tree_clean": false,
-    "dirty_paths_sha256": "d58eab9281f83492b0dddc289e3192b4d3be2d3a36c6cfcdfbaf478db0a3c5ba",
+    "dirty_paths_sha256": "ab4e7477e91ea1585b870ac67c98a3be148d2201deb0ce3b9d0405bb2b8468db",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "environment": {
@@ -26,8 +26,8 @@
     "source_status": "PASS"
   },
   "runtime_matrix": {
-    "status": "IMPLEMENTED_NOT_PROMOTED",
-    "code": "OPEN-T07-RUNTIME-02",
+    "status": "READY_FOR_PROMOTION_CANARY",
+    "code": "T07-RUNTIME-MATRIX-READY",
     "rows": [
       {
         "version": "17.2.12",
@@ -36,8 +36,8 @@
       },
       {
         "version": "17.2.10",
-        "available": false,
-        "source": "not-found"
+        "available": true,
+        "source": "local-cache"
       }
     ]
   },
@@ -46,7 +46,7 @@
       "status": "PASS",
       "exit_code": 0,
       "scope": "Model-free closed-schema, continuity-core, adapter, transaction, and pressure checks.",
-      "stdout_sha256": "d9ccf7edbf7478cdecd80c203f33cc233c7d5b8d5b59c44ae9222fa9d9361a6c",
+      "stdout_sha256": "b7bac74ec0577f305ef20af491d5145457a71ed02eb5d4797e272f3b60abb3e7",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0
@@ -82,7 +82,7 @@
       "status": "PASS",
       "exit_code": 0,
       "scope": "Model-free local pressure canary.",
-      "stdout_sha256": "bfa59c77667b2116e8cb5e1fa91727cd194d1181a4cc90f3ffc2dc298862678d",
+      "stdout_sha256": "31ce377e06b15c61720d01f29e1b8879789ce13b89742a78a95de04985cd98e5",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0
@@ -100,7 +100,7 @@
       "status": "PASS",
       "exit_code": 0,
       "scope": "Focused Topic 07 validation with only its not-yet-final evidence pair skipped (20 records).",
-      "stdout_sha256": "a4e21c06ad97a1be8d77987dd7614b4dcb0b5080e1ae01a1971a68791a6cd844",
+      "stdout_sha256": "21d20f84901178d19ed1ca7c1f60bc4fad4d34f48d5ac5382b5e2b73184c0cf4",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0
@@ -116,8 +116,8 @@
     }
   },
   "limitations": {
-    "promotion": "BLOCKED_UNTIL_BOTH_SUPPORTED_RUNTIME_CANARIES_PASS",
-    "open_blocker": "OPEN-T07-RUNTIME-02",
+    "promotion": "RUNTIME_CANARIES_PASS_PENDING_OWNER_PROMOTION",
+    "open_blocker": "T07-RUNTIME-MATRIX-READY",
     "provider_smoke": "NOT_RUN_MODEL_FREE_CAMPAIGN",
     "operational_state": "LOCAL_OUTSIDE_GIT"
   }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record_type": "topic08_deterministic_evidence",
-  "generated_at_utc": "2026-08-14T05:04:39.0628313Z",
+  "generated_at_utc": "2026-08-20T04:16:02.0953716Z",
   "status": "IMPLEMENTED_NOT_PROMOTED",
   "component": "behavior-core",
   "component_version": "1.0.0",
@@ -27,9 +27,9 @@
     },
     {
       "version": "17.2.10",
-      "available": false,
-      "path": null,
-      "canary": "UNAVAILABLE_NO_DOWNLOAD"
+      "available": true,
+      "path": "D:\\Dev\\Projects\\omp-template\\tools\\runtime-cache\\omp\\17.2.10\\omp.exe",
+      "canary": "NOT_RUN_TOPIC07_OWNER"
     }
   ],
   "checks": [
@@ -38,7 +38,7 @@
       "command": "node --test scripts/tests/topic08-behavior-core.Tests.mjs scripts/tests/topic08-skill-contracts.Tests.mjs scripts/tests/topic08-agent-tasks-tool.Tests.mjs scripts/tests/topic08-behavior-gates.Tests.mjs",
       "exit_code": 0,
       "status": "PASS",
-      "summary": "ℹ duration_ms 100.1487"
+      "summary": "Γä╣ duration_ms 138.9687"
     },
     {
       "name": "topic08-installer",
@@ -73,7 +73,7 @@
       "command": "node --test scripts/tests/topic06-agent-contracts.Tests.mjs",
       "exit_code": 0,
       "status": "PASS",
-      "summary": "ℹ duration_ms 1197.6551"
+      "summary": "Γä╣ duration_ms 1365.3697"
     }
   ],
   "open_items": [

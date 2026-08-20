@@ -2,14 +2,14 @@
   "schema_version": 1,
   "record_type": "topic06_agent_boundary_evidence",
   "status": "PASS",
-  "captured_at_utc": "2026-08-19T15:18:46.5304300Z",
+  "captured_at_utc": "2026-08-20T04:15:38.2750820Z",
   "provider_calls": 0,
   "model_processes_started": 0,
   "repository": {
-    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
+    "head": "cd43e0953329cd752563d3db9ecd155f97746238",
     "topic06_present_in_head": true,
     "working_tree_clean": false,
-    "dirty_paths_sha256": "b06d7d15363e959f2c351d1f0adf4cd1aa448caafdc4b4d2b9fdf50f4c23398b",
+    "dirty_paths_sha256": "ab4e7477e91ea1585b870ac67c98a3be148d2201deb0ce3b9d0405bb2b8468db",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "environment": {
@@ -30,7 +30,7 @@
       "status": "PASS",
       "exit_code": 0,
       "scope": "Closed portable core, role contracts, receipts, and native wrapper seams.",
-      "stdout_sha256": "ebd14899fa0f93f4fddf5db9587b39b64572a074c9d7166e52f3b5a7b2a10122",
+      "stdout_sha256": "938d332734992992de2db0c83567abc12ea309e4196db5c6ebe84fbedeca4817",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0

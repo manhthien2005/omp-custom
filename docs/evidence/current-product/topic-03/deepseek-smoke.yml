@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "status": "ENVIRONMENT_BLOCKED",
-  "reason_code": "DEEPSEEK_CREDENTIAL_MISSING",
-  "updated_at_utc": "2026-08-12T16:45:14.8115147Z",
+  "status": "PASS",
+  "reason_code": "NONE",
+  "updated_at_utc": "2026-08-20T03:41:20.1811132Z",
   "runs": {
     "flash": {
       "model": "Flash",
       "selector": "omniroute/ds/deepseek-v4-flash:xhigh",
-      "status": "ENVIRONMENT_BLOCKED",
-      "reason_code": "DEEPSEEK_CREDENTIAL_MISSING",
-      "read_tool_seen": false,
-      "sentinel_seen": false,
+      "status": "PASS",
+      "reason_code": "NONE",
+      "read_tool_seen": true,
+      "sentinel_seen": true,
       "process_exit_code": 0,
       "stderr_seen": false,
-      "output_sha256": "C642640DC8A2ED2775C62463DA82874A6DD5A422719ECC2A92EEA74399E56089",
-      "observed_at_utc": "2026-08-12T16:45:14.7940735Z"
+      "output_sha256": "A1A0860E2A06A13446355F28EE5BB081CC809A2212A786A15028967B85877359",
+      "observed_at_utc": "2026-08-20T03:40:49.4831766Z"
     },
     "pro": {
       "model": "Pro",
       "selector": "omniroute/ds/deepseek-v4-pro:xhigh",
-      "status": "ENVIRONMENT_BLOCKED",
-      "reason_code": "DEEPSEEK_CREDENTIAL_MISSING",
-      "read_tool_seen": false,
-      "sentinel_seen": false,
+      "status": "PASS",
+      "reason_code": "NONE",
+      "read_tool_seen": true,
+      "sentinel_seen": true,
       "process_exit_code": 0,
       "stderr_seen": false,
-      "output_sha256": "8A909914C8062CA627A3CD3EAAA8AF107D83680B1D75666CDB8C135B2CBAD9B7",
-      "observed_at_utc": "2026-08-12T16:44:08.7999292Z"
+      "output_sha256": "09E03FFA2689FA001ECDD99102837DC2BB8604446E06F1E8C95AA8B8784C035C",
+      "observed_at_utc": "2026-08-20T03:41:20.1429557Z"
     }
   }
 }

@@ -23,14 +23,14 @@
     },
     {
       "path": "release-readiness.json",
-      "sha256": "2935a843fdd5770bf7a3b7cf018b3c3a62be19e9a2d299d01e50f7a131f79e76",
+      "sha256": "4160fa6e8b6352902225452070ecfe093c1bf6bae8f9a4aabe432710b0116508",
       "record_type": "round0912_release_readiness"
     }
   ],
   "governed_files": [
     {
       "path": ".gitignore",
-      "sha256": "c759c76dde723577bde805a6e320d15a2a819ebf96e01938bc2141b4a5e1f15c"
+      "sha256": "4514cdb6477d73f209543385404cb4c7b4c5e13269359366bc85bc61027efc83"
     },
     {
       "path": "codex-round09-12-closure-evaluation-release-readiness-changelog.md",
