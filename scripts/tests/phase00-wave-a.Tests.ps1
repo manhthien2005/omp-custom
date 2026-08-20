@@ -345,9 +345,29 @@ Describe 'OMP registry and compatibility behavior' {
 Describe 'Repository validator integration' {
     It 'runs all ten Phase 00 contracts through the existing entrypoint' {
         $validator = Join-Path $repositoryRoot 'scripts\validate-template.ps1'
-        $output = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $validator -Verbose 4>&1 | Out-String
-        $exitCode = $LASTEXITCODE
-        $exitCode | Should Be 0
+        # Windows PowerShell 5.1 must resolve its own module path. When this suite is hosted by
+        # pwsh 7 the inherited PSModulePath shadows Microsoft.PowerShell.Utility with the 7.x
+        # copy, Get-FileHash disappears from the child shell, and every hash contract throws.
+        $nativeModulePath = @(
+            (Join-Path $env:USERPROFILE 'Documents\WindowsPowerShell\Modules'),
+            (Join-Path $env:ProgramFiles 'WindowsPowerShell\Modules'),
+            (Join-Path $env:SystemRoot 'system32\WindowsPowerShell\v1.0\Modules')
+        ) -join ';'
+        $previousModulePath = $env:PSModulePath
+        try {
+            $env:PSModulePath = $nativeModulePath
+            $output = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $validator -Verbose 4>&1 | Out-String
+            $exitCode = $LASTEXITCODE
+        } finally {
+            $env:PSModulePath = $previousModulePath
+        }
+        # Sections 9-12 declare an explicit pwsh 7.4 prerequisite and fail closed under 5.1.
+        # Those four version-gate codes are the only failures this shell may report, so the
+        # entrypoint exits 1 here by design while every Phase 00 contract still executes.
+        $failureCodes = @([regex]::Matches($output, '(?m)^\s*FAIL\s+\[(?<code>[^\]]+)\]') |
+            ForEach-Object { $_.Groups['code'].Value } | Sort-Object -Unique)
+        ($failureCodes -join ',') | Should Be 'R0912-PWSH,T06-PWSH,T07-PWSH,T08-PWSH'
+        $exitCode | Should Be 1
         ($output -match 'P00-MANIFEST-IDSET') | Should Be $true
         ($output -match 'P00-E1-READY') | Should Be $true
         ($output -match 'P00-E3I-TERMINAL') | Should Be $true

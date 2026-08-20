@@ -10,7 +10,7 @@
       "path": ".omp/state/manifest.json",
       "schema_version": 1,
       "record_type": "agent_tasks_component_manifest",
-      "sha256": "4898ddfbea5f8b14b0bcd41745daa0ab950c8f1ec4fe461f40f51fb1e8fc9d1f"
+      "sha256": "b70bc7b4a314088679c0d07026cb30efd7d5ea2ea64b7c6cce4c84522064cd26"
     }
   ],
   "upstream_lock": {

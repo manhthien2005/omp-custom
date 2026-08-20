@@ -266,6 +266,32 @@ test("native parameter translation is canonical and never forwards schema/model/
   assert.doesNotMatch(JSON.stringify(batch), /outputSchema|schemaMode|resolvedModel|modelRole/iu);
 });
 
+test("the managed task schema root is a closed object so strict-function validation accepts it", async () => {
+  const wrapper = await import(wrapperUrl);
+  const harness = createHarness(wrapper);
+  const root = harness.tool.parameters;
+  // A root union serializes to a bare `{ anyOf: [...] }` with no `type`, which
+  // OpenAI-responses strict-function validation rejects outright, and neither
+  // intent injection nor strict adaptation ever adds the missing root `type`.
+  assert.equal(root.type, "object");
+  assert.equal(root.additionalProperties, false);
+  assert.ok(!("anyOf" in root) && !("oneOf" in root) && !("allOf" in root));
+  assert.deepEqual(Object.keys(root.properties).sort(), [
+    "agent", "effort", "isolated", "role", "task_id", "tasks", "work_unit_id",
+  ]);
+  // Every root property is optional so both documented dispatch shapes remain
+  // satisfiable; `core.validateManagedRequest` is the sole shape authority.
+  for (const [key, property] of Object.entries(root.properties)) {
+    assert.equal(property.optional, true, `${key} must be optional at the root`);
+  }
+  assert.equal(root.properties.tasks.type, "array");
+  assert.equal(root.properties.tasks.maxItems, schema.LIMITS.maxBatchItems);
+  for (const branch of root.properties.tasks.items.anyOf) {
+    assert.equal(branch.type, "object");
+    assert.equal(branch.additionalProperties, false);
+  }
+});
+
 test("state output parser accepts one closed line and rejects duplicate/extra/multiple records", async () => {
   const wrapper = await import(wrapperUrl);
   const good = '{"code":"AT-OK","data":{"value":1},"ok":true,"operation":"project-work-unit"}\n';

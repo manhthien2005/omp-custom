@@ -2,14 +2,14 @@
   "schema_version": 1,
   "record_type": "topic07_context_continuity_evidence",
   "status": "IMPLEMENTED_NOT_PROMOTED",
-  "captured_at_utc": "2026-08-19T11:49:12.9508058Z",
+  "captured_at_utc": "2026-08-20T00:38:48.1473138Z",
   "provider_calls": 0,
   "model_processes_started": 0,
   "source_attachment_count": 15,
   "repository": {
-    "head": "9d9131841e9687d2346bc315a5e5f9b43299c33c",
+    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
     "working_tree_clean": false,
-    "dirty_paths_sha256": "8e451ca682ea9af90b31ac0f5666aabb035eb8f7da2c5561474b49ec00c198e3",
+    "dirty_paths_sha256": "d58eab9281f83492b0dddc289e3192b4d3be2d3a36c6cfcdfbaf478db0a3c5ba",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "environment": {
@@ -46,7 +46,7 @@
       "status": "PASS",
       "exit_code": 0,
       "scope": "Model-free closed-schema, continuity-core, adapter, transaction, and pressure checks.",
-      "stdout_sha256": "4c8a0ab452c91ae629759722444aafcd09bd08e5fdeb42742667c49e75e30412",
+      "stdout_sha256": "d9ccf7edbf7478cdecd80c203f33cc233c7d5b8d5b59c44ae9222fa9d9361a6c",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0
@@ -70,10 +70,10 @@
       "model_processes_started": 0
     },
     "managed_runtime_profile": {
-      "status": "FAIL",
-      "exit_code": 1,
+      "status": "PASS",
+      "exit_code": 0,
       "scope": "Model-free managed runtime profile.",
-      "stdout_sha256": "da9ee8486b3231deda9babad4cea74e0e141a5eeaeffc253a548603a8d253b3f",
+      "stdout_sha256": "24a9b476c06364b28a4df7ef2f2deb0911aae583f3d0f481442512769f936fa4",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0

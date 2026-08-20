@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "record_type": "topic06_current_product_manifest",
-  "generated_at_utc": "2026-08-14T07:36:32.5192122Z",
+  "generated_at_utc": "2026-08-19T15:18:46.5920896Z",
   "repository": {
-    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
-    "topic06_present_in_head": false,
+    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
+    "topic06_present_in_head": true,
     "working_tree_clean": false,
-    "dirty_paths_sha256": "01918751b13bccf324f80fe10f189a0ee2148c765b63c6470791f8a79d4349b4",
+    "dirty_paths_sha256": "b06d7d15363e959f2c351d1f0adf4cd1aa448caafdc4b4d2b9fdf50f4c23398b",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "pinned_omp": {
@@ -17,7 +17,7 @@
   "environment": {
     "os": "Microsoft Windows 10.0.26100",
     "architecture": "X64",
-    "pwsh_version": "7.6.4",
+    "pwsh_version": "7.6.5",
     "node_version": "v24.16.0",
     "git_version": "git version 2.54.0.windows.1",
     "installed_omp_version": "omp/17.2.12"
@@ -26,7 +26,7 @@
     {
       "path": "docs/evidence/current-product/topic-06/deterministic.json",
       "role": "evidence",
-      "sha256": "b4b730cf838cd7a761398945c79a59e1721e3d64717236279d3b20d37596eb7f"
+      "sha256": "4144b6b701f3650db4a89f9feff2fa28b0364848432561ab29d19091a262ff58"
     },
     {
       "path": "docs/agent-boundaries.md",
@@ -96,12 +96,12 @@
     {
       "path": "template/.omp/contracts/component-manifest.json",
       "role": "implementation",
-      "sha256": "f818dab27443aaecd2654570e587e6cbf2cef4c9ae4e2a6bcc77d3d10a8c5bfc"
+      "sha256": "4be767e231df73b6b3eb061beb8c8f7be1209b3d049320667b57d9fd53c527aa"
     },
     {
       "path": "template/.omp/extensions/agent-task-boundary.js",
       "role": "implementation",
-      "sha256": "6ff3e6b04f933c89b78c3191f2cdb9f94752fa40dba8d18496c8bbe969c67f5a"
+      "sha256": "138a82ad92eb35e594ba1a3d3d5eba39878c00a4a9734ef3c4d977f0ceac2130"
     },
     {
       "path": "template/.omp/bin/omp-managed.ps1",
@@ -181,7 +181,7 @@
     {
       "path": "scripts/tests/topic06-omp-wrapper.Tests.mjs",
       "role": "test_or_fixture",
-      "sha256": "9155fc0422a6270b840167f057f27b082fab23b1663f2652e421003657b64bf4"
+      "sha256": "a015b4ff63aa8b3e772fbe143c549f1cc9c61db68d23c5b1fa12ae40f2aa1729"
     },
     {
       "path": "scripts/tests/topic06-state-projection.Tests.ps1",
@@ -206,7 +206,7 @@
     {
       "path": "scripts/tests/topic06-validator-mutations.Tests.ps1",
       "role": "test_or_fixture",
-      "sha256": "54693df6f1f841e28da39445b506b7d205efa61c2ca14b02e863280d348bfbd9"
+      "sha256": "a65a945e3470416cafc7a2a70aaede8b154bdf5d135708487b7b91766c2384f3"
     },
     {
       "path": "scripts/tests/fixtures/topic06-boundary-e2e.mjs",

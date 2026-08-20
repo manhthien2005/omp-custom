@@ -1028,11 +1028,11 @@ function ConvertFrom-Topic05BenchmarkEventStream {
     foreach ($event in @($Events)) {
         if ([string]$event.type -ceq 'usage') {
             Assert-Topic05BenchmarkPropertySet -Value $event -Context 'usage event' -Expected @(
-                'type', 'scope', 'input_tokens', 'output_tokens', 'cache_read_tokens',
-                'residual_context_tokens'
+                'type', 'scope', 'input_tokens', 'output_tokens', 'cache_write_tokens',
+                'cache_read_tokens', 'residual_context_tokens'
             )
             if ([string]$event.scope -cnotin @('core', 'scout')) { throw 'usage event scope is invalid' }
-            foreach ($field in @('input_tokens', 'output_tokens', 'cache_read_tokens')) {
+            foreach ($field in @('input_tokens', 'output_tokens', 'cache_write_tokens', 'cache_read_tokens')) {
                 Assert-Topic05BenchmarkMeasuredOrUnknown -Value $event.$field -Context "usage event $field"
                 if ([string]$event.$field -ceq 'not_measured') { throw 'provider usage counts cannot be estimated' }
             }
@@ -1064,7 +1064,9 @@ function ConvertFrom-Topic05BenchmarkEventStream {
         $residual = 0L
         $residualMeasured = $true
         foreach ($event in $usageEvents) {
-            $tokens = [long]$event.input_tokens + [long]$event.output_tokens
+            # Observed basis: input + output + cacheWrite, excluding cacheRead.
+            $tokens = [long]$event.input_tokens + [long]$event.output_tokens +
+                [long]$event.cache_write_tokens
             if ([string]$event.scope -ceq 'core') { $core += $tokens } else { $scout += $tokens }
             $cache += [long]$event.cache_read_tokens
             if ([string]$event.residual_context_tokens -ceq 'not_measured') { $residualMeasured = $false }
@@ -1153,6 +1155,7 @@ function ConvertFrom-Topic05BenchmarkOmpJsonLines {
     $usageInput = 0L
     $usageOutput = 0L
     $usageCache = 0L
+    $usageCacheWrite = 0L
     $usageSeen = $false
     $models = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     $finalText = ''
@@ -1160,12 +1163,25 @@ function ConvertFrom-Topic05BenchmarkOmpJsonLines {
         if ($message.provider -and $message.model) {
             [void]$models.Add("$($message.provider)/$($message.model)")
         }
-        if ($null -ne $message.usage -and $null -ne $message.usage.input -and
-            $null -ne $message.usage.output -and $null -ne $message.usage.cacheRead) {
+        # The observed accounting basis is input + output + cacheWrite, excluding cacheRead
+        # (spec/13-validation-and-evaluation.md section C-2): each cached byte is written once,
+        # while cumulative cache reads recharge the same context every turn. A provider that
+        # omits any of the four counts leaves the ledger not_measured rather than estimated.
+        $usageBreakdown = if ($null -eq $message.usage) { $null } else {
+            $fields = [ordered]@{}
+            foreach ($name in @('input', 'output', 'cacheRead', 'cacheWrite')) {
+                $property = $message.usage.PSObject.Properties[$name]
+                if ($null -eq $property -or $null -eq $property.Value) { $fields = $null; break }
+                $fields[$name] = [long]$property.Value
+            }
+            $fields
+        }
+        if ($null -ne $usageBreakdown) {
             $usageSeen = $true
-            $usageInput += [long]$message.usage.input
-            $usageOutput += [long]$message.usage.output
-            $usageCache += [long]$message.usage.cacheRead
+            $usageInput += $usageBreakdown['input']
+            $usageOutput += $usageBreakdown['output']
+            $usageCache += $usageBreakdown['cacheRead']
+            $usageCacheWrite += $usageBreakdown['cacheWrite']
         }
         $text = Get-Topic05BenchmarkAssistantText $message
         if ($text) { $finalText = $text }
@@ -1184,6 +1200,7 @@ function ConvertFrom-Topic05BenchmarkOmpJsonLines {
             scope = $Scope
             input_tokens = $usageInput
             output_tokens = $usageOutput
+            cache_write_tokens = $usageCacheWrite
             cache_read_tokens = $usageCache
             residual_context_tokens = 'not_measured'
         }

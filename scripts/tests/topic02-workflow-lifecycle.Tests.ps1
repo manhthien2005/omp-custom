@@ -97,6 +97,14 @@ The coordinator rejects any result with resolvedModelIsFallback true.
 resolvedModelIsFallback marks retry fallback only; credential fallback and task.agentModelOverrides require exact returned identity comparison.
 Plan mode is a distinct planning-only contract and cannot satisfy selected mutation or fresh-command work.
 The four LSP registration gates do not authorize acceptance when no applicable language server exists or a required LSP call returns details.success false.
+
+<!-- topic07-authority:kd-031 -->
+## KD-031 — Explicit safe context-full compaction with authoritative continuity kernel
+Managed sessions disable automatic semantic compaction and context promotion; the only supported path is the argument-free `/safe-compact` command.
+Every new Quick, Standard, or Orchestrated task records its exact `workflow_class` and complete initial `locked_decisions` in `create-task`.
+The next normal user prompt receives one fresh canonical kernel exactly once; there is no hidden auto-continue.
+Current promotion status is IMPLEMENTED_NOT_PROMOTED, and OPEN-T07-RUNTIME-02 records the unavailable verified local 17.2.10 executable.
+OmniRoute and model routing remain separate and unchanged. Opus is not a continuity dependency.
 '@
     'spec/key/03-token-quality-model.md' = @'
 The task cycle starts when the task contract is accepted.
@@ -128,6 +136,10 @@ Offload safety follows effective isolation and artifact-retention responsibility
 context7_unavailable is the disclosed named skip when level 4 is unavailable.
 A forced softRequestBudget partial yield is nonterminal and requires recovery or redispatch.
 web_unavailable is disclosed when level 5 is unavailable; a freshness contract remains unresolved and cannot be accepted without authoritative evidence.
+KD-031 selects the managed profile contextPromotion.enabled = false, compaction.enabled = false, compaction.strategy = off, and compaction.autoContinue = false.
+After exact Topic 04 task arming, `/safe-compact` accepts no arguments and authorizes one native soft context-full transaction.
+The next normal prompt receives one fresh Topic 04-derived kernel exactly once; no hidden continuation is scheduled.
+At the managed pressure boundary a bounded subagent aborts as failed/partial and is not automatically retried.
 '@
     'spec/08-isolation-and-concurrency.md' = @'
 Parallel execution and parallel writers are optional.
@@ -313,6 +325,11 @@ Durable lifecycle state remains owned by Topic 04.
 Packets use file references from selected retrieval roles.
 Inspect a selected verification result for compact evidence.
 Retrieval uses bounded escalation; a named permitted skip is valid and disclosed.
+
+## Topic 07 continuity consumer
+Document and require automatic/context-promotion disabled and `compaction.strategy: off` in the managed profile.
+Deliverables cover one-shot kernel injection with no hidden continuation/retry and bounded-child settlement.
+Runtime canaries prove stop-before-provider on both supported versions before promotion.
 '@
     'spec/phases/phase-04-quality-system.md' = @'
 The selected verification mechanism obtains fresh evidence from a non-author.
@@ -484,6 +501,36 @@ The main session selects gates; the task packet carries names; the selected gate
 The selected gate-applier may report a missing gate as a scoped finding but does not expand its own review contract.
 This matrix does not decide whether independent review is selected. Review remains task-contract and risk-gated; Orchestrated classification alone does not mandate a Reviewer or worker dispatch.
 '@
+    'docs/context-continuity.md' = @'
+Use it only from `.omp/bin/omp-managed.ps1`. Bare `omp` remains usable, but it does not provide the guarantee.
+The command accepts no focus text. A focus phrase is rejected because the kernel cannot be rewritten.
+Control returns to the user. No prompt is sent and no continuation, retry, or handoff is scheduled.
+Operational authority remains in the local Topic 04 `agent-tasks` root.
+Quick may continue when authoritative state explicitly reports a permitted missing secondary field.
+OmniRoute, DeepSeek Scout routing, Worker/Reviewer effort, and Opus preference are separate and unchanged.
+Promotion stays IMPLEMENTED_NOT_PROMOTED with OPEN-T07-RUNTIME-02 until the second local canary passes.
+'@
+    'template/.omp/commands/quick.md' = @'
+The `create-task` request must include exact `workflow_class: quick` and the complete initial `locked_decisions` array accepted for this task.
+For a legacy active task missing these fields, call `set-continuity-contract` with the exact current revision/hash/lease compare-and-swap.
+Only after exactly one active task is owned by this persisted session may the user or Tech Lead run argument-free `/safe-compact`.
+It leaves the next normal prompt to receive one fresh kernel without hidden continuation or retry.
+If one attempt leaves pressure unresolved, checkpoint and use explicit Topic 04 `begin-handoff`/`accept-handoff` recovery.
+'@
+    'template/.omp/commands/standard.md' = @'
+The `create-task` request must include exact `workflow_class: standard` and the complete initial `locked_decisions` array accepted for this task.
+For a legacy active task missing these fields, call `set-continuity-contract` with the exact current revision/hash/lease compare-and-swap.
+Only after exactly one active task is owned by this persisted session may the user or Tech Lead run argument-free `/safe-compact`.
+It leaves the next normal prompt to receive one fresh kernel without hidden continuation or retry.
+If one attempt leaves pressure unresolved, checkpoint and use explicit Topic 04 `begin-handoff`/`accept-handoff` recovery.
+'@
+    'template/.omp/commands/orchestrated.md' = @'
+The `create-task` request must include exact `workflow_class: orchestrated` and the complete initial `locked_decisions` array accepted for this task.
+For a legacy active task missing these fields, call `set-continuity-contract` with the exact current revision/hash/lease compare-and-swap.
+Only after exactly one active task is owned by this persisted session may the user or Tech Lead run argument-free `/safe-compact`.
+It leaves the next normal prompt to receive one fresh kernel without hidden continuation or retry.
+If one attempt leaves pressure unresolved, checkpoint and use explicit Topic 04 `begin-handoff`/`accept-handoff` recovery.
+'@
 }
 
 try {
@@ -492,7 +539,6 @@ try {
         Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath $entry.Key -Content $entry.Value
     }
 
-    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'template/.omp/commands/quick.md' -Content 'restart as Standard'
     Assert-NoTopic02Failures -Results @(Test-Topic02WorkflowLifecycleContract -RepositoryRoot $fixtureRoot) -Scenario 'compliant-spec-phase-fixture'
 
     $wrapped = $goodFixture['spec/04-workflow-sizing.md'].Replace("This is the user's explicit Quick choice", "This is the user's" + [Environment]::NewLine + 'explicit Quick choice')
@@ -1053,6 +1099,42 @@ try {
     Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/phases/phase-06-evaluation.md' -Content $missingAliasHardFailure
     Assert-Topic02FailureCode -Results @(Test-Topic02PhaseContract -RepositoryRoot $fixtureRoot) -Code 'T02-PHASE06-REQ-19' -Scenario 'missing-phase06-alias-hard-failure'
     Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/phases/phase-06-evaluation.md' -Content $goodFixture['spec/phases/phase-06-evaluation.md']
+
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/key/04-decision-log.md' -Content ($goodFixture['spec/key/04-decision-log.md'] + [Environment]::NewLine + '<!-- topic07-authority:kd-031 -->')
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-MARKER' -Scenario 'duplicate-kd-031-authority-marker'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/key/04-decision-log.md' -Content $goodFixture['spec/key/04-decision-log.md']
+
+    $promotedDecisionLog = $goodFixture['spec/key/04-decision-log.md'].Replace('IMPLEMENTED_NOT_PROMOTED', 'PROMOTED')
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/key/04-decision-log.md' -Content $promotedDecisionLog
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-DECISION-REQ-5' -Scenario 'decision-log-claims-promotion'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/key/04-decision-log.md' -Content $goodFixture['spec/key/04-decision-log.md']
+
+    $mismatchedWorkflowClass = $goodFixture['template/.omp/commands/standard.md'].Replace('workflow_class: standard', 'workflow_class: quick')
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'template/.omp/commands/standard.md' -Content $mismatchedWorkflowClass
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-STANDARD-REQ-1' -Scenario 'standard-command-declares-wrong-workflow-class'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'template/.omp/commands/standard.md' -Content $goodFixture['template/.omp/commands/standard.md']
+
+    $hiddenContinuation = $goodFixture['template/.omp/commands/orchestrated.md'].Replace('without hidden continuation or retry', 'and the runtime resumes the interrupted turn automatically')
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'template/.omp/commands/orchestrated.md' -Content $hiddenContinuation
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-ORCHESTRATED-REQ-6' -Scenario 'orchestrated-command-drops-no-hidden-continuation'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'template/.omp/commands/orchestrated.md' -Content $goodFixture['template/.omp/commands/orchestrated.md']
+
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/05-context-and-token-model.md' -Content ($goodFixture['spec/05-context-and-token-model.md'] + [Environment]::NewLine + 'Rescue mode sets compaction.strategy = shake.')
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-CONTEXT-BAN-2' -Scenario 'context-model-restores-rescue-shake'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/05-context-and-token-model.md' -Content $goodFixture['spec/05-context-and-token-model.md']
+
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/phases/phase-03-context-efficiency.md' -Content ($goodFixture['spec/phases/phase-03-context-efficiency.md'] + [Environment]::NewLine + 'Set `compaction.strategy: shake` for rescue.')
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-PHASE03-BAN-1' -Scenario 'phase03-restores-rescue-shake'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/phases/phase-03-context-efficiency.md' -Content $goodFixture['spec/phases/phase-03-context-efficiency.md']
+
+    $droppedCanaryGate = $goodFixture['spec/phases/phase-03-context-efficiency.md'].Replace('Runtime canaries prove stop-before-provider on both supported versions before promotion.', '')
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/phases/phase-03-context-efficiency.md' -Content $droppedCanaryGate
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-PHASE03-REQ-4' -Scenario 'phase03-drops-two-version-canary-gate'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'spec/phases/phase-03-context-efficiency.md' -Content $goodFixture['spec/phases/phase-03-context-efficiency.md']
+
+    Remove-Item -LiteralPath (Join-Path $fixtureRoot 'docs/context-continuity.md') -Force
+    Assert-Topic02FailureCode -Results @(Test-Topic02ContinuityProjectionContract -RepositoryRoot $fixtureRoot) -Code 'T02-T07-OPERATOR-MISSING' -Scenario 'required-operator-continuity-doc'
+    Set-Topic02FixtureFile -FixtureRoot $fixtureRoot -RelativePath 'docs/context-continuity.md' -Content $goodFixture['docs/context-continuity.md']
 
     Remove-Item -LiteralPath (Join-Path $fixtureRoot 'spec/phases/phase-06-evaluation.md') -Force
     Assert-Topic02FailureCode -Results @(Test-Topic02PhaseContract -RepositoryRoot $fixtureRoot) -Code 'T02-PHASE06-MISSING' -Scenario 'required-phase-file'

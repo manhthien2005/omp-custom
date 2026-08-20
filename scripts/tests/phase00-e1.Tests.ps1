@@ -4,7 +4,16 @@ $ErrorActionPreference = 'Stop'
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $helperPath = Join-Path $repositoryRoot 'scripts\lib\phase00-e1-evidence.ps1'
+# Production always reaches Test-Phase00E1ArtifactContract through the main Phase 00 helper, which
+# dot-sources this helper and also owns Test-Phase00T003LaterProductSupersessionContract. Hosting
+# only the E1 helper hides that function, so the validator's current-product supersession branch
+# can never fire and the four retired Workflow v0 agent pins look like unexplained drift. Load the
+# main helper first; re-loading the E1 helper afterwards restores this suite's StrictMode 2.0.
+$mainHelperPath = Join-Path $repositoryRoot 'scripts\lib\phase00-evidence.ps1'
 
+if (Test-Path -LiteralPath $mainHelperPath -PathType Leaf) {
+    . $mainHelperPath
+}
 if (Test-Path -LiteralPath $helperPath -PathType Leaf) {
     . $helperPath
 }
@@ -2560,12 +2569,28 @@ process.stdout.write(JSON.stringify(Object.fromEntries(names.map(name => [name, 
 }
 
 Describe 'Phase 00 E1 runner protected-boundary snapshots' {
-    It 'matches the nine product pins and exposes both content and metadata deltas' {
+    It 'reports the nine product pins with only superseded drift and exposes content and metadata deltas' {
         $protected = Get-Phase00E1ProtectedSnapshot -RepositoryRoot $repositoryRoot `
             -ExpectedHashes (Get-Phase00E1ProtectedHashes)
         $protected.FileCount | Should Be 9
-        $protected.MatchedCount | Should Be 9
-        $protected.AllExpected | Should Be $true
+        # Topic 03 retired the five Workflow v0 agents and reshaped the verification schema, so six
+        # of the nine historical pins can no longer match live bytes. Asserting nine matches would
+        # demand that Phase 00 evidence be rewritten to absorb a later product decision. The honest
+        # assertion is that the drift set is exactly the superseded surface and that
+        # P00-E1-PROTECTED-SURFACE still passes, through the current-product supersession branch.
+        $protected.MatchedCount | Should Be 3
+        $protected.AllExpected | Should Be $false
+        @($protected.Entries | Where-Object { -not $_.Matched } |
+            ForEach-Object { $_.Path } | Sort-Object) -join ',' | Should Be (
+                'template/.omp/agents/explorer.md,template/.omp/agents/implementer.md,' +
+                'template/.omp/agents/reviewer.md,template/.omp/agents/tech-lead.md,' +
+                'template/.omp/agents/verifier.md,' +
+                'template/.omp/schemas/verification-result.schema.yml')
+        # Defined below this Describe, so resolve the row inline rather than depending on
+        # declaration order inside the hosted script.
+        @(Test-Phase00E1ArtifactContract -RepositoryRoot $repositoryRoot |
+            Where-Object { $_.Code -ceq 'P00-E1-PROTECTED-SURFACE' } |
+            ForEach-Object { $_.Status }) -join ',' | Should Be 'PASS'
 
         $testRoot = New-Phase00E1TestDirectory
         try {
@@ -4101,9 +4126,26 @@ function New-Phase00E1ArtifactContractFixture {
     }
     $relativeFiles += @(Get-Phase00E1ProtectedHashes).Keys
 
-    foreach ($relativePath in $relativeFiles) {
+    # Topic 03 superseded four of the nine historical E1 agent pins, so those paths no longer exist.
+    # P00-E1-PROTECTED-SURFACE resolves that drift through the current-product supersession branch,
+    # which reads the Topic 03 manifest, the immutable T-00.3 conclusion it binds, and every
+    # current_files row. Without them the fixture reports drift it has no evidence to explain.
+    $supersessionManifest = 'docs/evidence/current-product/topic-03/manifest.yml'
+    $relativeFiles += @($supersessionManifest, 'docs/evidence/phase-00/T-00.3/conclusion.yml')
+    $manifestSource = Join-Path $repositoryRoot `
+        $supersessionManifest.Replace('/',[IO.Path]::DirectorySeparatorChar)
+    if (Test-Path -LiteralPath $manifestSource -PathType Leaf) {
+        $manifest = Get-Content -Raw -LiteralPath $manifestSource -Encoding UTF8 | ConvertFrom-Json
+        $relativeFiles += @($manifest.current_files | ForEach-Object { [string]$_.path })
+    }
+
+    foreach ($relativePath in @($relativeFiles | Sort-Object -Unique)) {
         $source = Join-Path $repositoryRoot `
             ([string]$relativePath).Replace('/',[IO.Path]::DirectorySeparatorChar)
+        # A pinned protected path that no longer exists is retired historical evidence, never a
+        # fixture defect. Copying only what the repository still carries keeps the fixture an
+        # honest mirror of the live surface the validator is asked to judge.
+        if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { continue }
         $destination = Join-Path $fixtureRoot `
             ([string]$relativePath).Replace('/',[IO.Path]::DirectorySeparatorChar)
         [IO.Directory]::CreateDirectory((Split-Path -Parent $destination)) | Out-Null

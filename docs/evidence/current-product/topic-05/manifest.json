@@ -67,7 +67,7 @@
     {
       "path": "scripts/lib/topic05-benchmark.ps1",
       "role": "implementation",
-      "sha256": "f9084639163b5a23e3605f6074f8541531eaa32abd2d90516432201671101256"
+      "sha256": "e74131569ec4c01b8b1c84429b29fa326ef9376992cf7c3a188a83e8f1f71562"
     },
     {
       "path": "scripts/lib/topic05-codegraph.ps1",
@@ -102,7 +102,7 @@
     {
       "path": "scripts/tests/topic05-benchmark.Tests.ps1",
       "role": "test_or_fixture",
-      "sha256": "ea46d23cd18902058ee523967c835339446778750d93aaa32eb491e64b809f09"
+      "sha256": "8a096e64567a269529454b12dcd21bdbf2261711d7e6f6ad386e6947f16878cf"
     },
     {
       "path": "scripts/tests/topic05-installer.Tests.ps1",
@@ -177,7 +177,7 @@
     {
       "path": "template/.omp/codegraph/component-manifest.json",
       "role": "implementation",
-      "sha256": "c7ebb138a9008f73277ee2968e0d6489ff394fc08710072ee1a0e237ad31f5a1"
+      "sha256": "da8a4dd0184e928123177728096e8adee6367ee1ff8d7f081440e28846021d58"
     },
     {
       "path": "template/.omp/codegraph/safe-init.mjs",

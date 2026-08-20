@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "record_type": "topic07_current_product_manifest",
-  "generated_at_utc": "2026-08-19T11:49:13.0699447Z",
+  "generated_at_utc": "2026-08-20T00:38:48.2067964Z",
   "repository": {
-    "head": "9d9131841e9687d2346bc315a5e5f9b43299c33c",
+    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
     "working_tree_clean": false,
-    "dirty_paths_sha256": "8e451ca682ea9af90b31ac0f5666aabb035eb8f7da2c5561474b49ec00c198e3",
+    "dirty_paths_sha256": "d58eab9281f83492b0dddc289e3192b4d3be2d3a36c6cfcdfbaf478db0a3c5ba",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "pinned_omp": {
@@ -16,7 +16,7 @@
     {
       "path": "CHANGELOG.md",
       "role": "authority_or_guide",
-      "sha256": "609ff8e683f6a6598a3f41b33605b9f598b4a33b00e682450896cc3a07fa127b"
+      "sha256": "4d3ee04bb6b171dbafbdc7cd0897a9887e9f8e3cda17faadb6cb80e2c6dfd819"
     },
     {
       "path": "docs/agent-boundaries.md",
@@ -41,7 +41,7 @@
     {
       "path": "docs/evidence/current-product/topic-07/deterministic.json",
       "role": "evidence",
-      "sha256": "640197e5d793a94b3f29cd557f693f192ede1a0ddc390a4cd9204eadd304c337"
+      "sha256": "f01fe4dacecf8094348a154b3a548b9c1ccf45e800d720dddfbb31363ff16f28"
     },
     {
       "path": "docs/final-report.md",
@@ -116,7 +116,7 @@
     {
       "path": "scripts/lib/topic07-context-continuity.ps1",
       "role": "implementation",
-      "sha256": "57bd1438eb02b56fccdacb9d4a3a234db184681430902ec787cff560e0a5b820"
+      "sha256": "e123c4923d0e52562aa2dc882c66595e65685f87a1b2e6c0b97de519b596f527"
     },
     {
       "path": "scripts/tests/fixtures/topic07-provider-sentinel.mjs",
@@ -306,7 +306,7 @@
     {
       "path": "template/.omp/contracts/component-manifest.json",
       "role": "implementation",
-      "sha256": "f818dab27443aaecd2654570e587e6cbf2cef4c9ae4e2a6bcc77d3d10a8c5bfc"
+      "sha256": "4be767e231df73b6b3eb061beb8c8f7be1209b3d049320667b57d9fd53c527aa"
     },
     {
       "path": "template/.omp/contracts/context-continuity-core.mjs",
@@ -331,7 +331,7 @@
     {
       "path": "template/.omp/extensions/agent-task-boundary.js",
       "role": "implementation",
-      "sha256": "6ff3e6b04f933c89b78c3191f2cdb9f94752fa40dba8d18496c8bbe969c67f5a"
+      "sha256": "138a82ad92eb35e594ba1a3d3d5eba39878c00a4a9734ef3c4d977f0ceac2130"
     },
     {
       "path": "template/.omp/extensions/context-continuity.js",
@@ -397,8 +397,8 @@
     },
     {
       "id": "managed_runtime_profile",
-      "exit_code": 1,
-      "status": "FAIL"
+      "exit_code": 0,
+      "status": "PASS"
     },
     {
       "id": "local_pressure_canary",

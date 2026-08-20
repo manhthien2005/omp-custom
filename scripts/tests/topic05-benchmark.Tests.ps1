@@ -238,11 +238,11 @@ try {
     $events = @(
         [pscustomobject]@{
             type = 'usage'; scope = 'core'; input_tokens = 10; output_tokens = 5;
-            cache_read_tokens = 2; residual_context_tokens = 7
+            cache_write_tokens = 6; cache_read_tokens = 2; residual_context_tokens = 7
         },
         [pscustomobject]@{
             type = 'usage'; scope = 'scout'; input_tokens = 20; output_tokens = 4;
-            cache_read_tokens = 3; residual_context_tokens = 'not_measured'
+            cache_write_tokens = 1; cache_read_tokens = 3; residual_context_tokens = 'not_measured'
         },
         [pscustomobject]@{
             type = 'terminal'; status = 'completed'; reason = $null;
@@ -250,11 +250,25 @@ try {
         }
     )
     $parsed = ConvertFrom-Topic05BenchmarkEventStream -Events $events
+    # Observed basis is input + output + cacheWrite, excluding cacheRead: core 10+5+6, scout 20+4+1.
     Assert-Topic05BenchmarkTest ($parsed.status -ceq 'COMPLETED' -and
-        $parsed.usage.core_workflow_tokens -eq 15 -and $parsed.usage.cheap_scout_tokens -eq 24 -and
-        $parsed.usage.raw_total_tokens -eq 39 -and $parsed.usage.cache_read_tokens -eq 5 -and
+        $parsed.usage.core_workflow_tokens -eq 21 -and $parsed.usage.cheap_scout_tokens -eq 25 -and
+        $parsed.usage.raw_total_tokens -eq 46 -and $parsed.usage.cache_read_tokens -eq 5 -and
         $parsed.usage.residual_context_tokens -ceq 'not_measured') `
         'Provider usage event aggregation is incorrect.'
+    Assert-Topic05BenchmarkThrows -Pattern '*usage event*' `
+        -Message 'A usage event without cache_write_tokens was accepted.' -Body {
+        ConvertFrom-Topic05BenchmarkEventStream -Events @(
+            [pscustomobject]@{
+                type = 'usage'; scope = 'core'; input_tokens = 10; output_tokens = 5;
+                cache_read_tokens = 2; residual_context_tokens = 7
+            },
+            [pscustomobject]@{
+                type = 'terminal'; status = 'completed'; reason = $null;
+                resolved_model = 'omniroute/codex-gpt-5.6-sol:xhigh'; is_fallback = $false
+            }
+        ) | Out-Null
+    }
     $missingUsage = ConvertFrom-Topic05BenchmarkEventStream -Events @(
         [pscustomobject]@{
             type = 'terminal'; status = 'unavailable'; reason = 'provider_unavailable';
@@ -309,7 +323,7 @@ try {
             type = 'message_end'; message = [pscustomobject]@{
                 role = 'assistant'; provider = 'omniroute'; model = 'codex/gpt-5.6-sol';
                 content = @([pscustomobject]@{ type = 'text'; text = '{"facts":[],"completed":false,"absence_claims":[]}' });
-                usage = [pscustomobject]@{ input = 12; output = 4; cacheRead = 2 }
+                usage = [pscustomobject]@{ input = 12; output = 4; cacheRead = 2; cacheWrite = 5 }
             }
         } | ConvertTo-Json -Depth 12 -Compress)
     ) -join "`n"
@@ -321,8 +335,24 @@ try {
         (@($ompProjection.codegraph_fallback_reasons) -join '|') -ceq 'graph_gap' -and
         $ompProjection.lead_reread.source_ranges -eq 1 -and
         $ompProjection.lead_reread.source_bytes -gt 0 -and
-        $ompProjection.usage.core_workflow_tokens -eq 16) `
+        $ompProjection.usage.core_workflow_tokens -eq 21) `
         'OMP JSONL projection lost tool, graph-fallback, reread, or usage evidence.'
+
+    # A provider that omits cacheWrite cannot support the observed basis, so the ledger
+    # must stay not_measured instead of silently under-counting.
+    $ompNoCacheWrite = ([pscustomobject]@{
+        type = 'message_end'; message = [pscustomobject]@{
+            role = 'assistant'; provider = 'omniroute'; model = 'codex/gpt-5.6-sol';
+            content = @([pscustomobject]@{ type = 'text'; text = '{"facts":[],"completed":false,"absence_claims":[]}' });
+            usage = [pscustomobject]@{ input = 12; output = 4; cacheRead = 2 }
+        }
+    } | ConvertTo-Json -Depth 12 -Compress)
+    $ompPartial = ConvertFrom-Topic05BenchmarkOmpJsonLines -Stdout $ompNoCacheWrite `
+        -RequestedModel 'omniroute/codex/gpt-5.6-sol' -Scope core
+    Assert-Topic05BenchmarkTest ([string]$ompPartial.usage.core_workflow_tokens -ceq 'not_measured' -and
+        [string]$ompPartial.usage.raw_total_tokens -ceq 'not_measured' -and
+        $ompPartial.usage.provider_reported -eq $false) `
+        'A usage breakdown without cacheWrite was counted instead of not_measured.'
 
     $nativeRoot = Join-Path $planRoot 'native-boundary'
     [void](New-Topic05BenchmarkMaterializedFixture -Fixture $registry.fixtures[0] `

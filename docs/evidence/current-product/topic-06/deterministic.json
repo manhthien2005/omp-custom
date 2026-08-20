@@ -2,20 +2,20 @@
   "schema_version": 1,
   "record_type": "topic06_agent_boundary_evidence",
   "status": "PASS",
-  "captured_at_utc": "2026-08-14T07:36:32.4427739Z",
+  "captured_at_utc": "2026-08-19T15:18:46.5304300Z",
   "provider_calls": 0,
   "model_processes_started": 0,
   "repository": {
-    "head": "509cc43b5cbe74ba0edd25a3ab09c696c5a7e247",
-    "topic06_present_in_head": false,
+    "head": "f089faa37c2f40e3e775a3cd1232db80d2e6f52a",
+    "topic06_present_in_head": true,
     "working_tree_clean": false,
-    "dirty_paths_sha256": "01918751b13bccf324f80fe10f189a0ee2148c765b63c6470791f8a79d4349b4",
+    "dirty_paths_sha256": "b06d7d15363e959f2c351d1f0adf4cd1aa448caafdc4b4d2b9fdf50f4c23398b",
     "dirty_paths_algorithm": "sha256(sorted_git_porcelain_v1_lines_utf8_lf)"
   },
   "environment": {
     "os": "Microsoft Windows 10.0.26100",
     "architecture": "X64",
-    "pwsh_version": "7.6.4",
+    "pwsh_version": "7.6.5",
     "node_version": "v24.16.0",
     "git_version": "git version 2.54.0.windows.1",
     "installed_omp_version": "omp/17.2.12"
@@ -30,7 +30,7 @@
       "status": "PASS",
       "exit_code": 0,
       "scope": "Closed portable core, role contracts, receipts, and native wrapper seams.",
-      "stdout_sha256": "349f9aa525a840ed52257d9ec6c2b63df46ea18187c44f34bed80be80a041895",
+      "stdout_sha256": "ebd14899fa0f93f4fddf5db9587b39b64572a074c9d7166e52f3b5a7b2a10122",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "provider_calls": 0,
       "model_processes_started": 0

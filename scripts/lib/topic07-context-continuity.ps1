@@ -637,7 +637,9 @@ function Test-Topic07ContextContinuityContract {
             [int]$evidence.provider_calls -eq 0 -and [int]$evidence.model_processes_started -eq 0 -and
             [string]$evidence.runtime_matrix.status -ceq 'IMPLEMENTED_NOT_PROMOTED' -and
             [string]$evidence.runtime_matrix.code -ceq 'OPEN-T07-RUNTIME-02' -and
-            [int]$evidence.source_attachment_count -eq 15
+            [int]$evidence.source_attachment_count -eq 15 -and
+            @($evidence.cases.PSObject.Properties).Count -ge 8 -and
+            @($evidence.cases.PSObject.Properties.Value | Where-Object status -ne PASS).Count -eq 0
         if ($evidenceValid) {
             $serializedEvidence = $evidence | ConvertTo-Json -Depth 64 -Compress
             $evidenceValid = $serializedEvidence -notmatch '(?i)transcript|raw_nonce|api[_-]?key|credential|terminal_history|[A-Z]:\\'

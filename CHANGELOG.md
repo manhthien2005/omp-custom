@@ -82,6 +82,38 @@
   is specification and phase planning only; the Phase 06 benchmark implementation remains
   deferred.
 
+### Fixed
+- Managed `task` dispatch is accepted by strict-function validation again. The tool's root parameter
+  schema was a `Type.Union`, which serializes to a bare `{ anyOf: [...] }` with no root `type`;
+  OpenAI-responses strict validation rejects that outright and strict adaptation never repairs it
+  because `anyOf` already satisfies the combinator escape. The root is now one closed object with
+  every property optional, so both documented dispatch shapes stay satisfiable and
+  `core.validateManagedRequest` remains the sole shape authority with exact reason codes.
+- The Topic 05 token ledger no longer double-counts cached context. The accounting basis is
+  `input + output + cacheWrite`, excluding `cacheRead`: each cached byte is written once, while
+  cumulative cache reads recharge the same context every turn. A provider omitting any of the four
+  counts leaves the ledger `not_measured` rather than estimated.
+- `T07-EVIDENCE` now asserts the per-case verdicts (at least eight cases, none with a status other
+  than `PASS`) instead of only the status, blocker, and counter fields, so a partially-failing
+  capture can no longer satisfy it.
+- The installed CodeGraph component manifest re-pins the `.omp/state/manifest.json` digest that
+  install-time verification compares against.
+- Five test defects that no validator surfaced — the Pester-hosted suites exit `0` even when
+  individual assertions fail, and a mutation that stops mutating still reports success: an
+  incomplete `phase00-t003` fixture whose one missing `current_files`
+  path cascaded into eleven destination-row failures; a `phase00-wave-a` integration test asserting
+  exit `0` from a shell where the deliberate pwsh-7.4 version gates must fail closed, and whose
+  inherited `PSModulePath` shadowed `Get-FileHash` out of Windows PowerShell 5.1; a `phase00-e1`
+  suite that hosted only its own helper, hiding the supersession validator that explains the six
+  Topic 03-superseded protected pins; a version-coupled `topic06` mutation that silently stopped
+  mutating after any `component_version` bump; and a `topic02` Quick-command fixture that
+  contradicted the Topic 07 continuity contract.
+- OMP 17.2.10 and 17.2.12 were re-compared across all thirteen watched source paths and the complete
+  settings key set. Eight paths are byte-identical, every pinned default matches, and the only
+  key-set delta is three unused `exa.*` removals, so the two-version support claim stands and the
+  pin is unchanged. Details in
+  `docs/audit/claude-preflight-2026-08-14/reports/claude-defect-repair-and-runtime-parity-report.md`.
+
 ### Research sources (17 repositories)
 See `registry/upstreams.yml` for full provenance.
 

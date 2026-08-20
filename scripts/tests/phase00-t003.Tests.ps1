@@ -137,6 +137,7 @@ $script:t003FixturePaths = @(
     'template/.omp/agents/worker.md',
     'template/.omp/agents/reviewer.md',
     'template/.omp/config.yml',
+    'template/.omp/schemas/verification-result.schema.yml',
     'scripts/install-template.ps1',
     'scripts/validate-template.ps1',
     'scripts/lib/topic03-topology-routing.ps1',

@@ -383,10 +383,28 @@ function buildParameters(pi) {
   }, { additionalProperties: false });
   const reviewer = Type.Object(common("reviewer", "reviewer"), { additionalProperties: false });
   const item = Type.Union([cheapScout, worker, reviewer]);
-  const batch = Type.Object({
-    tasks: Type.Array(item, { minItems: 1, maxItems: LIMITS.maxBatchItems }),
-  }, { additionalProperties: false });
-  return Type.Union([cheapScout, worker, reviewer, batch]);
+  // The root must declare `type: "object"`. A root `Type.Union` serializes to a
+  // bare `{ anyOf: [...] }`, and OpenAI-responses strict-function validation
+  // rejects a function schema whose root has no `type` ("schema must be a JSON
+  // Schema of 'type: \"object\"', got 'type: null'"). Provider-side strict
+  // adaptation does not repair it either: `anyOf` satisfies the combinator
+  // escape in `enforceStrictSchemaBody`, so no root `type` is ever added. The
+  // two documented dispatch shapes (docs/agent-boundaries.md section 3) stay
+  // satisfiable as one closed root object; `core.validateManagedRequest`
+  // remains the sole authority on which key combination is legal and still
+  // fails closed with an exact reason code.
+  return Type.Object({
+    task_id: Type.Optional(Type.String({ pattern: "^T[0-9]{6}$" })),
+    work_unit_id: Type.Optional(Type.String({ pattern: "^WU-[A-Z0-9][A-Z0-9._-]{0,79}$" })),
+    agent: Type.Optional(Type.Union([Type.Literal("cheap-scout"), Type.Literal("worker"), Type.Literal("reviewer")])),
+    role: Type.Optional(Type.Union([Type.Literal("cheap_scout"), Type.Literal("worker"), Type.Literal("reviewer")])),
+    effort: Type.Optional(Type.Union([Type.Literal("high"), Type.Literal("xhigh")])),
+    isolated: Type.Optional(Type.Boolean()),
+    tasks: Type.Optional(Type.Array(item, { minItems: 1, maxItems: LIMITS.maxBatchItems })),
+  }, {
+    additionalProperties: false,
+    description: "Exactly one dispatch shape: a single work unit (task_id, work_unit_id, agent, role, plus Worker-only effort/isolated) or a batch (tasks only).",
+  });
 }
 
 function buildAgentTasksParameters(pi) {

@@ -68,7 +68,7 @@ try {
         param($t) $t.Replace('<!-- topic06-authority:kd-030 -->', '<!-- topic06-authority:missing -->')
     }
     Assert-Topic06MutationCaught 'manifest' 'T06-COMPONENT-MANIFEST' 'template/.omp/contracts/component-manifest.json' {
-        param($t) $t.Replace('"component_version": "1.0.0"', '"component_version": "2.0.0"')
+        param($t) [regex]::Replace($t, '"component_version": "\d+\.\d+\.\d+"', '"component_version": "0.0.0"')
     }
     Assert-Topic06MutationCaught 'portable-core' 'T06-BOUNDARY-CORE' 'template/.omp/contracts/agent-boundary-core.mjs' {
         param($t) $t.Replace('record_type: "agent_boundary_receipt"', 'record_type: "raw_agent_result"')
